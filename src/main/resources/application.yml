@@ -1,0 +1,25 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+spring:
+  application:
+    name: astro-engine
+  jackson:
+    encoding: UTF-8
+    serialization:
+      write_dates_as_timestamps: false
+
+
+  # Force Spring MVC to read and write all Web messages using UTF-8
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+
+  # Backup rule enforcing system message settings
+  messages:
+    encoding: UTF-8

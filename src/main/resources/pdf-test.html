@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Astrology PDF Test Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f5f6; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+        button { background: #007bff; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        select { padding: 10px; font-size: 14px; margin-right: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Astrology PDF Engine Tester</h2>
+    <p>Select target script layout language and execute engine compilation pipeline:</p>
+    <select id="langSelect">
+        <option value="ta">Tamil (South Indian Grid)</option>
+        <option value="hi">Hindi (North Indian Diamond)</option>
+        <option value="te">Telugu (South Indian Grid)</option>
+        <option value="ml">Malayalam (South Indian Grid)</option>
+        <option value="en">English (Standard Base)</option>
+    </select>
+    <button onclick="triggerPdfDownload()">Download PDF Report</button>
+</div>
+
+<script>
+    function triggerPdfDownload() {
+        const selectedLang = document.getElementById('langSelect').value;
+
+        fetch('http://localhost:8080/api/v1/astrology/download-pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept-Language': selectedLang
+            },
+            body: JSON.stringify({
+                name: "Adithiyan",
+                year: 1995,
+                month: 7,
+                day: 19,
+                hour: 12,
+                minute: 56,
+                second: 31,
+                latitude: 13.0827,
+                longitude: 80.2707
+            })
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Network context transmission failure');
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Adithiyan_Premium_Kundali.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(err => alert("Error compiling PDF matrix: " + err.message));
+    }
+</script>
+
+</body>
+</html>
