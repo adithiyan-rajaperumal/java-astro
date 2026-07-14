@@ -33,7 +33,7 @@ public class VargaEngineService {
             case 10 -> { // D10 Dhasamsam (Dasamsa)
                 int part = (int) (degreeInSign / 3.0);
                 yield (baseSign % 2 != 0) ? ((baseSign - 1 + part) % 12) + 1
-                        : ((baseSign + 8 + part) % 12) + 1;
+                        : ((baseSign + 7 + part) % 12) + 1;
             }
 
             case 12 -> { // D12 Thvathamsam (Dwadasamsa)
@@ -55,17 +55,27 @@ public class VargaEngineService {
 
             case 30 -> { // D30 Tridhamsam (Trimsamsa)
                 if (baseSign % 2 != 0) { // Odd Sign ownership ranges
-                    if (degreeInSign < 5.0) yield 1;       // Mars (Aries)
-                    else if (degreeInSign < 10.0) yield 11; // Saturn (Aquarius)
-                    else if (degreeInSign < 18.0) yield 9;  // Jupiter (Sagittarius)
-                    else if (degreeInSign < 25.0) yield 3;  // Mercury (Gemini)
-                    else yield 7;                           // Venus (Libra)
+                    if (degreeInSign < 5.0)
+                        yield 1; // Mars (Aries)
+                    else if (degreeInSign < 10.0)
+                        yield 11; // Saturn (Aquarius)
+                    else if (degreeInSign < 18.0)
+                        yield 9; // Jupiter (Sagittarius)
+                    else if (degreeInSign < 25.0)
+                        yield 3; // Mercury (Gemini)
+                    else
+                        yield 7; // Venus (Libra)
                 } else { // Even Sign ownership ranges
-                    if (degreeInSign < 5.0) yield 2;       // Venus (Taurus)
-                    else if (degreeInSign < 12.0) yield 6;  // Mercury (Virgo)
-                    else if (degreeInSign < 20.0) yield 12; // Jupiter (Pisces)
-                    else if (degreeInSign < 25.0) yield 10; // Saturn (Capricorn)
-                    else yield 8;                           // Mars (Scorpio)
+                    if (degreeInSign < 5.0)
+                        yield 2; // Venus (Taurus)
+                    else if (degreeInSign < 12.0)
+                        yield 6; // Mercury (Virgo)
+                    else if (degreeInSign < 20.0)
+                        yield 12; // Jupiter (Pisces)
+                    else if (degreeInSign < 25.0)
+                        yield 10; // Saturn (Capricorn)
+                    else
+                        yield 8; // Mars (Scorpio)
                 }
             }
 
@@ -79,8 +89,10 @@ public class VargaEngineService {
     }
 
     /**
-     * Determines the precise dynamic house placement for Bhava Chalit chart rendering.
-     * Computes the distance from the closest house cusps calculated by the Ephemeris engine.
+     * Determines the precise dynamic house placement for Bhava Chalit chart
+     * rendering.
+     * Computes the distance from the closest house cusps calculated by the
+     * Ephemeris engine.
      */
     public int calculateBhavaHouse(double planetLong, double[] cusps) {
         for (int i = 1; i <= 12; i++) {
@@ -88,9 +100,11 @@ public class VargaEngineService {
             double end = cusps[i == 12 ? 1 : i + 1];
 
             if (start < end) {
-                if (planetLong >= start && planetLong < end) return i;
+                if (planetLong >= start && planetLong < end)
+                    return i;
             } else { // Handles the 360-degree boundary overlap point
-                if (planetLong >= start || planetLong < end) return i;
+                if (planetLong >= start || planetLong < end)
+                    return i;
             }
         }
         return (int) (planetLong / 30.0) + 1; // Fallback to standard sign placement

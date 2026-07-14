@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -50,9 +51,11 @@ public class DrikPanchangamEngine implements PanchangamEngine {
         // Dynamic context timezone parsing
         String resolvedZoneId = timezoneService.getTimezoneFromCoordinates(dto.latitude(), dto.longitude());
         ZoneId zoneId = ZoneId.of(resolvedZoneId);
-        ZoneOffset offset = zoneId.getRules().getOffset(localTime);
 
-        LocalDateTime utcTime = localTime.atOffset(offset).withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        // Convert local birth time to UTC using ZonedDateTime for robust DST handling
+        ZonedDateTime zonedBirthTime = ZonedDateTime.of(localTime, zoneId);
+        LocalDateTime utcTime = zonedBirthTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+
         double longitudeOffsetMinutes = dto.longitude() * 4.0;
         LocalDateTime localMeanTime = utcTime.plusSeconds((long) (longitudeOffsetMinutes * 60));
 

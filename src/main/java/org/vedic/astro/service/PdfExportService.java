@@ -1,305 +1,172 @@
 package org.vedic.astro.service;
 
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.*;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import org.vedic.astro.dto.ChartResponseDTO;
 import org.vedic.astro.dto.ComprehensiveReportDTO;
 
+import javax.imageio.ImageIO;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class PdfExportService {
 
     private final TranslationService ts;
-    public PdfExportService(TranslationService ts) { this.ts = ts; }
+    private final TemplateEngine templateEngine;
+
+    public PdfExportService(TranslationService ts, TemplateEngine templateEngine) {
+        this.ts = ts;
+        this.templateEngine = templateEngine;
+    }
 
     public byte[] generateAstrologyReport(ComprehensiveReportDTO data) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Document document = new Document(PageSize.A4, 36, 36, 36, 36);
         try {
-            PdfWriter writer = PdfWriter.getInstance(document, out);
-            document.open();
-
-            // 1. FOOLPROOF FONT STREAM INJECTION FROM CLASS-PATH REGISTRY
             Locale locale = LocaleContextHolder.getLocale();
             String lang = locale.getLanguage();
-            String fontFile = switch (lang) {
-                case "ta" -> "NotoSansTamil-Regular.ttf";
-                case "hi" -> "NotoSansDevanagari-Regular.ttf";
-                case "te" -> "NotoSansTelugu-Regular.ttf";
-                case "kn" -> "NotoSansKannada-Regular.ttf";
-                case "ml" -> "NotoSansMalayalam-Regular.ttf";
-                default -> "NotoSans-Regular.ttf";
-            };
-
-            ClassPathResource resource = new ClassPathResource("fonts/" + fontFile);
-            byte[] fontBytes = resource.getInputStream().readAllBytes();
-            BaseFont bf = BaseFont.createFont(fontFile, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, BaseFont.CACHED, fontBytes, null);
-
-            Font tFont = new Font(bf, 18, Font.BOLD);
-            Font sFont = new Font(bf, 13, Font.BOLD);
-            Font bFont = new Font(bf, 9, Font.NORMAL);
-            Font boldB = new Font(bf, 9, Font.BOLD);
             boolean isHi = "hi".equalsIgnoreCase(lang);
 
-            // Document Main Headline
-            Paragraph title = new Paragraph(ts.getLabel("pdf.report.title"), tFont);
-            title.setAlignment(Element.ALIGN_CENTER); title.setSpacingAfter(14);
-            document.add(title);
-
-            // UPGRADED METADATA LAYOUT MATRIX: 4-Column design prevents text wrapping splits entirely
-            PdfPTable info = new PdfPTable(4);
-            info.setWidthPercentage(100);
-            info.setSpacingAfter(12);
-            info.setWidths(new float[]{18f, 32f, 18f, 32f});
-
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.name"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(org.vedic.astro.util.IndicPreShaper.shape(data.getName()), bFont, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.timezone"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(data.getResolvedTimezone(), bFont, Element.ALIGN_LEFT));
-
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.dob"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(data.getDateOfBirth(), bFont, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.tob"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(data.getTimeOfBirth(), bFont, Element.ALIGN_LEFT));
-
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.lmt"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(data.getLocalMeanTime(), bFont, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell("", bFont, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell("", bFont, Element.ALIGN_LEFT));
-
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.lat"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(String.valueOf(data.getLatitude()), bFont, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.long"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(String.valueOf(data.getLongitude()), bFont, Element.ALIGN_LEFT));
-            document.add(info);
-
-            // UPGRADED PANCHANGAM BAR: 2-Column layout expands width, stopping label fragmentation
-            PdfPTable panchangamTable = new PdfPTable(2);
-            panchangamTable.setWidthPercentage(100);
-            panchangamTable.setSpacingAfter(14);
-            panchangamTable.setWidths(new float[]{50f, 50f});
-
-            panchangamTable.addCell(buildTableCell(data.getBirthProfile().getLagna() + "  |  " + data.getBirthProfile().getRashi(), boldB, Element.ALIGN_LEFT));
-            panchangamTable.addCell(buildTableCell(ts.getLabel("pdf.panchangam.thithi") + ": " + data.getThithi(), bFont, Element.ALIGN_LEFT));
-            panchangamTable.addCell(buildTableCell(ts.getLabel("pdf.panchangam.yogam") + ": " + data.getYogam(), bFont, Element.ALIGN_LEFT));
-            panchangamTable.addCell(buildTableCell(ts.getLabel("pdf.panchangam.karanam") + ": " + data.getKaranam(), bFont, Element.ALIGN_LEFT));
-            document.add(panchangamTable);
-
-            // UPGRADED COORDS MATRIX: Structured widths protect multi-character Tamil strings
-            document.add(new Paragraph(ts.getLabel("pdf.pos.title"), sFont)); document.add(new Paragraph(" ", bFont));
-            PdfPTable posTab = new PdfPTable(5);
-            posTab.setWidthPercentage(100);
-            posTab.setSpacingAfter(15);
-            posTab.setWidths(new float[]{14f, 16f, 12f, 22f, 36f}); // Allots 36% safety zone to degree text strings
-
-            posTab.addCell(buildTableCell(ts.getLabel("pdf.pos.hdr.key"), boldB, Element.ALIGN_CENTER));
-            posTab.addCell(buildTableCell(ts.getLabel("pdf.pos.hdr.name"), boldB, Element.ALIGN_CENTER));
-            posTab.addCell(buildTableCell(ts.getLabel("pdf.pos.hdr.sign"), boldB, Element.ALIGN_CENTER));
-            posTab.addCell(buildTableCell(ts.getLabel("pdf.pos.hdr.rashi"), boldB, Element.ALIGN_CENTER));
-            posTab.addCell(buildTableCell(ts.getLabel("pdf.pos.hdr.long"), boldB, Element.ALIGN_CENTER));
-
-            for (var p : data.getBirthPlanetaryPositions()) {
-                posTab.addCell(buildTableCell(p.getPlanetKey(), bFont, Element.ALIGN_CENTER));
-                posTab.addCell(buildTableCell(p.getDisplayName(), bFont, Element.ALIGN_CENTER));
-                posTab.addCell(buildTableCell(String.valueOf(p.getSignNumber()), bFont, Element.ALIGN_CENTER));
-                posTab.addCell(buildTableCell(p.getRashiName(), bFont, Element.ALIGN_CENTER));
-                posTab.addCell(buildTableCell(p.getFormattedDegree(), bFont, Element.ALIGN_CENTER));
-            }
-            document.add(posTab);
-
-            // ==========================================
-            // SECTION 3: REWRITTEN 2-COLUMN 12-CHART SUITE GRID
-            // ==========================================
-            document.newPage();
-            document.add(new Paragraph(ts.getLabel("pdf.chart.suite.title"), sFont));
-            document.add(new Paragraph(" ", bFont));
-
-            PdfPTable masterGrid = new PdfPTable(2); masterGrid.setWidthPercentage(100); masterGrid.setSplitRows(true);
+            // Prepare list of Varga chart titles
             String[] vargaKeys = {
                     "pdf.chart.d1", "pdf.chart.d2", "pdf.chart.d3", "pdf.chart.bhava",
                     "pdf.chart.d7", "pdf.chart.d9", "pdf.chart.d10", "pdf.chart.d12",
                     "pdf.chart.d20", "pdf.chart.d24", "pdf.chart.d30", "pdf.chart.d60"
             };
+            List<String> vargaTitles = new ArrayList<>();
+            for (String key : vargaKeys) {
+                vargaTitles.add(ts.getLabel(key));
+            }
 
+            // Coordinates for North Indian template houses
+            float[][] targets = {
+                    {80f,115f}, {40f,135f}, {20f,100f}, {45f,80f}, {20f,60f}, {40f,25f},
+                    {80f,45f}, {120f,25f}, {140f,60f}, {115f,80f}, {140f,100f}, {120f,135f}
+            };
+
+            // Compile sign mappings for South Indian cells and North Indian templates
+            List<Map<Integer, Map<String, Object>>> chartMap = new ArrayList<>();
             for (int i = 0; i < 12; i++) {
-                PdfPCell layoutCell = new PdfPCell(); layoutCell.setBorder(PdfPCell.NO_BORDER); layoutCell.setPadding(6);
-                String resolvedTitleText = ts.getLabel(vargaKeys[i]);
-
                 List<ChartResponseDTO.PositionDetail> planets = data.getVargaChartsSuite().get(i);
-                if (isHi) {
-                    Paragraph chartLabel = new Paragraph(resolvedTitleText, boldB);
-                    chartLabel.setSpacingAfter(4);
-                    layoutCell.addElement(chartLabel);
-                    layoutCell.addElement(buildNorthIndianTemplateImage(writer, planets, bFont));
-                } else {
-                    layoutCell.addElement(buildCleanSouthIndianGrid(planets, resolvedTitleText, bFont, boldB));
+                Map<Integer, Map<String, Object>> signMap = new HashMap<>();
+
+                for (int currentSign = 1; currentSign <= 12; currentSign++) {
+                    final int sigVal = currentSign;
+
+                    boolean hasLagna = planets.stream()
+                            .anyMatch(p -> "LAGNA".equalsIgnoreCase(p.getPlanetKey()) && p.getSignNumber() == sigVal);
+
+                    List<String> planetNames = planets.stream()
+                            .filter(p -> p.getSignNumber() == sigVal && !"LAGNA".equalsIgnoreCase(p.getPlanetKey()))
+                            .map(ChartResponseDTO.PositionDetail::getDisplayName)
+                            .collect(Collectors.toList());
+
+                    String planetsText = String.join(" ", planetNames);
+
+                    // Compute target coordinates for the North Indian Diamond chart
+                    int lagnaSign = planets.stream()
+                            .filter(p -> "LAGNA".equalsIgnoreCase(p.getPlanetKey()))
+                            .findFirst().map(ChartResponseDTO.PositionDetail::getSignNumber).orElse(1);
+                    int targetIdx = (currentSign - lagnaSign + 12) % 12;
+                    float cx = targets[targetIdx][0];
+                    float cy = 160f - targets[targetIdx][1]; // Invert PDF to SVG space
+
+                    Map<String, Object> houseData = new HashMap<>();
+                    houseData.put("isLagna", hasLagna);
+                    houseData.put("planets", planetNames);
+                    houseData.put("planetsText", planetsText);
+                    houseData.put("x", cx);
+                    houseData.put("y", cy);
+
+                    signMap.put(currentSign, houseData);
                 }
-                masterGrid.addCell(layoutCell);
+                chartMap.add(signMap);
             }
-            masterGrid.completeRow();
-            document.add(masterGrid);
 
-            // UPGRADED SHADBALA GRID: Broad status channels eliminate wrapping text splits
-            document.newPage(); document.add(new Paragraph(ts.getLabel("pdf.shadbala.title"), sFont)); document.add(new Paragraph(" ", bFont));
-            PdfPTable sb = new PdfPTable(7);
-            sb.setWidthPercentage(100);
-            sb.setSpacingAfter(15);
-            sb.setWidths(new float[]{16f, 12f, 12f, 12f, 12f, 14f, 22f}); // 22% handles long words like "மிகவும் பலம்" cleanly
+            // Generate Lagna Diagonal Slash PNG dynamically
+            BufferedImage img = new BufferedImage(120, 120, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = img.createGraphics();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(Color.BLACK);
+            g2.setStroke(new BasicStroke(1.5f));
+            g2.drawLine(0, 0, 120, 120);
+            g2.dispose();
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(img, "png", baos);
+            String lagnaSlashBase64 = Base64.getEncoder().encodeToString(baos.toByteArray());
 
-            sb.addCell(buildTableCell(ts.getLabel("pdf.shadbala.hdr.planet"), boldB, Element.ALIGN_CENTER));
-            sb.addCell(buildTableCell(ts.getLabel("pdf.shadbala.hdr.sthana"), boldB, Element.ALIGN_CENTER));
-            sb.addCell(buildTableCell(ts.getLabel("pdf.shadbala.hdr.dig"), boldB, Element.ALIGN_CENTER));
-            sb.addCell(buildTableCell(ts.getLabel("pdf.shadbala.hdr.kala"), boldB, Element.ALIGN_CENTER));
-            sb.addCell(buildTableCell(ts.getLabel("pdf.shadbala.hdr.cheshta"), boldB, Element.ALIGN_CENTER));
-            sb.addCell(buildTableCell(ts.getLabel("pdf.shadbala.hdr.total"), boldB, Element.ALIGN_CENTER));
-            sb.addCell(buildTableCell(ts.getLabel("pdf.shadbala.hdr.status"), boldB, Element.ALIGN_CENTER));
+            Context context = new Context(locale);
+            context.setVariable("data", data);
+            context.setVariable("isHi", isHi);
+            context.setVariable("vargaTitles", vargaTitles);
+            context.setVariable("chartMap", chartMap);
+            context.setVariable("lagnaSlashBase64", lagnaSlashBase64);
 
-            data.getShadbalaStrengths().getPlanetStrengths().forEach((p, s) -> {
-                String localizedPName = ts.getLabel("planet." + p.toUpperCase() + ".short");
-                String localizedStatus = ts.getLabel("shadbala.status." + s.getStrengthCategory().toLowerCase().replaceAll("\\s+", ""));
-                sb.addCell(buildTableCell(localizedPName, bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.1f", s.getSthanaBala()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.1f", s.getDigBala()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.1f", s.getKalaBala()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.1f", s.getCheshtaBala()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.2f", s.getTotalShadbalaRupas()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(localizedStatus, bFont, Element.ALIGN_CENTER));
-            });
-            document.add(sb);
+            String htmlContent = templateEngine.process("astrology_report_template", context);
 
-            // UPGRADED DASA TIMELINE: Defined widths prevent tracking timeline faults
-            document.newPage(); document.add(new Paragraph(ts.getLabel("pdf.dasa.title"), sFont)); document.add(new Paragraph(" ", bFont));
-            PdfPTable ds = new PdfPTable(4);
-            ds.setWidthPercentage(100);
-            ds.setSplitRows(true);
-            ds.setHeaderRows(1);
-            ds.setWidths(new float[]{20f, 25f, 27f, 28f});
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            PdfRendererBuilder builder = new PdfRendererBuilder();
+            builder.useFastMode();
 
-            ds.addCell(buildTableCell(ts.getLabel("pdf.dasa.hdr.mahadasa"), boldB, Element.ALIGN_CENTER));
-            ds.addCell(buildTableCell(ts.getLabel("pdf.dasa.hdr.bhukthi"), boldB, Element.ALIGN_CENTER));
-            ds.addCell(buildTableCell(ts.getLabel("pdf.dasa.hdr.start"), boldB, Element.ALIGN_CENTER));
-            ds.addCell(buildTableCell(ts.getLabel("pdf.dasa.hdr.end"), boldB, Element.ALIGN_CENTER));
+            // Set base URL to classpath root
+            builder.withHtmlContent(htmlContent, new ClassPathResource("/").getURL().toExternalForm());
 
-            for (var d : data.getVimshottariTimeline()) {
-                String locMaha = ts.getLabel("planet." + d.getPlanetName().toUpperCase() + ".short");
-                PdfPCell m = buildTableCell(locMaha + " " + ts.getLabel("pdf.dasa.label.mahadasa"), boldB, Element.ALIGN_LEFT);
-                m.setBackgroundColor(java.awt.Color.LIGHT_GRAY); m.setColspan(2); ds.addCell(m);
+            // Load and register all Noto Sans font families for multi-lingual fallback
+            String[] fontFiles = {
+                    "NotoSans-Regular.ttf",
+                    "NotoSansTamil-Regular.ttf",
+                    "NotoSansDevanagari-Regular.ttf",
+                    "NotoSansTelugu-Regular.ttf",
+                    "NotoSansKannada-Regular.ttf",
+                    "NotoSansMalayalam-Regular.ttf"
+            };
 
-                PdfPCell s = buildTableCell(d.getStartDate().toString(), boldB, Element.ALIGN_CENTER); s.setBackgroundColor(java.awt.Color.LIGHT_GRAY); ds.addCell(s);
-                PdfPCell e = buildTableCell(d.getEndDate().toString(), boldB, Element.ALIGN_CENTER); e.setBackgroundColor(java.awt.Color.LIGHT_GRAY); ds.addCell(e);
+            String[] fontFamilies = {
+                    "Noto Sans",
+                    "Noto Sans Tamil",
+                    "Noto Sans Devanagari",
+                    "Noto Sans Telugu",
+                    "Noto Sans Kannada",
+                    "Noto Sans Malayalam"
+            };
 
-                for (var b : d.getBhukthis()) {
-                    String locBhuk = ts.getLabel("planet." + b.getPlanetName().toUpperCase() + ".short");
-                    ds.addCell(buildTableCell("", bFont, Element.ALIGN_CENTER));
-                    ds.addCell(buildTableCell(locBhuk, bFont, Element.ALIGN_LEFT));
-                    ds.addCell(buildTableCell(b.getStartDate().toString(), bFont, Element.ALIGN_CENTER));
-                    ds.addCell(buildTableCell(b.getEndDate().toString(), bFont, Element.ALIGN_CENTER));
-                }
+            for (int k = 0; k < fontFiles.length; k++) {
+                final String fFile = fontFiles[k];
+                final String fFamily = fontFamilies[k];
+                builder.useFont(() -> getFontStream(new ClassPathResource("fonts/" + fFile)), fFamily);
             }
-            document.add(ds);
-            document.close();
-        } catch (Exception e) { throw new RuntimeException(e); }
-        return out.toByteArray();
-    }
 
-    // =========================================================================
-    // SAFE CELL BUILDING ENGINE FOR COMPLEX VERTICAL INDIC FONTS
-    // =========================================================================
-    private PdfPCell buildTableCell(String text, Font font, int alignment) {
-        Phrase phrase = new Phrase(text, font);
+            builder.toStream(out);
+            builder.run();
 
-        // Explicit leading safety margin prevents top/bottom modifier clipping
-        phrase.setLeading(font.getSize() + 5f);
-
-        PdfPCell cell = new PdfPCell(phrase);
-        cell.setPaddingTop(6f);
-        cell.setPaddingBottom(7f);
-        cell.setPaddingLeft(6f);
-        cell.setPaddingRight(6f);
-        cell.setHorizontalAlignment(alignment);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        return cell;
-    }
-
-    private PdfPTable buildCleanSouthIndianGrid(List<ChartResponseDTO.PositionDetail> planets, String titleText, Font baseFont, Font titleFont) {
-        PdfPTable table = new PdfPTable(4);
-        table.setWidthPercentage(100);
-
-        table.addCell(buildBoxCell(planets, 12, baseFont));
-        table.addCell(buildBoxCell(planets, 1, baseFont));
-        table.addCell(buildBoxCell(planets, 2, baseFont));
-        table.addCell(buildBoxCell(planets, 3, baseFont));
-
-        table.addCell(buildBoxCell(planets, 11, baseFont));
-
-        Phrase titlePhrase = new Phrase(titleText, titleFont);
-        titlePhrase.setLeading(titleFont.getSize() + 4f);
-        PdfPCell centerBlock = new PdfPCell(titlePhrase);
-        centerBlock.setColspan(2); centerBlock.setRowspan(2);
-        centerBlock.setHorizontalAlignment(Element.ALIGN_CENTER);
-        centerBlock.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        centerBlock.setPadding(4);
-        table.addCell(centerBlock);
-
-        table.addCell(buildBoxCell(planets, 4, baseFont));
-        table.addCell(buildBoxCell(planets, 10, baseFont));
-        table.addCell(buildBoxCell(planets, 5, baseFont));
-
-        table.addCell(buildBoxCell(planets, 9, baseFont));
-        table.addCell(buildBoxCell(planets, 8, baseFont));
-        table.addCell(buildBoxCell(planets, 7, baseFont));
-        table.addCell(buildBoxCell(planets, 6, baseFont));
-
-        return table;
-    }
-
-    private PdfPCell buildBoxCell(List<ChartResponseDTO.PositionDetail> planets, int targetSign, Font font) {
-        // Collect planetary abbreviations on clean vertical lines inside the grid boxes
-        String inlinePlanets = planets.stream()
-                .filter(p -> p.getSignNumber() == targetSign)
-                .map(ChartResponseDTO.PositionDetail::getDisplayName)
-                .collect(Collectors.joining("\n"));
-
-        Phrase phrase = new Phrase(inlinePlanets, font);
-        phrase.setLeading(font.getSize() + 4f); // Keeps line bounds clear inside houses
-
-        PdfPCell cell = new PdfPCell(phrase);
-        cell.setMinimumHeight(48f); // Increased minimum frame height to account for stacked text lines
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        cell.setPaddingTop(5f);
-        cell.setPaddingBottom(5f);
-        return cell;
-    }
-
-    private Image buildNorthIndianTemplateImage(PdfWriter wr, List<ChartResponseDTO.PositionDetail> planets, Font font) throws Exception {
-        PdfContentByte cb = wr.getDirectContent();
-        PdfTemplate template = cb.createTemplate(160f, 160f);
-        template.setColorStroke(java.awt.Color.BLACK); template.setLineWidth(0.8f);
-
-        template.rectangle(0, 0, 160f, 160f);
-        template.moveTo(0, 0); template.lineTo(160f, 160f);
-        template.moveTo(0, 160f); template.lineTo(160f, 0);
-        template.moveTo(80f, 0); template.lineTo(0, 80f); template.lineTo(80f, 160f); template.lineTo(160f, 80f); template.lineTo(80f, 0);
-        template.stroke();
-
-        float[][] targets = {{80f,115f}, {40f,135f}, {20f,100f}, {45f,80f}, {20f,60f}, {40f,25f}, {80f,45f}, {120f,25f}, {140f,60f}, {115f,80f}, {140f,100f}, {120f,135f}};
-        int lagnaSign = planets.stream().filter(p -> "LAGNA".equalsIgnoreCase(p.getPlanetKey())).findFirst().orElseThrow().getSignNumber();
-        BaseFont bf = font.getBaseFont();
-
-        for (int i = 0; i < 12; i++) {
-            int curSign = ((lagnaSign - 1 + i) % 12) + 1; float cx = targets[i][0]; float cy = targets[i][1];
-            template.beginText(); template.setFontAndSize(bf, 6); template.setTextMatrix(cx - 2f, cy + 6f); template.showText(String.valueOf(curSign)); template.endText();
-            String pText = planets.stream().filter(p -> p.getSignNumber() == curSign && !"LAGNA".equalsIgnoreCase(p.getPlanetKey())).map(ChartResponseDTO.PositionDetail::getDisplayName).collect(Collectors.joining(" "));
-            if (!pText.isEmpty()) { template.beginText(); template.setFontAndSize(bf, 8); template.setTextMatrix(cx - (bf.getWidthPoint(pText, 8) / 2f), cy - 4f); template.showText(pText); template.endText(); }
+            System.out.println("[PDF EXPORT] OpenHTMLtoPDF compiled successfully using multi-font fallback with locale: " + locale);
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate astrology PDF report using OpenHTMLtoPDF: " + e.getMessage(), e);
         }
-        return Image.getInstance(template);
+    }
+
+    private InputStream getFontStream(ClassPathResource resource) {
+        try {
+            return resource.getInputStream();
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Failed to load font from classpath resource: " + resource.getPath(), e);
+        }
     }
 }

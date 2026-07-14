@@ -28,7 +28,7 @@ public class ZodiacUtils {
     }
 
     public static int getNakshatraNumber(double absoluteLongitude) {
-        double boundedLong = absoluteLongitude % 360.0;
+        double boundedLong = ((absoluteLongitude % 360.0) + 360.0) % 360.0;
         int index = (int) (boundedLong / (360.0 / 27.0)) + 1;
         return index > 27 ? 27 : index;
     }
