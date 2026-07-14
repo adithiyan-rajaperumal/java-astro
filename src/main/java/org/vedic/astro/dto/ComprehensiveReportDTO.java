@@ -11,9 +11,16 @@ public class ComprehensiveReportDTO {
     private String name;
     private String dateOfBirth;
     private String timeOfBirth;
+    private String localMeanTime;
     private double latitude;
     private double longitude;
     private String resolvedTimezone;
+
+    // Core Panchangam Element Block
+    private String thithi;
+    private String yogam;
+    private String karanam;
+
     private ChartResponseDTO.BirthProfile birthProfile;
     private List<ChartResponseDTO.PositionDetail> birthPlanetaryPositions;
     private List<List<ChartResponseDTO.PositionDetail>> vargaChartsSuite;

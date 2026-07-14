@@ -35,8 +35,7 @@ public class ChartController {
         // Factory resolves strategy pattern dynamically
         PanchangamEngine engine = panchangamFactory.getEngine(systemType);
         ChartResult res = engine.calculate(birthDetails);
-        LocalDate dob = LocalDate.of(birthDetails.year(), birthDetails.month(), birthDetails.day());
-        return ResponseEntity.ok(orchestrationService.convertToUiDashboardResponse(res, dob));
+        return ResponseEntity.ok(orchestrationService.convertToUiDashboardResponse(res, birthDetails));
     }
 
 

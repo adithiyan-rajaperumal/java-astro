@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 public class ChartResult {
     private String name;
     private String localMeanTime;
+    private String dateOfBirth;
+    private String timeOfBirth;
     private double julianDayUT;
     private Map<String, PlanetaryPosition> d1Positions;
     private Map<String, PlanetaryPosition> d9Positions;

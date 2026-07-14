@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 public class ChartResponseDTO {
     private String name;
+    private String dateOfBirth;
     private String localMeanTime;
     private double julianDayUT;
     private BirthProfile birthProfile;

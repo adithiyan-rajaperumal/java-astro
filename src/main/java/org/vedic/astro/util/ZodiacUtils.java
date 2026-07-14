@@ -47,14 +47,12 @@ public class ZodiacUtils {
         return pada > 4 ? 4 : pada;
     }
 
-    public static String formatDMS(double decimalDegrees) {
-        int degrees = (int) decimalDegrees;
-        int minutes = (int) Math.round((decimalDegrees - degrees) * 60);
-        if (minutes == 60) {
-            degrees += 1;
-            minutes = 0;
-        }
-        // Replaced the literal '°' character with its safe unicode escape '\u00B0'
-        return String.format("%02d\u00B0 %02d'", degrees, minutes);
+    public static String formatDMS(double degreeInSign) {
+        int degrees = (int) degreeInSign;
+        double minutesRaw = (degreeInSign - degrees) * 60.0;
+        int minutes = (int) minutesRaw;
+
+        // Returns standard readable formatting: 13°45'
+        return String.format("%02d°%02d'", degrees, minutes);
     }
 }

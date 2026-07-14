@@ -17,6 +17,7 @@ import org.vedic.astro.service.TimezoneService;
 import org.vedic.astro.util.ZodiacUtils;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -94,6 +95,8 @@ public class DrikPanchangamEngine implements PanchangamEngine {
                 .name(dto.name())
                 .localMeanTime(localMeanTime.toString())
                 .julianDayUT(julianDayUT)
+                .dateOfBirth(LocalDate.of(dto.year(), dto.month(), dto.day()).toString())
+                .timeOfBirth(String.format("%02d:%02d:%02d", dto.hour(), dto.minute(), dto.second()))
                 .d1Positions(d1Map)
                 .d9Positions(d9Map)
                 .build();
