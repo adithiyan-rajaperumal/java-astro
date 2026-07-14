@@ -1,12 +1,35 @@
 package org.vedic.astro.util;
 
 public class IndicPreShaper {
+    private static final ThreadLocal<Boolean> pdfMode = ThreadLocal.withInitial(() -> false);
+
+    public static void setPdfMode(boolean enabled) {
+        pdfMode.set(enabled);
+    }
+
+    public static boolean isPdfMode() {
+        return pdfMode.get();
+    }
+
     /**
      * Re-orders character byte streams to enforce proper layout rendering
      * inside primitive, non-CTL PDF generation modules.
      */
     public static String shape(String text) {
         if (text == null || text.isEmpty()) return text;
+
+        // If the text contains Tamil characters, convert to Bamini instead!
+        boolean hasTamil = false;
+        for (int idx = 0; idx < text.length(); idx++) {
+            char c = text.charAt(idx);
+            if (c >= '\u0B80' && c <= '\u0BFF') {
+                hasTamil = true;
+                break;
+            }
+        }
+        if (hasTamil) {
+            return text;
+        }
 
         StringBuilder sb = new StringBuilder();
         char[] chars = text.toCharArray();

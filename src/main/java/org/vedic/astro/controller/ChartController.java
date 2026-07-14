@@ -44,16 +44,21 @@ public class ChartController {
 
     @PostMapping("/download-pdf")
     public ResponseEntity<byte[]> downloadComprehensiveAstrologyReport(@RequestBody BirthDetailsDTO payload, @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType) {
-        // Factory resolves strategy pattern dynamically
-        PanchangamEngine engine = panchangamFactory.getEngine(systemType);
-        ChartResult res = engine.calculate(payload);
+        try {
+            org.vedic.astro.util.IndicPreShaper.setPdfMode(true);
+            // Factory resolves strategy pattern dynamically
+            PanchangamEngine engine = panchangamFactory.getEngine(systemType);
+            ChartResult res = engine.calculate(payload);
 
-        ComprehensiveReportDTO deepReportData = engine.generateComprehensiveReport(payload, res);
-        byte[] pdfBinaryReport = pdfExportService.generateAstrologyReport(deepReportData);
-        String fileName = payload.name().replaceAll("[^a-zA-Z0-9]", "") + "_Premium_Kundali.pdf";
+            ComprehensiveReportDTO deepReportData = engine.generateComprehensiveReport(payload, res);
+            byte[] pdfBinaryReport = pdfExportService.generateAstrologyReport(deepReportData);
+            String fileName = payload.name().replaceAll("[^a-zA-Z0-9]", "") + "_Premium_Kundali.pdf";
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                .contentType(MediaType.APPLICATION_PDF).contentLength(pdfBinaryReport.length).body(pdfBinaryReport);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                    .contentType(MediaType.APPLICATION_PDF).contentLength(pdfBinaryReport.length).body(pdfBinaryReport);
+        } finally {
+            org.vedic.astro.util.IndicPreShaper.setPdfMode(false);
+        }
     }
 }

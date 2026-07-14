@@ -2,70 +2,1323 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Astrology PDF Test Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vedic Astrology Dashboard & PDF Engine</title>
+    <!-- Import Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f5f6; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
-        button { background: #007bff; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #0056b3; }
-        select { padding: 10px; font-size: 14px; margin-right: 10px; border-radius: 4px; }
+        :root {
+            --bg-gradient: radial-gradient(circle at 50% 50%, #161233 0%, #0b0819 100%);
+            --panel-bg: rgba(22, 18, 51, 0.45);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(12px);
+            --accent-gold: #f5af19;
+            --accent-gold-glow: rgba(245, 175, 25, 0.35);
+            --accent-purple: #9d4edd;
+            --accent-cyan: #00f0ff;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Cosmic background glow elements */
+        .nebula-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(157, 78, 221, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -200px;
+            left: -100px;
+            z-index: -1;
+            filter: blur(50px);
+            pointer-events: none;
+        }
+        
+        .nebula-glow-right {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, rgba(0,0,0,0) 70%);
+            bottom: -100px;
+            right: -100px;
+            z-index: -1;
+            filter: blur(50px);
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            z-index: 10;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 40%, var(--accent-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+            z-index: 10;
+        }
+
+        @media (min-width: 900px) {
+            .main-container {
+                grid-template-columns: 380px 1fr;
+            }
+        }
+
+        /* Glassmorphic Panel styling */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        h2.section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px;
+        }
+
+        /* Input Styles */
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .input-row-triple {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        input, select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 8px var(--accent-gold-glow);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Autocomplete styles */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #110d2a;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        .autocomplete-item:hover {
+            background: rgba(245, 175, 25, 0.15);
+            color: var(--accent-gold);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Button styling */
+        .btn {
+            background: linear-gradient(135deg, #f5af19 0%, #e65c00 100%);
+            color: #07050f;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(230, 92, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230, 92, 0, 0.45);
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            box-shadow: none;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: none;
+        }
+
+        /* Results view elements */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .results-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+        }
+
+        .results-placeholder svg {
+            width: 80px;
+            height: 80px;
+            fill: var(--text-muted);
+            margin-bottom: 20px;
+            opacity: 0.4;
+        }
+
+        .results-placeholder h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .results-placeholder p {
+            color: rgba(156, 163, 175, 0.7);
+            max-width: 400px;
+        }
+
+        /* Profile Block */
+        .profile-summary {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 600px) {
+            .profile-summary {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .summary-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .summary-card span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .summary-card strong {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .summary-card.gold strong {
+            color: var(--accent-gold);
+        }
+
+        /* Panchangam badges grid */
+        .panchangam-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .panchangam-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .panchangam-badge {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15) 0%, rgba(22, 18, 51, 0.4) 100%);
+            border: 1px solid rgba(157, 78, 221, 0.25);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge-icon {
+            font-size: 1.8rem;
+        }
+
+        .badge-info h4 {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-info p {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Chart visualizer container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 750px) {
+            .charts-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .chart-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .chart-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            color: var(--accent-gold);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .chart-tabs {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-gold);
+            color: #000000;
+            font-weight: 600;
+            border-color: var(--accent-gold);
+        }
+
+        /* Astrology Grid Styles (South Indian Style) */
+        .south-indian-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            width: 320px;
+            height: 320px;
+            border: 2px solid var(--accent-gold);
+            background: rgba(11, 8, 25, 0.6);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .chart-cell {
+            border: 1px solid rgba(245, 175, 25, 0.3);
+            display: flex;
+            flex-direction: column;
+            padding: 4px;
+            font-size: 0.65rem;
+            position: relative;
+            height: 80px;
+            width: 80px;
+        }
+
+        .cell-sign-label {
+            color: var(--text-muted);
+            font-size: 0.6rem;
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+        }
+
+        .cell-planets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .planet-tag {
+            background: rgba(0, 240, 255, 0.15);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            color: var(--accent-cyan);
+            padding: 1px 3px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.65rem;
+        }
+        
+        .planet-tag.lagna-tag {
+            background: rgba(245, 175, 25, 0.2);
+            border: 1px solid rgba(245, 175, 25, 0.5);
+            color: var(--accent-gold);
+        }
+
+        .center-cell {
+            grid-column: 2 / span 2;
+            grid-row: 2 / span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(245, 175, 25, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .center-cell h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+        }
+
+        .center-cell p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* North Indian Diamond Chart styling */
+        .north-indian-svg {
+            width: 320px;
+            height: 320px;
+            background: rgba(11, 8, 25, 0.6);
+            border-radius: 8px;
+            border: 2px solid var(--accent-gold);
+            color: var(--text-main);
+        }
+
+        .svg-line {
+            stroke: rgba(245, 175, 25, 0.4);
+            stroke-width: 1.5;
+        }
+
+        .svg-house-number {
+            fill: var(--text-muted);
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .svg-planets {
+            fill: var(--accent-cyan);
+            font-size: 11px;
+            font-weight: bold;
+            text-anchor: middle;
+        }
+
+        .svg-planets-lagna {
+            fill: var(--accent-gold);
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent-gold);
+            padding: 12px 16px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Timeline dashboard */
+        .dasa-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .dasa-node {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--accent-purple);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            transition: background 0.2s ease;
+        }
+
+        .dasa-node:hover {
+            background: rgba(157, 78, 221, 0.08);
+        }
+
+        .dasa-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dasa-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .dasa-dates {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--accent-gold);
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Astrology PDF Engine Tester</h2>
-    <p>Select target script layout language and execute engine compilation pipeline:</p>
-    <select id="langSelect">
-        <option value="ta">Tamil (South Indian Grid)</option>
-        <option value="hi">Hindi (North Indian Diamond)</option>
-        <option value="te">Telugu (South Indian Grid)</option>
-        <option value="ml">Malayalam (South Indian Grid)</option>
-        <option value="en">English (Standard Base)</option>
-        <option value="kn">Kannada (South Indian Grid)</option>
-    </select>
-    <button onclick="triggerPdfDownload()">Download PDF Report</button>
-</div>
+<div class="nebula-glow"></div>
+<div class="nebula-glow-right"></div>
+
+<header>
+    <h1>Vedic Astrology Engine Panel</h1>
+    <p>Calculate interactive birth charts and export high-precision PDF reports</p>
+</header>
+
+<main class="main-container">
+    <!-- LEFT SIDE: INPUT FORM -->
+    <section class="glass-panel">
+        <h2 class="section-title">
+            <span style="font-size: 1.2rem;">🌟</span> Configuration
+        </h2>
+        
+        <div class="form-group">
+            <label for="birthName">Name</label>
+            <input type="text" id="birthName" value="Adithiyan" placeholder="Enter name">
+        </div>
+
+        <div class="form-group autocomplete-container">
+            <label for="locationSearch">Birth Place (Autocomplete)</label>
+            <input type="text" id="locationSearch" value="Chennai, Tamil Nadu, India" placeholder="Type city to search...">
+            <div id="autocompleteResults" class="autocomplete-dropdown"></div>
+        </div>
+
+        <!-- Hidden coordinates set by autocomplete selection -->
+        <div class="input-row">
+            <div class="form-group">
+                <label for="latitude">Latitude</label>
+                <input type="number" id="latitude" step="any" value="13.0827">
+            </div>
+            <div class="form-group">
+                <label for="longitude">Longitude</label>
+                <input type="number" id="longitude" step="any" value="80.2707">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Birth Date (Day / Month / Year)</label>
+            <div class="input-row-triple">
+                <input type="number" id="birthDay" min="1" max="31" value="19" placeholder="DD">
+                <input type="number" id="birthMonth" min="1" max="12" value="7" placeholder="MM">
+                <input type="number" id="birthYear" value="1995" placeholder="YYYY">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Birth Time (Hour : Min : Sec)</label>
+            <div class="input-row-triple">
+                <input type="number" id="birthHour" min="0" max="23" value="13" placeholder="HH">
+                <input type="number" id="birthMinute" min="0" max="59" value="10" placeholder="MM">
+                <input type="number" id="birthSecond" min="0" max="59" value="0" placeholder="SS">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="systemType">Ayanamsa Engine System</label>
+            <select id="systemType">
+                <option value="DRIK_TIRUKANITHAM" selected>Drik Tirukanitham</option>
+                <option value="VAKYA">Vakya</option>
+                <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="langSelect">PDF Language</label>
+            <select id="langSelect">
+                <option value="en">English (Base)</option>
+                <option value="ta" selected>Tamil (தமிழ்)</option>
+                <option value="hi">Hindi (हिन्दी)</option>
+                <option value="te">Telugu (తెలుగు)</option>
+                <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                <option value="ml">Malayalam (മലയാളം)</option>
+            </select>
+        </div>
+
+        <button id="calculateBtn" class="btn">
+            Calculate Dashboard
+        </button>
+        
+        <button id="downloadPdfBtn" class="btn btn-secondary">
+            Download PDF Report
+        </button>
+    </section>
+
+    <!-- RIGHT SIDE: CHART DISPLAY & DATA -->
+    <section class="glass-panel" style="min-height: 550px; position: relative;">
+        <!-- LOADING SPINNER -->
+        <div id="loader" class="spinner"></div>
+
+        <!-- PLACEHOLDER VIEW -->
+        <div id="placeholderView" class="results-placeholder">
+            <svg viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" />
+            </svg>
+            <h3>No Calculations Performed</h3>
+            <p>Fill in the configuration parameters on the left and click "Calculate Dashboard" to compute your chart.</p>
+        </div>
+
+        <!-- ACTUAL RESULTS VIEW -->
+        <div id="resultsView" class="results-container" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <h2 class="section-title" style="margin-bottom: 0; border: none; padding: 0;">
+                    🔮 Natal Chart Dashboard
+                </h2>
+                <div class="chart-tabs">
+                    <button id="styleSouthBtn" class="tab-btn active" onclick="switchChartStyle('SOUTH')">South Indian</button>
+                    <button id="styleNorthBtn" class="tab-btn" onclick="switchChartStyle('NORTH')">North Indian</button>
+                </div>
+            </div>
+
+            <!-- Profile Cards Summary -->
+            <div class="profile-summary">
+                <div class="summary-card">
+                    <span>Lagna (Ascendant)</span>
+                    <strong id="summaryLagna">-</strong>
+                </div>
+                <div class="summary-card gold">
+                    <span>Janma Rashi</span>
+                    <strong id="summaryRashi">-</strong>
+                </div>
+                <div class="summary-card">
+                    <span>Nakshatra</span>
+                    <strong id="summaryNakshatra">-</strong>
+                </div>
+                <div class="summary-card">
+                    <span>Local Mean Time</span>
+                    <strong id="summaryLMT" style="font-size: 0.95rem;">-</strong>
+                </div>
+            </div>
+
+            <!-- Panchangam badging -->
+            <div class="panchangam-grid">
+                <div class="panchangam-badge">
+                    <span class="badge-icon">🌙</span>
+                    <div class="badge-info">
+                        <h4>Thithi</h4>
+                        <p id="badgeThithi">-</p>
+                    </div>
+                </div>
+                <div class="panchangam-badge">
+                    <span class="badge-icon">☀️</span>
+                    <div class="badge-info">
+                        <h4>Yogam</h4>
+                        <p id="badgeYogam">-</p>
+                    </div>
+                </div>
+                <div class="panchangam-badge">
+                    <span class="badge-icon">⏳</span>
+                    <div class="badge-info">
+                        <h4>Karanam</h4>
+                        <p id="badgeKaranam">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts visually rendering -->
+            <div class="charts-container">
+                <!-- D1 CHART PANEL -->
+                <div class="chart-box">
+                    <div class="chart-title">D-1 Natal Rashi Chart</div>
+                    
+                    <!-- South Indian Grid representation -->
+                    <div id="d1SouthGrid" class="south-indian-grid">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- North Indian SVG representation -->
+                    <div id="d1NorthGrid" style="display: none;">
+                        <svg class="north-indian-svg" id="d1NorthSvg" viewBox="0 0 400 400">
+                            <!-- Background paths and coordinates drawn dynamically -->
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- D9 CHART PANEL -->
+                <div class="chart-box">
+                    <div class="chart-title">D-9 Navamsha Chart</div>
+                    
+                    <!-- South Indian Grid representation -->
+                    <div id="d9SouthGrid" class="south-indian-grid">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- North Indian SVG representation -->
+                    <div id="d9NorthGrid" style="display: none;">
+                        <svg class="north-indian-svg" id="d9NorthSvg" viewBox="0 0 400 400">
+                            <!-- Background paths and coordinates drawn dynamically -->
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Planetary Positions Table -->
+            <div>
+                <h3 class="section-title">🪐 Planetary Positions</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Planet</th>
+                                <th>Rashi Sign</th>
+                                <th>Degree</th>
+                                <th>Formatted Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="planetaryTableBody">
+                            <!-- Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Dasa Timeline -->
+            <div>
+                <h3 class="section-title">📅 Current Dasa Timeline</h3>
+                <div id="dasaTimelineContainer" class="dasa-timeline">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 
 <script>
-    function triggerPdfDownload() {
-        const selectedLang = document.getElementById('langSelect').value;
+    // State variables
+    let currentChartData = null;
+    let selectedChartStyle = 'SOUTH'; // 'SOUTH' or 'NORTH'
 
-        fetch('http://localhost:8080/api/v1/astrology/download-pdf', {
+    const API_BASE = 'http://localhost:8080/api/v1';
+
+    // Sign details for South Indian style indexing mapping
+    const southIndianCells = [
+        { sign: 12, name: 'Pisces (Meena)', row: 1, col: 1 },
+        { sign: 1, name: 'Aries (Mesha)', row: 1, col: 2 },
+        { sign: 2, name: 'Taurus (Rishabha)', row: 1, col: 3 },
+        { sign: 3, name: 'Gemini (Mithuna)', row: 1, col: 4 },
+        { sign: 4, name: 'Cancer (Karka)', row: 2, col: 4 },
+        { sign: 5, name: 'Leo (Simha)', row: 3, col: 4 },
+        { sign: 6, name: 'Virgo (Kanya)', row: 4, col: 4 },
+        { sign: 7, name: 'Libra (Tula)', row: 4, col: 3 },
+        { sign: 8, name: 'Scorpio (Vrishchika)', row: 4, col: 2 },
+        { sign: 9, name: 'Sagittarius (Dhanu)', row: 4, col: 1 },
+        { sign: 10, name: 'Capricorn (Makara)', row: 3, col: 1 },
+        { sign: 11, name: 'Aquarius (Kumbha)', row: 2, col: 1 }
+    ];
+
+    // Standard translation mapping table of celestial entities
+    const planetAbbrs = {
+        'Sun': 'Su',
+        'Moon': 'Mo',
+        'Mars': 'Ma',
+        'Mercury': 'Me',
+        'Jupiter': 'Ju',
+        'Venus': 'Ve',
+        'Saturn': 'Sa',
+        'Rahu': 'Ra',
+        'Ketu': 'Ke',
+        'Lagna': 'Asc',
+        'Ascendant': 'Asc'
+    };
+
+    // Helper translation of sign strings to 1-indexed integers
+    const signNames = [
+        'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
+        'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'
+    ];
+    
+    const sanskritSignNames = [
+        'mesha', 'rishabha', 'mithuna', 'karka', 'simha', 'kanya',
+        'tula', 'vrishchika', 'dhanu', 'makara', 'kumbha', 'meena'
+    ];
+
+    function getSignNumberByName(name) {
+        if (!name) return 1;
+        const n = name.toLowerCase().trim();
+        let idx = signNames.findIndex(s => n.includes(s));
+        if (idx !== -1) return idx + 1;
+        idx = sanskritSignNames.findIndex(s => n.includes(s));
+        if (idx !== -1) return idx + 1;
+        
+        const num = parseInt(n);
+        if (!isNaN(num) && num >= 1 && num <= 12) return num;
+        return 1;
+    }
+
+    function getPlanetAbbr(detail) {
+        const name = detail.displayName || detail.planetKey || '';
+        if (planetAbbrs[name]) return planetAbbrs[name];
+        for (const key in planetAbbrs) {
+            if (name.toLowerCase().includes(key.toLowerCase())) {
+                return planetAbbrs[key];
+            }
+        }
+        return name.substring(0, 3);
+    }
+
+    // Set up location autocompleter
+    const locationInput = document.getElementById('locationSearch');
+    const autocompleteResults = document.getElementById('autocompleteResults');
+    const latInput = document.getElementById('latitude');
+    const lonInput = document.getElementById('longitude');
+
+    let debounceTimeout = null;
+
+    locationInput.addEventListener('input', () => {
+        clearTimeout(debounceTimeout);
+        const query = locationInput.value.trim();
+
+        if (query.length < 3) {
+            autocompleteResults.style.display = 'none';
+            return;
+        }
+
+        debounceTimeout = setTimeout(() => {
+            fetch(`${API_BASE}/locations/autocomplete?query=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(suggestions => {
+                    autocompleteResults.innerHTML = '';
+                    if (suggestions.length === 0) {
+                        autocompleteResults.style.display = 'none';
+                        return;
+                    }
+
+                    suggestions.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'autocomplete-item';
+                        div.textContent = item.label;
+                        div.addEventListener('click', () => {
+                            locationInput.value = item.label;
+                            latInput.value = item.latitude.toFixed(6);
+                            lonInput.value = item.longitude.toFixed(6);
+                            autocompleteResults.style.display = 'none';
+                        });
+                        autocompleteResults.appendChild(div);
+                    });
+                    autocompleteResults.style.display = 'block';
+                })
+                .catch(err => {
+                    console.error('Location autocomplete fetch transmission error:', err);
+                });
+        }, 300);
+    });
+
+    // Close autocomplete menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (e.target !== locationInput) {
+            autocompleteResults.style.display = 'none';
+        }
+    });
+
+    // Trigger Calculations
+    document.getElementById('calculateBtn').addEventListener('click', () => {
+        const payload = getFormPayload();
+
+        // UI state toggle
+        document.getElementById('placeholderView').style.display = 'none';
+        document.getElementById('resultsView').style.display = 'none';
+        document.getElementById('loader').style.display = 'block';
+
+        const systemType = document.getElementById('systemType').value;
+
+        fetch(`${API_BASE}/astrology/calculate?systemType=${systemType}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Astrology processing compilation failure');
+            return res.json();
+        })
+        .then(data => {
+            currentChartData = data;
+            renderDashboard(data);
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('resultsView').style.display = 'flex';
+        })
+        .catch(err => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('placeholderView').style.display = 'flex';
+            alert('Failed to calculate natal chart: ' + err.message);
+        });
+    });
+
+    // Download PDF report
+    document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+        const payload = getFormPayload();
+        const selectedLang = document.getElementById('langSelect').value;
+        const systemType = document.getElementById('systemType').value;
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+
+        const originalText = downloadPdfBtn.textContent;
+        downloadPdfBtn.textContent = 'Generating PDF...';
+        downloadPdfBtn.disabled = true;
+
+        fetch(`${API_BASE}/astrology/download-pdf?systemType=${systemType}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept-Language': selectedLang
             },
-            body: JSON.stringify({
-                name: "Adithiyan",
-                year: 1995,
-                month: 7,
-                day: 19,
-                hour: 13,
-                minute: 10,
-                second: 0,
-                latitude: 13.0827,
-                longitude: 80.2707
-            })
+            body: JSON.stringify(payload)
         })
-            .then(response => {
-                if (!response.ok) throw new Error('Network context transmission failure');
-                return response.blob();
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Adithiyan_Premium_Kundali.pdf';
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-            })
-            .catch(err => alert("Error compiling PDF matrix: " + err.message));
+        .then(res => {
+            if (!res.ok) throw new Error('PDF layout generation failure');
+            return res.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${payload.name.replace(/[^a-zA-Z0-9]/g, '')}_Premium_Kundali.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+            
+            downloadPdfBtn.textContent = originalText;
+            downloadPdfBtn.disabled = false;
+        })
+        .catch(err => {
+            downloadPdfBtn.textContent = originalText;
+            downloadPdfBtn.disabled = false;
+            alert('Error generating PDF report: ' + err.message);
+        });
+    });
+
+    function getFormPayload() {
+        return {
+            name: document.getElementById('birthName').value.trim() || 'Anonymous',
+            year: parseInt(document.getElementById('birthYear').value),
+            month: parseInt(document.getElementById('birthMonth').value),
+            day: parseInt(document.getElementById('birthDay').value),
+            hour: parseInt(document.getElementById('birthHour').value),
+            minute: parseInt(document.getElementById('birthMinute').value),
+            second: parseInt(document.getElementById('birthSecond').value),
+            latitude: parseFloat(latInput.value),
+            longitude: parseFloat(lonInput.value)
+        };
+    }
+
+    function switchChartStyle(style) {
+        selectedChartStyle = style;
+        
+        // Active buttons
+        document.getElementById('styleSouthBtn').classList.toggle('active', style === 'SOUTH');
+        document.getElementById('styleNorthBtn').classList.toggle('active', style === 'NORTH');
+
+        // Toggle container visibility
+        document.getElementById('d1SouthGrid').style.display = style === 'SOUTH' ? 'grid' : 'none';
+        document.getElementById('d9SouthGrid').style.display = style === 'SOUTH' ? 'grid' : 'none';
+        document.getElementById('d1NorthGrid').style.display = style === 'NORTH' ? 'block' : 'none';
+        document.getElementById('d9NorthGrid').style.display = style === 'NORTH' ? 'block' : 'none';
+
+        if (currentChartData) {
+            renderCharts(currentChartData);
+        }
+    }
+
+    function renderDashboard(data) {
+        // 1. Render Birth Profiles
+        const bp = data.birthProfile || {};
+        document.getElementById('summaryLagna').textContent = bp.lagna || '-';
+        document.getElementById('summaryRashi').textContent = bp.rashi || '-';
+        document.getElementById('summaryNakshatra').textContent = `${bp.nakshatra || '-'} (${bp.nakshatraPada || '-'})`;
+        document.getElementById('summaryLMT').textContent = data.localMeanTime || '-';
+
+        // 2. Render Panchangam elements
+        document.getElementById('badgeThithi').textContent = data.thithi || 'N/A';
+        document.getElementById('badgeYogam').textContent = data.yogam || 'N/A';
+        document.getElementById('badgeKaranam').textContent = data.karanam || 'N/A';
+
+        // 3. Render Planet positions table
+        const tableBody = document.getElementById('planetaryTableBody');
+        tableBody.innerHTML = '';
+        
+        const combinedPlanets = data.d1Chart || [];
+        combinedPlanets.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight: 600; color: #ffffff;">${p.displayName}</td>
+                <td>${p.rashiName}</td>
+                <td>${p.degreeInSign.toFixed(2)}°</td>
+                <td style="color: var(--accent-cyan); font-family: monospace;">${p.formattedDegree || '-'}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        // 4. Render Dasa Timeline
+        const timelineContainer = document.getElementById('dasaTimelineContainer');
+        timelineContainer.innerHTML = '';
+        
+        const dasas = data.currentDasaTimeline || [];
+        dasas.forEach(d => {
+            const node = document.createElement('div');
+            node.className = 'dasa-node';
+            
+            let bhukthiText = '';
+            if (d.bhukthis && d.bhukthis.length > 0) {
+                bhukthiText = `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px;">
+                    Bhukthis: ${d.bhukthis.map(b => `${b.planetName} (to ${b.endDate})`).join(', ')}
+                </div>`;
+            }
+
+            node.innerHTML = `
+                <div class="dasa-header">
+                    <span class="dasa-title">${d.planetName} Mahadasa</span>
+                    <span class="dasa-dates">${d.startDate} - ${d.endDate}</span>
+                </div>
+                ${bhukthiText}
+            `;
+            timelineContainer.appendChild(node);
+        });
+
+        // 5. Render Charts
+        renderCharts(data);
+    }
+
+    function renderCharts(data) {
+        if (selectedChartStyle === 'SOUTH') {
+            renderSouthIndianChart(document.getElementById('d1SouthGrid'), data.d1Chart || [], data.birthProfile?.lagna);
+            renderSouthIndianChart(document.getElementById('d9SouthGrid'), data.d9Chart || [], data.birthProfile?.lagna);
+        } else {
+            const lagnaSign = getSignNumberByName(data.birthProfile?.lagna);
+            renderNorthIndianChart(document.getElementById('d1NorthSvg'), data.d1Chart || [], lagnaSign);
+            renderNorthIndianChart(document.getElementById('d9NorthSvg'), data.d9Chart || [], lagnaSign);
+        }
+    }
+
+    function renderSouthIndianChart(gridEl, chartList, lagnaName) {
+        gridEl.innerHTML = '';
+        
+        // Group planets by sign index
+        const signPlanetGroups = {};
+        for (let i = 1; i <= 12; i++) {
+            signPlanetGroups[i] = [];
+        }
+
+        // Add standard planets
+        chartList.forEach(p => {
+            if (p.signNumber >= 1 && p.signNumber <= 12) {
+                signPlanetGroups[p.signNumber].push(getPlanetAbbr(p));
+            }
+        });
+
+        // Also figure out Lagna sign to put Ascendant tag in
+        const lagnaSignNum = getSignNumberByName(lagnaName);
+        if (lagnaSignNum >= 1 && lagnaSignNum <= 12) {
+            // Only add if Asc/Lagn not already explicitly in the list
+            const hasLagna = chartList.some(p => p.planetKey.toLowerCase().includes('lagna') || p.planetKey.toLowerCase().includes('asc'));
+            if (!hasLagna) {
+                signPlanetGroups[lagnaSignNum].push('Asc');
+            }
+        }
+
+        // Draw South Indian Grid Cells
+        southIndianCells.forEach(cell => {
+            const cellEl = document.createElement('div');
+            cellEl.className = 'chart-cell';
+            cellEl.style.gridRow = cell.row;
+            cellEl.style.gridColumn = cell.col;
+            
+            const spanSign = document.createElement('span');
+            spanSign.className = 'cell-sign-label';
+            spanSign.textContent = cell.name.split(' ')[0].substring(0,3);
+            cellEl.appendChild(spanSign);
+
+            const divPlanets = document.createElement('div');
+            divPlanets.className = 'cell-planets';
+            
+            const planets = signPlanetGroups[cell.sign] || [];
+            planets.forEach(p => {
+                const tag = document.createElement('span');
+                tag.className = 'planet-tag' + (p === 'Asc' ? ' lagna-tag' : '');
+                tag.textContent = p;
+                divPlanets.appendChild(tag);
+            });
+            
+            cellEl.appendChild(divPlanets);
+            gridEl.appendChild(cellEl);
+        });
+
+        // Add merged center cell
+        const centerEl = document.createElement('div');
+        centerEl.className = 'center-cell';
+        
+        const chartId = gridEl.id.includes('d1') ? 'D-1 Rashi' : 'D-9 Navamsha';
+        centerEl.innerHTML = `
+            <h4>${chartId}</h4>
+            <p style="color: var(--accent-gold); font-weight: bold; margin-top: 4px;">ASC: ${lagnaName || 'N/A'}</p>
+        `;
+        gridEl.appendChild(centerEl);
+    }
+
+    function renderNorthIndianChart(svgEl, chartList, lagnaSignNumber) {
+        // Base SVG Template layout lines (North Indian Diamond shape)
+        let svgHtml = `
+            <!-- Diagonals -->
+            <line x1="0" y1="0" x2="400" y2="400" class="svg-line"/>
+            <line x1="400" y1="0" x2="0" y2="400" class="svg-line"/>
+            
+            <!-- Inner Diamond -->
+            <line x1="200" y1="0" x2="400" y2="200" class="svg-line"/>
+            <line x1="400" y1="200" x2="200" y2="400" class="svg-line"/>
+            <line x1="200" y1="400" x2="0" y2="200" class="svg-line"/>
+            <line x1="0" y1="200" x2="200" y2="0" class="svg-line"/>
+            
+            <!-- Border -->
+            <rect x="0" y="0" width="400" height="400" fill="none" stroke="var(--accent-gold)" stroke-width="2"/>
+        `;
+
+        // House position properties coordinates mapping
+        const housePositions = {
+            1:  { signX: 200, signY: 45,  planetX: 200, planetY: 110 },
+            2:  { signX: 145, signY: 35,  planetX: 100, planetY: 60  },
+            3:  { signX: 35,  signY: 145, planetX: 60,  planetY: 100 },
+            4:  { signX: 45,  signY: 200, planetX: 110, planetY: 200 },
+            5:  { signX: 35,  signY: 255, planetX: 60,  planetY: 300 },
+            6:  { signX: 145, signY: 365, planetX: 100, planetY: 340 },
+            7:  { signX: 200, signY: 355, planetX: 200, planetY: 290 },
+            8:  { signX: 255, signY: 365, planetX: 300, planetY: 340 },
+            9:  { signX: 365, signY: 255, planetX: 340, planetY: 300 },
+            10: { signX: 355, signY: 200, planetX: 290, planetY: 200 },
+            11: { signX: 365, signY: 145, planetX: 340, planetY: 100 },
+            12: { signX: 255, signY: 35,  planetX: 300, planetY: 60  }
+        };
+
+        // Group planets by sign index
+        const signPlanets = {};
+        for (let i = 1; i <= 12; i++) {
+            signPlanets[i] = [];
+        }
+        chartList.forEach(p => {
+            if (p.signNumber >= 1 && p.signNumber <= 12) {
+                signPlanets[p.signNumber].push(getPlanetAbbr(p));
+            }
+        });
+
+        // Add Asc tag if needed
+        const hasLagna = chartList.some(p => p.planetKey.toLowerCase().includes('lagna') || p.planetKey.toLowerCase().includes('asc'));
+        if (!hasLagna && lagnaSignNumber >= 1 && lagnaSignNumber <= 12) {
+            signPlanets[lagnaSignNumber].push('Asc');
+        }
+
+        // Draw details for each house
+        for (let h = 1; h <= 12; h++) {
+            // Find sign number in this house (House 1 is lagnaSignNumber, counting counter-clockwise)
+            const signNum = ((lagnaSignNumber + h - 2) % 12) + 1;
+            const pos = housePositions[h];
+
+            // Render Sign label
+            svgHtml += `<text x="${pos.signX}" y="${pos.signY}" class="svg-house-number" text-anchor="middle">${signNum}</text>`;
+
+            // Render Planet lists inside this house
+            const planets = signPlanets[signNum] || [];
+            if (planets.length > 0) {
+                // If we have multiple planets, write them nicely
+                let planetStr = planets.join(' ');
+                
+                // Draw text node
+                svgHtml += `<text x="${pos.planetX}" y="${pos.planetY}" class="svg-planets">${planets.map(p => {
+                    const cls = p === 'Asc' ? ' class="svg-planets-lagna"' : '';
+                    return `<tspan${cls}>${p}</tspan>`;
+                }).join(' ')}</text>`;
+            }
+        }
+
+        svgEl.innerHTML = svgHtml;
     }
 </script>
-
 </body>
 </html>

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class PdfExportService {
 
+    private static final ThreadLocal<BaseFont> currentEngBf = new ThreadLocal<>();
     private final TranslationService ts;
     public PdfExportService(TranslationService ts) { this.ts = ts; }
 
@@ -30,7 +31,7 @@ public class PdfExportService {
             Locale locale = LocaleContextHolder.getLocale();
             String lang = locale.getLanguage();
             String fontFile = switch (lang) {
-                case "ta" -> "NotoSansTamil-Regular.ttf";
+                case "ta" -> "Bamini.ttf";
                 case "hi" -> "NotoSansDevanagari-Regular.ttf";
                 case "te" -> "NotoSansTelugu-Regular.ttf";
                 case "kn" -> "NotoSansKannada-Regular.ttf";
@@ -42,6 +43,16 @@ public class PdfExportService {
             byte[] fontBytes = resource.getInputStream().readAllBytes();
             BaseFont bf = BaseFont.createFont(fontFile, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, BaseFont.CACHED, fontBytes, null);
 
+            BaseFont engBf;
+            if ("ta".equalsIgnoreCase(lang)) {
+                ClassPathResource engResource = new ClassPathResource("fonts/NotoSans-Regular.ttf");
+                byte[] engFontBytes = engResource.getInputStream().readAllBytes();
+                engBf = BaseFont.createFont("NotoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, BaseFont.CACHED, engFontBytes, null);
+            } else {
+                engBf = bf;
+            }
+            currentEngBf.set(engBf);
+
             boolean isEnglish = "en".equalsIgnoreCase(lang);
             int boldStyle = isEnglish ? Font.BOLD : Font.NORMAL;
 
@@ -50,10 +61,16 @@ public class PdfExportService {
             Font bFont = new Font(bf, 9, Font.NORMAL);
             Font boldB = new Font(bf, 9, boldStyle);
             Font chartFont = new Font(bf, 8, Font.NORMAL);
+
+            Font engTFont = new Font(engBf, 18, boldStyle);
+            Font engSFont = new Font(engBf, 13, boldStyle);
+            Font engBFont = new Font(engBf, 9, Font.NORMAL);
+            Font engBoldB = new Font(engBf, 9, boldStyle);
+            Font engChartFont = new Font(engBf, 8, Font.NORMAL);
             boolean isHi = "hi".equalsIgnoreCase(lang);
 
             // Document Main Headline
-            Paragraph title = new Paragraph(ts.getLabel("pdf.report.title"), tFont);
+            Paragraph title = buildMixedParagraph(ts.getLabel("pdf.report.title"), tFont, engTFont);
             title.setAlignment(Element.ALIGN_CENTER); title.setSpacingAfter(14);
             document.add(title);
 
@@ -63,25 +80,26 @@ public class PdfExportService {
             info.setSpacingAfter(12);
             info.setWidths(new float[]{18f, 32f, 18f, 32f});
 
+            Font nameFont = containsTamil(data.getName()) ? bFont : engBFont;
             info.addCell(buildTableCell(ts.getLabel("pdf.info.name"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(org.vedic.astro.util.IndicPreShaper.shape(data.getName()), bFont, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(org.vedic.astro.util.IndicPreShaper.shape(data.getName()), nameFont, Element.ALIGN_LEFT));
             info.addCell(buildTableCell(ts.getLabel("pdf.info.timezone"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(data.getResolvedTimezone(), bFont, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(data.getResolvedTimezone(), engBFont, Element.ALIGN_LEFT));
 
             info.addCell(buildTableCell(ts.getLabel("pdf.info.dob"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(data.getDateOfBirth(), bFont, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(data.getDateOfBirth(), engBFont, Element.ALIGN_LEFT));
             info.addCell(buildTableCell(ts.getLabel("pdf.info.tob"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(data.getTimeOfBirth(), bFont, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(data.getTimeOfBirth(), engBFont, Element.ALIGN_LEFT));
 
             info.addCell(buildTableCell(ts.getLabel("pdf.info.lmt"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(data.getLocalMeanTime(), bFont, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(data.getLocalMeanTime(), engBFont, Element.ALIGN_LEFT));
             info.addCell(buildTableCell("", bFont, Element.ALIGN_LEFT));
             info.addCell(buildTableCell("", bFont, Element.ALIGN_LEFT));
 
             info.addCell(buildTableCell(ts.getLabel("pdf.info.lat"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(String.valueOf(data.getLatitude()), bFont, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(String.valueOf(data.getLatitude()), engBFont, Element.ALIGN_LEFT));
             info.addCell(buildTableCell(ts.getLabel("pdf.info.long"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(String.valueOf(data.getLongitude()), bFont, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(String.valueOf(data.getLongitude()), engBFont, Element.ALIGN_LEFT));
             document.add(info);
 
             // UPGRADED PANCHANGAM BAR: 2-Column layout expands width, stopping label fragmentation
@@ -106,7 +124,7 @@ public class PdfExportService {
             document.add(panchangamTable);
 
             // UPGRADED COORDS MATRIX: Structured widths protect multi-character Tamil strings
-            document.add(new Paragraph(ts.getLabel("pdf.pos.title"), sFont)); document.add(new Paragraph(" ", bFont));
+            document.add(buildMixedParagraph(ts.getLabel("pdf.pos.title"), sFont, engSFont)); document.add(new Paragraph(" ", bFont));
             PdfPTable posTab = new PdfPTable(5);
             posTab.setWidthPercentage(100);
             posTab.setSpacingAfter(15);
@@ -119,11 +137,11 @@ public class PdfExportService {
             posTab.addCell(buildTableCell(ts.getLabel("pdf.pos.hdr.long"), boldB, Element.ALIGN_CENTER));
 
             for (var p : data.getBirthPlanetaryPositions()) {
-                posTab.addCell(buildTableCell(p.getPlanetKey(), bFont, Element.ALIGN_CENTER));
+                posTab.addCell(buildTableCell(p.getPlanetKey(), engBFont, Element.ALIGN_CENTER));
                 posTab.addCell(buildTableCell(p.getDisplayName(), bFont, Element.ALIGN_CENTER));
-                posTab.addCell(buildTableCell(String.valueOf(p.getSignNumber()), bFont, Element.ALIGN_CENTER));
+                posTab.addCell(buildTableCell(String.valueOf(p.getSignNumber()), engBFont, Element.ALIGN_CENTER));
                 posTab.addCell(buildTableCell(p.getRashiName(), bFont, Element.ALIGN_CENTER));
-                posTab.addCell(buildTableCell(p.getFormattedDegree(), bFont, Element.ALIGN_CENTER));
+                posTab.addCell(buildTableCell(p.getFormattedDegree(), engBFont, Element.ALIGN_CENTER));
             }
             document.add(posTab);
 
@@ -131,7 +149,7 @@ public class PdfExportService {
             // SECTION 3: REWRITTEN 2-COLUMN 12-CHART SUITE GRID
             // ==========================================
             document.newPage();
-            document.add(new Paragraph(ts.getLabel("pdf.chart.suite.title"), sFont));
+            document.add(buildMixedParagraph(ts.getLabel("pdf.chart.suite.title"), sFont, engSFont));
             document.add(new Paragraph(" ", bFont));
 
             PdfPTable masterGrid = new PdfPTable(2); masterGrid.setWidthPercentage(100); masterGrid.setSplitRows(true);
@@ -178,17 +196,17 @@ public class PdfExportService {
                 String localizedPName = ts.getLabel("planet." + p.toUpperCase() + ".short");
                 String localizedStatus = ts.getLabel("shadbala.status." + s.getStrengthCategory().toLowerCase().replaceAll("\\s+", ""));
                 sb.addCell(buildTableCell(localizedPName, bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.1f", s.getSthanaBala()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.1f", s.getDigBala()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.1f", s.getKalaBala()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.1f", s.getCheshtaBala()), bFont, Element.ALIGN_CENTER));
-                sb.addCell(buildTableCell(String.format("%.2f", s.getTotalShadbalaRupas()), bFont, Element.ALIGN_CENTER));
+                sb.addCell(buildTableCell(String.format("%.1f", s.getSthanaBala()), engBFont, Element.ALIGN_CENTER));
+                sb.addCell(buildTableCell(String.format("%.1f", s.getDigBala()), engBFont, Element.ALIGN_CENTER));
+                sb.addCell(buildTableCell(String.format("%.1f", s.getKalaBala()), engBFont, Element.ALIGN_CENTER));
+                sb.addCell(buildTableCell(String.format("%.1f", s.getCheshtaBala()), engBFont, Element.ALIGN_CENTER));
+                sb.addCell(buildTableCell(String.format("%.2f", s.getTotalShadbalaRupas()), engBFont, Element.ALIGN_CENTER));
                 sb.addCell(buildTableCell(localizedStatus, bFont, Element.ALIGN_CENTER));
             });
             document.add(sb);
 
             // UPGRADED DASA TIMELINE: Defined widths prevent tracking timeline faults
-            document.newPage(); document.add(new Paragraph(ts.getLabel("pdf.dasa.title"), sFont)); document.add(new Paragraph(" ", bFont));
+            document.newPage(); document.add(buildMixedParagraph(ts.getLabel("pdf.dasa.title"), sFont, engSFont)); document.add(new Paragraph(" ", bFont));
             PdfPTable ds = new PdfPTable(4);
             ds.setWidthPercentage(100);
             ds.setSplitRows(true);
@@ -205,28 +223,85 @@ public class PdfExportService {
                 PdfPCell m = buildTableCell(locMaha + " " + ts.getLabel("pdf.dasa.label.mahadasa"), boldB, Element.ALIGN_LEFT);
                 m.setBackgroundColor(java.awt.Color.LIGHT_GRAY); m.setColspan(2); ds.addCell(m);
 
-                PdfPCell s = buildTableCell(d.getStartDate().toString(), boldB, Element.ALIGN_CENTER); s.setBackgroundColor(java.awt.Color.LIGHT_GRAY); ds.addCell(s);
-                PdfPCell e = buildTableCell(d.getEndDate().toString(), boldB, Element.ALIGN_CENTER); e.setBackgroundColor(java.awt.Color.LIGHT_GRAY); ds.addCell(e);
+                PdfPCell s = buildTableCell(d.getStartDate().toString(), engBoldB, Element.ALIGN_CENTER); s.setBackgroundColor(java.awt.Color.LIGHT_GRAY); ds.addCell(s);
+                PdfPCell e = buildTableCell(d.getEndDate().toString(), engBoldB, Element.ALIGN_CENTER); e.setBackgroundColor(java.awt.Color.LIGHT_GRAY); ds.addCell(e);
 
                 for (var b : d.getBhukthis()) {
                     String locBhuk = ts.getLabel("planet." + b.getPlanetName().toUpperCase() + ".short");
                     ds.addCell(buildTableCell("", bFont, Element.ALIGN_CENTER));
                     ds.addCell(buildTableCell(locBhuk, bFont, Element.ALIGN_LEFT));
-                    ds.addCell(buildTableCell(b.getStartDate().toString(), bFont, Element.ALIGN_CENTER));
-                    ds.addCell(buildTableCell(b.getEndDate().toString(), bFont, Element.ALIGN_CENTER));
+                    ds.addCell(buildTableCell(b.getStartDate().toString(), engBFont, Element.ALIGN_CENTER));
+                    ds.addCell(buildTableCell(b.getEndDate().toString(), engBFont, Element.ALIGN_CENTER));
                 }
             }
             document.add(ds);
             document.close();
-        } catch (Exception e) { throw new RuntimeException(e); }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            currentEngBf.remove();
+        }
         return out.toByteArray();
     }
 
     // =========================================================================
     // SAFE CELL BUILDING ENGINE FOR COMPLEX VERTICAL INDIC FONTS
     // =========================================================================
+    private Phrase buildMixedPhrase(String text, Font tamFont, Font engFont) {
+        Phrase phrase = new Phrase();
+        if (text == null || text.isEmpty()) {
+            return phrase;
+        }
+        phrase.setLeading(tamFont.getSize() + 5f);
+        boolean isTa = "ta".equalsIgnoreCase(LocaleContextHolder.getLocale().getLanguage());
+        int i = 0;
+        int len = text.length();
+        StringBuilder currentSegment = new StringBuilder();
+        boolean isCurrentTamil = false;
+
+        while (i < len) {
+            char c = text.charAt(i);
+            boolean isTamil = isTa && (c >= '\u0B80' && c <= '\u0BFF');
+
+            if (i == 0) {
+                isCurrentTamil = isTamil;
+            }
+
+            if (isTamil == isCurrentTamil) {
+                currentSegment.append(c);
+            } else {
+                String segmentStr = currentSegment.toString();
+                if (isCurrentTamil) {
+                    phrase.add(new Chunk(org.vedic.astro.util.BaminiConverter.convert(segmentStr), tamFont));
+                } else {
+                    phrase.add(new Chunk(segmentStr, engFont));
+                }
+                currentSegment.setLength(0);
+                currentSegment.append(c);
+                isCurrentTamil = isTamil;
+            }
+            i++;
+        }
+
+        if (currentSegment.length() > 0) {
+            String segmentStr = currentSegment.toString();
+            if (isCurrentTamil) {
+                phrase.add(new Chunk(org.vedic.astro.util.BaminiConverter.convert(segmentStr), tamFont));
+            } else {
+                phrase.add(new Chunk(segmentStr, engFont));
+            }
+        }
+        return phrase;
+    }
+
+    private Paragraph buildMixedParagraph(String text, Font tamFont, Font engFont) {
+        return new Paragraph(buildMixedPhrase(text, tamFont, engFont));
+    }
+
     private PdfPCell buildTableCell(String text, Font font, int alignment) {
-        Phrase phrase = new Phrase(text, font);
+        BaseFont engBase = currentEngBf.get();
+        Font engFont = (engBase != null) ? new Font(engBase, font.getSize(), font.getStyle(), font.getColor()) : font;
+        Phrase phrase = buildMixedPhrase(text, font, engFont);
 
         // Explicit leading safety margin prevents top/bottom modifier clipping
         phrase.setLeading(font.getSize() + 5f);
@@ -252,7 +327,9 @@ public class PdfExportService {
 
         table.addCell(buildBoxCell(planets, 11, baseFont));
 
-        Phrase titlePhrase = new Phrase(titleText, titleFont);
+        BaseFont engBase = currentEngBf.get();
+        Font engFont = (engBase != null) ? new Font(engBase, titleFont.getSize(), titleFont.getStyle(), titleFont.getColor()) : titleFont;
+        Phrase titlePhrase = buildMixedPhrase(titleText, titleFont, engFont);
         titlePhrase.setLeading(titleFont.getSize() + 4f);
         PdfPCell centerBlock = new PdfPCell(titlePhrase);
         centerBlock.setColspan(2); centerBlock.setRowspan(2);
@@ -281,7 +358,9 @@ public class PdfExportService {
                 .map(ChartResponseDTO.PositionDetail::getDisplayName)
                 .collect(Collectors.joining("\n"));
 
-        Phrase phrase = new Phrase(inlinePlanets, font);
+        BaseFont engBase = currentEngBf.get();
+        Font engFont = (engBase != null) ? new Font(engBase, font.getSize(), font.getStyle(), font.getColor()) : font;
+        Phrase phrase = buildMixedPhrase(inlinePlanets, font, engFont);
         phrase.setLeading(font.getSize() + 4f); // Keeps line bounds clear inside houses
 
         PdfPCell cell = new PdfPCell(phrase);
@@ -322,6 +401,15 @@ public class PdfExportService {
             if (!pText.isEmpty()) { template.beginText(); template.setFontAndSize(bf, 8); template.setTextMatrix(cx - (bf.getWidthPoint(pText, 8) / 2f), cy - 4f); template.showText(pText); template.endText(); }
         }
         return Image.getInstance(template);
+    }
+
+    private boolean containsTamil(String s) {
+        if (s == null) return false;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c >= '\u0B80' && c <= '\u0BFF') return true;
+        }
+        return false;
     }
 
     private static class LagnaCellEvent implements PdfPCellEvent {
