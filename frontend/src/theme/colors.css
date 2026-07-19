@@ -1,0 +1,19 @@
+:root {
+  --bg-primary: #0f0f1a;
+  --bg-card: #1a1a2e;
+  --bg-card-hover: #22223a;
+  --accent-gold: #d4a843;
+  --accent-warm: #e8913a;
+  --text-primary: #f0e6d3;
+  --text-secondary: #a09888;
+  --success: #4caf50;
+  --warning: #ff9800;
+  --danger: #f44336;
+  --border: #2a2a3e;
+}
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
