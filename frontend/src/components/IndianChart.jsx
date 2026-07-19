@@ -1,24 +1,31 @@
 import { useState } from 'react';
 
-function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi' }) {
+function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang = 'en' }) {
   const [selectedHouse, setSelectedHouse] = useState(null);
+
+  const abbrevMaps = {
+    en: { Lagna: 'Lg', Sun: 'Su', Moon: 'Mo', Mars: 'Ma', Mercury: 'Me', Jupiter: 'Ju', Venus: 'Ve', Saturn: 'Sa', Rahu: 'Ra', Ketu: 'Ke' },
+    ta: { Lagna: 'ல', Sun: 'சூ', Moon: 'ச', Mars: 'செ', Mercury: 'பு', Jupiter: 'கு', Venus: 'சு', Saturn: 'சனி', Rahu: 'ரா', Ketu: 'கே' },
+    hi: { Lagna: 'ल', Sun: 'सू', Moon: 'च', Mars: 'मं', Mercury: 'बु', Jupiter: 'गु', Venus: 'शु', Saturn: 'श', Rahu: 'रा', Ketu: 'के' },
+    te: { Lagna: 'ల', Sun: 'సూ', Moon: 'చ', Mars: 'మం', Mercury: 'బు', Jupiter: 'గు', Venus: 'శు', Saturn: 'శ', Rahu: 'రా', Ketu: 'కే' },
+    kn: { Lagna: 'ಲ', Sun: 'ಸೂ', Moon: 'ಚ', Mars: 'ಮం', Mercury: 'ಬು', Jupiter: 'ಗು', Venus: 'ಶು', Saturn: 'ಶ', Rahu: 'ರಾ', Ketu: 'ಕೇ' },
+    ml: { Lagna: 'ല', Sun: 'സൂ', Moon: 'ച', Mars: 'ചൊ', Mercury: 'ബു', Jupiter: 'ഗു', Venus: 'ശു', Saturn: 'ശ', Rahu: 'രാ', Ketu: 'കേ' }
+  };
+
+  const langMap = abbrevMaps[lang] || abbrevMaps.en;
 
   // Group planets by sign (1 to 12)
   const signPlanets = Array.from({ length: 13 }, () => []);
   positions.forEach((p) => {
-    // Determine short display name
-    let shortName = p.displayName || p.planetKey;
-    if (shortName.toLowerCase().includes('lagna')) shortName = 'Lg';
-    else if (shortName.toLowerCase().includes('sun')) shortName = 'Su';
-    else if (shortName.toLowerCase().includes('moon')) shortName = 'Mo';
-    else if (shortName.toLowerCase().includes('mars')) shortName = 'Ma';
-    else if (shortName.toLowerCase().includes('mercury')) shortName = 'Me';
-    else if (shortName.toLowerCase().includes('jupiter')) shortName = 'Ju';
-    else if (shortName.toLowerCase().includes('venus')) shortName = 'Ve';
-    else if (shortName.toLowerCase().includes('saturn')) shortName = 'Sa';
-    else if (shortName.toLowerCase().includes('rahu')) shortName = 'Ra';
-    else if (shortName.toLowerCase().includes('ketu')) shortName = 'Ke';
-    else shortName = shortName.substring(0, 2);
+    let key = p.planetKey || p.displayName || '';
+    let shortName = '';
+
+    const matchedKey = Object.keys(langMap).find(k => k.toLowerCase() === key.toLowerCase());
+    if (matchedKey) {
+      shortName = langMap[matchedKey];
+    } else {
+      shortName = key.substring(0, 2);
+    }
 
     if (p.signNumber >= 1 && p.signNumber <= 12) {
       signPlanets[p.signNumber].push(shortName);
@@ -138,18 +145,21 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi' }) {
               
               {/* Planet symbols */}
               <g transform={`translate(${coords.x + 10}, ${coords.y + 40})`}>
-                {cellPlanets.map((p, idx) => (
-                  <text
-                    key={idx}
-                    x={(idx % 3) * 28}
-                    y={Math.floor(idx / 3) * 20}
-                    fill={p === 'Lg' ? 'var(--accent-gold)' : 'var(--text-primary)'}
-                    fontSize="13"
-                    fontWeight={p === 'Lg' ? 'bold' : 'normal'}
-                  >
-                    {p}
-                  </text>
-                ))}
+                {cellPlanets.map((p, idx) => {
+                  const isLagna = p === langMap.Lagna;
+                  return (
+                    <text
+                      key={idx}
+                      x={(idx % 3) * 28}
+                      y={Math.floor(idx / 3) * 20}
+                      fill={isLagna ? 'var(--accent-gold)' : 'var(--text-primary)'}
+                      fontSize="13"
+                      fontWeight={isLagna ? 'bold' : 'normal'}
+                    >
+                      {p}
+                    </text>
+                  );
+                })}
               </g>
             </g>
           );

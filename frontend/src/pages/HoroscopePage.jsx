@@ -18,7 +18,10 @@ function HoroscopePage({ settings }) {
     try {
       const response = await fetch('/api/v1/astrology/comprehensive', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
         body: JSON.stringify(payload)
       });
       if (response.ok) {
@@ -39,7 +42,10 @@ function HoroscopePage({ settings }) {
     try {
       const response = await fetch(`/api/v1/astrology/download-pdf?systemType=DRIK_TIRUKANITHAM`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
         body: JSON.stringify(formPayload)
       });
       if (response.ok) {
@@ -72,11 +78,11 @@ function HoroscopePage({ settings }) {
         <div className="grid-2">
           <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <h3 className="title-gold">D1 Rasi Chart</h3>
-            <IndianChart positions={d1} style="south" title="D1 Rasi" />
+            <IndianChart positions={d1} style="south" title="D1 Rasi" lang={settings.language} />
           </div>
           <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <h3 className="title-gold">D9 Navamsa Chart</h3>
-            <IndianChart positions={d9} style="south" title="D9 Navamsa" />
+            <IndianChart positions={d9} style="south" title="D9 Navamsa" lang={settings.language} />
           </div>
         </div>
 

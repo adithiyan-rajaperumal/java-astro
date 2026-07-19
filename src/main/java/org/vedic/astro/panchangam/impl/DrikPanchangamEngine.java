@@ -146,7 +146,20 @@ public class DrikPanchangamEngine implements PanchangamEngine {
     }
 
     private PlanetaryPosition buildNavamsaPosition(String name, double absoluteLongitude, double speed) {
-        int d9SignNumber = ((int) (absoluteLongitude * 9.0 / 30.0) % 12) + 1;
+        int baseSignNumber = ((int) (absoluteLongitude / 30.0)) % 12 + 1;
+        double degreeInSign = absoluteLongitude % 30.0;
+        int navamsaIndexInSign = (int) (degreeInSign / (30.0 / 9.0));
+        navamsaIndexInSign = Math.min(8, Math.max(0, navamsaIndexInSign));
+
+        int startSign = switch (baseSignNumber) {
+            case 1, 5, 9 -> 1;     // Fiery (Aries)
+            case 2, 6, 10 -> 10;   // Earth (Capricorn)
+            case 3, 7, 11 -> 7;    // Air (Libra)
+            default -> 4;          // Water (Cancer) (4, 8, 12)
+        };
+
+        int d9SignNumber = (navamsaIndexInSign + startSign - 1) % 12 + 1;
+
         return PlanetaryPosition.builder()
                 .name(name)
                 .absoluteLongitude(absoluteLongitude)

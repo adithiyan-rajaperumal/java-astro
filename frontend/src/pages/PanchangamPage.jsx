@@ -14,7 +14,10 @@ function PanchangamPage({ settings }) {
     try {
       const response = await fetch('/api/v1/astrology/panchangam', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
         body: JSON.stringify({
           date: dateStr,
           latitude: settings.location.latitude,

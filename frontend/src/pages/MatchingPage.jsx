@@ -68,7 +68,10 @@ function MatchingPage({ settings }) {
     try {
       const response = await fetch('/api/v1/astrology/match', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
         body: JSON.stringify(payload)
       });
       if (response.ok) {
@@ -123,7 +126,10 @@ function MatchingPage({ settings }) {
     try {
       const response = await fetch(`/api/v1/astrology/match/download-pdf?systemType=DRIK_TIRUKANITHAM`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
         body: JSON.stringify(payload)
       });
       if (response.ok) {
