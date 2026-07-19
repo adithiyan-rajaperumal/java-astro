@@ -68,6 +68,11 @@ public class PdfExportService {
             Font engBoldB = new Font(engBf, 9, boldStyle);
             Font engChartFont = new Font(engBf, 8, Font.NORMAL);
             boolean isHi = "hi".equalsIgnoreCase(lang);
+            boolean isKn = "kn".equalsIgnoreCase(lang);
+
+            // Kannada needs smaller chart fonts to prevent overlap in tight grid cells
+            Font chartFontActual = isKn ? new Font(bf, 7, Font.NORMAL) : chartFont;
+            Font chartBoldActual = isKn ? new Font(bf, 8, boldStyle) : boldB;
 
             // Document Main Headline
             Paragraph title = buildMixedParagraph(ts.getLabel("pdf.report.title"), tFont, engTFont);
@@ -165,12 +170,12 @@ public class PdfExportService {
 
                 List<ChartResponseDTO.PositionDetail> planets = data.getVargaChartsSuite().get(i);
                 if (isHi) {
-                    Paragraph chartLabel = new Paragraph(resolvedTitleText, boldB);
+                    Paragraph chartLabel = buildMixedParagraph(resolvedTitleText, boldB, engBoldB);
                     chartLabel.setSpacingAfter(4);
                     layoutCell.addElement(chartLabel);
-                    layoutCell.addElement(buildNorthIndianTemplateImage(writer, planets, chartFont));
+                    layoutCell.addElement(buildNorthIndianTemplateImage(writer, planets, chartFontActual, engBf));
                 } else {
-                    layoutCell.addElement(buildCleanSouthIndianGrid(planets, resolvedTitleText, chartFont, boldB));
+                    layoutCell.addElement(buildCleanSouthIndianGrid(planets, resolvedTitleText, chartFontActual, chartBoldActual, isKn));
                 }
                 masterGrid.addCell(layoutCell);
             }
@@ -235,6 +240,195 @@ public class PdfExportService {
                 }
             }
             document.add(ds);
+            document.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            currentEngBf.remove();
+        }
+        return out.toByteArray();
+    }
+
+    public byte[] generateMarriageMatchingReport(org.vedic.astro.matching.dto.MatchingResponseDTO data) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4, 36, 36, 36, 36);
+        try {
+            PdfWriter writer = PdfWriter.getInstance(document, out);
+            document.open();
+
+            Locale locale = LocaleContextHolder.getLocale();
+            String lang = locale.getLanguage();
+            String fontFile = switch (lang) {
+                case "ta" -> "Bamini.ttf";
+                case "hi" -> "NotoSansDevanagari-Regular.ttf";
+                case "te" -> "NotoSansTelugu-Regular.ttf";
+                case "kn" -> "NotoSansKannada-Regular.ttf";
+                case "ml" -> "NotoSansMalayalam-Regular.ttf";
+                default -> "NotoSans-Regular.ttf";
+            };
+
+            ClassPathResource resource = new ClassPathResource("fonts/" + fontFile);
+            byte[] fontBytes = resource.getInputStream().readAllBytes();
+            BaseFont bf = BaseFont.createFont(fontFile, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, BaseFont.CACHED, fontBytes, null);
+
+            BaseFont engBf;
+            if ("ta".equalsIgnoreCase(lang)) {
+                ClassPathResource engResource = new ClassPathResource("fonts/NotoSans-Regular.ttf");
+                byte[] engFontBytes = engResource.getInputStream().readAllBytes();
+                engBf = BaseFont.createFont("NotoSans-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, BaseFont.CACHED, engFontBytes, null);
+            } else {
+                engBf = bf;
+            }
+            currentEngBf.set(engBf);
+
+            boolean isEnglish = "en".equalsIgnoreCase(lang);
+            int boldStyle = isEnglish ? Font.BOLD : Font.NORMAL;
+
+            Font tFont = new Font(bf, 18, boldStyle);
+            Font sFont = new Font(bf, 13, boldStyle);
+            Font bFont = new Font(bf, 9, Font.NORMAL);
+            Font boldB = new Font(bf, 9, boldStyle);
+            Font chartFont = new Font(bf, 8, Font.NORMAL);
+
+            Font engTFont = new Font(engBf, 18, boldStyle);
+            Font engSFont = new Font(engBf, 13, boldStyle);
+            Font engBFont = new Font(engBf, 9, Font.NORMAL);
+            Font engBoldB = new Font(engBf, 9, boldStyle);
+            boolean isHi = "hi".equalsIgnoreCase(lang);
+            boolean isKn = "kn".equalsIgnoreCase(lang);
+
+            Font chartFontActual = isKn ? new Font(bf, 7, Font.NORMAL) : chartFont;
+            Font chartBoldActual = isKn ? new Font(bf, 8, boldStyle) : boldB;
+
+            Paragraph title = buildMixedParagraph(ts.getLabel("matching.pdf.title"), tFont, engTFont);
+            title.setAlignment(Element.ALIGN_CENTER); title.setSpacingAfter(14);
+            document.add(title);
+
+            PdfPTable profiles = new PdfPTable(4);
+            profiles.setWidthPercentage(100);
+            profiles.setSpacingAfter(12);
+            profiles.setWidths(new float[]{20f, 30f, 20f, 30f});
+
+            PdfPCell hBoy = buildTableCell(ts.getLabel("matching.pdf.boy"), boldB, Element.ALIGN_CENTER);
+            hBoy.setColspan(2); hBoy.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+            profiles.addCell(hBoy);
+
+            PdfPCell hGirl = buildTableCell(ts.getLabel("matching.pdf.girl"), boldB, Element.ALIGN_CENTER);
+            hGirl.setColspan(2); hGirl.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+            profiles.addCell(hGirl);
+
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.name"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getBoyProfile().getName(), bFont, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.name"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getGirlProfile().getName(), bFont, Element.ALIGN_LEFT));
+
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.dob"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getBoyProfile().getDateOfBirth(), engBFont, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.dob"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getGirlProfile().getDateOfBirth(), engBFont, Element.ALIGN_LEFT));
+
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.tob"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getBoyProfile().getTimeOfBirth(), engBFont, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.tob"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getGirlProfile().getTimeOfBirth(), engBFont, Element.ALIGN_LEFT));
+
+            profiles.addCell(buildTableCell(ts.getLabel("profile.lagna"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getBoyProfile().getBirthProfile().getLagna(), bFont, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel("profile.lagna"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getGirlProfile().getBirthProfile().getLagna(), bFont, Element.ALIGN_LEFT));
+
+            profiles.addCell(buildTableCell(ts.getLabel("profile.rashi"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getBoyProfile().getBirthProfile().getRashi(), bFont, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel("profile.rashi"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getGirlProfile().getBirthProfile().getRashi(), bFont, Element.ALIGN_LEFT));
+
+            profiles.addCell(buildTableCell(ts.getLabel("profile.nakshatra"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getBoyProfile().getBirthProfile().getNakshatra() + " (" + data.getBoyProfile().getBirthProfile().getNakshatraPada() + ")", bFont, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel("profile.nakshatra"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(data.getGirlProfile().getBirthProfile().getNakshatra() + " (" + data.getGirlProfile().getBirthProfile().getNakshatraPada() + ")", bFont, Element.ALIGN_LEFT));
+
+            document.add(profiles);
+
+            PdfPTable scoreTable = new PdfPTable(2);
+            scoreTable.setWidthPercentage(100);
+            scoreTable.setSpacingAfter(14);
+            scoreTable.setWidths(new float[]{50f, 50f});
+
+            scoreTable.addCell(buildTableCell(ts.getLabel("matching.pdf.score") + ": " + String.format("%.1f", data.getTotalScore()) + " / " + String.format("%.1f", data.getMaxScore()) + " (" + String.format("%.1f", data.getPercentage()) + "%)", boldB, Element.ALIGN_LEFT));
+            scoreTable.addCell(buildTableCell(ts.getLabel("matching.pdf.verdict") + ": " + data.getVerdict(), boldB, Element.ALIGN_LEFT));
+
+            document.add(scoreTable);
+
+            if (data.getWarnings() != null && !data.getWarnings().isEmpty()) {
+                document.add(buildMixedParagraph(ts.getLabel("matching.pdf.warnings"), sFont, engSFont));
+                for (String warning : data.getWarnings()) {
+                    Paragraph wp = buildMixedParagraph("• " + warning, bFont, engBFont);
+                    wp.setSpacingAfter(4);
+                    document.add(wp);
+                }
+                document.add(new Paragraph(" ", bFont));
+            }
+
+            document.add(buildMixedParagraph(ts.getLabel("pdf.chart.suite.title") + " (D1 Rasi)", sFont, engSFont));
+            document.add(new Paragraph(" ", bFont));
+
+            PdfPTable chartGrid = new PdfPTable(2);
+            chartGrid.setWidthPercentage(100);
+            chartGrid.setSpacingAfter(15);
+
+            PdfPCell boyCell = new PdfPCell(); boyCell.setBorder(PdfPCell.NO_BORDER); boyCell.setPadding(6);
+            if (isHi) {
+                boyCell.addElement(buildMixedParagraph(data.getBoyProfile().getName() + " - D1", boldB, engBoldB));
+                boyCell.addElement(buildNorthIndianTemplateImage(writer, data.getBoyProfile().getD1Chart(), chartFontActual, engBf));
+            } else {
+                boyCell.addElement(buildCleanSouthIndianGrid(data.getBoyProfile().getD1Chart(), data.getBoyProfile().getName() + " - D1", chartFontActual, chartBoldActual, isKn));
+            }
+            chartGrid.addCell(boyCell);
+
+            PdfPCell girlCell = new PdfPCell(); girlCell.setBorder(PdfPCell.NO_BORDER); girlCell.setPadding(6);
+            if (isHi) {
+                girlCell.addElement(buildMixedParagraph(data.getGirlProfile().getName() + " - D1", boldB, engBoldB));
+                girlCell.addElement(buildNorthIndianTemplateImage(writer, data.getGirlProfile().getD1Chart(), chartFontActual, engBf));
+            } else {
+                girlCell.addElement(buildCleanSouthIndianGrid(data.getGirlProfile().getD1Chart(), data.getGirlProfile().getName() + " - D1", chartFontActual, chartBoldActual, isKn));
+            }
+            chartGrid.addCell(girlCell);
+
+            document.add(chartGrid);
+
+            document.newPage();
+            document.add(buildMixedParagraph(ts.getLabel("matching.pdf.koota"), sFont, engSFont));
+            document.add(new Paragraph(" ", bFont));
+
+            PdfPTable kTable = new PdfPTable(5);
+            kTable.setWidthPercentage(100);
+            kTable.setWidths(new float[]{20f, 12f, 12f, 16f, 40f});
+
+            kTable.addCell(buildTableCell(ts.getLabel("matching.pdf.koota"), boldB, Element.ALIGN_CENTER));
+            kTable.addCell(buildTableCell(ts.getLabel("matching.pdf.max"), boldB, Element.ALIGN_CENTER));
+            kTable.addCell(buildTableCell(ts.getLabel("matching.pdf.scored"), boldB, Element.ALIGN_CENTER));
+            kTable.addCell(buildTableCell(ts.getLabel("matching.pdf.status"), boldB, Element.ALIGN_CENTER));
+            kTable.addCell(buildTableCell(ts.getLabel("matching.pdf.notes"), boldB, Element.ALIGN_CENTER));
+
+            for (var k : data.getKootas()) {
+                kTable.addCell(buildTableCell(k.getName(), bFont, Element.ALIGN_LEFT));
+                kTable.addCell(buildTableCell(String.valueOf(k.getMaxPoints()), engBFont, Element.ALIGN_CENTER));
+                kTable.addCell(buildTableCell(String.valueOf(k.getScoredPoints()), engBFont, Element.ALIGN_CENTER));
+                
+                String statusText = switch (k.getStatus()) {
+                    case MATCHED -> ts.getLabel("matching.status.matched");
+                    case MATCHED_VIA_NULLIFICATION -> ts.getLabel("matching.status.nullified");
+                    case NOT_MATCHED -> ts.getLabel("matching.status.notmatched");
+                };
+                kTable.addCell(buildTableCell(statusText, bFont, Element.ALIGN_CENTER));
+
+                String note = (k.getStatus() == org.vedic.astro.matching.dto.KootaResultDTO.MatchStatus.MATCHED_VIA_NULLIFICATION)
+                        ? k.getNullificationReason() : k.getDescription();
+                kTable.addCell(buildTableCell(note, bFont, Element.ALIGN_LEFT));
+            }
+
+            document.add(kTable);
+
             document.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -316,42 +510,43 @@ public class PdfExportService {
         return cell;
     }
 
-    private PdfPTable buildCleanSouthIndianGrid(List<ChartResponseDTO.PositionDetail> planets, String titleText, Font baseFont, Font titleFont) {
+    private PdfPTable buildCleanSouthIndianGrid(List<ChartResponseDTO.PositionDetail> planets, String titleText, Font baseFont, Font titleFont, boolean isKn) {
         PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
 
-        table.addCell(buildBoxCell(planets, 12, baseFont));
-        table.addCell(buildBoxCell(planets, 1, baseFont));
-        table.addCell(buildBoxCell(planets, 2, baseFont));
-        table.addCell(buildBoxCell(planets, 3, baseFont));
+        table.addCell(buildBoxCell(planets, 12, baseFont, isKn));
+        table.addCell(buildBoxCell(planets, 1, baseFont, isKn));
+        table.addCell(buildBoxCell(planets, 2, baseFont, isKn));
+        table.addCell(buildBoxCell(planets, 3, baseFont, isKn));
 
-        table.addCell(buildBoxCell(planets, 11, baseFont));
+        table.addCell(buildBoxCell(planets, 11, baseFont, isKn));
 
         BaseFont engBase = currentEngBf.get();
         Font engFont = (engBase != null) ? new Font(engBase, titleFont.getSize(), titleFont.getStyle(), titleFont.getColor()) : titleFont;
         Phrase titlePhrase = buildMixedPhrase(titleText, titleFont, engFont);
-        titlePhrase.setLeading(titleFont.getSize() + 4f);
+        float titleLeadingExtra = isKn ? 7f : 4f;
+        titlePhrase.setLeading(titleFont.getSize() + titleLeadingExtra);
         PdfPCell centerBlock = new PdfPCell(titlePhrase);
         centerBlock.setColspan(2); centerBlock.setRowspan(2);
         centerBlock.setHorizontalAlignment(Element.ALIGN_CENTER);
         centerBlock.setVerticalAlignment(Element.ALIGN_MIDDLE);
         centerBlock.setPadding(4);
-        centerBlock.setFixedHeight(104f);
+        centerBlock.setFixedHeight(isKn ? 116f : 104f);
         table.addCell(centerBlock);
 
-        table.addCell(buildBoxCell(planets, 4, baseFont));
-        table.addCell(buildBoxCell(planets, 10, baseFont));
-        table.addCell(buildBoxCell(planets, 5, baseFont));
+        table.addCell(buildBoxCell(planets, 4, baseFont, isKn));
+        table.addCell(buildBoxCell(planets, 10, baseFont, isKn));
+        table.addCell(buildBoxCell(planets, 5, baseFont, isKn));
 
-        table.addCell(buildBoxCell(planets, 9, baseFont));
-        table.addCell(buildBoxCell(planets, 8, baseFont));
-        table.addCell(buildBoxCell(planets, 7, baseFont));
-        table.addCell(buildBoxCell(planets, 6, baseFont));
+        table.addCell(buildBoxCell(planets, 9, baseFont, isKn));
+        table.addCell(buildBoxCell(planets, 8, baseFont, isKn));
+        table.addCell(buildBoxCell(planets, 7, baseFont, isKn));
+        table.addCell(buildBoxCell(planets, 6, baseFont, isKn));
 
         return table;
     }
 
-    private PdfPCell buildBoxCell(List<ChartResponseDTO.PositionDetail> planets, int targetSign, Font font) {
+    private PdfPCell buildBoxCell(List<ChartResponseDTO.PositionDetail> planets, int targetSign, Font font, boolean isKn) {
         // Collect planetary abbreviations on clean vertical lines inside the grid boxes
         String inlinePlanets = planets.stream()
                 .filter(p -> p.getSignNumber() == targetSign)
@@ -361,10 +556,11 @@ public class PdfExportService {
         BaseFont engBase = currentEngBf.get();
         Font engFont = (engBase != null) ? new Font(engBase, font.getSize(), font.getStyle(), font.getColor()) : font;
         Phrase phrase = buildMixedPhrase(inlinePlanets, font, engFont);
-        phrase.setLeading(font.getSize() + 4f); // Keeps line bounds clear inside houses
+        float leadingExtra = isKn ? 7f : 4f;
+        phrase.setLeading(font.getSize() + leadingExtra);
 
         PdfPCell cell = new PdfPCell(phrase);
-        cell.setFixedHeight(52f);
+        cell.setFixedHeight(isKn ? 58f : 52f);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setPaddingTop(3f);
@@ -379,7 +575,7 @@ public class PdfExportService {
         return cell;
     }
 
-    private Image buildNorthIndianTemplateImage(PdfWriter wr, List<ChartResponseDTO.PositionDetail> planets, Font font) throws Exception {
+    private Image buildNorthIndianTemplateImage(PdfWriter wr, List<ChartResponseDTO.PositionDetail> planets, Font font, BaseFont engBaseFont) throws Exception {
         PdfContentByte cb = wr.getDirectContent();
         PdfTemplate template = cb.createTemplate(160f, 160f);
         template.setColorStroke(java.awt.Color.BLACK); template.setLineWidth(0.8f);
@@ -392,13 +588,39 @@ public class PdfExportService {
 
         float[][] targets = {{80f,115f}, {40f,135f}, {20f,100f}, {45f,80f}, {20f,60f}, {40f,25f}, {80f,45f}, {120f,25f}, {140f,60f}, {115f,80f}, {140f,100f}, {120f,135f}};
         int lagnaSign = planets.stream().filter(p -> "LAGNA".equalsIgnoreCase(p.getPlanetKey())).findFirst().orElseThrow().getSignNumber();
-        BaseFont bf = font.getBaseFont();
+        BaseFont indicBf = font.getBaseFont();
+
+        // Use NotoSans (English) for sign numbers to avoid Devanagari metric issues
+        BaseFont numBf = (engBaseFont != null) ? engBaseFont : indicBf;
+        float signNumSize = 6f;
+        float planetTextSize = 7f;
 
         for (int i = 0; i < 12; i++) {
-            int curSign = ((lagnaSign - 1 + i) % 12) + 1; float cx = targets[i][0]; float cy = targets[i][1];
-            template.beginText(); template.setFontAndSize(bf, 6); template.setTextMatrix(cx - 2f, cy + 6f); template.showText(String.valueOf(curSign)); template.endText();
-            String pText = planets.stream().filter(p -> p.getSignNumber() == curSign && !"LAGNA".equalsIgnoreCase(p.getPlanetKey())).map(ChartResponseDTO.PositionDetail::getDisplayName).collect(Collectors.joining(" "));
-            if (!pText.isEmpty()) { template.beginText(); template.setFontAndSize(bf, 8); template.setTextMatrix(cx - (bf.getWidthPoint(pText, 8) / 2f), cy - 4f); template.showText(pText); template.endText(); }
+            int curSign = ((lagnaSign - 1 + i) % 12) + 1;
+            float cx = targets[i][0]; float cy = targets[i][1];
+
+            // Sign number: use English font, center dynamically based on actual glyph width
+            String signStr = String.valueOf(curSign);
+            float signWidth = numBf.getWidthPoint(signStr, signNumSize);
+            template.beginText();
+            template.setFontAndSize(numBf, signNumSize);
+            template.setTextMatrix(cx - (signWidth / 2f), cy + 8f);
+            template.showText(signStr);
+            template.endText();
+
+            // Planet text: use Indic font, center dynamically, placed well below sign number
+            String pText = planets.stream()
+                    .filter(p -> p.getSignNumber() == curSign && !"LAGNA".equalsIgnoreCase(p.getPlanetKey()))
+                    .map(ChartResponseDTO.PositionDetail::getDisplayName)
+                    .collect(Collectors.joining(" "));
+            if (!pText.isEmpty()) {
+                float pWidth = indicBf.getWidthPoint(pText, planetTextSize);
+                template.beginText();
+                template.setFontAndSize(indicBf, planetTextSize);
+                template.setTextMatrix(cx - (pWidth / 2f), cy - 6f);
+                template.showText(pText);
+                template.endText();
+            }
         }
         return Image.getInstance(template);
     }

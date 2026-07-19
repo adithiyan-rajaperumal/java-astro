@@ -70,27 +70,33 @@ public class DrikPanchangamEngine implements PanchangamEngine {
         // Lagna derivation
         double[] cusps = new double[13];
         double[] ascmc = new double[10];
-        swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-        double lagnaLong = ascmc[SweConst.SE_ASC];
-
-        d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
-        d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
 
         // Planet iteration
         double[] xx = new double[6];
         StringBuffer serr = new StringBuffer();
 
-        for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
-            swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
-            double absoluteLong = xx[0];
+        synchronized (swissEph) {
+            org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(dto.ayanamsa());
+            swissEph.swe_set_sid_mode(ayanamsaType.getMode(), 0, 0);
 
-            d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), absoluteLong, xx[3]));
-            d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), absoluteLong, xx[3]));
+            swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
+            double lagnaLong = ascmc[SweConst.SE_ASC];
 
-            if ("Rahu".equals(planet.getKey())) {
-                double ketuLong = (absoluteLong + 180.0) % 360.0;
-                d1Map.put("Ketu", buildBasePosition("Ketu", ketuLong, xx[3]));
-                d9Map.put("Ketu", buildNavamsaPosition("Ketu", ketuLong, xx[3]));
+            d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
+            d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
+
+            for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
+                swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
+                double absoluteLong = xx[0];
+
+                d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), absoluteLong, xx[3]));
+                d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), absoluteLong, xx[3]));
+
+                if ("Rahu".equals(planet.getKey())) {
+                    double ketuLong = (absoluteLong + 180.0) % 360.0;
+                    d1Map.put("Ketu", buildBasePosition("Ketu", ketuLong, xx[3]));
+                    d9Map.put("Ketu", buildNavamsaPosition("Ketu", ketuLong, xx[3]));
+                }
             }
         }
 
@@ -113,7 +119,11 @@ public class DrikPanchangamEngine implements PanchangamEngine {
     @Override
     public ComprehensiveReportDTO generateComprehensiveReport(BirthDetailsDTO payload, ChartResult res) {
         double[] cusps = new double[13]; double[] ascmc = new double[10];
-        swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
+        synchronized (swissEph) {
+            org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(payload.ayanamsa());
+            swissEph.swe_set_sid_mode(ayanamsaType.getMode(), 0, 0);
+            swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
+        }
 
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);
         deepReportData.setResolvedTimezone(timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));

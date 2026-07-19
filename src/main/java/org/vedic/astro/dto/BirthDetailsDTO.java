@@ -9,5 +9,7 @@ public record BirthDetailsDTO(
         int minute,
         int second,
         double latitude,
-        double longitude
+        double longitude,
+        String ayanamsa
 ) {}
+
