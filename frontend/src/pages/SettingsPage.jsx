@@ -1,0 +1,81 @@
+import LocationSearch from '../components/LocationSearch';
+
+function SettingsPage({ settings, onSettingsChange }) {
+  const languages = [
+    { code: 'en', name: 'English', script: 'English' },
+    { code: 'ta', name: 'Tamil', script: 'தமிழ்' },
+    { code: 'hi', name: 'Hindi', script: 'हिंदी' },
+    { code: 'kn', name: 'Kannada', script: 'ಕನ್ನಡ' },
+    { code: 'te', name: 'Telugu', script: 'తెలుగు' },
+    { code: 'ml', name: 'Malayalam', script: 'മലയാളം' },
+  ];
+
+  const handleLanguageSelect = (langCode) => {
+    onSettingsChange({ ...settings, language: langCode });
+  };
+
+  const handleLocationChange = (loc) => {
+    onSettingsChange({ ...settings, location: loc });
+  };
+
+  const handleAyanamsaChange = (e) => {
+    onSettingsChange({ ...settings, ayanamsa: e.target.value });
+  };
+
+  return (
+    <div>
+      <h2 className="title-gold">Settings</h2>
+      
+      <div className="card">
+        <h3 style={{ marginTop: 0, color: 'var(--accent-gold)' }}>App Language</h3>
+        <div className="lang-selector-grid">
+          {languages.map((lang) => (
+            <div
+              key={lang.code}
+              className={`lang-card ${settings.language === lang.code ? 'active' : ''}`}
+              onClick={() => handleLanguageSelect(lang.code)}
+            >
+              <h3>{lang.script}</h3>
+              <span>{lang.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <h3 style={{ marginTop: 0, color: 'var(--accent-gold)' }}>Default Location</h3>
+        <LocationSearch
+          value={settings.location}
+          onChange={handleLocationChange}
+          placeholder="Search and set default location..."
+        />
+        {settings.location && (
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: '5px' }}>
+            Current default: Lat {settings.location.latitude.toFixed(4)}, Lon {settings.location.longitude.toFixed(4)}
+          </p>
+        )}
+      </div>
+
+      <div className="card">
+        <h3 style={{ marginTop: 0, color: 'var(--accent-gold)' }}>Calculation Engine Settings</h3>
+        <label>Ayanamsa Method</label>
+        <select value={settings.ayanamsa} onChange={handleAyanamsaChange}>
+          <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
+          <option value="RAMAN">Raman</option>
+          <option value="KP">KP (Krishnamurti Padhdhati)</option>
+          <option value="SAYANA">Sayana (Tropical)</option>
+        </select>
+      </div>
+
+      <div className="card" style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+        <h3 style={{ marginTop: 0, color: 'var(--accent-gold)' }}>About StellaVedic</h3>
+        <p>Version 1.0.0 (Release 2026)</p>
+        <p style={{ marginTop: '10px' }}>
+          StellaVedic combines high-precision astronomical positions calculated via Swiss Ephemeris with traditional Vedic principles to deliver accurate Panchangam, Horoscope matching, and structural dosha/yoga diagnostics.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default SettingsPage;
