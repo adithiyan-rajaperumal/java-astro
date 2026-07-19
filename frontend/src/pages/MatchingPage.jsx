@@ -266,7 +266,7 @@ function MatchingPage({ settings }) {
                 {result.totalScore}
               </span>
               <span className="label">
-                out of {result.maxScore}
+                {t('outOf', settings.language)} {result.maxScore}
               </span>
             </div>
             <div className={`verdict-badge ${getVerdictClass(result.verdict)}`}>
@@ -275,10 +275,10 @@ function MatchingPage({ settings }) {
             
             <div style={{ marginTop: '20px', display: 'flex', gap: '15px' }}>
               <button onClick={handleDownloadPdf} className="btn-primary">
-                📥 Download PDF Compatibility Report
+                📥 {t('downloadPdf', settings.language)}
               </button>
               <button onClick={() => setResult(null)} className="btn-primary" style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
-                New Match
+                {t('newMatch', settings.language)}
               </button>
             </div>
           </div>
@@ -286,7 +286,7 @@ function MatchingPage({ settings }) {
           {/* Warnings and alerts */}
           {result.warnings && result.warnings.length > 0 && (
             <div className="card" style={{ borderLeft: '4px solid var(--warning)', backgroundColor: 'rgba(255, 152, 0, 0.05)' }}>
-              <h4 style={{ margin: '0 0 10px', color: 'var(--accent-gold)' }}>⚠️ Compatibility Notes & Warnings</h4>
+              <h4 style={{ margin: '0 0 10px', color: 'var(--accent-gold)' }}>⚠️ {t('warningsTitle', settings.language)}</h4>
               <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', color: 'var(--text-primary)' }}>
                 {result.warnings.map((w, idx) => (
                   <li key={idx} style={{ marginBottom: '5px' }}>{w}</li>
@@ -297,16 +297,16 @@ function MatchingPage({ settings }) {
 
           {/* Koota/Porutham detail table */}
           <div className="card">
-            <h3 className="title-gold">Porutham/Koota Detailed Breakdown</h3>
+            <h3 className="title-gold">{t('breakdownTitle', settings.language)}</h3>
             <div className="horai-table-container">
               <table className="horai-table">
                 <thead>
                   <tr>
-                    <th>Match Parameter</th>
-                    <th>Scored</th>
-                    <th>Max</th>
-                    <th>Status</th>
-                    <th>Detail</th>
+                    <th>{t('matching', settings.language)}</th>
+                    <th>{t('scored', settings.language)}</th>
+                    <th>{t('max', settings.language)}</th>
+                    <th>{t('status', settings.language)}</th>
+                    <th>{t('notes', settings.language)}</th>
                   </tr>
                 </thead>
                 <tbody>

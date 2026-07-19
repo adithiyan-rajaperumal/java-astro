@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
 function App() {
   const [settings, setSettings] = useState(() => {
     try {
-      const saved = localStorage.getItem('stellavedic_settings');
+      const saved = localStorage.getItem('drikvedic_settings');
       return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
     } catch {
       return DEFAULT_SETTINGS;
@@ -29,7 +29,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('panchangam');
 
   useEffect(() => {
-    localStorage.setItem('stellavedic_settings', JSON.stringify(settings));
+    localStorage.setItem('drikvedic_settings', JSON.stringify(settings));
   }, [settings]);
 
   const handleSettingsChange = (newSettings) => {

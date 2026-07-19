@@ -163,18 +163,18 @@ function HoroscopePage({ settings }) {
     if (!report || !report.shadbalaStrengths?.planetStrengths) return null;
     return (
       <div className="card">
-        <h3 className="title-gold">Shadbala Strengths</h3>
+        <h3 className="title-gold">{t('shadbalaTab', settings.language)}</h3>
         <div className="horai-table-container">
           <table className="horai-table">
             <thead>
               <tr>
-                <th>Planet</th>
+                <th>{t('planet', settings.language)}</th>
                 <th>Sthana</th>
                 <th>Dig</th>
                 <th>Kala</th>
                 <th>Cheshta</th>
                 <th>Total</th>
-                <th>Category</th>
+                <th>{t('status', settings.language)}</th>
               </tr>
             </thead>
             <tbody>
@@ -213,7 +213,7 @@ function HoroscopePage({ settings }) {
     return (
       <div>
         <div className="card">
-          <h3 className="title-gold">Yogas Detected</h3>
+          <h3 className="title-gold">{t('yogasDetected', settings.language)}</h3>
           <div className="grid-2">
             {diag.activeYogas?.map((yoga, idx) => (
               <div key={idx} className="card" style={{ borderLeft: '4px solid var(--accent-gold)', margin: 0 }}>
@@ -231,7 +231,7 @@ function HoroscopePage({ settings }) {
         </div>
 
         <div className="card">
-          <h3 className="title-gold">Doshams Evaluated</h3>
+          <h3 className="title-gold">{t('doshamsEvaluated', settings.language)}</h3>
           <div className="dosha-grid">
             {diag.discoveredDoshams?.map((dosha, idx) => {
               const active = dosha.active;
@@ -240,10 +240,10 @@ function HoroscopePage({ settings }) {
               let badgeText = 'None';
               if (active) {
                 badgeClass = 'active';
-                badgeText = dosha.severity || 'Active';
+                badgeText = dosha.severity || t('active', settings.language);
               } else if (nullified) {
                 badgeClass = 'cancelled';
-                badgeText = 'Cancelled';
+                badgeText = t('cancelled', settings.language);
               }
 
               return (
@@ -322,10 +322,10 @@ function HoroscopePage({ settings }) {
             <div>
               <h3 style={{ margin: '0 0 5px', color: 'var(--accent-gold)' }}>{report.name}</h3>
               <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                Born: {report.dateOfBirth} at {report.timeOfBirth} (LMT: {report.localMeanTime})
+                {t('born', settings.language)}: {report.dateOfBirth} at {report.timeOfBirth} ({t('localMeanTime', settings.language)}: {report.localMeanTime})
               </p>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                Lagna: {report.birthProfile?.lagna} | Rasi: {report.birthProfile?.rasi} | Star: {report.birthProfile?.nakshatra} (Pada {report.birthProfile?.nakshatraPada})
+                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada})
               </p>
             </div>
             <div>
@@ -333,7 +333,7 @@ function HoroscopePage({ settings }) {
                 📥 {t('downloadPdf', settings.language)}
               </button>
               <button onClick={() => setReport(null)} className="btn-primary" style={{ marginLeft: '10px', background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
-                New Chart
+                {t('newChart', settings.language)}
               </button>
             </div>
           </div>
@@ -344,25 +344,25 @@ function HoroscopePage({ settings }) {
               className={`tab-btn ${activeSubTab === 'charts' ? 'active' : ''}`}
               onClick={() => setActiveSubTab('charts')}
             >
-              D1/D9 Charts
+              {t('chartsTab', settings.language)}
             </button>
             <button 
               className={`tab-btn ${activeSubTab === 'dasa' ? 'active' : ''}`}
               onClick={() => setActiveSubTab('dasa')}
             >
-              Dasa-Bhukthi
+              {t('dasaTab', settings.language)}
             </button>
             <button 
               className={`tab-btn ${activeSubTab === 'shadbala' ? 'active' : ''}`}
               onClick={() => setActiveSubTab('shadbala')}
             >
-              Shadbala
+              {t('shadbalaTab', settings.language)}
             </button>
             <button 
               className={`tab-btn ${activeSubTab === 'diagnostics' ? 'active' : ''}`}
               onClick={() => setActiveSubTab('diagnostics')}
             >
-              Doshas & Yogas
+              {t('diagnosticsTab', settings.language)}
             </button>
           </div>
 
