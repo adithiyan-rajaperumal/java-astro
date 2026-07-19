@@ -1,6 +1,8 @@
 package org.vedic.astro;
 
 import org.junit.jupiter.api.Test;
+import de.thmac.swisseph.SwissEph;
+import de.thmac.swisseph.SweConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.vedic.astro.dto.BirthDetailsDTO;
@@ -96,4 +98,28 @@ public class MatchingEngineTest {
         assertTrue(dasaResponse.getTotalScore() >= 0 && dasaResponse.getTotalScore() <= 10.0);
         assertFalse(dasaResponse.getKootas().isEmpty());
     }
+
+    @Test
+    public void testSunriseSunset() {
+        SwissEph swissEph = new SwissEph();
+        double julianDay = 2461241.5; // July 19, 2026 noon UT
+        double[] geopos = {77.2090, 28.6139, 0}; // New Delhi (longitude, latitude, altitude)
+        de.thmac.swisseph.DblObj tret = new de.thmac.swisseph.DblObj();
+        StringBuffer serr = new StringBuffer();
+        int res = swissEph.swe_rise_trans(
+            julianDay,
+            de.thmac.swisseph.SweConst.SE_SUN,
+            null,
+            de.thmac.swisseph.SweConst.SEFLG_SWIEPH,
+            de.thmac.swisseph.SweConst.SE_CALC_RISE,
+            geopos,
+            1013.25,
+            15.0,
+            tret,
+            serr
+        );
+        assertTrue(res >= 0, "Sunrise calculation should succeed");
+    }
 }
+
+
