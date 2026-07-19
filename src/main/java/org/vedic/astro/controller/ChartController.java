@@ -38,9 +38,17 @@ public class ChartController {
         return ResponseEntity.ok(orchestrationService.convertToUiDashboardResponse(res, birthDetails));
     }
 
-
-
-
+    @PostMapping(path = "/comprehensive", produces = "application/json;charset=UTF-8")
+    public ResponseEntity<ComprehensiveReportDTO> getComprehensiveData(
+            @RequestBody BirthDetailsDTO payload,
+            @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType) {
+        
+        PanchangamEngine engine = panchangamFactory.getEngine(systemType);
+        ChartResult res = engine.calculate(payload);
+        
+        ComprehensiveReportDTO report = engine.generateComprehensiveReport(payload, res);
+        return ResponseEntity.ok(report);
+    }
 
     @PostMapping("/download-pdf")
     public ResponseEntity<byte[]> downloadComprehensiveAstrologyReport(@RequestBody BirthDetailsDTO payload, @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType) {
