@@ -67,25 +67,25 @@ function PanchangamPage({ settings }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <button onClick={() => changeDate(-1)} className="btn-primary" style={{ padding: '8px 15px' }}>← Prev</button>
+        <button onClick={() => changeDate(-1)} className="btn-primary" style={{ padding: '8px 15px' }}>← {t('prev', settings.language)}</button>
         <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--accent-gold)' }}>
           📅 {currentDate}
         </span>
-        <button onClick={() => changeDate(1)} className="btn-primary" style={{ padding: '8px 15px' }}>Next →</button>
+        <button onClick={() => changeDate(1)} className="btn-primary" style={{ padding: '8px 15px' }}>{t('next', settings.language)} →</button>
       </div>
 
       {loading && (
         <div className="spinner-container">
           <div className="spinner"></div>
-          <p>Calculating planetary equations...</p>
+          <p>{t('calculating', settings.language)}</p>
         </div>
       )}
 
       {error && (
         <div className="card" style={{ borderLeft: '4px solid var(--danger)' }}>
-          <p style={{ color: 'var(--danger)', fontWeight: 'bold' }}>Error Loading Panchangam</p>
+          <p style={{ color: 'var(--danger)', fontWeight: 'bold' }}>{t('errorLoadingPanchangam', settings.language)}</p>
           <p>{error}</p>
-          <button onClick={() => fetchPanchangam(currentDate)} className="btn-primary" style={{ marginTop: '10px' }}>Retry</button>
+          <button onClick={() => fetchPanchangam(currentDate)} className="btn-primary" style={{ marginTop: '10px' }}>{t('retry', settings.language)}</button>
         </div>
       )}
 
@@ -108,19 +108,19 @@ function PanchangamPage({ settings }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div>
                   <strong>{t('thithi', settings.language)}:</strong> {data.thithi?.localizedName || data.thithi?.name} 
-                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>ends at {data.thithi?.endTime}</span>
+                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>{t('endsAt', settings.language)} {data.thithi?.endTime}</span>
                 </div>
                 <div>
                   <strong>{t('nakshatra', settings.language)}:</strong> {data.nakshatra?.localizedName || data.nakshatra?.name}
-                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>ends at {data.nakshatra?.endTime}</span>
+                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>{t('endsAt', settings.language)} {data.nakshatra?.endTime}</span>
                 </div>
                 <div>
                   <strong>{t('yogam', settings.language)}:</strong> {data.yogam?.localizedName || data.yogam?.name}
-                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>ends at {data.yogam?.endTime}</span>
+                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>{t('endsAt', settings.language)} {data.yogam?.endTime}</span>
                 </div>
                 <div>
                   <strong>{t('karanam', settings.language)}:</strong> {data.karanam?.localizedName || data.karanam?.name}
-                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>ends at {data.karanam?.endTime}</span>
+                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>{t('endsAt', settings.language)} {data.karanam?.endTime}</span>
                 </div>
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '5px' }}>
                   <strong>{t('rashi', settings.language)}:</strong> {data.rashi} | <strong>{t('chandrastamam', settings.language)}:</strong> {data.chandrastamamRashi}
@@ -132,15 +132,15 @@ function PanchangamPage({ settings }) {
               <h3 className="title-gold">{t('muhurtham', settings.language)}</h3>
               <div className="grid-2">
                 <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold' }}>
-                  {data.muhurthamDay ? '✅ Auspicious Day' : '❌ Inauspicious / Regular Day'}
+                  {data.muhurthamDay ? '✅ ' + t('auspiciousDay', settings.language) : '❌ ' + t('inauspiciousDay', settings.language)}
                 </div>
                 <div style={{ color: data.vasthuDay ? 'var(--success)' : 'var(--text-secondary)' }}>
-                  🏡 {data.vasthuDay ? 'Vasthu Day (Auspicious for construction)' : 'No Vasthu Activity'}
+                  🏡 {data.vasthuDay ? t('vasthuDay', settings.language) : t('noVasthuDay', settings.language)}
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '15px', marginTop: '15px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <div>Netram: {data.netram}</div>
-                <div>Jeevan: {data.jeevan}</div>
+                <div>{t('netram', settings.language)}: {data.netram}</div>
+                <div>{t('jeevan', settings.language)}: {data.jeevan}</div>
               </div>
             </div>
           </div>
@@ -168,9 +168,9 @@ function PanchangamPage({ settings }) {
               <table className="horai-table">
                 <thead>
                   <tr>
-                    <th>Hr</th>
-                    <th>Interval</th>
-                    <th>Planet</th>
+                    <th>{t('hr', settings.language)}</th>
+                    <th>{t('interval', settings.language)}</th>
+                    <th>{t('planet', settings.language)}</th>
                   </tr>
                 </thead>
                 <tbody>
