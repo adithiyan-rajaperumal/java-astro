@@ -1,19 +1,19 @@
 # Stage 1: Build frontend
-FROM node:18-alpine AS frontend-build
+FROM node:22-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci || echo "No frontend yet"
+RUN npm ci
 COPY frontend/ ./
-RUN npm run build || echo "No frontend yet"
+RUN npm run build
 
 # Stage 2: Build backend
 FROM maven:3.9-eclipse-temurin-17 AS backend-build
 WORKDIR /app
 COPY pom.xml .
 COPY src/ src/
-# Create static directory in case frontend build failed/skipped
+# Create static directory
 RUN mkdir -p src/main/resources/static/
-COPY --from=frontend-build /app/frontend/dist/ src/main/resources/static/ || true
+COPY --from=frontend-build /app/frontend/dist/ src/main/resources/static/
 RUN mvn package -DskipTests -Dfrontend.skip=true
 
 # Stage 3: Runtime
