@@ -23,8 +23,11 @@ public class DiagnosticsDTO {
     @Builder
     public static class DoshaDetail {
         private String name;
+        private boolean detected;
         private boolean active;
+        private boolean nullified;
         private String severity;
+        private String nullificationReason;
         private String remedySuggestion;
     }
 }
