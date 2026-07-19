@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import LocationSearch from '../components/LocationSearch';
+import { t } from '../i18n/translations';
 
 function MatchingPage({ settings }) {
   const [boyName, setBoyName] = useState('');
@@ -160,7 +161,7 @@ function MatchingPage({ settings }) {
 
   return (
     <div>
-      <h2 className="title-gold">Marriage Compatibility Matching</h2>
+      <h2 className="title-gold">{t('matching', settings.language)}</h2>
 
       {!result && !loading && (
         <form onSubmit={handleMatch}>
@@ -168,24 +169,24 @@ function MatchingPage({ settings }) {
             {/* Boy's card */}
             <div className="card">
               <h3 className="title-gold" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
-                🙋‍♂️ Boy's Details
+                🙋‍♂️ {t('boyDetails', settings.language)}
               </h3>
               <div style={{ marginTop: '15px' }}>
-                <label>Name</label>
+                <label>{t('name', settings.language)}</label>
                 <input type="text" value={boyName} onChange={(e) => setBoyName(e.target.value)} required />
               </div>
               <div className="grid-2">
                 <div>
-                  <label>Birth Date</label>
+                  <label>{t('birthDate', settings.language)}</label>
                   <input type="date" value={boyDate} onChange={(e) => setBoyDate(e.target.value)} required />
                 </div>
                 <div>
-                  <label>Birth Time</label>
+                  <label>{t('birthTime', settings.language)}</label>
                   <input type="time" value={boyTime} onChange={(e) => setBoyTime(e.target.value)} required />
                 </div>
               </div>
               <div>
-                <label>Birth Location</label>
+                <label>{t('birthLocation', settings.language)}</label>
                 <LocationSearch value={boyLocation} onChange={setBoyLocation} />
               </div>
             </div>
@@ -193,24 +194,24 @@ function MatchingPage({ settings }) {
             {/* Girl's card */}
             <div className="card">
               <h3 className="title-gold" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
-                🙋‍♀️ Girl's Details
+                🙋‍♀️ {t('girlDetails', settings.language)}
               </h3>
               <div style={{ marginTop: '15px' }}>
-                <label>Name</label>
+                <label>{t('name', settings.language)}</label>
                 <input type="text" value={girlName} onChange={(e) => setGirlName(e.target.value)} required />
               </div>
               <div className="grid-2">
                 <div>
-                  <label>Birth Date</label>
+                  <label>{t('birthDate', settings.language)}</label>
                   <input type="date" value={girlDate} onChange={(e) => setGirlDate(e.target.value)} required />
                 </div>
                 <div>
-                  <label>Birth Time</label>
+                  <label>{t('birthTime', settings.language)}</label>
                   <input type="time" value={girlTime} onChange={(e) => setGirlTime(e.target.value)} required />
                 </div>
               </div>
               <div>
-                <label>Birth Location</label>
+                <label>{t('birthLocation', settings.language)}</label>
                 <LocationSearch value={girlLocation} onChange={setGirlLocation} />
               </div>
             </div>
@@ -219,14 +220,14 @@ function MatchingPage({ settings }) {
           {/* Settings block */}
           <div className="card grid-2">
             <div>
-              <label>Matching Methodology</label>
+              <label>{t('methodology', settings.language)}</label>
               <select value={matchingSystem} onChange={(e) => setMatchingSystem(e.target.value)}>
                 <option value="ASHTA_KOOTA">Ashta Koota (North Indian 36 Points)</option>
                 <option value="DASA_PORUTHAM">Dasa Porutham (South Indian 10 matches)</option>
               </select>
             </div>
             <div>
-              <label>Match Strictness</label>
+              <label>{t('strictness', settings.language)}</label>
               <select value={strictness} onChange={(e) => setStrictness(e.target.value)}>
                 <option value="LENIENT">Lenient</option>
                 <option value="MODERATE">Moderate</option>
@@ -236,7 +237,7 @@ function MatchingPage({ settings }) {
           </div>
 
           <button type="submit" className="btn-primary" style={{ width: '100%', padding: '15px', fontSize: '16px' }}>
-            Calculate Compatibility Match
+            {t('calculateMatch', settings.language)}
           </button>
         </form>
       )}

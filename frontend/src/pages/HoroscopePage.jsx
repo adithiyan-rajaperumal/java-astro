@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import BirthForm from '../components/BirthForm';
 import IndianChart from '../components/IndianChart';
+import { t } from '../i18n/translations';
 
 function HoroscopePage({ settings }) {
   const [report, setReport] = useState(null);
@@ -114,28 +115,39 @@ function HoroscopePage({ settings }) {
         <div className="dasa-accordion">
           {report.vimshottariTimeline.map((dasa, idx) => {
             const isExpanded = expandedDasa === idx;
+            const today = new Date().toISOString().split('T')[0];
+            const isCurrent = today >= dasa.startDate && today <= dasa.endDate;
             return (
-              <div key={idx} className="dasa-item">
+              <div key={idx} className="dasa-item" style={isCurrent ? { borderLeft: '4px solid var(--accent-gold)' } : {}}>
                 <div 
                   className={`dasa-header ${isExpanded ? 'active' : ''}`}
                   onClick={() => setExpandedDasa(isExpanded ? null : idx)}
                 >
-                  <span style={{ fontWeight: 'bold', color: 'var(--accent-gold)' }}>
-                    ☀️ {dasa.planet} Maha Dasa
+                  <span style={{ fontWeight: 'bold', color: isCurrent ? 'var(--accent-warm)' : 'var(--accent-gold)' }}>
+                    ☀️ {dasa.planetName} Maha Dasa {isCurrent ? '(Active)' : ''}
                   </span>
                   <span>
-                    {dasa.start} to {dasa.end}
+                    {dasa.startDate} to {dasa.endDate}
                   </span>
                 </div>
                 {isExpanded && dasa.bhukthis && (
                   <div className="dasa-body">
                     <div className="bhukthi-grid">
-                      {dasa.bhukthis.map((bhukthi, bidx) => (
-                        <div key={bidx} className="bhukthi-card">
-                          <div style={{ fontWeight: 'bold', color: 'var(--accent-warm)' }}>{bhukthi.planet} Bhukthi</div>
-                          <div>{bhukthi.start} to {bhukthi.end}</div>
-                        </div>
-                      ))}
+                      {dasa.bhukthis.map((bhukthi, bidx) => {
+                        const isBhukthiCurrent = today >= bhukthi.startDate && today <= bhukthi.endDate;
+                        return (
+                          <div 
+                            key={bidx} 
+                            className="bhukthi-card" 
+                            style={isBhukthiCurrent ? { borderColor: 'var(--accent-gold)', backgroundColor: 'var(--bg-card-hover)' } : {}}
+                          >
+                            <div style={{ fontWeight: 'bold', color: isBhukthiCurrent ? 'var(--accent-gold)' : 'var(--accent-warm)' }}>
+                              {bhukthi.planetName} Bhukthi {isBhukthiCurrent ? '(Active)' : ''}
+                            </div>
+                            <div>{bhukthi.startDate} to {bhukthi.endDate}</div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -274,7 +286,7 @@ function HoroscopePage({ settings }) {
 
   return (
     <div>
-      <h2 className="title-gold">Natal Horoscope (Kundali)</h2>
+      <h2 className="title-gold">{t('horoscope', settings.language)}</h2>
       
       {!report && !loading && (
         <BirthForm
@@ -283,7 +295,8 @@ function HoroscopePage({ settings }) {
             location: settings.location,
             ayanamsa: settings.ayanamsa
           }}
-          submitLabel="Generate Horoscope"
+          submitLabel="calculateHoroscope"
+          lang={settings.language}
         />
       )}
 
@@ -317,7 +330,7 @@ function HoroscopePage({ settings }) {
             </div>
             <div>
               <button onClick={handleDownloadPdf} className="btn-primary">
-                📥 Download PDF Report
+                📥 {t('downloadPdf', settings.language)}
               </button>
               <button onClick={() => setReport(null)} className="btn-primary" style={{ marginLeft: '10px', background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 New Chart

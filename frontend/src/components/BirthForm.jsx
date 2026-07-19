@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import LocationSearch from './LocationSearch';
+import { t } from '../i18n/translations';
 
-function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit' }) {
+function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang = 'en' }) {
   const [name, setName] = useState(initialValues.name || '');
   const [date, setDate] = useState(initialValues.date || '');
   const [time, setTime] = useState(initialValues.time || '');
@@ -37,7 +38,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit' }) {
   return (
     <form onSubmit={handleSubmit} className="card">
       <div style={{ marginBottom: '15px' }}>
-        <label>Name</label>
+        <label>{t('name', lang)}</label>
         <input
           type="text"
           value={name}
@@ -49,7 +50,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit' }) {
 
       <div className="grid-2">
         <div>
-          <label>Birth Date</label>
+          <label>{t('birthDate', lang)}</label>
           <input
             type="date"
             value={date}
@@ -58,7 +59,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit' }) {
           />
         </div>
         <div>
-          <label>Birth Time</label>
+          <label>{t('birthTime', lang)}</label>
           <input
             type="time"
             value={time}
@@ -69,7 +70,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit' }) {
       </div>
 
       <div style={{ marginBottom: '15px' }}>
-        <label>Birth Location</label>
+        <label>{t('birthLocation', lang)}</label>
         <LocationSearch
           value={location}
           onChange={setLocation}
@@ -78,7 +79,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit' }) {
       </div>
 
       <div style={{ marginBottom: '20px' }}>
-        <label>Ayanamsa</label>
+        <label>{t('ayanamsa', lang)}</label>
         <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
           <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
           <option value="RAMAN">Raman</option>
@@ -88,7 +89,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit' }) {
       </div>
 
       <button type="submit" className="btn-primary" style={{ width: '100%' }}>
-        {submitLabel}
+        {t(submitLabel, lang) || submitLabel}
       </button>
     </form>
   );

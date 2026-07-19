@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { t } from '../i18n/translations';
 
 function PanchangamPage({ settings }) {
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
@@ -45,11 +46,11 @@ function PanchangamPage({ settings }) {
     setCurrentDate(d.toISOString().split('T')[0]);
   };
 
-  const renderTimeSlotList = (slots = [], title, isAuspicious) => {
+  const renderTimeSlotList = (slots = [], titleKey, isAuspicious) => {
     if (!slots || slots.length === 0) return null;
     return (
       <div className="time-slot-container">
-        <h4 style={{ margin: '10px 0 5px', fontSize: '14px', color: 'var(--text-secondary)' }}>{title}</h4>
+        <h4 style={{ margin: '10px 0 5px', fontSize: '14px', color: 'var(--text-secondary)' }}>{t(titleKey, settings.language)}</h4>
         {slots.map((s, idx) => (
           <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
             <span>{s.label}</span>
@@ -90,42 +91,42 @@ function PanchangamPage({ settings }) {
           {/* Main Panchangam Elements */}
           <div>
             <div className="card">
-              <h3 className="title-gold">Sun & Moon Timings</h3>
+              <h3 className="title-gold">{t('sunrise', settings.language)} & {t('sunset', settings.language)}</h3>
               <div className="grid-2" style={{ fontSize: '15px' }}>
-                <div>🌅 <strong>Sunrise:</strong> {data.sunrise}</div>
-                <div>🌇 <strong>Sunset:</strong> {data.sunset}</div>
-                <div>🌙 <strong>Moonrise:</strong> {data.moonrise}</div>
-                <div>🌕 <strong>Moonset:</strong> {data.moonset}</div>
+                <div>🌅 <strong>{t('sunrise', settings.language)}:</strong> {data.sunrise}</div>
+                <div>🌇 <strong>{t('sunset', settings.language)}:</strong> {data.sunset}</div>
+                <div>🌙 <strong>{t('moonrise', settings.language)}:</strong> {data.moonrise}</div>
+                <div>🌕 <strong>{t('moonset', settings.language)}:</strong> {data.moonset}</div>
               </div>
             </div>
 
             <div className="card">
-              <h3 className="title-gold">Panchangam Elements</h3>
+              <h3 className="title-gold">{t('panchangamElements', settings.language)}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div>
-                  <strong>Thithi:</strong> {data.thithi?.localizedName || data.thithi?.name} 
+                  <strong>{t('thithi', settings.language)}:</strong> {data.thithi?.localizedName || data.thithi?.name} 
                   <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>ends at {data.thithi?.endTime}</span>
                 </div>
                 <div>
-                  <strong>Nakshatra:</strong> {data.nakshatra?.localizedName || data.nakshatra?.name}
+                  <strong>{t('nakshatra', settings.language)}:</strong> {data.nakshatra?.localizedName || data.nakshatra?.name}
                   <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>ends at {data.nakshatra?.endTime}</span>
                 </div>
                 <div>
-                  <strong>Yogam:</strong> {data.yogam?.localizedName || data.yogam?.name}
+                  <strong>{t('yogam', settings.language)}:</strong> {data.yogam?.localizedName || data.yogam?.name}
                   <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>ends at {data.yogam?.endTime}</span>
                 </div>
                 <div>
-                  <strong>Karanam:</strong> {data.karanam?.localizedName || data.karanam?.name}
+                  <strong>{t('karanam', settings.language)}:</strong> {data.karanam?.localizedName || data.karanam?.name}
                   <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>ends at {data.karanam?.endTime}</span>
                 </div>
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '5px' }}>
-                  <strong>Rashi:</strong> {data.rashi} | <strong>Chandrastamam:</strong> {data.chandrastamamRashi}
+                  <strong>{t('rashi', settings.language)}:</strong> {data.rashi} | <strong>{t('chandrastamam', settings.language)}:</strong> {data.chandrastamamRashi}
                 </div>
               </div>
             </div>
 
             <div className="card">
-              <h3 className="title-gold">Muhurtham & Vasthu</h3>
+              <h3 className="title-gold">{t('muhurtham', settings.language)}</h3>
               <div className="grid-2">
                 <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold' }}>
                   {data.muhurthamDay ? '✅ Auspicious Day' : '❌ Inauspicious / Regular Day'}
@@ -144,22 +145,22 @@ function PanchangamPage({ settings }) {
           {/* Time Slots & Horai */}
           <div>
             <div className="card">
-              <h3 className="title-gold">Auspicious Times</h3>
-              {renderTimeSlotList(data.nallaNeram, 'Nalla Neram', true)}
-              {renderTimeSlotList(data.gowriNallaNeram, 'Gowri Nalla Neram', true)}
+              <h3 className="title-gold">{t('auspicious', settings.language)}</h3>
+              {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
+              {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
             </div>
 
             <div className="card">
-              <h3 className="title-gold">Inauspicious Times</h3>
-              {renderTimeSlotList(data.raghuKalam, 'Rahu Kalam', false)}
-              {renderTimeSlotList(data.emagandam, 'Yamagandam', false)}
-              {renderTimeSlotList(data.kulikai, 'Gulika Kalam', false)}
+              <h3 className="title-gold">{t('inauspicious', settings.language)}</h3>
+              {renderTimeSlotList(data.raghuKalam, 'rahuKalam', false)}
+              {renderTimeSlotList(data.emagandam, 'yamagandam', false)}
+              {renderTimeSlotList(data.kulikai, 'gulikaKalam', false)}
             </div>
           </div>
 
           {/* 24 Horai Table */}
           <div style={{ gridColumn: '1 / -1' }} className="card">
-            <h3 className="title-gold">24 Horas (Hourly Divisions)</h3>
+            <h3 className="title-gold">{t('horas', settings.language)}</h3>
             <div className="horai-table-container">
               <table className="horai-table">
                 <thead>

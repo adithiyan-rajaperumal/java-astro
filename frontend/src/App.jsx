@@ -4,6 +4,7 @@ import PanchangamPage from './pages/PanchangamPage';
 import HoroscopePage from './pages/HoroscopePage';
 import MatchingPage from './pages/MatchingPage';
 import SettingsPage from './pages/SettingsPage';
+import { t } from './i18n/translations';
 
 const DEFAULT_SETTINGS = {
   language: 'en',
@@ -36,29 +37,18 @@ function App() {
   };
 
   const tabs = [
-    { id: 'panchangam', label: 'Panchangam', icon: '🏠' },
-    { id: 'horoscope', label: 'Horoscope', icon: '📜' },
-    { id: 'matching', label: 'Matching', icon: '💑' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' }
+    { id: 'panchangam', labelKey: 'panchangam', icon: '🏠' },
+    { id: 'horoscope', labelKey: 'horoscope', icon: '📜' },
+    { id: 'matching', labelKey: 'matching', icon: '💑' },
+    { id: 'settings', labelKey: 'settings', icon: '⚙️' }
   ];
-
-  const getLanguageLabel = (code) => {
-    switch (code) {
-      case 'ta': return 'தமிழ்';
-      case 'hi': return 'हिंदी';
-      case 'kn': return 'ಕನ್ನಡ';
-      case 'te': return 'తెలుగు';
-      case 'ml': return 'മലയാളം';
-      default: return 'EN';
-    }
-  };
 
   return (
     <>
       {/* Top Navbar */}
       <nav className="navbar">
         <div className="navbar-brand">
-          🕉️ StellaVedic
+          🕉️ {t('appTitle', settings.language)}
         </div>
         <div className="navbar-actions">
           {settings.location && (
@@ -92,7 +82,7 @@ function App() {
               onClick={() => setActiveTab(tab.id)}
             >
               <span style={{ fontSize: '20px' }}>{tab.icon}</span>
-              <span>{tab.label}</span>
+              <span>{t(tab.labelKey, settings.language)}</span>
             </div>
           ))}
         </aside>
@@ -117,7 +107,7 @@ function App() {
             onClick={() => setActiveTab(tab.id)}
           >
             <span>{tab.icon}</span>
-            <div>{tab.label}</div>
+            <div>{t(tab.labelKey, settings.language)}</div>
           </div>
         ))}
       </nav>
