@@ -24,25 +24,35 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleInputChange = async (e) => {
-    const val = e.target.value;
-    setQuery(val);
-    if (!val.trim()) {
+  useEffect(() => {
+    if (!query.trim()) {
       setSuggestions([]);
       setShowDropdown(false);
       return;
     }
 
-    try {
-      const response = await fetch(`/api/v1/locations/autocomplete?query=${encodeURIComponent(val)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSuggestions(data);
-        setShowDropdown(true);
-      }
-    } catch (error) {
-      console.error('Failed to fetch location suggestions', error);
+    if (value && query === value.label) {
+      return;
     }
+
+    const handler = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/v1/locations/autocomplete?query=${encodeURIComponent(query)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setSuggestions(data);
+          setShowDropdown(true);
+        }
+      } catch (error) {
+        console.error('Failed to fetch location suggestions', error);
+      }
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [query, value]);
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
   };
 
   const handleSelect = (item) => {

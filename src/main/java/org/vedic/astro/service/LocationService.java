@@ -34,7 +34,7 @@ public class LocationService {
                     .uri(uriBuilder -> uriBuilder
                             .path("/api")
                             .queryParam("q", query.trim())
-                            .queryParam("limit", "10") // Caps results to top 10 relevant matches
+                            .queryParam("limit", "30") // Caps results to top 30 relevant matches
                             .build())
                     .retrieve()
                     .body(LocationDto.PhotonResponse.class);
@@ -53,15 +53,30 @@ public class LocationService {
 
                         // Intelligently piece together a scannable dropdown label
                         StringBuilder labelBuilder = new StringBuilder(props.name());
+                        java.util.Set<String> added = new java.util.HashSet<>();
+                        added.add(props.name().toLowerCase().trim());
 
-                        if (props.city() != null && !props.name().equalsIgnoreCase(props.city())) {
-                            labelBuilder.append(", ").append(props.city());
-                        }
-                        if (props.state() != null) {
-                            labelBuilder.append(", ").append(props.state());
-                        }
-                        if (props.country() != null) {
-                            labelBuilder.append(", ").append(props.country());
+                        String[] segments = {
+                            props.street(),
+                            props.suburb(),
+                            props.locality(),
+                            props.district(),
+                            props.county(),
+                            props.city(),
+                            props.state(),
+                            props.postcode(),
+                            props.country()
+                        };
+
+                        for (String seg : segments) {
+                            if (seg != null && !seg.trim().isEmpty()) {
+                                String clean = seg.trim();
+                                String norm = clean.toLowerCase();
+                                if (!added.contains(norm)) {
+                                    labelBuilder.append(", ").append(clean);
+                                    added.add(norm);
+                                }
+                            }
                         }
 
                         return new LocationDto.LocationSuggestionDTO(labelBuilder.toString(), lat, lon);

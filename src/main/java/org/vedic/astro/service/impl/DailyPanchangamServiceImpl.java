@@ -231,10 +231,18 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double jeevan = calculateJeevan(dDiff);
 
         // Muhurtham and Vasthu Days
+        boolean isAuspiciousThithi = (thithiIdx == 2 || thithiIdx == 3 || thithiIdx == 5 || thithiIdx == 7 || thithiIdx == 10 
+                || thithiIdx == 11 || thithiIdx == 13 || thithiIdx == 17 || thithiIdx == 18 || thithiIdx == 20 
+                || thithiIdx == 22 || thithiIdx == 25 || thithiIdx == 26 || thithiIdx == 28);
+                
+        boolean isAuspiciousNakshatra = (nakIdx == 1 || nakIdx == 4 || nakIdx == 5 || nakIdx == 8 || nakIdx == 12 
+                || nakIdx == 13 || nakIdx == 14 || nakIdx == 15 || nakIdx == 17 || nakIdx == 21 
+                || nakIdx == 22 || nakIdx == 23 || nakIdx == 24 || nakIdx == 26 || nakIdx == 27);
+
         boolean isMuhurthamDay = (date.getDayOfWeek() != DayOfWeek.TUESDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY)
-                && (thithiIdx != 4 && thithiIdx != 9 && thithiIdx != 14 && thithiIdx != 19 && thithiIdx != 24 && thithiIdx != 29)
-                && (nakIdx != 2 && nakIdx != 3 && nakIdx != 9 && nakIdx != 11 && nakIdx != 18 && nakIdx != 19 && nakIdx != 20 && nakIdx != 25)
-                && (netram >= 1 && jeevan >= 0.5);
+                && isAuspiciousThithi
+                && isAuspiciousNakshatra
+                && (netram == 2 && jeevan == 1.0);
 
         boolean isVasthuDay = (date.getMonthValue() == 1 && date.getDayOfMonth() == 25)
                 || (date.getMonthValue() == 4 && date.getDayOfMonth() == 22)

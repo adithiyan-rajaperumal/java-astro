@@ -20,9 +20,15 @@ public class LocationDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record PhotonProperties(
             String name,
+            String street,
+            String suburb,
+            String locality,
+            String district,
+            String county,
             String city,
             String state,
-            String country
+            String country,
+            String postcode
     ) {}
 
     /**
