@@ -76,34 +76,40 @@ function HoroscopePage({ settings }) {
       <div>
         <div className="grid-2">
           <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <h3 className="title-gold">D1 Rasi Chart</h3>
-            <IndianChart positions={d1} style="south" title="D1 Rasi" lang={settings.language} />
+            <h3 className="title-gold">{t('d1ChartTitle', settings.language)}</h3>
+            <IndianChart positions={d1} style="south" title={t('d1ChartTitle', settings.language)} lang={settings.language} />
           </div>
           <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <h3 className="title-gold">D9 Navamsa Chart</h3>
-            <IndianChart positions={d9} style="south" title="D9 Navamsa" lang={settings.language} />
+            <h3 className="title-gold">{t('d9ChartTitle', settings.language)}</h3>
+            <IndianChart positions={d9} style="south" title={t('d9ChartTitle', settings.language)} lang={settings.language} />
           </div>
         </div>
 
         <div className="card">
-          <h3 className="title-gold">Planetary Positions</h3>
+          <h3 className="title-gold">{t('planetaryPositions', settings.language)}</h3>
           <div className="horai-table-container">
             <table className="horai-table">
               <thead>
                 <tr>
-                  <th>Planet</th>
-                  <th>Sign</th>
-                  <th>Degree</th>
+                  <th>{t('planet', settings.language)}</th>
+                  <th>{t('rashi', settings.language)}</th>
+                  <th>{t('degree', settings.language)}</th>
                 </tr>
               </thead>
               <tbody>
-                {d1.map((p, idx) => (
-                  <tr key={idx}>
-                    <td style={{ fontWeight: 'bold' }}>{p.displayName || p.planetKey}</td>
-                    <td>{p.rashiName}</td>
-                    <td>{p.formattedDegree}</td>
-                  </tr>
-                ))}
+                {d1.map((p, idx) => {
+                  const planetKey = (p.planetKey || p.displayName || '').toLowerCase();
+                  const localizedPlanet = t('planet.' + planetKey, settings.language) !== ('planet.' + planetKey)
+                    ? t('planet.' + planetKey, settings.language)
+                    : (p.displayName || p.planetKey);
+                  return (
+                    <tr key={idx}>
+                      <td style={{ fontWeight: 'bold' }}>{localizedPlanet}</td>
+                      <td>{p.rashiName}</td>
+                      <td>{p.formattedDegree}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -314,10 +320,10 @@ function HoroscopePage({ settings }) {
 
         {diag.horoscopicSpecialities && diag.horoscopicSpecialities.length > 0 && (
           <div className="card">
-            <h3 className="title-gold">Special Features</h3>
-            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px' }}>
+            <h3 className="title-gold">{t('specialFeatures', settings.language)}</h3>
+            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', color: 'var(--text-primary)' }}>
               {diag.horoscopicSpecialities.map((s, idx) => (
-                <li key={idx} style={{ marginBottom: '5px' }}>{s}</li>
+                <li key={idx} style={{ marginBottom: '6px' }}>{s}</li>
               ))}
             </ul>
           </div>
@@ -345,15 +351,15 @@ function HoroscopePage({ settings }) {
       {loading && (
         <div className="spinner-container">
           <div className="spinner"></div>
-          <p>Running comprehensive horoscope calculation engine...</p>
+          <p>{t('calculatingHoroscope', settings.language)}</p>
         </div>
       )}
 
       {error && (
         <div className="card" style={{ borderLeft: '4px solid var(--danger)' }}>
-          <p style={{ color: 'var(--danger)', fontWeight: 'bold' }}>Calculation Faulted</p>
+          <p style={{ color: 'var(--danger)', fontWeight: 'bold' }}>{t('errorLoadingPanchangam', settings.language)}</p>
           <p>{error}</p>
-          <button onClick={() => setReport(null)} className="btn-primary" style={{ marginTop: '10px' }}>Try Again</button>
+          <button onClick={() => setReport(null)} className="btn-primary" style={{ marginTop: '10px' }}>{t('retry', settings.language)}</button>
         </div>
       )}
 

@@ -328,6 +328,7 @@ input:focus, select:focus {
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 .horai-table {
   width: 100%;
@@ -340,13 +341,15 @@ input:focus, select:focus {
   font-size: 14px;
 }
 .horai-table th {
-  background-color: #0b0b14;
-  color: var(--accent-gold);
+  background: linear-gradient(135deg, #fff4e5 0%, #ffe8d6 100%);
+  color: var(--accent-warm);
+  font-weight: 700;
   position: sticky;
   top: 0;
+  border-bottom: 2px solid var(--border);
 }
 .horai-table tr:hover {
-  background-color: rgba(255,255,255,0.03);
+  background-color: var(--bg-card-hover, #fff6ec);
 }
 
 /* Chart Styles */
@@ -357,10 +360,11 @@ input:focus, select:focus {
 }
 .south-indian-svg, .north-indian-svg {
   max-width: 100%;
-  background-color: #121224;
-  border: 2px solid var(--border);
+  background-color: #ffffff;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   cursor: pointer;
+  box-shadow: 0 2px 12px rgba(232, 93, 4, 0.06);
 }
 
 /* Dasa timeline accordion */
@@ -368,35 +372,48 @@ input:focus, select:focus {
   border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 .dasa-item {
   border-bottom: 1px solid var(--border);
 }
 .dasa-header {
-  padding: 15px;
-  background-color: #121224;
+  padding: 14px 18px;
+  background: linear-gradient(90deg, #fffaf4 0%, #fff4e5 100%);
   display: flex;
   justify-content: space-between;
+  align-items: center;
   cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.dasa-header:hover {
+  background: #ffe8d6;
 }
 .dasa-header.active {
-  border-left: 4px solid var(--accent-gold);
+  border-left: 4px solid var(--accent-saffron);
+  background: #ffebd6;
 }
 .dasa-body {
   padding: 15px;
-  background-color: #0b0b14;
+  background-color: #fffdfa;
+  border-top: 1px dashed var(--border);
 }
 .bhukthi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 .bhukthi-card {
-  background: var(--bg-card);
-  padding: 10px;
+  background: #ffffff;
+  padding: 12px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+.bhukthi-card:hover {
+  border-color: var(--accent-gold);
+  transform: translateY(-1px);
 }
 
 /* Diagnostics Cards */

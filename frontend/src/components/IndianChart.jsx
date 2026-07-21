@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { t } from '../i18n/translations';
 
 function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang = 'en' }) {
   const [selectedHouse, setSelectedHouse] = useState(null);
@@ -230,18 +231,22 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
       {selectedHouse && (
         <div className="card" style={{ marginTop: '15px', width: '100%', maxWidth: '400px', padding: '15px' }}>
           <h4 style={{ margin: '0 0 10px', color: 'var(--accent-gold)' }}>
-            House Details (House {getHouseNumber(selectedHouse)} — Sign Lord: {signLords[selectedHouse]})
+            {t('houseDetails', lang)} ({t('house', lang)} {getHouseNumber(selectedHouse)} — {t('signLord', lang)}: {t('planet.' + (signLords[selectedHouse] || '').toLowerCase(), lang)})
           </h4>
           {selectedPlanets.length === 0 ? (
-            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>No planets in this house.</p>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>{t('noPlanetsInHouse', lang)}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {selectedPlanets.map((p, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>
-                  <span><strong>{p.displayName || p.planetKey}:</strong> {p.formattedDegree || `${p.degreeInSign?.toFixed(2)}°`}</span>
-                  <span style={{ color: 'var(--accent-saffron)' }}>{getDignity(p.planetKey, selectedHouse)}</span>
-                </div>
-              ))}
+              {selectedPlanets.map((p, idx) => {
+                const planetKey = (p.planetKey || p.displayName || '').toLowerCase();
+                const localizedPlanetName = t('planet.' + planetKey, lang) !== ('planet.' + planetKey) ? t('planet.' + planetKey, lang) : (p.displayName || p.planetKey);
+                return (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>
+                    <span><strong>{localizedPlanetName}:</strong> {p.formattedDegree || `${p.degreeInSign?.toFixed(2)}°`}</span>
+                    <span style={{ color: 'var(--accent-saffron)' }}>{getDignity(p.planetKey, selectedHouse)}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
