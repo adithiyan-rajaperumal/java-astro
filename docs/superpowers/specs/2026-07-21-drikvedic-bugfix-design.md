@@ -50,7 +50,44 @@ public class ChartUiResponseDTO {
 }
 ```
 
----
+### 1b. Fix PDF Chart Rendering — Same Index Problem
+
+**Problem:** The PDF generation in `PdfExportService` (line 171) also uses `data.getVargaChartsSuite().get(i)` paired with a separate `vargaKeys[]` array. If the suite index order doesn't match the label order, charts are mislabeled in the PDF too.
+
+**Solution:** Refactor `ComprehensiveReportDTO` to replace the indexed `List<List<PositionDetail>> vargaChartsSuite` with a **named map**:
+
+```java
+// ComprehensiveReportDTO — internal PDF-only DTO
+private Map<String, List<ChartResponseDTO.PositionDetail>> vargaChartsMap;
+// Keys: "d1", "d2", "d3", "bhava", "d7", "d9", "d10", "d12", "d20", "d24", "d30", "d60"
+```
+
+**PdfExportService update:** Instead of iterating by index, iterate by chart key name:
+
+```java
+String[] chartKeys = {"d1", "d2", "d3", "bhava", "d7", "d9", "d10", "d12", "d20", "d24", "d30", "d60"};
+String[] labelKeys = {"pdf.chart.d1", "pdf.chart.d2", ..., "pdf.chart.d60"};
+
+for (int i = 0; i < chartKeys.length; i++) {
+    List<PositionDetail> planets = data.getVargaChartsMap().get(chartKeys[i]); // Named lookup!
+    String title = ts.getLabel(labelKeys[i]);
+    // ... render chart with correct data guaranteed by name match
+}
+```
+
+**`ChartOrchestrationService.compileComprehensivePdfData()`:** Build the map with explicit key→chart binding:
+```java
+Map<String, List<PositionDetail>> chartsMap = new LinkedHashMap<>();
+chartsMap.put("d1", compileVargaList(1, d1, cusps));
+chartsMap.put("d2", compileVargaList(2, d1, cusps));
+chartsMap.put("d3", compileVargaList(3, d1, cusps));
+chartsMap.put("bhava", compileVargaList(-1, d1, cusps));
+chartsMap.put("d7", compileVargaList(7, d1, cusps));
+chartsMap.put("d9", compileVargaList(9, d1, cusps));
+// ... etc
+```
+
+This guarantees that the chart labeled "D9 - நவாம்ச சக்கரம்" in the PDF always contains actual D9 Navamsa data, regardless of iteration order.
 
 ## 2. Panchangam Transitional Display
 
