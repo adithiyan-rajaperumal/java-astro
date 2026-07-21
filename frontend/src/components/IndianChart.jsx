@@ -118,8 +118,8 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
     const aspectedSigns = getAspectedHouses(selectedHouse);
     
     return (
-      <svg width="400" height="400" className="south-indian-svg" viewBox="0 0 400 400">
-        <rect x="0" y="0" width="400" height="400" fill="none" stroke="var(--border)" strokeWidth="2" />
+      <svg width="400" height="400" className="south-indian-svg" viewBox="0 0 400 400" style={{ backgroundColor: '#ffffff', borderRadius: '8px' }}>
+        <rect x="0" y="0" width="400" height="400" fill="#ffffff" stroke="var(--border)" strokeWidth="2" />
         <line x1="0" y1="100" x2="400" y2="100" stroke="var(--border)" strokeWidth="1" />
         <line x1="0" y1="200" x2="400" y2="200" stroke="var(--border)" strokeWidth="1" />
         <line x1="0" y1="300" x2="400" y2="300" stroke="var(--border)" strokeWidth="1" />
@@ -199,8 +199,8 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
 
   const renderNorthIndian = () => {
     return (
-      <svg width="400" height="400" className="north-indian-svg" viewBox="0 0 400 400">
-        <rect x="0" y="0" width="400" height="400" fill="none" stroke="var(--border)" strokeWidth="2" />
+      <svg width="400" height="400" className="north-indian-svg" viewBox="0 0 400 400" style={{ backgroundColor: '#ffffff', borderRadius: '8px' }}>
+        <rect x="0" y="0" width="400" height="400" fill="#ffffff" stroke="var(--border)" strokeWidth="2" />
         <line x1="0" y1="0" x2="400" y2="400" stroke="var(--border)" strokeWidth="1" />
         <line x1="400" y1="0" x2="0" y2="400" stroke="var(--border)" strokeWidth="1" />
         <line x1="200" y1="0" x2="400" y2="200" stroke="var(--border)" strokeWidth="1" />

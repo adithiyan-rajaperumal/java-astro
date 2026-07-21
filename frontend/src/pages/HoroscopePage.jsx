@@ -112,45 +112,81 @@ function HoroscopePage({ settings }) {
     );
   };
 
+  const formatDate = (val) => {
+    if (!val) return '';
+    if (typeof val === 'string') return val;
+    if (Array.isArray(val)) {
+      const [y, m, d] = val;
+      return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+    if (typeof val === 'object') {
+      if (val.year && val.monthValue && val.dayOfMonth) {
+        return `${val.year}-${String(val.monthValue).padStart(2, '0')}-${String(val.dayOfMonth).padStart(2, '0')}`;
+      }
+    }
+    return String(val);
+  };
+
   const renderDasaTab = () => {
     const timeline = report?.currentDasaTimeline || report?.vimshottariTimeline;
-    if (!report || !timeline) return null;
+    if (!report || !timeline || timeline.length === 0) {
+      return (
+        <div className="card">
+          <h3 className="title-gold">{t('dasaTab', settings.language)}</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>No Dasa-Bhukthi timeline data available.</p>
+        </div>
+      );
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+
     return (
       <div className="card">
         <h3 className="title-gold">{t('dasaTab', settings.language)}</h3>
         <div className="dasa-accordion">
           {timeline.map((dasa, idx) => {
-            const isExpanded = expandedDasa === idx;
-            const today = new Date().toISOString().split('T')[0];
-            const isCurrent = today >= dasa.startDate && today <= dasa.endDate;
+            const startStr = formatDate(dasa.startDate);
+            const endStr = formatDate(dasa.endDate);
+            const isCurrent = today >= startStr && today <= endStr;
+            const isExpanded = expandedDasa === idx || (expandedDasa === null && (isCurrent || idx === 0));
+
             return (
               <div key={idx} className="dasa-item" style={isCurrent ? { borderLeft: '4px solid var(--accent-gold)' } : {}}>
                 <div 
                   className={`dasa-header ${isExpanded ? 'active' : ''}`}
-                  onClick={() => setExpandedDasa(isExpanded ? null : idx)}
+                  onClick={() => setExpandedDasa(isExpanded ? -1 : idx)}
                 >
                   <span style={{ fontWeight: 'bold', color: isCurrent ? 'var(--accent-warm)' : 'var(--accent-gold)' }}>
-                    ☀️ {t('planet.' + dasa.planetName.toLowerCase(), settings.language)} {t('mahaDasa', settings.language)} {isCurrent ? `(${t('active', settings.language)})` : ''}
+                    ☀️ {t('planet.' + (dasa.planetName || '').toLowerCase(), settings.language)} {t('mahaDasa', settings.language)} {isCurrent ? `(${t('active', settings.language)})` : ''}
                   </span>
                   <span>
-                    {dasa.startDate} to {dasa.endDate}
+                    {startStr} to {endStr}
                   </span>
                 </div>
-                {isExpanded && dasa.bhukthis && (
-                  <div className="dasa-body">
+                {isExpanded && dasa.bhukthis && dasa.bhukthis.length > 0 && (
+                  <div className="dasa-body" style={{ padding: '15px 0' }}>
                     <div className="bhukthi-grid">
                       {dasa.bhukthis.map((bhukthi, bidx) => {
-                        const isBhukthiCurrent = today >= bhukthi.startDate && today <= bhukthi.endDate;
+                        const bStartStr = formatDate(bhukthi.startDate);
+                        const bEndStr = formatDate(bhukthi.endDate);
+                        const isBhukthiCurrent = today >= bStartStr && today <= bEndStr;
                         return (
                           <div 
                             key={bidx} 
                             className="bhukthi-card" 
-                            style={isBhukthiCurrent ? { borderColor: 'var(--accent-gold)', backgroundColor: 'var(--bg-card-hover)' } : {}}
+                            style={{
+                              padding: '10px 12px',
+                              borderRadius: '8px',
+                              border: isBhukthiCurrent ? '2px solid var(--accent-gold)' : '1px solid var(--border)',
+                              backgroundColor: isBhukthiCurrent ? 'var(--bg-card-hover)' : 'var(--bg-card)'
+                            }}
                           >
                             <div style={{ fontWeight: 'bold', color: isBhukthiCurrent ? 'var(--accent-gold)' : 'var(--accent-warm)' }}>
-                              {t('planet.' + bhukthi.planetName.toLowerCase(), settings.language)} {t('bhukthi', settings.language)} {isBhukthiCurrent ? `(${t('active', settings.language)})` : ''}
+                              {t('planet.' + (bhukthi.planetName || '').toLowerCase(), settings.language)} {t('bhukthi', settings.language)} {isBhukthiCurrent ? `(${t('active', settings.language)})` : ''}
                             </div>
-                            <div>{bhukthi.startDate} to {bhukthi.endDate}</div>
+                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                              {bStartStr} to {bEndStr}
+                            </div>
                           </div>
                         );
                       })}
