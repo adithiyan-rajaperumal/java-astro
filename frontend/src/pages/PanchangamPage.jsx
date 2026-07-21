@@ -1,8 +1,29 @@
 import { useState, useEffect } from 'react';
 import { t } from '../i18n/translations';
 
+const getTodayDateString = (loc) => {
+  const now = new Date();
+  if (loc?.timezone) {
+    try {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: loc.timezone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      return formatter.format(now);
+    } catch {
+      // Fallback to local
+    }
+  }
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 function PanchangamPage({ settings }) {
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [currentDate, setCurrentDate] = useState(() => getTodayDateString(settings.location));
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,9 +65,12 @@ function PanchangamPage({ settings }) {
   }, [currentDate, settings.location, settings.language, settings.ayanamsa]);
 
   const changeDate = (days) => {
-    const d = new Date(currentDate);
+    const d = new Date(currentDate + 'T12:00:00');
     d.setDate(d.getDate() + days);
-    setCurrentDate(d.toISOString().split('T')[0]);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    setCurrentDate(`${year}-${month}-${day}`);
   };
 
   const renderTimeSlotList = (slots = [], titleKey, isAuspicious) => {
