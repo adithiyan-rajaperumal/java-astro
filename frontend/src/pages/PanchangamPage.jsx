@@ -135,7 +135,7 @@ function PanchangamPage({ settings }) {
                   </span>
                 </div>
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '5px' }}>
-                  <strong>{t('rashi', settings.language)}:</strong> {data.rashi} | <strong>{t('chandrastamam', settings.language)}:</strong> {data.chandrastamamRashi}
+                  <strong>{t('rashi', settings.language)}:</strong> {data.rashi} | <strong>{t('chandrastamam', settings.language)}:</strong> {Array.isArray(data.chandrastamamNakshatras) ? data.chandrastamamNakshatras.join(', ') : (data.chandrastamamRashi || '')}
                 </div>
               </div>
             </div>

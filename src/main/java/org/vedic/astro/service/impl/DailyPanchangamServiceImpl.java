@@ -218,9 +218,9 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Horais
         List<HoraTimeSlotDTO> horais = calculateHorais(jdSunrise, jdSunset, jdNextSunrise, dayOfWeek0, zoneId);
 
-        // Chandrastamam Rashi
+        // Chandrastamam Nakshatras (Nakshatras in the 8th rashi from current Moon sign)
         int chandrastamamSign = (rashiNum - 8 + 12) % 12 + 1;
-        String chandrastamamRashi = translationService.getLocalizedRashi(chandrastamamSign);
+        List<String> chandrastamamNakshatras = getChandrastamamNakshatras(chandrastamamSign);
 
         // Netram and Jeevan
         double[] coordinatesSun = getSunMoonLongitude(jdSunrise); // reload coordinates just in case
@@ -270,12 +270,38 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             emagandam,
             kulikai,
             horais,
-            chandrastamamRashi,
+            chandrastamamNakshatras,
             netram,
             jeevan,
             isMuhurthamDay,
             isVasthuDay
         );
+    }
+
+    private List<String> getChandrastamamNakshatras(int sign) {
+        List<String> list = new ArrayList<>();
+        int[][] signNakMap = {
+            {1, 2, 3},    // Sign 1: Ashwini, Bharani, Krittika
+            {3, 4, 5},    // Sign 2: Krittika, Rohini, Mrigashira
+            {5, 6, 7},    // Sign 3: Mrigashira, Ardra, Punarvasu
+            {7, 8, 9},    // Sign 4: Punarvasu, Pushya, Ashlesha
+            {10, 11, 12}, // Sign 5: Magha, Purva Phalguni, Uttara Phalguni
+            {12, 13, 14}, // Sign 6: Uttara Phalguni, Hasta, Chitra
+            {14, 15, 16}, // Sign 7: Chitra, Swati, Vishakha
+            {16, 17, 18}, // Sign 8: Vishakha, Anuradha, Jyeshtha
+            {19, 20, 21}, // Sign 9: Mula, Purva Ashadha, Uttara Ashadha
+            {21, 22, 23}, // Sign 10: Uttara Ashadha, Shravana, Dhanishta
+            {23, 24, 25}, // Sign 11: Dhanishta, Shatabhisha, Purva Bhadrapada
+            {25, 26, 27}  // Sign 12: Purva Bhadrapada, Uttara Bhadrapada, Revati
+        };
+        int idx = (sign - 1 + 12) % 12;
+        for (int nakIdx : signNakMap[idx]) {
+            String localized = translationService.getLocalizedNakshatra(nakIdx);
+            if (!list.contains(localized)) {
+                list.add(localized);
+            }
+        }
+        return list;
     }
 
     private ZonedDateTime jdToZonedDateTime(double jd, ZoneId zoneId) {
