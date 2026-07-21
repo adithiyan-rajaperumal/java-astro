@@ -167,12 +167,37 @@ function PanchangamPage({ settings }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <button onClick={() => changeDate(-1)} className="btn-primary" style={{ padding: '8px 15px' }}>← {t('prev', settings.language)}</button>
-        <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--accent-gold)' }}>
-          📅 {currentDate}
-        </span>
-        <button onClick={() => changeDate(1)} className="btn-primary" style={{ padding: '8px 15px' }}>{t('next', settings.language)} →</button>
+      {/* Top Header Control Bar */}
+      <div className="panchangam-header-bar">
+        <div className="panchangam-header-title">
+          <h2>🕉️ {t('panchangam', settings.language)}</h2>
+          {settings.location && (
+            <span className="sub-pill">
+              📍 {settings.location.label.split(',')[0]}
+            </span>
+          )}
+        </div>
+        <div className="panchangam-date-controls">
+          <button onClick={() => changeDate(-1)} className="btn-primary" style={{ padding: '6px 14px' }}>
+            ← {t('prev', settings.language)}
+          </button>
+          <button 
+            onClick={() => setCurrentDate(getTodayDateString(settings.location))} 
+            className="btn-primary" 
+            style={{ padding: '6px 14px', background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+          >
+            {t('today', settings.language)}
+          </button>
+          <input
+            type="date"
+            className="date-pill-input"
+            value={currentDate}
+            onChange={(e) => e.target.value && setCurrentDate(e.target.value)}
+          />
+          <button onClick={() => changeDate(1)} className="btn-primary" style={{ padding: '6px 14px' }}>
+            {t('next', settings.language)} →
+          </button>
+        </div>
       </div>
 
       {loading && (
@@ -191,105 +216,137 @@ function PanchangamPage({ settings }) {
       )}
 
       {!loading && !error && data && (
-        <div className="grid-2">
-          {/* Main Panchangam Elements */}
-          <div>
-            <div className="card">
-              <h3 className="title-gold">{t('sunrise', settings.language)} & {t('sunset', settings.language)}</h3>
-              <div className="grid-2" style={{ fontSize: '15px' }}>
-                <div>🌅 <strong>{t('sunrise', settings.language)}:</strong> {data.sunrise}</div>
-                <div>🌇 <strong>{t('sunset', settings.language)}:</strong> {data.sunset}</div>
-                <div>🌙 <strong>{t('moonrise', settings.language)}:</strong> {data.moonrise}</div>
-                <div>🌕 <strong>{t('moonset', settings.language)}:</strong> {data.moonset}</div>
+        <div>
+          {/* Top Hero Summary Cards */}
+          <div className="panchangam-hero-grid">
+            <div className="hero-metric-card">
+              <div className="hero-metric-header">🌅 {t('sunrise', settings.language)} & 🌇 {t('sunset', settings.language)}</div>
+              <div className="hero-metric-value" style={{ fontSize: '13.5px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                <div>🌅 {data.sunrise}</div>
+                <div>🌇 {data.sunset}</div>
+                <div>🌙 {data.moonrise}</div>
+                <div>🌕 {data.moonset}</div>
               </div>
             </div>
 
-            <div className="card">
-              <h3 className="title-gold">{t('panchangamElements', settings.language)}</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div>
-                  <strong>{t('thithi', settings.language)}:</strong> {formatElementTiming(data.thithi)}
-                </div>
-                <div>
-                  <strong>{t('nakshatra', settings.language)}:</strong> {formatElementTiming(data.nakshatra)}
-                </div>
-                <div>
-                  <strong>{t('yogam', settings.language)}:</strong> {formatElementTiming(data.yogam)}
-                </div>
-                <div>
-                  <strong>{t('karanam', settings.language)}:</strong> {formatElementTiming(data.karanam)}
-                </div>
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '5px' }}>
-                  <strong>{t('rashi', settings.language)}:</strong> {data.rashi} | <strong>{t('chandrastamam', settings.language)}:</strong> {Array.isArray(data.chandrastamamNakshatras) ? data.chandrastamamNakshatras.join(', ') : (data.chandrastamamRashi || '')}
+            <div className="hero-metric-card">
+              <div className="hero-metric-header">✨ {t('thithi', settings.language)} & {t('nakshatra', settings.language)}</div>
+              <div className="hero-metric-value">
+                <div style={{ color: 'var(--accent-saffron)' }}>{data.thithi?.localizedName || data.thithi?.name}</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 'normal', marginTop: '4px' }}>
+                  {data.nakshatra?.localizedName || data.nakshatra?.name}
                 </div>
               </div>
             </div>
 
-            <div className="card">
-              <h3 className="title-gold">{t('muhurtham', settings.language)}</h3>
-              <div className="grid-2">
-                <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold' }}>
+            <div className="hero-metric-card">
+              <div className="hero-metric-header">⚖️ {t('yogam', settings.language)} & {t('karanam', settings.language)}</div>
+              <div className="hero-metric-value">
+                <div style={{ color: 'var(--accent-warm)' }}>{data.yogam?.localizedName || data.yogam?.name}</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 'normal', marginTop: '4px' }}>
+                  {data.karanam?.localizedName || data.karanam?.name}
+                </div>
+              </div>
+            </div>
+
+            <div className="hero-metric-card">
+              <div className="hero-metric-header">🏡 {t('muhurtham', settings.language)}</div>
+              <div>
+                <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '14px' }}>
                   {data.muhurthamDay ? '✅ ' + t('auspiciousDay', settings.language) : '❌ ' + t('inauspiciousDay', settings.language)}
                 </div>
-                <div style={{ color: data.vasthuDay ? 'var(--success)' : 'var(--text-secondary)' }}>
-                  🏡 {data.vasthuDay ? t('vasthuDay', settings.language) : t('noVasthuDay', settings.language)}
+                <div className="hero-sub-pills">
+                  <span className="sub-pill">{t('netram', settings.language)}: {data.netram}</span>
+                  <span className="sub-pill">{t('jeevan', settings.language)}: {data.jeevan}</span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '15px', marginTop: '15px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <div>{t('netram', settings.language)}: {data.netram}</div>
-                <div>{t('jeevan', settings.language)}: {data.jeevan}</div>
+            </div>
+          </div>
+
+          {/* Main Responsive 3-Column Dashboard */}
+          <div className="panchangam-dashboard-grid">
+            {/* Column 1: Detailed Panchangam Elements */}
+            <div className="card" style={{ height: 'fit-content' }}>
+              <h3 className="title-gold" style={{ marginTop: 0 }}>{t('panchangamElements', settings.language)}</h3>
+
+              <div className="element-detail-item">
+                <div className="element-label">{t('thithi', settings.language)}</div>
+                <div className="element-content">{formatElementTiming(data.thithi)}</div>
+              </div>
+
+              <div className="element-detail-item">
+                <div className="element-label">{t('nakshatra', settings.language)}</div>
+                <div className="element-content">{formatElementTiming(data.nakshatra)}</div>
+              </div>
+
+              <div className="element-detail-item">
+                <div className="element-label">{t('yogam', settings.language)}</div>
+                <div className="element-content">{formatElementTiming(data.yogam)}</div>
+              </div>
+
+              <div className="element-detail-item">
+                <div className="element-label">{t('karanam', settings.language)}</div>
+                <div className="element-content">{formatElementTiming(data.karanam)}</div>
+              </div>
+
+              <div className="element-detail-item" style={{ background: '#fffaf4' }}>
+                <div className="element-label">{t('rashi', settings.language)} & {t('chandrastamam', settings.language)}</div>
+                <div className="element-content">
+                  <strong>{t('rashi', settings.language)}:</strong> {data.rashi} <br/>
+                  <strong style={{ color: 'var(--accent-warm)' }}>{t('chandrastamam', settings.language)}:</strong> {Array.isArray(data.chandrastamamNakshatras) ? data.chandrastamamNakshatras.join(', ') : (data.chandrastamamRashi || '')}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Time Slots & Horai */}
-          <div>
-            <div className="card">
-              <h3 className="title-gold">{t('auspicious', settings.language)}</h3>
-              {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
-              {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
+            {/* Column 2: Time Slots (Auspicious & Inauspicious) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div className="card" style={{ margin: 0 }}>
+                <h3 className="title-gold" style={{ marginTop: 0 }}>{t('auspicious', settings.language)}</h3>
+                {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
+                {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
+              </div>
+
+              <div className="card" style={{ margin: 0 }}>
+                <h3 className="title-gold" style={{ marginTop: 0 }}>{t('inauspicious', settings.language)}</h3>
+                {renderTimeSlotList(data.raghuKalam, 'rahuKalam', false)}
+                {renderTimeSlotList(data.emagandam, 'yamagandam', false)}
+                {renderTimeSlotList(data.kulikai, 'gulikaKalam', false)}
+              </div>
             </div>
 
-            <div className="card">
-              <h3 className="title-gold">{t('inauspicious', settings.language)}</h3>
-              {renderTimeSlotList(data.raghuKalam, 'rahuKalam', false)}
-              {renderTimeSlotList(data.emagandam, 'yamagandam', false)}
-              {renderTimeSlotList(data.kulikai, 'gulikaKalam', false)}
-            </div>
-          </div>
-
-          {/* 24 Horai Table */}
-          <div style={{ gridColumn: '1 / -1' }} className="card">
-            <h3 className="title-gold">{t('horas', settings.language)}</h3>
-            <div className="horai-table-container">
-              <table className="horai-table">
-                <thead>
-                  <tr>
-                    <th>{t('hr', settings.language)}</th>
-                    <th>{t('interval', settings.language)}</th>
-                    <th>{t('planet', settings.language)}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.horais?.map((h, idx) => (
-                    <tr key={idx}>
-                      <td>{h.hour}</td>
-                      <td>{h.start} - {h.end}</td>
-                      <td>
-                        <span style={{
-                          display: 'inline-block',
-                          width: '10px',
-                          height: '10px',
-                          borderRadius: '50%',
-                          backgroundColor: h.planet === 'Sun' ? 'yellow' : h.planet === 'Moon' ? 'lightblue' : h.planet === 'Mars' ? 'red' : h.planet === 'Mercury' ? 'green' : h.planet === 'Jupiter' ? 'orange' : h.planet === 'Venus' ? 'pink' : 'purple',
-                          marginRight: '8px'
-                        }}></span>
-                        {h.localizedPlanet || h.planet}
-                      </td>
+            {/* Column 3: 24 Horai Table */}
+            <div className="card panchangam-grid-full" style={{ height: 'fit-content', margin: 0 }}>
+              <h3 className="title-gold" style={{ marginTop: 0 }}>{t('horas', settings.language)}</h3>
+              <div className="horai-table-container">
+                <table className="horai-table">
+                  <thead>
+                    <tr>
+                      <th>{t('hr', settings.language)}</th>
+                      <th>{t('interval', settings.language)}</th>
+                      <th>{t('planet', settings.language)}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {data.horais?.map((h, idx) => (
+                      <tr key={idx}>
+                        <td>{h.hour}</td>
+                        <td>{h.start} - {h.end}</td>
+                        <td>
+                          <span style={{
+                            display: 'inline-block',
+                            width: '9px',
+                            height: '9px',
+                            borderRadius: '50%',
+                            backgroundColor: h.planet === 'Sun' ? '#ff9800' : h.planet === 'Moon' ? '#2196f3' : h.planet === 'Mars' ? '#f44336' : h.planet === 'Mercury' ? '#4caf50' : h.planet === 'Jupiter' ? '#ffc107' : h.planet === 'Venus' ? '#e91e63' : '#9c27b0',
+                            marginRight: '8px'
+                          }}></span>
+                          {h.localizedPlanet || h.planet}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

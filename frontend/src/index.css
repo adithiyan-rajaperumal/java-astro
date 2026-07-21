@@ -324,7 +324,7 @@ input:focus, select:focus {
 
 /* Horai Table */
 .horai-table-container {
-  max-height: 400px;
+  max-height: 440px;
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -336,9 +336,9 @@ input:focus, select:focus {
   text-align: left;
 }
 .horai-table th, .horai-table td {
-  padding: 12px 15px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border);
-  font-size: 14px;
+  font-size: 13.5px;
 }
 .horai-table th {
   background: linear-gradient(135deg, #fff4e5 0%, #ffe8d6 100%);
@@ -350,6 +350,195 @@ input:focus, select:focus {
 }
 .horai-table tr:hover {
   background-color: var(--bg-card-hover, #fff6ec);
+}
+
+/* ==========================================================================
+   MODERN RESPONSIVE PANCHANGAM DASHBOARD STYLES
+   ========================================================================== */
+
+/* Date Bar Header */
+.panchangam-header-bar {
+  background: linear-gradient(135deg, #ffffff 0%, #fffaf4 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  box-shadow: 0 4px 16px rgba(232, 93, 4, 0.05);
+}
+
+.panchangam-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panchangam-header-title h2 {
+  margin: 0;
+  color: var(--accent-saffron);
+  font-size: 22px;
+}
+
+.panchangam-date-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.date-pill-input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: #ffffff;
+  cursor: pointer;
+  outline: none;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Hero Metric Cards Grid (Top Summary Row) */
+.panchangam-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.hero-metric-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 3px 12px rgba(232, 93, 4, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hero-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(232, 93, 4, 0.1);
+  border-color: var(--accent-gold);
+}
+
+.hero-metric-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hero-metric-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.hero-sub-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sub-pill {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: #fff4e5;
+  color: var(--accent-warm);
+  font-weight: 600;
+  border: 1px solid #ffe0b2;
+}
+
+/* Main Dashboard Grid (3 Columns on Desktop, 2 on Tablet, 1 on Mobile) */
+.panchangam-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 1100px) {
+  .panchangam-dashboard-grid {
+    grid-template-columns: 1.2fr 1fr 1fr;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1099px) {
+  .panchangam-dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .panchangam-grid-full {
+    grid-column: span 2;
+  }
+}
+
+/* Element Detail Cards inside Deep Panchangam Column */
+.element-detail-item {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s ease;
+}
+.element-detail-item:hover {
+  border-color: var(--accent-saffron);
+}
+
+.element-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-saffron);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.element-content {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Time Slot Bars */
+.time-slot-bar.auspicious {
+  background: #f1f8e9;
+  border: 1px solid #c8e6c9;
+  color: #2e7d32;
+  border-left: 4px solid #4caf50;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.time-slot-bar.inauspicious {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  color: #c62828;
+  border-left: 4px solid #ff9800;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* Chart Styles */
