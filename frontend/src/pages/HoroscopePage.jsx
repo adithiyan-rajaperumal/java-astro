@@ -373,7 +373,7 @@ function HoroscopePage({ settings }) {
                 {t('born', settings.language)}: {report.dateOfBirth} at {report.timeOfBirth} ({t('localMeanTime', settings.language)}: {report.localMeanTime})
               </p>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {settings.ayanamsa}
+                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rashi || report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {settings.ayanamsa}
               </p>
             </div>
             <div>
