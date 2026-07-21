@@ -167,8 +167,14 @@ function PanchangamPage({ settings }) {
 
   return (
     <div>
-      {/* Simple Centered Date Chooser */}
+      {/* Simple Centered Date Chooser with Aligned Today Button */}
       <div className="panchangam-top-bar">
+        <button 
+          onClick={() => setCurrentDate(getTodayDateString(settings.location))} 
+          className="today-btn"
+        >
+          {t('today', settings.language)}
+        </button>
         <input
           type="date"
           className="date-picker-input"
@@ -194,10 +200,52 @@ function PanchangamPage({ settings }) {
 
       {!loading && !error && data && (
         <div className="panchangam-grid-2col">
-          {/* LEFT COLUMN: Core Interlinked Astronomical & Panchangam Elements */}
+          {/* LEFT COLUMN: Core Astronomical & Panchangam Elements */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
-            {/* Card 1: Rashi, Nakshatram & Chandrastamam (Single Paired Block) */}
+            {/* Card 1 (TOP): Sunrise, Sunset & Muhurtham / Vasthu Summary */}
+            <div className="card" style={{ margin: 0 }}>
+              <h3 className="title-gold" style={{ marginTop: 0 }}>🌅 {t('sunrise', settings.language)} & 🌇 {t('sunset', settings.language)}</h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '10px', marginBottom: '12px' }}>
+                <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
+                  <div className="element-label">🌅 {t('sunrise', settings.language)}</div>
+                  <strong style={{ fontSize: '14px' }}>{data.sunrise}</strong>
+                </div>
+                <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
+                  <div className="element-label">🌇 {t('sunset', settings.language)}</div>
+                  <strong style={{ fontSize: '14px' }}>{data.sunset}</strong>
+                </div>
+                <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
+                  <div className="element-label">🌙 {t('moonrise', settings.language)}</div>
+                  <strong style={{ fontSize: '14px' }}>{data.moonrise}</strong>
+                </div>
+                <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
+                  <div className="element-label">🌕 {t('moonset', settings.language)}</div>
+                  <strong style={{ fontSize: '14px' }}>{data.moonset}</strong>
+                </div>
+              </div>
+
+              <div className="element-detail-item" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px' }}>
+                    {data.muhurthamDay ? '✅ ' + t('auspiciousDay', settings.language) : '❌ ' + t('inauspiciousDay', settings.language)}
+                  </div>
+
+                  {data.vasthuDay && (
+                    <div style={{ background: '#e8f5e9', border: '1px solid #a5d6a7', color: '#2e7d32', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px' }}>
+                      🏡 {t('vasthuDay', settings.language)}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', borderTop: '1px dashed var(--border)', paddingTop: '6px' }}>
+                  {t('netram', settings.language)}: <strong>{data.netram}</strong> | {t('jeevan', settings.language)}: <strong>{data.jeevan}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Rashi, Nakshatram & Chandrastamam (Single Paired Block) */}
             <div className="card" style={{ margin: 0 }}>
               <h3 className="title-gold" style={{ marginTop: 0 }}>🌙 {t('rashi', settings.language)}, {t('nakshatra', settings.language)} & {t('chandrastamam', settings.language)}</h3>
               
@@ -222,7 +270,7 @@ function PanchangamPage({ settings }) {
               </div>
             </div>
 
-            {/* Card 2: Other Core Panchangam Elements (Thithi, Yoga, Karana) */}
+            {/* Card 3: Other Core Panchangam Elements (Thithi, Yoga, Karana) */}
             <div className="card" style={{ margin: 0 }}>
               <h3 className="title-gold" style={{ marginTop: 0 }}>📜 {t('panchangamElements', settings.language)}</h3>
               
@@ -239,39 +287,6 @@ function PanchangamPage({ settings }) {
               <div className="element-detail-item" style={{ marginBottom: 0 }}>
                 <div className="element-label">{t('karanam', settings.language)}</div>
                 <div className="element-content">{formatElementTiming(data.karanam)}</div>
-              </div>
-            </div>
-
-            {/* Card 3: Sunrise / Sunset & Muhurtham Summary */}
-            <div className="card" style={{ margin: 0 }}>
-              <h3 className="title-gold" style={{ marginTop: 0 }}>🌅 {t('sunrise', settings.language)} & 🌇 {t('sunset', settings.language)}</h3>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', marginBottom: '12px' }}>
-                <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
-                  <div className="element-label">🌅 {t('sunrise', settings.language)}</div>
-                  <strong style={{ fontSize: '14px' }}>{data.sunrise}</strong>
-                </div>
-                <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
-                  <div className="element-label">🌇 {t('sunset', settings.language)}</div>
-                  <strong style={{ fontSize: '14px' }}>{data.sunset}</strong>
-                </div>
-                <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
-                  <div className="element-label">🌙 {t('moonrise', settings.language)}</div>
-                  <strong style={{ fontSize: '14px' }}>{data.moonrise}</strong>
-                </div>
-                <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
-                  <div className="element-label">🌕 {t('moonset', settings.language)}</div>
-                  <strong style={{ fontSize: '14px' }}>{data.moonset}</strong>
-                </div>
-              </div>
-
-              <div className="element-detail-item" style={{ margin: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px' }}>
-                  {data.muhurthamDay ? '✅ ' + t('auspiciousDay', settings.language) : '❌ ' + t('inauspiciousDay', settings.language)}
-                </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                  {t('netram', settings.language)}: <strong>{data.netram}</strong> | {t('jeevan', settings.language)}: <strong>{data.jeevan}</strong>
-                </div>
               </div>
             </div>
 
