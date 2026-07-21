@@ -128,11 +128,19 @@ public class ChartOrchestrationService {
         int karanamIdx = (int) (elongation / 6.0) + 1;
         String computedKaranam = ts.getLabel("karanam." + resolveKaranamId(karanamIdx));
 
-        List<List<ChartResponseDTO.PositionDetail>> suite = new ArrayList<>();
-        int[] targets = { 1, 2, 3, -1, 7, 9, 10, 12, 20, 24, 30, 60 };
-        for (int t : targets) {
-            suite.add(compileVargaList(t, d1, cusps));
-        }
+        Map<String, List<ChartResponseDTO.PositionDetail>> suiteMap = new java.util.LinkedHashMap<>();
+        suiteMap.put("d1", compileVargaList(1, d1, cusps));
+        suiteMap.put("d2", compileVargaList(2, d1, cusps));
+        suiteMap.put("d3", compileVargaList(3, d1, cusps));
+        suiteMap.put("bhava", compileVargaList(-1, d1, cusps));
+        suiteMap.put("d7", compileVargaList(7, d1, cusps));
+        suiteMap.put("d9", compileVargaList(9, d1, cusps));
+        suiteMap.put("d10", compileVargaList(10, d1, cusps));
+        suiteMap.put("d12", compileVargaList(12, d1, cusps));
+        suiteMap.put("d20", compileVargaList(20, d1, cusps));
+        suiteMap.put("d24", compileVargaList(24, d1, cusps));
+        suiteMap.put("d30", compileVargaList(30, d1, cusps));
+        suiteMap.put("d60", compileVargaList(60, d1, cusps));
 
         return ComprehensiveReportDTO.builder()
                 .name(pay.name())
@@ -147,7 +155,7 @@ public class ChartOrchestrationService {
                 .birthProfile(buildProfileHeader(d1))
                 .birthPlanetaryPositions(d1.entrySet().stream()
                         .map(e -> mapToDetail(e.getKey().toUpperCase(), e.getValue())).collect(Collectors.toList()))
-                .vargaChartsSuite(suite)
+                .vargaChartsMap(suiteMap)
                 .vimshottariTimeline(dasaEngine.calculateVimshottariTimeline(moonLong, dob))
                 .shadbalaStrengths(shadbalaService.calculateShadbala(d1))
                 .structuralDiagnostics(diagnosticsService.runHoroscopeDiagnostics(d1))

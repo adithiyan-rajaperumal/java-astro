@@ -163,19 +163,24 @@ public class PdfExportService {
                     "pdf.chart.d7", "pdf.chart.d9", "pdf.chart.d10", "pdf.chart.d12",
                     "pdf.chart.d20", "pdf.chart.d24", "pdf.chart.d30", "pdf.chart.d60"
             };
+            String[] chartMapKeys = {
+                    "d1", "d2", "d3", "bhava", "d7", "d9", "d10", "d12", "d20", "d24", "d30", "d60"
+            };
 
             for (int i = 0; i < 12; i++) {
                 PdfPCell layoutCell = new PdfPCell(); layoutCell.setBorder(PdfPCell.NO_BORDER); layoutCell.setPadding(6);
                 String resolvedTitleText = ts.getLabel(vargaKeys[i]);
 
-                List<ChartResponseDTO.PositionDetail> planets = data.getVargaChartsSuite().get(i);
-                if (isHi) {
-                    Paragraph chartLabel = buildMixedParagraph(resolvedTitleText, boldB, engBoldB);
-                    chartLabel.setSpacingAfter(4);
-                    layoutCell.addElement(chartLabel);
-                    layoutCell.addElement(buildNorthIndianTemplateImage(writer, planets, chartFontActual, engBf));
-                } else {
-                    layoutCell.addElement(buildCleanSouthIndianGrid(planets, resolvedTitleText, chartFontActual, chartBoldActual, isKn));
+                List<ChartResponseDTO.PositionDetail> planets = data.getVargaChartsMap() != null ? data.getVargaChartsMap().get(chartMapKeys[i]) : null;
+                if (planets != null) {
+                    if (isHi) {
+                        Paragraph chartLabel = buildMixedParagraph(resolvedTitleText, boldB, engBoldB);
+                        chartLabel.setSpacingAfter(4);
+                        layoutCell.addElement(chartLabel);
+                        layoutCell.addElement(buildNorthIndianTemplateImage(writer, planets, chartFontActual, engBf));
+                    } else {
+                        layoutCell.addElement(buildCleanSouthIndianGrid(planets, resolvedTitleText, chartFontActual, chartBoldActual, isKn));
+                    }
                 }
                 masterGrid.addCell(layoutCell);
             }

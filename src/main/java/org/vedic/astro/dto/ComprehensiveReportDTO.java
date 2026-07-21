@@ -1,6 +1,6 @@
 package org.vedic.astro.dto;
 
-import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import org.vedic.astro.model.DasaPeriod;
@@ -23,7 +23,7 @@ public class ComprehensiveReportDTO {
 
     private ChartResponseDTO.BirthProfile birthProfile;
     private List<ChartResponseDTO.PositionDetail> birthPlanetaryPositions;
-    private List<List<ChartResponseDTO.PositionDetail>> vargaChartsSuite;
+    private Map<String, List<ChartResponseDTO.PositionDetail>> vargaChartsMap;
     private List<DasaPeriod> vimshottariTimeline;
     private ShadbalaDTO shadbalaStrengths;
     private DiagnosticsDTO structuralDiagnostics;
