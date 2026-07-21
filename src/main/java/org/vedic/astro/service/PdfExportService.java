@@ -188,7 +188,7 @@ public class PdfExportService {
             document.add(masterGrid);
 
             // UPGRADED SHADBALA GRID: Broad status channels eliminate wrapping text splits
-            document.newPage(); document.add(new Paragraph(ts.getLabel("pdf.shadbala.title"), sFont)); document.add(new Paragraph(" ", bFont));
+            document.newPage(); document.add(buildMixedParagraph(ts.getLabel("pdf.shadbala.title"), sFont, engSFont)); document.add(new Paragraph(" ", bFont));
             PdfPTable sb = new PdfPTable(7);
             sb.setWidthPercentage(100);
             sb.setSpacingAfter(15);
