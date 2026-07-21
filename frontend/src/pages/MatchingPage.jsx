@@ -20,6 +20,31 @@ function MatchingPage({ settings }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const handleDateChange = (val, setter) => {
+    const clean = val.replace(/\D/g, '');
+    let formatted = clean;
+    if (clean.length > 2) {
+      formatted = `${clean.slice(0, 2)}/${clean.slice(2)}`;
+    }
+    if (clean.length > 4) {
+      formatted = `${clean.slice(0, 2)}/${clean.slice(2, 4)}/${clean.slice(4, 8)}`;
+    }
+    setter(formatted);
+  };
+
+  const parseDateText = (dateText) => {
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = dateText.match(dateRegex);
+    if (!match) return null;
+    const day = parseInt(match[1]);
+    const month = parseInt(match[2]);
+    const year = parseInt(match[3]);
+    if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1800 || year > 2100) {
+      return null;
+    }
+    return { year, month, day };
+  };
+
   const handleMatch = async (e) => {
     e.preventDefault();
     if (!boyName.trim() || !boyDate || !boyTime || !boyLocation ||
@@ -28,20 +53,26 @@ function MatchingPage({ settings }) {
       return;
     }
 
+    const bDateParsed = parseDateText(boyDate);
+    const gDateParsed = parseDateText(girlDate);
+
+    if (!bDateParsed || !gDateParsed) {
+      alert('Please enter valid dates in DD/MM/YYYY format (e.g. 15/05/1995).');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
-    const [bYear, bMonth, bDay] = boyDate.split('-').map(Number);
     const [bHour, bMinute] = boyTime.split(':').map(Number);
-    const [gYear, gMonth, gDay] = girlDate.split('-').map(Number);
     const [gHour, gMinute] = girlTime.split(':').map(Number);
 
     const payload = {
       boy: {
         name: boyName,
-        year: bYear,
-        month: bMonth,
-        day: bDay,
+        year: bDateParsed.year,
+        month: bDateParsed.month,
+        day: bDateParsed.day,
         hour: bHour,
         minute: bMinute,
         second: 0,
@@ -51,9 +82,9 @@ function MatchingPage({ settings }) {
       },
       girl: {
         name: girlName,
-        year: gYear,
-        month: gMonth,
-        day: gDay,
+        year: gDateParsed.year,
+        month: gDateParsed.month,
+        day: gDateParsed.day,
         hour: gHour,
         minute: gMinute,
         second: 0,
@@ -89,17 +120,21 @@ function MatchingPage({ settings }) {
 
   const handleDownloadPdf = async () => {
     if (!result) return;
-    const [bYear, bMonth, bDay] = boyDate.split('-').map(Number);
+    const bDateParsed = parseDateText(boyDate);
+    const gDateParsed = parseDateText(girlDate);
+    if (!bDateParsed || !gDateParsed) {
+      alert('Please enter valid dates in DD/MM/YYYY format (e.g. 15/05/1995).');
+      return;
+    }
     const [bHour, bMinute] = boyTime.split(':').map(Number);
-    const [gYear, gMonth, gDay] = girlDate.split('-').map(Number);
     const [gHour, gMinute] = girlTime.split(':').map(Number);
 
     const payload = {
       boy: {
         name: boyName,
-        year: bYear,
-        month: bMonth,
-        day: bDay,
+        year: bDateParsed.year,
+        month: bDateParsed.month,
+        day: bDateParsed.day,
         hour: bHour,
         minute: bMinute,
         second: 0,
@@ -109,9 +144,9 @@ function MatchingPage({ settings }) {
       },
       girl: {
         name: girlName,
-        year: gYear,
-        month: gMonth,
-        day: gDay,
+        year: gDateParsed.year,
+        month: gDateParsed.month,
+        day: gDateParsed.day,
         hour: gHour,
         minute: gMinute,
         second: 0,
@@ -184,7 +219,14 @@ function MatchingPage({ settings }) {
               <div className="grid-2">
                 <div>
                   <label>{t('birthDate', settings.language)}</label>
-                  <input type="date" value={boyDate} onChange={(e) => setBoyDate(e.target.value)} required />
+                  <input
+                    type="text"
+                    value={boyDate}
+                    onChange={(e) => handleDateChange(e.target.value, setBoyDate)}
+                    placeholder="DD/MM/YYYY"
+                    maxLength="10"
+                    required
+                  />
                 </div>
                 <div>
                   <label>{t('birthTime', settings.language)}</label>
@@ -209,7 +251,14 @@ function MatchingPage({ settings }) {
               <div className="grid-2">
                 <div>
                   <label>{t('birthDate', settings.language)}</label>
-                  <input type="date" value={girlDate} onChange={(e) => setGirlDate(e.target.value)} required />
+                  <input
+                    type="text"
+                    value={girlDate}
+                    onChange={(e) => handleDateChange(e.target.value, setGirlDate)}
+                    placeholder="DD/MM/YYYY"
+                    maxLength="10"
+                    required
+                  />
                 </div>
                 <div>
                   <label>{t('birthTime', settings.language)}</label>

@@ -70,8 +70,7 @@ function HoroscopePage({ settings }) {
   const renderChartsTab = () => {
     if (!report) return null;
     const d1 = report.birthPlanetaryPositions || [];
-    // If vargaChartsSuite has D9, usually index 1 or we can map d9 if available, or just map D1
-    const d9 = report.vargaChartsSuite?.[1] || d1;
+    const d9 = report.vargaChartsSuite?.[5] || d1;
 
     return (
       <div>
@@ -130,7 +129,7 @@ function HoroscopePage({ settings }) {
                   onClick={() => setExpandedDasa(isExpanded ? null : idx)}
                 >
                   <span style={{ fontWeight: 'bold', color: isCurrent ? 'var(--accent-warm)' : 'var(--accent-gold)' }}>
-                    ☀️ {dasa.planetName} Maha Dasa {isCurrent ? '(Active)' : ''}
+                    ☀️ {t('planet.' + dasa.planetName.toLowerCase(), settings.language)} {t('mahaDasa', settings.language)} {isCurrent ? `(${t('active', settings.language)})` : ''}
                   </span>
                   <span>
                     {dasa.startDate} to {dasa.endDate}
@@ -148,7 +147,7 @@ function HoroscopePage({ settings }) {
                             style={isBhukthiCurrent ? { borderColor: 'var(--accent-gold)', backgroundColor: 'var(--bg-card-hover)' } : {}}
                           >
                             <div style={{ fontWeight: 'bold', color: isBhukthiCurrent ? 'var(--accent-gold)' : 'var(--accent-warm)' }}>
-                              {bhukthi.planetName} Bhukthi {isBhukthiCurrent ? '(Active)' : ''}
+                              {t('planet.' + bhukthi.planetName.toLowerCase(), settings.language)} {t('bhukthi', settings.language)} {isBhukthiCurrent ? `(${t('active', settings.language)})` : ''}
                             </div>
                             <div>{bhukthi.startDate} to {bhukthi.endDate}</div>
                           </div>
@@ -175,11 +174,11 @@ function HoroscopePage({ settings }) {
             <thead>
               <tr>
                 <th>{t('planet', settings.language)}</th>
-                <th>Sthana</th>
-                <th>Dig</th>
-                <th>Kala</th>
-                <th>Cheshta</th>
-                <th>Total</th>
+                <th>{t('sthana', settings.language)}</th>
+                <th>{t('dig', settings.language)}</th>
+                <th>{t('kala', settings.language)}</th>
+                <th>{t('cheshta', settings.language)}</th>
+                <th>{t('total', settings.language)}</th>
                 <th>{t('status', settings.language)}</th>
               </tr>
             </thead>
@@ -189,7 +188,7 @@ function HoroscopePage({ settings }) {
                 const isWeak = strength.strengthCategory?.toLowerCase().includes('weak');
                 return (
                   <tr key={idx}>
-                    <td style={{ fontWeight: 'bold' }}>{planet}</td>
+                    <td style={{ fontWeight: 'bold' }}>{t('planet.' + planet.toLowerCase(), settings.language)}</td>
                     <td>{strength.sthanaBala.toFixed(2)}</td>
                     <td>{strength.digBala.toFixed(2)}</td>
                     <td>{strength.kalaBala.toFixed(2)}</td>
@@ -201,7 +200,7 @@ function HoroscopePage({ settings }) {
                       color: isStrong ? 'var(--success)' : isWeak ? 'var(--danger)' : 'var(--accent-gold)',
                       fontWeight: 'bold'
                     }}>
-                      {strength.strengthCategory}
+                      {strength.strengthCategory?.toLowerCase().includes('strong') ? t('veryStrong', settings.language) : strength.strengthCategory?.toLowerCase().includes('weak') ? t('weak', settings.language) : t('optimum', settings.language)}
                     </td>
                   </tr>
                 );
