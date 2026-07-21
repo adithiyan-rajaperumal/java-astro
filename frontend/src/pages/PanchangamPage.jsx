@@ -88,6 +88,39 @@ function PanchangamPage({ settings }) {
     );
   };
 
+  const parseTimeToMinutes = (timeStr) => {
+    if (!timeStr) return -1;
+    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!match) return -1;
+    let hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const isPM = match[3].toUpperCase() === 'PM';
+    if (isPM && hours < 12) hours += 12;
+    if (!isPM && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  };
+
+  const isCrossedMidnight = (startStr, endStr) => {
+    if (!startStr || !endStr) return false;
+    const nextDayKeywords = ['next day', 'அடுத்த நாள்', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം'];
+    if (nextDayKeywords.some(k => endStr.includes(k))) return true;
+    const startMins = parseTimeToMinutes(startStr);
+    const endMins = parseTimeToMinutes(endStr);
+    if (startMins < 0 || endMins < 0) return false;
+    return (startMins >= 12 * 60 && endMins < 12 * 60);
+  };
+
+  const formatTimeString = (timeStr, refStartStr, nextDayText) => {
+    if (!timeStr) return '';
+    const nextDayKeywords = ['next day', 'அடுத்த நாள்', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം'];
+    const alreadyHasLabel = nextDayKeywords.some(k => timeStr.includes(k));
+    if (alreadyHasLabel) return timeStr;
+    if (refStartStr && isCrossedMidnight(refStartStr, timeStr)) {
+      return `${timeStr} (${nextDayText})`;
+    }
+    return timeStr;
+  };
+
   const formatElementTiming = (elem) => {
     if (!elem) return '';
     const firstName = elem.localizedName || elem.name;
@@ -96,13 +129,16 @@ function PanchangamPage({ settings }) {
     const untilStr = t('until', settings.language);
     const fromStr = t('from', settings.language);
     const thenStr = t('then', settings.language);
+    const nextDayStr = t('nextDay', settings.language);
 
-    let text = `${firstName} ${elem.endTime} ${untilStr}`;
+    const formattedEndTime = formatTimeString(elem.endTime, '06:00 AM', nextDayStr);
+    let text = `${firstName} ${formattedEndTime} ${untilStr}`;
 
     const nextName = elem.nextLocalizedName || elem.nextName;
     if (nextName) {
-      if (elem.nextEndTime) {
-        text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr} - ${elem.nextEndTime} ${untilStr}`;
+      const formattedNextEndTime = formatTimeString(elem.nextEndTime, elem.endTime, nextDayStr);
+      if (formattedNextEndTime) {
+        text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr} - ${formattedNextEndTime} ${untilStr}`;
       } else {
         text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr}`;
       }
