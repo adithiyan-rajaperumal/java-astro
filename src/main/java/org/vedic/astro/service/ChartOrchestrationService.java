@@ -71,14 +71,19 @@ public class ChartOrchestrationService {
 
         return ChartUiResponseDTO.builder().name(res.getName()).dateOfBirth(dob.toString())
                 .timeOfBirth(String.format("%02d:%02d:%02d", pay.hour(), pay.minute(), pay.second()))
+                .latitude(pay.latitude())
+                .longitude(pay.longitude())
+                .resolvedTimezone(res.getResolvedTimezone() != null ? res.getResolvedTimezone() : "Asia/Kolkata")
                 .thithi(computedThithi)
                 .yogam(computedYogam)
                 .karanam(computedKaranam)
                 .localMeanTime(res.getLocalMeanTime()).birthProfile(buildProfileHeader(res.getD1Positions()))
                 .d1Chart(compileVargaList(1, res.getD1Positions(), null))
                 .d9Chart(compileVargaList(9, res.getD1Positions(), null))
-                .currentDasaTimeline(dasaEngine.calculateVimshottariTimeline(moon.getAbsoluteLongitude(), dob).stream()
-                        .collect(Collectors.toList()))
+                .bhavaChart(compileVargaList(-1, res.getD1Positions(), null))
+                .currentDasaTimeline(dasaEngine.calculateVimshottariTimeline(moon.getAbsoluteLongitude(), dob))
+                .shadbalaStrengths(shadbalaService.calculateShadbala(d1))
+                .structuralDiagnostics(diagnosticsService.runHoroscopeDiagnostics(d1))
                 .build();
     }
 

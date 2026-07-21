@@ -14,10 +14,18 @@ public class ChartUiResponseDTO {
     private String dateOfBirth;   // <-- Added actual input date tracking
     private String timeOfBirth;   // <-- Added actual input time tracking
     private String localMeanTime; // <-- Holds the astronomical computed LMT
+    private double latitude;
+    private double longitude;
+    private String resolvedTimezone;
+
     private ChartResponseDTO.BirthProfile birthProfile;
     private List<ChartResponseDTO.PositionDetail> d1Chart;
     private List<ChartResponseDTO.PositionDetail> d9Chart;
+    private List<ChartResponseDTO.PositionDetail> bhavaChart;
     private List<DasaPeriod> currentDasaTimeline;
+    private ShadbalaDTO shadbalaStrengths;
+    private DiagnosticsDTO structuralDiagnostics;
+
     // Core Panchangam Element Block
     private String thithi;
     private String yogam;
