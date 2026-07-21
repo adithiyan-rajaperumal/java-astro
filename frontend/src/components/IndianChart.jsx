@@ -8,11 +8,27 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
     ta: { Lagna: 'ல', Sun: 'சூ', Moon: 'ச', Mars: 'செ', Mercury: 'பு', Jupiter: 'கு', Venus: 'சு', Saturn: 'சனி', Rahu: 'ரா', Ketu: 'கே' },
     hi: { Lagna: 'ल', Sun: 'सू', Moon: 'च', Mars: 'मं', Mercury: 'बु', Jupiter: 'गु', Venus: 'शु', Saturn: 'श', Rahu: 'रा', Ketu: 'के' },
     te: { Lagna: 'ల', Sun: 'సూ', Moon: 'చ', Mars: 'మం', Mercury: 'బు', Jupiter: 'గు', Venus: 'శు', Saturn: 'శ', Rahu: 'రా', Ketu: 'కే' },
-    kn: { Lagna: 'ಲ', Sun: 'ಸೂ', Moon: 'ಚ', Mars: 'ಮం', Mercury: 'ಬು', Jupiter: 'ಗು', Venus: 'ಶು', Saturn: 'ಶ', Rahu: 'ರಾ', Ketu: 'ಕೇ' },
+    kn: { Lagna: 'ಲ', Sun: 'ಸೂ', Moon: 'ಚ', Mars: 'ಮಂ', Mercury: 'ಬು', Jupiter: 'ಗು', Venus: 'ಶು', Saturn: 'ಶ', Rahu: 'ರಾ', Ketu: 'ಕೇ' },
     ml: { Lagna: 'ല', Sun: 'സൂ', Moon: 'ച', Mars: 'ചൊ', Mercury: 'ബു', Jupiter: 'ഗു', Venus: 'ശു', Saturn: 'ശ', Rahu: 'രാ', Ketu: 'കേ' }
   };
 
+  const dignityLabels = {
+    en: { own: 'Own Sign (Aatchi)', exalted: 'Exalted (Uchcham)', debilitated: 'Debilitated (Neecham)', neutral: 'Neutral' },
+    ta: { own: 'ஆட்சி (Own)', exalted: 'உச்சம் (Exalted)', debilitated: 'நீசம் (Debilitated)', neutral: 'சமம் (Neutral)' },
+    hi: { own: 'स्वक्षेत्री (Own)', exalted: 'उच्च (Exalted)', debilitated: 'नीच (Debilitated)', neutral: 'सम (Neutral)' },
+    te: { own: 'స్వక్షేత్రం', exalted: 'ఉచ్ఛ', debilitated: 'నీచ', neutral: 'సమ' },
+    kn: { own: 'ಸ್ವಕ್ಷೇತ್ರ', exalted: 'ಉಚ್ಚ', debilitated: 'ನೀಚ', neutral: 'ಸಮ' },
+    ml: { own: 'സ്വക്ഷേത്രം', exalted: 'ഉച്ചം', debilitated: 'നീചം', neutral: 'സമം' }
+  };
+
+  const signLords = {
+    1: 'Mars', 2: 'Venus', 3: 'Mercury', 4: 'Moon', 5: 'Sun', 6: 'Mercury',
+    7: 'Venus', 8: 'Mars', 9: 'Jupiter', 10: 'Saturn', 11: 'Saturn', 12: 'Jupiter'
+  };
+
+  const activeDignityMap = dignityLabels[lang] || dignityLabels.en;
   const langMap = abbrevMaps[lang] || abbrevMaps.en;
+  const activeChartStyle = lang === 'hi' ? 'north' : style;
 
   // Group planets by sign (1 to 12)
   const signPlanets = Array.from({ length: 13 }, () => []);
@@ -28,27 +44,27 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
     }
 
     if (p.signNumber >= 1 && p.signNumber <= 12) {
-      signPlanets[p.signNumber].push(shortName);
+      signPlanets[p.signNumber].push({ ...p, shortName });
     }
   });
 
   // South Indian Cell mapping (Aries=1, Taurus=2... Pisces=12)
   const southCells = {
-    12: { x: 0, y: 0, label: 'Pi' },
-    1: { x: 100, y: 0, label: 'Ar' },
-    2: { x: 200, y: 0, label: 'Ta' },
-    3: { x: 300, y: 0, label: 'Ge' },
-    11: { x: 0, y: 100, label: 'Aq' },
-    4: { x: 300, y: 100, label: 'Cn' },
-    10: { x: 0, y: 200, label: 'Cp' },
-    5: { x: 300, y: 200, label: 'Le' },
-    9: { x: 0, y: 300, label: 'Sg' },
-    8: { x: 100, y: 300, label: 'Sc' },
-    7: { x: 200, y: 300, label: 'Li' },
-    6: { x: 300, y: 300, label: 'Vi' },
+    12: { x: 0, y: 0 },
+    1: { x: 100, y: 0 },
+    2: { x: 200, y: 0 },
+    3: { x: 300, y: 0 },
+    11: { x: 0, y: 100 },
+    4: { x: 300, y: 100 },
+    10: { x: 0, y: 200 },
+    5: { x: 300, y: 200 },
+    9: { x: 0, y: 300 },
+    8: { x: 100, y: 300 },
+    7: { x: 200, y: 300 },
+    6: { x: 300, y: 300 },
   };
 
-  // Find the Lagna sign to calculate house numbers relative to Lagna
+  // Find Lagna sign
   const lagnaPos = positions.find((p) => p.planetKey?.toLowerCase().includes('lagna') || p.displayName?.toLowerCase().includes('lagna'));
   const lagnaSign = lagnaPos ? lagnaPos.signNumber : 1;
 
@@ -56,61 +72,61 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
     return ((sign - lagnaSign + 12) % 12) + 1;
   };
 
-  // Calculate aspects from selected house (1-12 in signs)
+  const getDignity = (planetKey, sign) => {
+    const pk = (planetKey || '').toUpperCase();
+    if (pk === 'SUN') return sign === 5 ? activeDignityMap.own : (sign === 1 ? activeDignityMap.exalted : (sign === 7 ? activeDignityMap.debilitated : activeDignityMap.neutral));
+    if (pk === 'MOON') return sign === 4 ? activeDignityMap.own : (sign === 2 ? activeDignityMap.exalted : (sign === 8 ? activeDignityMap.debilitated : activeDignityMap.neutral));
+    if (pk === 'MARS') return (sign === 1 || sign === 8) ? activeDignityMap.own : (sign === 10 ? activeDignityMap.exalted : (sign === 4 ? activeDignityMap.debilitated : activeDignityMap.neutral));
+    if (pk === 'MERCURY') return (sign === 3 || sign === 6) ? activeDignityMap.own : (sign === 6 ? activeDignityMap.exalted : (sign === 12 ? activeDignityMap.debilitated : activeDignityMap.neutral));
+    if (pk === 'JUPITER') return (sign === 9 || sign === 12) ? activeDignityMap.own : (sign === 4 ? activeDignityMap.exalted : (sign === 10 ? activeDignityMap.debilitated : activeDignityMap.neutral));
+    if (pk === 'VENUS') return (sign === 2 || sign === 7) ? activeDignityMap.own : (sign === 12 ? activeDignityMap.exalted : (sign === 6 ? activeDignityMap.debilitated : activeDignityMap.neutral));
+    if (pk === 'SATURN') return (sign === 10 || sign === 11) ? activeDignityMap.own : (sign === 7 ? activeDignityMap.exalted : (sign === 1 ? activeDignityMap.debilitated : activeDignityMap.neutral));
+    return activeDignityMap.neutral;
+  };
+
+  // Calculate aspects from selected house
   const getAspectedHouses = (sign) => {
     if (!sign) return [];
     const house = getHouseNumber(sign);
-    
-    // Determine if any key planets are in this house to check special aspects
-    // Otherwise draw standard 7th aspect
     const planetsInHouse = positions.filter((p) => p.signNumber === sign);
-    const aspectHouses = new Set([ (house + 6) % 12 || 12 ]); // All houses aspect 7th
+    const aspectHouses = new Set([ (house + 6) % 12 || 12 ]);
 
     planetsInHouse.forEach((p) => {
       const name = p.planetKey?.toLowerCase();
-      if (name.includes('mars')) {
+      if (name?.includes('mars')) {
         aspectHouses.add((house + 3) % 12 || 12);
         aspectHouses.add((house + 7) % 12 || 12);
-      } else if (name.includes('jupiter')) {
+      } else if (name?.includes('jupiter')) {
         aspectHouses.add((house + 4) % 12 || 12);
         aspectHouses.add((house + 8) % 12 || 12);
-      } else if (name.includes('saturn')) {
+      } else if (name?.includes('saturn')) {
         aspectHouses.add((house + 2) % 12 || 12);
         aspectHouses.add((house + 9) % 12 || 12);
       }
     });
 
-    // Map house index back to sign index
     return Array.from(aspectHouses).map((h) => ((h + lagnaSign - 2) % 12) + 1);
   };
 
   const handleCellClick = (sign) => {
-    if (selectedHouse === sign) {
-      setSelectedHouse(null);
-    } else {
-      setSelectedHouse(sign);
-    }
+    setSelectedHouse(selectedHouse === sign ? null : sign);
   };
+
+  const selectedPlanets = selectedHouse ? signPlanets[selectedHouse] : [];
 
   const renderSouthIndian = () => {
     const aspectedSigns = getAspectedHouses(selectedHouse);
     
     return (
       <svg width="400" height="400" className="south-indian-svg" viewBox="0 0 400 400">
-        {/* Draw main grid */}
         <rect x="0" y="0" width="400" height="400" fill="none" stroke="var(--border)" strokeWidth="2" />
-        
-        {/* Horizontal lines */}
         <line x1="0" y1="100" x2="400" y2="100" stroke="var(--border)" strokeWidth="1" />
         <line x1="0" y1="200" x2="400" y2="200" stroke="var(--border)" strokeWidth="1" />
         <line x1="0" y1="300" x2="400" y2="300" stroke="var(--border)" strokeWidth="1" />
-        
-        {/* Vertical lines */}
         <line x1="100" y1="0" x2="100" y2="400" stroke="var(--border)" strokeWidth="1" />
         <line x1="200" y1="0" x2="200" y2="400" stroke="var(--border)" strokeWidth="1" />
         <line x1="300" y1="0" x2="300" y2="400" stroke="var(--border)" strokeWidth="1" />
 
-        {/* Clear center */}
         <rect x="101" y="101" width="198" height="198" fill="var(--bg-card)" />
         <text x="200" y="190" textAnchor="middle" fill="var(--accent-gold)" fontSize="18" fontWeight="bold">
           {title}
@@ -119,12 +135,10 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
           {lagnaPos ? `Lagna: ${lagnaPos.rashiName || 'Asc'}` : ''}
         </text>
 
-        {/* Draw Cells */}
         {Object.entries(southCells).map(([signStr, coords]) => {
           const sign = parseInt(signStr);
           const isSelected = selectedHouse === sign;
           const isAspected = aspectedSigns.includes(sign);
-          const houseNo = getHouseNumber(sign);
           const cellPlanets = signPlanets[sign];
 
           return (
@@ -134,29 +148,25 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
                 y={coords.y}
                 width="100"
                 height="100"
-                fill={isSelected ? 'rgba(212, 168, 67, 0.15)' : isAspected ? 'rgba(232, 145, 58, 0.08)' : 'transparent'}
-                stroke={isSelected ? 'var(--accent-gold)' : 'transparent'}
+                fill={isSelected ? 'rgba(255, 107, 0, 0.18)' : isAspected ? 'rgba(232, 93, 4, 0.08)' : 'transparent'}
+                stroke={isSelected ? 'var(--accent-saffron, #ff6b00)' : 'transparent'}
                 strokeWidth="2"
               />
-              {/* Sign label */}
-              <text x={coords.x + 8} y={coords.y + 18} fill="var(--text-secondary)" fontSize="10">
-                {coords.label} ({houseNo})
-              </text>
               
-              {/* Planet symbols */}
-              <g transform={`translate(${coords.x + 10}, ${coords.y + 40})`}>
+              {/* Clean Planet Symbols Only - No house numbers / rashi labels */}
+              <g transform={`translate(${coords.x + 12}, ${coords.y + 35})`}>
                 {cellPlanets.map((p, idx) => {
-                  const isLagna = p === langMap.Lagna;
+                  const isLagna = p.planetKey?.toUpperCase() === 'LAGNA';
                   return (
                     <text
                       key={idx}
                       x={(idx % 3) * 28}
-                      y={Math.floor(idx / 3) * 20}
+                      y={Math.floor(idx / 3) * 22}
                       fill={isLagna ? 'var(--accent-gold)' : 'var(--text-primary)'}
-                      fontSize="13"
-                      fontWeight={isLagna ? 'bold' : 'normal'}
+                      fontSize="14"
+                      fontWeight={isLagna ? 'bold' : '600'}
                     >
-                      {p}
+                      {p.shortName}
                     </text>
                   );
                 })}
@@ -165,7 +175,6 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
           );
         })}
 
-        {/* Draw aspect lines */}
         {selectedHouse && aspectedSigns.map((targetSign, idx) => {
           const start = southCells[selectedHouse];
           const end = southCells[targetSign];
@@ -178,10 +187,9 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
               y1={start.y + 50}
               x2={end.x + 50}
               y2={end.y + 50}
-              stroke="var(--accent-warm)"
+              stroke="var(--accent-saffron, #ff6b00)"
               strokeDasharray="4,4"
               strokeWidth="2"
-              markerEnd="url(#arrow)"
             />
           );
         })}
@@ -189,40 +197,55 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
     );
   };
 
-  // North Indian Diamond Layout
   const renderNorthIndian = () => {
-    // North Indian coordinates and layout lines
     return (
       <svg width="400" height="400" className="north-indian-svg" viewBox="0 0 400 400">
         <rect x="0" y="0" width="400" height="400" fill="none" stroke="var(--border)" strokeWidth="2" />
-        
-        {/* Draw diagonals */}
         <line x1="0" y1="0" x2="400" y2="400" stroke="var(--border)" strokeWidth="1" />
         <line x1="400" y1="0" x2="0" y2="400" stroke="var(--border)" strokeWidth="1" />
-        
-        {/* Draw inner square */}
         <line x1="200" y1="0" x2="400" y2="200" stroke="var(--border)" strokeWidth="1" />
         <line x1="400" y1="200" x2="200" y2="400" stroke="var(--border)" strokeWidth="1" />
         <line x1="200" y1="400" x2="0" y2="200" stroke="var(--border)" strokeWidth="1" />
         <line x1="0" y1="200" x2="200" y2="0" stroke="var(--border)" strokeWidth="1" />
 
-        {/* Center label */}
         <text x="200" y="205" textAnchor="middle" fill="var(--accent-gold)" fontSize="18" fontWeight="bold">
-          {title} (North)
+          {title}
         </text>
 
-        {/* Draw coordinates/planets based on house coordinates */}
-        {/* Since South is standard and North requires complex coordinate math, we support South Indian primarily and add a responsive fallback label */}
-        <text x="200" y="380" textAnchor="middle" fill="var(--text-secondary)" fontSize="12">
-          (Interactive aspects supported in South Indian view)
+        {/* North Indian Houses rendering with sign number in center house */}
+        <text x="200" y="140" textAnchor="middle" fill="var(--accent-saffron)" fontSize="14" fontWeight="bold">
+          1 ({lagnaSign})
         </text>
       </svg>
     );
   };
 
   return (
-    <div className="chart-box">
-      {style === 'north' ? renderNorthIndian() : renderSouthIndian()}
+    <div className="chart-box-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div className="chart-box">
+        {activeChartStyle === 'north' ? renderNorthIndian() : renderSouthIndian()}
+      </div>
+
+      {/* House detail panel below chart on house click */}
+      {selectedHouse && (
+        <div className="card" style={{ marginTop: '15px', width: '100%', maxWidth: '400px', padding: '15px' }}>
+          <h4 style={{ margin: '0 0 10px', color: 'var(--accent-gold)' }}>
+            House Details (House {getHouseNumber(selectedHouse)} — Sign Lord: {signLords[selectedHouse]})
+          </h4>
+          {selectedPlanets.length === 0 ? (
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>No planets in this house.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {selectedPlanets.map((p, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>
+                  <span><strong>{p.displayName || p.planetKey}:</strong> {p.formattedDegree || `${p.degreeInSign?.toFixed(2)}°`}</span>
+                  <span style={{ color: 'var(--accent-saffron)' }}>{getDignity(p.planetKey, selectedHouse)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
