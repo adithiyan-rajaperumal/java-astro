@@ -149,9 +149,14 @@ function PanchangamPage({ settings }) {
 
     const nextName = elem.nextLocalizedName || elem.nextName;
     if (nextName) {
-      const formattedNextEndTime = formatTimeString(elem.nextEndTime, elem.endTime, nextDayStr);
-      if (formattedNextEndTime) {
-        text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr} - ${formattedNextEndTime} ${untilStr}`;
+      let nextEnd = elem.nextEndTime;
+      const ignoreKeywords = ['next day', 'அடுத்த நாள்', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം', 'throughout', 'நாள் முழுவதும்', 'दिन भर', 'ಇಡೀ ದಿನ', 'త్రోలట్', 'മുഴുവൻ'];
+      if (nextEnd && !ignoreKeywords.some(k => nextEnd.includes(k))) {
+        nextEnd = `${nextEnd} (${nextDayStr})`;
+      }
+
+      if (nextEnd) {
+        text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr} - ${nextEnd} ${untilStr}`;
       } else {
         text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr}`;
       }
