@@ -100,22 +100,35 @@ function PanchangamPage({ settings }) {
     return hours * 60 + minutes;
   };
 
-  const isCrossedMidnight = (startStr, endStr) => {
-    if (!startStr || !endStr) return false;
+  const isNextDayTime = (endStr, refStartStr = null) => {
+    if (!endStr) return false;
     const nextDayKeywords = ['next day', 'அடுத்த நாள்', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം'];
     if (nextDayKeywords.some(k => endStr.includes(k))) return true;
-    const startMins = parseTimeToMinutes(startStr);
+
     const endMins = parseTimeToMinutes(endStr);
-    if (startMins < 0 || endMins < 0) return false;
-    return (startMins >= 12 * 60 && endMins < 12 * 60);
+    if (endMins < 0) return false;
+
+    if (refStartStr) {
+      const refMins = parseTimeToMinutes(refStartStr);
+      if (refMins >= 0 && endMins < refMins && refMins >= 12 * 60) {
+        return true;
+      }
+    }
+
+    // Early morning hours (00:00 AM to 06:30 AM) belong to next calendar day morning
+    if (endMins >= 0 && endMins <= 6 * 60 + 30) {
+      return true;
+    }
+
+    return false;
   };
 
   const formatTimeString = (timeStr, refStartStr, nextDayText) => {
     if (!timeStr) return '';
-    const nextDayKeywords = ['next day', 'அடுத்த நாள்', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം'];
-    const alreadyHasLabel = nextDayKeywords.some(k => timeStr.includes(k));
-    if (alreadyHasLabel) return timeStr;
-    if (refStartStr && isCrossedMidnight(refStartStr, timeStr)) {
+    const ignoreKeywords = ['next day', 'அடுத்த நாள்', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം', 'throughout', 'நாள் முழுவதும்', 'दिन भर', 'ಇಡೀ ದಿನ', 'త్రోలట్', 'മുഴുവൻ'];
+    if (ignoreKeywords.some(k => timeStr.includes(k))) return timeStr;
+
+    if (isNextDayTime(timeStr, refStartStr)) {
       return `${timeStr} (${nextDayText})`;
     }
     return timeStr;
@@ -131,7 +144,7 @@ function PanchangamPage({ settings }) {
     const thenStr = t('then', settings.language);
     const nextDayStr = t('nextDay', settings.language);
 
-    const formattedEndTime = formatTimeString(elem.endTime, '06:00 AM', nextDayStr);
+    const formattedEndTime = formatTimeString(elem.endTime, null, nextDayStr);
     let text = `${firstName} ${formattedEndTime} ${untilStr}`;
 
     const nextName = elem.nextLocalizedName || elem.nextName;
