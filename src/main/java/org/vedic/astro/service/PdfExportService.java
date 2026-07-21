@@ -114,8 +114,8 @@ public class PdfExportService {
             panchangamTable.setWidths(new float[]{50f, 50f});
 
             // Row 1: Lagna & Rashi (Left), Nakshatra & Pada (Right)
-            panchangamTable.addCell(buildTableCell(data.getBirthProfile().getLagna() + "  |  " + data.getBirthProfile().getRashi(), boldB, Element.ALIGN_LEFT));
-            panchangamTable.addCell(buildTableCell(data.getBirthProfile().getNakshatra() + "  |  " + ts.getLabel("profile.pada") + ": " + data.getBirthProfile().getNakshatraPada(), boldB, Element.ALIGN_LEFT));
+            panchangamTable.addCell(buildTableCell(ts.getLabel("profile.lagna") + ": " + data.getBirthProfile().getLagna() + "  |  " + ts.getLabel("profile.rashi") + ": " + data.getBirthProfile().getRashi(), boldB, Element.ALIGN_LEFT));
+            panchangamTable.addCell(buildTableCell(ts.getLabel("profile.nakshatra") + ": " + data.getBirthProfile().getNakshatra() + "  |  " + ts.getLabel("profile.pada") + ": " + data.getBirthProfile().getNakshatraPada(), boldB, Element.ALIGN_LEFT));
 
             // Row 2: Thithi (Left), Yogam (Right)
             panchangamTable.addCell(buildTableCell(ts.getLabel("pdf.panchangam.thithi") + ": " + data.getThithi(), bFont, Element.ALIGN_LEFT));

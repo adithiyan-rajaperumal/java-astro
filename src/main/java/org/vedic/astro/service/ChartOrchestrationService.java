@@ -188,13 +188,20 @@ public class ChartOrchestrationService {
     }
 
     private ChartResponseDTO.BirthProfile buildProfileHeader(Map<String, PlanetaryPosition> d1) {
+        PlanetaryPosition lagna = d1.get("Lagna");
+        PlanetaryPosition moon = d1.get("Moon");
+        int lagnaSign = (lagna != null) ? lagna.getSignNumber() : 1;
+        int moonSign = (moon != null) ? moon.getSignNumber() : 1;
+        double moonLong = (moon != null) ? moon.getAbsoluteLongitude() : 0.0;
+        int nakNum = (moon != null) ? ZodiacUtils.getNakshatraNumber(moonLong) : 1;
+        int pada = (moon != null) ? moon.getPada() : 1;
+
         return ChartResponseDTO.BirthProfile.builder()
-                .lagna(ts.getLabel("profile.lagna") + ": " + ts.getLocalizedRashi(d1.get("Lagna").getSignNumber()))
-                .rashi(ts.getLabel("profile.rashi") + ": " + ts.getLocalizedRashi(d1.get("Moon").getSignNumber()))
-                .nakshatra(ts.getLabel("profile.nakshatra") + ": "
-                        + ts.getLocalizedNakshatra(
-                                ZodiacUtils.getNakshatraNumber(d1.get("Moon").getAbsoluteLongitude())))
-                .nakshatraPada(d1.get("Moon").getPada()).build();
+                .lagna(ts.getLocalizedRashi(lagnaSign))
+                .rashi(ts.getLocalizedRashi(moonSign))
+                .nakshatra(ts.getLocalizedNakshatra(nakNum))
+                .nakshatraPada(pada)
+                .build();
     }
 
     private List<ChartResponseDTO.PositionDetail> compileVargaList(int dNo, Map<String, PlanetaryPosition> d1,

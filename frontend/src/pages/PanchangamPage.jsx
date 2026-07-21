@@ -64,6 +64,29 @@ function PanchangamPage({ settings }) {
     );
   };
 
+  const formatElementTiming = (elem) => {
+    if (!elem) return '';
+    const firstName = elem.localizedName || elem.name;
+    if (!elem.endTime) return firstName;
+
+    const untilStr = t('until', settings.language);
+    const fromStr = t('from', settings.language);
+    const thenStr = t('then', settings.language);
+
+    let text = `${firstName} ${elem.endTime} ${untilStr}`;
+
+    const nextName = elem.nextLocalizedName || elem.nextName;
+    if (nextName) {
+      if (elem.nextEndTime) {
+        text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr} - ${elem.nextEndTime} ${untilStr}`;
+      } else {
+        text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr}`;
+      }
+    }
+
+    return text;
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -107,32 +130,16 @@ function PanchangamPage({ settings }) {
               <h3 className="title-gold">{t('panchangamElements', settings.language)}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div>
-                  <strong>{t('thithi', settings.language)}:</strong> {data.thithi?.localizedName || data.thithi?.name} 
-                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>
-                    {data.thithi?.endTime}
-                    {data.thithi?.nextLocalizedName && `, ${t('then', settings.language)} ${data.thithi.nextLocalizedName} ${data.thithi.nextEndTime || ''}`}
-                  </span>
+                  <strong>{t('thithi', settings.language)}:</strong> {formatElementTiming(data.thithi)}
                 </div>
                 <div>
-                  <strong>{t('nakshatra', settings.language)}:</strong> {data.nakshatra?.localizedName || data.nakshatra?.name}
-                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>
-                    {data.nakshatra?.endTime}
-                    {data.nakshatra?.nextLocalizedName && `, ${t('then', settings.language)} ${data.nakshatra.nextLocalizedName} ${data.nakshatra.nextEndTime || ''}`}
-                  </span>
+                  <strong>{t('nakshatra', settings.language)}:</strong> {formatElementTiming(data.nakshatra)}
                 </div>
                 <div>
-                  <strong>{t('yogam', settings.language)}:</strong> {data.yogam?.localizedName || data.yogam?.name}
-                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>
-                    {data.yogam?.endTime}
-                    {data.yogam?.nextLocalizedName && `, ${t('then', settings.language)} ${data.yogam.nextLocalizedName} ${data.yogam.nextEndTime || ''}`}
-                  </span>
+                  <strong>{t('yogam', settings.language)}:</strong> {formatElementTiming(data.yogam)}
                 </div>
                 <div>
-                  <strong>{t('karanam', settings.language)}:</strong> {data.karanam?.localizedName || data.karanam?.name}
-                  <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>
-                    {data.karanam?.endTime}
-                    {data.karanam?.nextLocalizedName && `, ${t('then', settings.language)} ${data.karanam.nextLocalizedName} ${data.karanam.nextEndTime || ''}`}
-                  </span>
+                  <strong>{t('karanam', settings.language)}:</strong> {formatElementTiming(data.karanam)}
                 </div>
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '5px' }}>
                   <strong>{t('rashi', settings.language)}:</strong> {data.rashi} | <strong>{t('chandrastamam', settings.language)}:</strong> {Array.isArray(data.chandrastamamNakshatras) ? data.chandrastamamNakshatras.join(', ') : (data.chandrastamamRashi || '')}
