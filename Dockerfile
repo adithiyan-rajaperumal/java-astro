@@ -21,4 +21,4 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=backend-build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-XX:+UseG1GC", "-XX:+UseStringDeduplication", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx256m", "-Xms128m", "-XX:+UseSerialGC", "-XX:ReservedCodeCacheSize=64m", "-XX:MaxMetaspaceSize=128m", "-jar", "app.jar"]
