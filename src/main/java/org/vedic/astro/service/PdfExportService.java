@@ -98,8 +98,9 @@ public class PdfExportService {
 
             info.addCell(buildTableCell(ts.getLabel("pdf.info.lmt"), boldB, Element.ALIGN_LEFT));
             info.addCell(buildTableCell(data.getLocalMeanTime(), engBFont, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell("", bFont, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell("", bFont, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(ts.getLabel("pdf.info.ayanamsa"), boldB, Element.ALIGN_LEFT));
+            String ayanKey = "ayanamsa." + (data.getAyanamsa() != null ? data.getAyanamsa().toUpperCase() : "LAHIRI");
+            info.addCell(buildTableCell(ts.getLabel(ayanKey), bFont, Element.ALIGN_LEFT));
 
             info.addCell(buildTableCell(ts.getLabel("pdf.info.lat"), boldB, Element.ALIGN_LEFT));
             info.addCell(buildTableCell(String.valueOf(data.getLatitude()), engBFont, Element.ALIGN_LEFT));

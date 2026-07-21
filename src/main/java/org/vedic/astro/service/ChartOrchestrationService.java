@@ -155,6 +155,7 @@ public class ChartOrchestrationService {
                 .thithi(computedThithi)
                 .yogam(computedYogam)
                 .karanam(computedKaranam)
+                .ayanamsa(pay.ayanamsa() != null ? pay.ayanamsa() : "LAHIRI")
                 .birthProfile(buildProfileHeader(d1))
                 .birthPlanetaryPositions(d1.entrySet().stream()
                         .map(e -> mapToDetail(e.getKey().toUpperCase(), e.getValue())).collect(Collectors.toList()))
