@@ -16,7 +16,7 @@ function HoroscopePage({ settings }) {
     setError(null);
     setFormPayload(payload);
     try {
-      const response = await fetch('/api/v1/astrology/comprehensive', {
+      const response = await fetch('/api/v1/astrology/calculate', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -69,8 +69,8 @@ function HoroscopePage({ settings }) {
 
   const renderChartsTab = () => {
     if (!report) return null;
-    const d1 = report.birthPlanetaryPositions || [];
-    const d9 = report.vargaChartsSuite?.[5] || d1;
+    const d1 = report.d1Chart || [];
+    const d9 = report.d9Chart || d1;
 
     return (
       <div>
