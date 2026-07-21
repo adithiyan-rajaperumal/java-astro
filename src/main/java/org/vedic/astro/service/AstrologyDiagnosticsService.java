@@ -319,9 +319,9 @@ public class AstrologyDiagnosticsService {
                     .build());
         }
         
-        int sunSign = d1Map.get("Sun").getSignNumber();
-        int merSign = d1Map.get("Mercury").getSignNumber();
-        if (sunSign == merSign) {
+        PlanetaryPosition sunPos = d1Map.get("Sun");
+        PlanetaryPosition merPos = d1Map.get("Mercury");
+        if (sunPos.getSignNumber() == merPos.getSignNumber() && !PlanetDignityUtils.isCombust("Mercury", merPos.getAbsoluteLongitude(), sunPos.getAbsoluteLongitude())) {
             yogas.add(DiagnosticsDTO.YogaDetail.builder()
                     .name(ts.getLabel("yoga.budha_aditya"))
                     .description(ts.getLabel("yoga.budha_aditya.desc"))
@@ -346,6 +346,7 @@ public class AstrologyDiagnosticsService {
             yogas.add(DiagnosticsDTO.YogaDetail.builder().name(ts.getLabel("yoga.ruchaka")).description(ts.getLabel("yoga.ruchaka.desc")).impactLevel(ts.getLabel("severity.high")).build());
         }
         
+        int merSign = merPos.getSignNumber();
         int merH = PlanetDignityUtils.getHouseFromLagna(merSign, lagnaSign);
         if ((merH == 1 || merH == 4 || merH == 7 || merH == 10) && (PlanetDignityUtils.isOwnSign("Mercury", merSign) || PlanetDignityUtils.isExalted("Mercury", merSign))) {
             yogas.add(DiagnosticsDTO.YogaDetail.builder().name(ts.getLabel("yoga.bhadra")).description(ts.getLabel("yoga.bhadra.desc")).impactLevel(ts.getLabel("severity.high")).build());
@@ -366,6 +367,27 @@ public class AstrologyDiagnosticsService {
         int satH = PlanetDignityUtils.getHouseFromLagna(satSign, lagnaSign);
         if ((satH == 1 || satH == 4 || satH == 7 || satH == 10) && (PlanetDignityUtils.isOwnSign("Saturn", satSign) || PlanetDignityUtils.isExalted("Saturn", satSign))) {
             yogas.add(DiagnosticsDTO.YogaDetail.builder().name(ts.getLabel("yoga.sasa")).description(ts.getLabel("yoga.sasa.desc")).impactLevel(ts.getLabel("severity.high")).build());
+        }
+
+        // Neechabhanga Raja Yoga check
+        String[] checkPlanets = {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"};
+        for (String pKey : checkPlanets) {
+            PlanetaryPosition p = d1Map.get(pKey);
+            if (p != null && PlanetDignityUtils.isDebilitated(pKey, p.getSignNumber())) {
+                String lord = PlanetDignityUtils.getSignLord(p.getSignNumber());
+                PlanetaryPosition lordPos = d1Map.get(lord);
+                if (lordPos != null) {
+                    int lordHFromLagna = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), lagnaSign);
+                    int lordHFromMoon = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), moonSign);
+                    if (lordHFromLagna == 1 || lordHFromLagna == 4 || lordHFromLagna == 7 || lordHFromLagna == 10 || lordHFromMoon == 1 || lordHFromMoon == 4 || lordHFromMoon == 7 || lordHFromMoon == 10) {
+                        yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                                .name("Neechabhanga Raja Yoga (" + pKey + ")")
+                                .description("Debilitation of " + pKey + " is cancelled by dispositor " + lord + " in kendra.")
+                                .impactLevel(ts.getLabel("severity.high"))
+                                .build());
+                    }
+                }
+            }
         }
     }
 }

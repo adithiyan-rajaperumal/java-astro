@@ -51,4 +51,24 @@ public class PlanetDignityUtils {
             default -> false;
         };
     }
+
+    public static boolean isCombust(String planet, double planetAbsLong, double sunAbsLong) {
+        if ("Sun".equalsIgnoreCase(planet) || "Rahu".equalsIgnoreCase(planet) || "Ketu".equalsIgnoreCase(planet)) return false;
+        double diff = Math.abs(planetAbsLong - sunAbsLong);
+        if (diff > 180.0) diff = 360.0 - diff;
+        return diff < 14.0;
+    }
+
+    public static String getSignLord(int sign) {
+        return switch (sign) {
+            case 1, 8 -> "Mars";
+            case 2, 7 -> "Venus";
+            case 3, 6 -> "Mercury";
+            case 4 -> "Moon";
+            case 5 -> "Sun";
+            case 9, 12 -> "Jupiter";
+            case 10, 11 -> "Saturn";
+            default -> "";
+        };
+    }
 }
