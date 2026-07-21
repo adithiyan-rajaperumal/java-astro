@@ -25,6 +25,7 @@ public class ChartOrchestrationService {
     private final DasaEngineService dasaEngine;
     private final ShadbalaService shadbalaService;
     private final AstrologyDiagnosticsService diagnosticsService;
+    private final TimezoneService timezoneService;
 
     public ChartUiResponseDTO convertToUiDashboardResponse(ChartResult res, BirthDetailsDTO pay) {
         PlanetaryPosition moon = res.getD1Positions().get("Moon");
@@ -69,11 +70,13 @@ public class ChartOrchestrationService {
         int karanamIdx = (int) (elongation / 6.0) + 1;
         String computedKaranam = ts.getLabel("karanam." + resolveKaranamId(karanamIdx));
 
+        String resolvedTz = timezoneService.getTimezoneFromCoordinates(pay.latitude(), pay.longitude());
+
         return ChartUiResponseDTO.builder().name(res.getName()).dateOfBirth(dob.toString())
                 .timeOfBirth(String.format("%02d:%02d:%02d", pay.hour(), pay.minute(), pay.second()))
                 .latitude(pay.latitude())
                 .longitude(pay.longitude())
-                .resolvedTimezone(res.getResolvedTimezone() != null ? res.getResolvedTimezone() : "Asia/Kolkata")
+                .resolvedTimezone(resolvedTz != null ? resolvedTz : "Asia/Kolkata")
                 .thithi(computedThithi)
                 .yogam(computedYogam)
                 .karanam(computedKaranam)
