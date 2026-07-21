@@ -110,28 +110,28 @@ function PanchangamPage({ settings }) {
                   <strong>{t('thithi', settings.language)}:</strong> {data.thithi?.localizedName || data.thithi?.name} 
                   <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>
                     {data.thithi?.endTime}
-                    {data.thithi?.nextLocalizedName && `, then ${data.thithi.nextLocalizedName} ${data.thithi.nextEndTime || ''}`}
+                    {data.thithi?.nextLocalizedName && `, ${t('then', settings.language)} ${data.thithi.nextLocalizedName} ${data.thithi.nextEndTime || ''}`}
                   </span>
                 </div>
                 <div>
                   <strong>{t('nakshatra', settings.language)}:</strong> {data.nakshatra?.localizedName || data.nakshatra?.name}
                   <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>
                     {data.nakshatra?.endTime}
-                    {data.nakshatra?.nextLocalizedName && `, then ${data.nakshatra.nextLocalizedName} ${data.nakshatra.nextEndTime || ''}`}
+                    {data.nakshatra?.nextLocalizedName && `, ${t('then', settings.language)} ${data.nakshatra.nextLocalizedName} ${data.nakshatra.nextEndTime || ''}`}
                   </span>
                 </div>
                 <div>
                   <strong>{t('yogam', settings.language)}:</strong> {data.yogam?.localizedName || data.yogam?.name}
                   <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>
                     {data.yogam?.endTime}
-                    {data.yogam?.nextLocalizedName && `, then ${data.yogam.nextLocalizedName} ${data.yogam.nextEndTime || ''}`}
+                    {data.yogam?.nextLocalizedName && `, ${t('then', settings.language)} ${data.yogam.nextLocalizedName} ${data.yogam.nextEndTime || ''}`}
                   </span>
                 </div>
                 <div>
                   <strong>{t('karanam', settings.language)}:</strong> {data.karanam?.localizedName || data.karanam?.name}
                   <span style={{ color: 'var(--text-secondary)', marginLeft: '10px' }}>
                     {data.karanam?.endTime}
-                    {data.karanam?.nextLocalizedName && `, then ${data.karanam.nextLocalizedName} ${data.karanam.nextEndTime || ''}`}
+                    {data.karanam?.nextLocalizedName && `, ${t('then', settings.language)} ${data.karanam.nextLocalizedName} ${data.karanam.nextEndTime || ''}`}
                   </span>
                 </div>
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '5px' }}>
