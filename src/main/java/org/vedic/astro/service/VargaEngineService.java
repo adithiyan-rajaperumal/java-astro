@@ -95,16 +95,18 @@ public class VargaEngineService {
      * Ephemeris engine.
      */
     public int calculateBhavaHouse(double planetLong, double[] cusps) {
-        for (int i = 1; i <= 12; i++) {
-            double start = cusps[i];
-            double end = cusps[i == 12 ? 1 : i + 1];
+        if (cusps != null && cusps.length >= 13) {
+            for (int i = 1; i <= 12; i++) {
+                double start = cusps[i];
+                double end = cusps[i == 12 ? 1 : i + 1];
 
-            if (start < end) {
-                if (planetLong >= start && planetLong < end)
-                    return i;
-            } else { // Handles the 360-degree boundary overlap point
-                if (planetLong >= start || planetLong < end)
-                    return i;
+                if (start < end) {
+                    if (planetLong >= start && planetLong < end)
+                        return i;
+                } else { // Handles the 360-degree boundary overlap point
+                    if (planetLong >= start || planetLong < end)
+                        return i;
+                }
             }
         }
         return (int) (planetLong / 30.0) + 1; // Fallback to standard sign placement
