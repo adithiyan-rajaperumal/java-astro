@@ -1,5 +1,6 @@
 package org.vedic.astro.dto;
 
+import java.util.List;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
