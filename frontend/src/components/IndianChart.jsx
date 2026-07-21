@@ -148,9 +148,9 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
                 y={coords.y}
                 width="100"
                 height="100"
-                fill={isSelected ? 'rgba(255, 107, 0, 0.18)' : isAspected ? 'rgba(232, 93, 4, 0.08)' : 'transparent'}
-                stroke={isSelected ? 'var(--accent-saffron, #ff6b00)' : 'transparent'}
-                strokeWidth="2"
+                fill={isSelected ? 'rgba(255, 107, 0, 0.18)' : isAspected ? 'rgba(232, 93, 4, 0.08)' : '#ffffff'}
+                stroke={isSelected ? 'var(--accent-saffron, #ff6b00)' : 'var(--border, #f0e2d0)'}
+                strokeWidth={isSelected ? '2' : '1'}
               />
               
               {/* Clean Planet Symbols Only - No house numbers / rashi labels */}

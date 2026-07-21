@@ -113,12 +113,13 @@ function HoroscopePage({ settings }) {
   };
 
   const renderDasaTab = () => {
-    if (!report || !report.vimshottariTimeline) return null;
+    const timeline = report?.currentDasaTimeline || report?.vimshottariTimeline;
+    if (!report || !timeline) return null;
     return (
       <div className="card">
-        <h3 className="title-gold">Vimshottari Dasa Periods</h3>
+        <h3 className="title-gold">{t('dasaTab', settings.language)}</h3>
         <div className="dasa-accordion">
-          {report.vimshottariTimeline.map((dasa, idx) => {
+          {timeline.map((dasa, idx) => {
             const isExpanded = expandedDasa === idx;
             const today = new Date().toISOString().split('T')[0];
             const isCurrent = today >= dasa.startDate && today <= dasa.endDate;
@@ -225,12 +226,12 @@ function HoroscopePage({ settings }) {
                 <h4 style={{ margin: '0 0 5px', color: 'var(--accent-gold)' }}>{yoga.name}</h4>
                 <p style={{ fontSize: '14px' }}>{yoga.description}</p>
                 <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                  Impact: {yoga.impactLevel}
+                  {t('impact', settings.language)}: {yoga.impactLevel}
                 </p>
               </div>
             ))}
             {(!diag.activeYogas || diag.activeYogas.length === 0) && (
-              <p>No major planetary Yogas detected in this horoscope configuration.</p>
+              <p>{t('noYogasDetected', settings.language)}</p>
             )}
           </div>
         </div>
@@ -242,7 +243,7 @@ function HoroscopePage({ settings }) {
               const active = dosha.active;
               const nullified = dosha.nullified;
               let badgeClass = 'none';
-              let badgeText = 'None';
+              let badgeText = t('severity.none', settings.language) || 'None';
               if (active) {
                 badgeClass = 'active';
                 badgeText = dosha.severity || t('active', settings.language);
@@ -258,16 +259,16 @@ function HoroscopePage({ settings }) {
                   
                   {nullified && (
                     <p style={{ fontSize: '13px', color: 'var(--success)', marginTop: '5px' }}>
-                      <strong>Nullification:</strong> {dosha.nullificationReason}
+                      <strong>{t('cancelled', settings.language)}:</strong> {dosha.nullificationReason}
                     </p>
                   )}
                   {active && (
                     <p style={{ fontSize: '13px', color: 'var(--accent-warm)', marginTop: '5px' }}>
-                      <strong>Remedy:</strong> {dosha.remedySuggestion}
+                      <strong>{t('remedy', settings.language)}:</strong> {dosha.remedySuggestion}
                     </p>
                   )}
                   {!active && !nullified && (
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No affliction detected.</p>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{t('noDoshasDetected', settings.language)}</p>
                   )}
                 </div>
               );
