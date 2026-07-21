@@ -29,7 +29,10 @@ public record DailyPanchangamDTO(
         int number,
         String name,
         String localizedName,
-        String endTime // format e.g. "HH:mm" or "Throughout the day"
+        String endTime, // format e.g. "HH:mm" or "Throughout the day"
+        String nextName,
+        String nextLocalizedName,
+        String nextEndTime
     ) {}
 
     public record TimeSlotDTO(
