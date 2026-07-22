@@ -22,7 +22,21 @@ public class TranslationService {
     }
 
     public String getLabel(String key) {
-        String value = messageSource.getMessage(key, null, key, LocaleContextHolder.getLocale());
+        if (key == null) return "";
+        String value = messageSource.getMessage(key, null, null, LocaleContextHolder.getLocale());
+        if (value == null) {
+            int dotIdx = key.lastIndexOf('.');
+            if (dotIdx >= 0) {
+                String prefix = key.substring(0, dotIdx + 1);
+                String suffix = key.substring(dotIdx + 1);
+                value = messageSource.getMessage(prefix + suffix.toUpperCase(), null, null, LocaleContextHolder.getLocale());
+                if (value == null) {
+                    value = messageSource.getMessage(prefix + suffix.toLowerCase(), null, key, LocaleContextHolder.getLocale());
+                }
+            } else {
+                value = key;
+            }
+        }
         return IndicPreShaper.shape(value);
     }
 }

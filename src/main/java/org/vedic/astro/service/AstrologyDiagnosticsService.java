@@ -513,8 +513,8 @@ public class AstrologyDiagnosticsService {
                 }
 
                 if (neechabhanga) {
-                    String localizedPlanet = ts.getLabel("planet." + pKey.toLowerCase());
-                    String localizedLord = ts.getLabel("planet." + lord.toLowerCase());
+                    String localizedPlanet = ts.getLabel("planet." + pKey.toUpperCase());
+                    String localizedLord = ts.getLabel("planet." + lord.toUpperCase());
                     yogas.add(DiagnosticsDTO.YogaDetail.builder()
                             .name(ts.getLabel("yoga.neechabhanga") + " (" + localizedPlanet + ")")
                             .description(ts.getLabel("yoga.neechabhanga.desc") + " (" + localizedPlanet + " / " + localizedLord + ")")
@@ -522,7 +522,9 @@ public class AstrologyDiagnosticsService {
                             .build());
                 }
             }
-        }// Vipareeta Rajayoga (6th, 8th, 12th Lords in 6th, 8th, or 12th House)
+        }
+
+        // Vipareeta Rajayoga (6th, 8th, 12th Lords in 6th, 8th, or 12th House)
         int[] trikHouses = {6, 8, 12};
         for (int th : trikHouses) {
             int trikSign = ((lagnaSign + th - 2 + 12) % 12) + 1;
@@ -532,7 +534,7 @@ public class AstrologyDiagnosticsService {
                 int lordH = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), lagnaSign);
                 if (lordH == 6 || lordH == 8 || lordH == 12) {
                     yogas.add(DiagnosticsDTO.YogaDetail.builder()
-                            .name(ts.getLabel("yoga.vipareeta") + " (" + ts.getLabel("planet." + lord.toLowerCase()) + ")")
+                            .name(ts.getLabel("yoga.vipareeta") + " (" + ts.getLabel("planet." + lord.toUpperCase()) + ")")
                             .description(ts.getLabel("yoga.vipareeta.desc"))
                             .impactLevel(ts.getLabel("severity.high"))
                             .build());
