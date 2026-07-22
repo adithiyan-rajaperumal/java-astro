@@ -18,7 +18,8 @@ public class PanchangamFactory {
     }
 
     public PanchangamEngine getEngine(PanchangamType type) {
+        if (type == null) return engines.get(PanchangamType.DRIK_TIRUKANITHAM);
         return Optional.ofNullable(engines.get(type))
-                .orElseThrow(() -> new IllegalArgumentException("Unsupported calculation model format requested: " + type));
+                .orElseGet(() -> engines.get(PanchangamType.DRIK_TIRUKANITHAM));
     }
 }
