@@ -97,6 +97,7 @@ public class AstrologyDiagnosticsService {
         PlanetaryPosition rahu = d1Map.get("Rahu");
         PlanetaryPosition ketu = d1Map.get("Ketu");
         PlanetaryPosition jupiter = d1Map.get("Jupiter");
+        int lagnaSign = d1Map.get("Lagna").getSignNumber();
 
         double rLong = rahu.getAbsoluteLongitude();
         double kLong = ketu.getAbsoluteLongitude();
@@ -121,12 +122,18 @@ public class AstrologyDiagnosticsService {
         String reason = null;
 
         if (detected) {
+            int rH = PlanetDignityUtils.getHouseFromLagna(rahu.getSignNumber(), lagnaSign);
+            int kH = PlanetDignityUtils.getHouseFromLagna(ketu.getSignNumber(), lagnaSign);
+            
             if (planetConjunct) {
                 nullified = true;
                 reason = ts.getLabel("nullification.kalasarpa.conjunct");
             } else if (PlanetDignityUtils.isAspecting("Jupiter", jupiter.getSignNumber(), rahu.getSignNumber()) || PlanetDignityUtils.isAspecting("Jupiter", jupiter.getSignNumber(), ketu.getSignNumber())) {
                 nullified = true;
                 reason = ts.getLabel("nullification.kalasarpa.jupiter_aspect");
+            } else if (rH == 1 || rH == 4 || rH == 7 || rH == 10 || rH == 5 || rH == 9 || kH == 1 || kH == 4 || kH == 7 || kH == 10 || kH == 5 || kH == 9) {
+                nullified = true;
+                reason = ts.getLabel("nullification.sarpam.own_exalted");
             }
         }
 
@@ -147,7 +154,11 @@ public class AstrologyDiagnosticsService {
         int ketuH = PlanetDignityUtils.getHouseFromLagna(d1Map.get("Ketu").getSignNumber(), lagnaSign);
         int jupSign = d1Map.get("Jupiter").getSignNumber();
         int rahuSign = d1Map.get("Rahu").getSignNumber();
+        int ketuSign = d1Map.get("Ketu").getSignNumber();
+        int venSign = d1Map.get("Venus").getSignNumber();
+        int merSign = d1Map.get("Mercury").getSignNumber();
 
+        // Rahu/Ketu in 3, 6, 11 is Upachaya (beneficial) - not a dosham
         boolean detected = (rahuH == 1 || rahuH == 2 || rahuH == 5 || rahuH == 7 || rahuH == 8 || ketuH == 1 || ketuH == 2 || ketuH == 5 || ketuH == 7 || ketuH == 8);
         boolean nullified = false;
         String reason = null;
@@ -157,12 +168,15 @@ public class AstrologyDiagnosticsService {
             if (jupFromRahu == 1 || jupFromRahu == 4 || jupFromRahu == 7 || jupFromRahu == 10) {
                 nullified = true;
                 reason = ts.getLabel("nullification.sarpam.jupiter_kendra");
-            } else if (PlanetDignityUtils.isAspecting("Jupiter", jupSign, rahuSign) || PlanetDignityUtils.isAspecting("Jupiter", jupSign, d1Map.get("Ketu").getSignNumber())) {
+            } else if (PlanetDignityUtils.isAspecting("Jupiter", jupSign, rahuSign) || PlanetDignityUtils.isAspecting("Jupiter", jupSign, ketuSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.sarpam.jupiter_aspect");
-            } else if (PlanetDignityUtils.isOwnSign("Rahu", rahuSign) || PlanetDignityUtils.isExalted("Rahu", rahuSign)) {
+            } else if (PlanetDignityUtils.isOwnSign("Rahu", rahuSign) || PlanetDignityUtils.isExalted("Rahu", rahuSign) || PlanetDignityUtils.isOwnSign("Ketu", ketuSign) || PlanetDignityUtils.isExalted("Ketu", ketuSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.sarpam.own_exalted");
+            } else if (venSign == rahuSign || venSign == ketuSign || merSign == rahuSign || merSign == ketuSign || PlanetDignityUtils.isAspecting("Venus", venSign, rahuSign)) {
+                nullified = true;
+                reason = ts.getLabel("nullification.pithru.benefic");
             }
         }
 
@@ -192,13 +206,15 @@ public class AstrologyDiagnosticsService {
         
         if (detected) {
             int jupSign = d1Map.get("Jupiter").getSignNumber();
+            int merSign = d1Map.get("Mercury").getSignNumber();
+
             if (PlanetDignityUtils.isAspecting("Jupiter", jupSign, sunSign) || jupSign == sunSign) {
                 nullified = true;
                 reason = ts.getLabel("nullification.pithru.jupiter_aspect");
             } else if (PlanetDignityUtils.isOwnSign("Sun", sunSign) || PlanetDignityUtils.isExalted("Sun", sunSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.pithru.own_exalted");
-            } else if (d1Map.get("Venus").getSignNumber() == sunSign || d1Map.get("Mercury").getSignNumber() == sunSign) {
+            } else if (d1Map.get("Venus").getSignNumber() == sunSign || merSign == sunSign) {
                 nullified = true;
                 reason = ts.getLabel("nullification.pithru.benefic");
             }
@@ -224,18 +240,27 @@ public class AstrologyDiagnosticsService {
                                  d1Map.get("Ketu").getSignNumber() == fifthHouseSign || 
                                  d1Map.get("Mars").getSignNumber() == fifthHouseSign;
                                  
-        boolean detected = maleficInFifth; // Simplified for this logic
+        boolean detected = maleficInFifth;
         boolean nullified = false;
         String reason = null;
         
         if (detected) {
             int jupSign = d1Map.get("Jupiter").getSignNumber();
+            String lord5 = PlanetDignityUtils.getSignLord(fifthHouseSign);
+            PlanetaryPosition pLord5 = d1Map.get(lord5);
+
             if (jupSign == fifthHouseSign || PlanetDignityUtils.isAspecting("Jupiter", jupSign, fifthHouseSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.putra.jupiter");
             } else if (d1Map.get("Venus").getSignNumber() == fifthHouseSign || d1Map.get("Mercury").getSignNumber() == fifthHouseSign) {
                 nullified = true;
                 reason = ts.getLabel("nullification.putra.benefic");
+            } else if (fifthHouseSign == 2 || fifthHouseSign == 4 || fifthHouseSign == 7) { // Taurus, Cancer, Libra (fertile signs)
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.house_sign_exemption");
+            } else if (pLord5 != null && (PlanetDignityUtils.isOwnSign(lord5, pLord5.getSignNumber()) || PlanetDignityUtils.isExalted(lord5, pLord5.getSignNumber()))) {
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.own_exalted");
             }
         }
         
@@ -266,12 +291,21 @@ public class AstrologyDiagnosticsService {
         if (detected) {
             int venusSign = d1Map.get("Venus").getSignNumber();
             int jupSign = d1Map.get("Jupiter").getSignNumber();
+            String lord7 = PlanetDignityUtils.getSignLord(seventhHouseSign);
+            PlanetaryPosition pLord7 = d1Map.get(lord7);
+
             if (PlanetDignityUtils.isOwnSign("Venus", venusSign) || PlanetDignityUtils.isExalted("Venus", venusSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.kalathira.venus_strong");
             } else if (jupSign == seventhHouseSign || PlanetDignityUtils.isAspecting("Jupiter", jupSign, seventhHouseSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.kalathira.jupiter_aspect");
+            } else if (d1Map.get("Mercury").getSignNumber() == seventhHouseSign || venusSign == seventhHouseSign) {
+                nullified = true;
+                reason = ts.getLabel("nullification.putra.benefic");
+            } else if (pLord7 != null && (PlanetDignityUtils.isOwnSign(lord7, pLord7.getSignNumber()) || PlanetDignityUtils.isExalted(lord7, pLord7.getSignNumber()))) {
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.own_exalted");
             }
         }
         
@@ -291,6 +325,7 @@ public class AstrologyDiagnosticsService {
         int saturnSign = d1Map.get("Saturn").getSignNumber();
         int satH = PlanetDignityUtils.getHouseFromLagna(saturnSign, lagnaSign);
         
+        // Saturn in 3, 6, 11 (Upachaya) is NOT Shani Dosham
         boolean detected = (satH == 1 || satH == 4 || satH == 7 || satH == 8 || satH == 10 || satH == 12);
         boolean nullified = false;
         String reason = null;
@@ -305,6 +340,9 @@ public class AstrologyDiagnosticsService {
             } else if (lagnaSign == 2 || lagnaSign == 7) { // Yogakaraka for Vrishabha and Tula
                 nullified = true;
                 reason = ts.getLabel("nullification.shani.yogakaraka");
+            } else if ((satH == 4 || satH == 8 || satH == 12) && (saturnSign == 4 || saturnSign == 5 || saturnSign == 12)) { // Cancer, Leo, Pisces exemption
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.house_sign_exemption");
             }
         }
         
