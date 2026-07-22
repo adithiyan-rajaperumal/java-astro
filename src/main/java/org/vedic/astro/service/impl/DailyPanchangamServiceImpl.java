@@ -218,10 +218,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Horais
         List<HoraTimeSlotDTO> horais = calculateHorais(jdSunrise, jdSunset, jdNextSunrise, dayOfWeek0, zoneId);
 
-        // Chandrastamam Nakshatras (Nakshatras of the Janma Rashi for which today's Moon is in the 8th house)
-        // If today's Moon is in sign M, Janma Sign J is (M + 5 - 1) % 12 + 1 so that J + 7 = M (8th house count)
-        int chandrastamamSign = (rashiNum + 5 - 1) % 12 + 1;
-        List<String> chandrastamamNakshatras = getChandrastamamNakshatras(chandrastamamSign);
+        // Precise Chandrastamam Nakshatra(s) (8th house Nakshatra count relative to today's transiting Moon Nakshatra)
+        List<String> chandrastamamNakshatras = getExactChandrastamamNakshatras(nakshatraDTO);
 
         // Netram and Jeevan
         double[] coordinatesSun = getSunMoonLongitude(jdSunrise); // reload coordinates just in case
@@ -279,29 +277,26 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         );
     }
 
-    private List<String> getChandrastamamNakshatras(int sign) {
+    private List<String> getExactChandrastamamNakshatras(PanchangamElementDTO nakshatraDTO) {
         List<String> list = new ArrayList<>();
-        int[][] signNakMap = {
-            {1, 2, 3},    // Sign 1: Ashwini, Bharani, Krittika
-            {3, 4, 5},    // Sign 2: Krittika, Rohini, Mrigashira
-            {5, 6, 7},    // Sign 3: Mrigashira, Ardra, Punarvasu
-            {7, 8, 9},    // Sign 4: Punarvasu, Pushya, Ashlesha
-            {10, 11, 12}, // Sign 5: Magha, Purva Phalguni, Uttara Phalguni
-            {12, 13, 14}, // Sign 6: Uttara Phalguni, Hasta, Chitra
-            {14, 15, 16}, // Sign 7: Chitra, Swati, Vishakha
-            {16, 17, 18}, // Sign 8: Vishakha, Anuradha, Jyeshtha
-            {19, 20, 21}, // Sign 9: Mula, Purva Ashadha, Uttara Ashadha
-            {21, 22, 23}, // Sign 10: Uttara Ashadha, Shravana, Dhanishta
-            {23, 24, 25}, // Sign 11: Dhanishta, Shatabhisha, Purva Bhadrapada
-            {25, 26, 27}  // Sign 12: Purva Bhadrapada, Uttara Bhadrapada, Revati
-        };
-        int idx = (sign - 1 + 12) % 12;
-        for (int nakIdx : signNakMap[idx]) {
-            String localized = translationService.getLocalizedNakshatra(nakIdx);
-            if (!list.contains(localized)) {
-                list.add(localized);
+        if (nakshatraDTO == null) return list;
+
+        int currentNakIdx = nakshatraDTO.number();
+        int exactNakIdx = ((currentNakIdx + 12 - 1) % 27) + 1;
+        String localized = translationService.getLocalizedNakshatra(exactNakIdx);
+        if (!list.contains(localized)) {
+            list.add(localized);
+        }
+
+        if (nakshatraDTO.nextName() != null) {
+            int nextNakIdx = (currentNakIdx % 27) + 1;
+            int nextExactNakIdx = ((nextNakIdx + 12 - 1) % 27) + 1;
+            String nextLocalized = translationService.getLocalizedNakshatra(nextExactNakIdx);
+            if (!list.contains(nextLocalized)) {
+                list.add(nextLocalized);
             }
         }
+
         return list;
     }
 
