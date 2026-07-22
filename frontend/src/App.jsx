@@ -4,6 +4,7 @@ import PanchangamPage from './pages/PanchangamPage';
 import HoroscopePage from './pages/HoroscopePage';
 import MatchingPage from './pages/MatchingPage';
 import SettingsPage from './pages/SettingsPage';
+import AstroLogo from './components/AstroLogo';
 import { t } from './i18n/translations';
 
 const DEFAULT_SETTINGS = {
@@ -48,7 +49,7 @@ function App() {
       {/* Top Navbar */}
       <nav className="navbar">
         <div className="navbar-brand" onClick={() => setActiveTab('panchangam')} style={{ cursor: 'pointer' }}>
-          <span className="brand-icon">🪔</span>
+          <AstroLogo size={26} />
           <span className="brand-text">{t('appTitle', settings.language)}</span>
         </div>
         <div className="navbar-actions">
