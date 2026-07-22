@@ -218,8 +218,9 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Horais
         List<HoraTimeSlotDTO> horais = calculateHorais(jdSunrise, jdSunset, jdNextSunrise, dayOfWeek0, zoneId);
 
-        // Chandrastamam Nakshatras (Nakshatras in the 8th rashi from current Moon sign)
-        int chandrastamamSign = (rashiNum + 7 - 1) % 12 + 1;
+        // Chandrastamam Nakshatras (Nakshatras of the Janma Rashi for which today's Moon is in the 8th house)
+        // If today's Moon is in sign M, Janma Sign J is (M + 5 - 1) % 12 + 1 so that J + 7 = M (8th house count)
+        int chandrastamamSign = (rashiNum + 5 - 1) % 12 + 1;
         List<String> chandrastamamNakshatras = getChandrastamamNakshatras(chandrastamamSign);
 
         // Netram and Jeevan
