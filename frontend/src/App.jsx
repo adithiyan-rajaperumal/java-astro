@@ -47,14 +47,21 @@ function App() {
     <>
       {/* Top Navbar */}
       <nav className="navbar">
-        <div className="navbar-brand">
-          🕉️ {t('appTitle', settings.language)}
+        <div className="navbar-brand" onClick={() => setActiveTab('panchangam')} style={{ cursor: 'pointer' }}>
+          <span className="brand-icon">🪔</span>
+          <span className="brand-text">{t('appTitle', settings.language)}</span>
         </div>
         <div className="navbar-actions">
           {settings.location && (
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              📍 {settings.location.label.split(',')[0]}
-            </span>
+            <button
+              type="button"
+              className="location-pill-btn"
+              onClick={() => setActiveTab('settings')}
+              title={t('changeLocation', settings.language) || "Click to change location"}
+            >
+              <span className="loc-icon">📍</span>
+              <span className="loc-text">{settings.location.label.split(',')[0]}</span>
+            </button>
           )}
           <select 
             value={settings.language} 
