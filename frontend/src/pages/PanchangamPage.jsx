@@ -156,9 +156,9 @@ function PanchangamPage({ settings }) {
       }
 
       if (nextEnd) {
-        text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr} - ${nextEnd} ${untilStr}`;
+        text += `, ${thenStr} ${nextName} ${nextEnd} ${untilStr}`;
       } else {
-        text += `, ${thenStr} ${nextName} ${elem.endTime} ${fromStr}`;
+        text += `, ${thenStr} ${nextName}`;
       }
     }
 
