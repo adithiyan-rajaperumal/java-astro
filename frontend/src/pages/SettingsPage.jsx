@@ -62,9 +62,10 @@ function SettingsPage({ settings, onSettingsChange }) {
         <label>{t('ayanamsa', settings.language)}</label>
         <select value={settings.ayanamsa} onChange={handleAyanamsaChange}>
           <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
-          <option value="RAMAN">Raman</option>
           <option value="KP">KP (Krishnamurti Padhdhati)</option>
-          <option value="SAYANA">Sayana (Tropical)</option>
+          <option value="RAMAN">B.V. Raman</option>
+          <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
+          <option value="PUSHYAPAKSHA">Pushyapaksha</option>
         </select>
       </div>
 
