@@ -59,6 +59,19 @@ public class PlanetDignityUtils {
         return diff < 14.0;
     }
 
+    public static int getExaltationSign(String planet) {
+        return switch (planet) {
+            case "Sun" -> 1;
+            case "Moon" -> 2;
+            case "Mars" -> 10;
+            case "Mercury" -> 6;
+            case "Jupiter" -> 4;
+            case "Venus" -> 12;
+            case "Saturn" -> 7;
+            default -> 0;
+        };
+    }
+
     public static String getSignLord(int sign) {
         return switch (sign) {
             case 1, 8 -> "Mars";

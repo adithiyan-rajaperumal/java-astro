@@ -472,28 +472,57 @@ public class AstrologyDiagnosticsService {
             }
         }
 
-        // Neechabhanga Raja Yoga check (Fully localized)
+        // Neechabhanga Raja Yoga check (Fully localized across all 4 Parashari rules)
         String[] checkPlanets = {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"};
         for (String pKey : checkPlanets) {
             PlanetaryPosition p = d1Map.get(pKey);
             if (p != null && PlanetDignityUtils.isDebilitated(pKey, p.getSignNumber())) {
                 String lord = PlanetDignityUtils.getSignLord(p.getSignNumber());
+                int exSign = PlanetDignityUtils.getExaltationSign(pKey);
+                String exLord = PlanetDignityUtils.getSignLord(exSign);
+
                 PlanetaryPosition lordPos = d1Map.get(lord);
+                PlanetaryPosition exLordPos = d1Map.get(exLord);
+
+                boolean neechabhanga = false;
+
+                // Rule 1: Sign lord in Kendra from Lagna or Moon
                 if (lordPos != null) {
                     int lordHFromLagna = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), lagnaSign);
                     int lordHFromMoon = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), moonSign);
                     if (lordHFromLagna == 1 || lordHFromLagna == 4 || lordHFromLagna == 7 || lordHFromLagna == 10 || lordHFromMoon == 1 || lordHFromMoon == 4 || lordHFromMoon == 7 || lordHFromMoon == 10) {
-                        String localizedPlanet = ts.getLabel("planet." + pKey.toLowerCase());
-                        String localizedLord = ts.getLabel("planet." + lord.toLowerCase());
-                        yogas.add(DiagnosticsDTO.YogaDetail.builder()
-                                .name(ts.getLabel("yoga.neechabhanga") + " (" + localizedPlanet + ")")
-                                .description(ts.getLabel("yoga.neechabhanga.desc") + " (" + localizedPlanet + " / " + localizedLord + ")")
-                                .impactLevel(ts.getLabel("severity.high"))
-                                .build());
+                        neechabhanga = true;
                     }
                 }
+
+                // Rule 2: Exaltation lord in Kendra from Lagna or Moon
+                if (!neechabhanga && exLordPos != null) {
+                    int exLordHFromLagna = PlanetDignityUtils.getHouseFromLagna(exLordPos.getSignNumber(), lagnaSign);
+                    int exLordHFromMoon = PlanetDignityUtils.getHouseFromLagna(exLordPos.getSignNumber(), moonSign);
+                    if (exLordHFromLagna == 1 || exLordHFromLagna == 4 || exLordHFromLagna == 7 || exLordHFromLagna == 10 || exLordHFromMoon == 1 || exLordHFromMoon == 4 || exLordHFromMoon == 7 || exLordHFromMoon == 10) {
+                        neechabhanga = true;
+                    }
+                }
+
+                // Rule 3: Aspected by or conjunct sign lord or exaltation lord
+                if (!neechabhanga && lordPos != null && (lordPos.getSignNumber() == p.getSignNumber() || PlanetDignityUtils.isAspecting(lord, lordPos.getSignNumber(), p.getSignNumber()))) {
+                    neechabhanga = true;
+                }
+                if (!neechabhanga && exLordPos != null && (exLordPos.getSignNumber() == p.getSignNumber() || PlanetDignityUtils.isAspecting(exLord, exLordPos.getSignNumber(), p.getSignNumber()))) {
+                    neechabhanga = true;
+                }
+
+                if (neechabhanga) {
+                    String localizedPlanet = ts.getLabel("planet." + pKey.toLowerCase());
+                    String localizedLord = ts.getLabel("planet." + lord.toLowerCase());
+                    yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                            .name(ts.getLabel("yoga.neechabhanga") + " (" + localizedPlanet + ")")
+                            .description(ts.getLabel("yoga.neechabhanga.desc") + " (" + localizedPlanet + " / " + localizedLord + ")")
+                            .impactLevel(ts.getLabel("severity.high"))
+                            .build());
+                }
             }
-        // Vipareeta Rajayoga (6th, 8th, 12th Lords in 6th, 8th, or 12th House)
+        }// Vipareeta Rajayoga (6th, 8th, 12th Lords in 6th, 8th, or 12th House)
         int[] trikHouses = {6, 8, 12};
         for (int th : trikHouses) {
             int trikSign = ((lagnaSign + th - 2 + 12) % 12) + 1;
