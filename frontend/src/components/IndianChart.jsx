@@ -119,16 +119,16 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
     const aspectedSigns = getAspectedHouses(selectedHouse);
     
     return (
-      <svg width="400" height="400" className="south-indian-svg" viewBox="0 0 400 400" style={{ backgroundColor: '#ffffff', borderRadius: '8px' }}>
-        <rect x="0" y="0" width="400" height="400" fill="#ffffff" stroke="var(--border)" strokeWidth="2" />
-        <line x1="0" y1="100" x2="400" y2="100" stroke="var(--border)" strokeWidth="1" />
-        <line x1="0" y1="200" x2="400" y2="200" stroke="var(--border)" strokeWidth="1" />
-        <line x1="0" y1="300" x2="400" y2="300" stroke="var(--border)" strokeWidth="1" />
-        <line x1="100" y1="0" x2="100" y2="400" stroke="var(--border)" strokeWidth="1" />
-        <line x1="200" y1="0" x2="200" y2="400" stroke="var(--border)" strokeWidth="1" />
-        <line x1="300" y1="0" x2="300" y2="400" stroke="var(--border)" strokeWidth="1" />
+      <svg width="100%" height="auto" viewBox="0 0 400 400" className="south-indian-svg" style={{ backgroundColor: '#ffffff', borderRadius: '8px', maxWidth: '400px' }}>
+        <rect x="0" y="0" width="400" height="400" fill="#ffffff" stroke="#c8b89a" strokeWidth="2" />
+        <line x1="0" y1="100" x2="400" y2="100" stroke="#c8b89a" strokeWidth="1.5" />
+        <line x1="0" y1="200" x2="400" y2="200" stroke="#c8b89a" strokeWidth="1.5" />
+        <line x1="0" y1="300" x2="400" y2="300" stroke="#c8b89a" strokeWidth="1.5" />
+        <line x1="100" y1="0" x2="100" y2="400" stroke="#c8b89a" strokeWidth="1.5" />
+        <line x1="200" y1="0" x2="200" y2="400" stroke="#c8b89a" strokeWidth="1.5" />
+        <line x1="300" y1="0" x2="300" y2="400" stroke="#c8b89a" strokeWidth="1.5" />
 
-        <rect x="101" y="101" width="198" height="198" fill="var(--bg-card)" />
+        <rect x="101.5" y="101.5" width="197" height="197" fill="var(--bg-card)" />
         <text x="200" y="190" textAnchor="middle" fill="var(--accent-gold)" fontSize="18" fontWeight="bold">
           {title}
         </text>
@@ -150,11 +150,11 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
                 width="100"
                 height="100"
                 fill={isSelected ? 'rgba(255, 107, 0, 0.18)' : isAspected ? 'rgba(232, 93, 4, 0.08)' : '#ffffff'}
-                stroke={isSelected ? 'var(--accent-saffron, #ff6b00)' : 'var(--border, #f0e2d0)'}
-                strokeWidth={isSelected ? '2' : '1'}
+                stroke={isSelected ? 'var(--accent-saffron, #ff6b00)' : '#c8b89a'}
+                strokeWidth={isSelected ? '3' : '1.5'}
               />
               
-              {/* Clean Planet Symbols Only - No house numbers / rashi labels */}
+              {/* Clean Planet Symbols Only */}
               <g transform={`translate(${coords.x + 12}, ${coords.y + 35})`}>
                 {cellPlanets.map((p, idx) => {
                   const isLagna = p.planetKey?.toUpperCase() === 'LAGNA';
@@ -176,6 +176,20 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
           );
         })}
 
+        {/* Re-render selected house outline on top to ensure all 4 sides are clearly visible */}
+        {selectedHouse && southCells[selectedHouse] && (
+          <rect
+            x={southCells[selectedHouse].x}
+            y={southCells[selectedHouse].y}
+            width="100"
+            height="100"
+            fill="none"
+            stroke="var(--accent-saffron, #ff6b00)"
+            strokeWidth="3"
+            style={{ pointerEvents: 'none' }}
+          />
+        )}
+
         {selectedHouse && aspectedSigns.map((targetSign, idx) => {
           const start = southCells[selectedHouse];
           const end = southCells[targetSign];
@@ -190,7 +204,7 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
               y2={end.y + 50}
               stroke="var(--accent-saffron, #ff6b00)"
               strokeDasharray="4,4"
-              strokeWidth="2"
+              strokeWidth="2.5"
             />
           );
         })}
@@ -199,23 +213,80 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
   };
 
   const renderNorthIndian = () => {
+    const northHouseCenters = {
+      1:  { cx: 200, cy: 95,  signNum: ((lagnaSign + 0 - 1) % 12) + 1, path: "M 200,0 L 300,100 L 200,200 L 100,100 Z", numPos: { x: 200, y: 35 } },
+      2:  { cx: 100, cy: 45,  signNum: ((lagnaSign + 1 - 1) % 12) + 1, path: "M 0,0 L 200,0 L 100,100 Z", numPos: { x: 90, y: 25 } },
+      3:  { cx: 45,  cy: 100, signNum: ((lagnaSign + 2 - 1) % 12) + 1, path: "M 0,0 L 100,100 L 0,200 Z", numPos: { x: 25, y: 90 } },
+      4:  { cx: 95,  cy: 200, signNum: ((lagnaSign + 3 - 1) % 12) + 1, path: "M 0,200 L 100,100 L 200,200 L 100,300 Z", numPos: { x: 35, y: 200 } },
+      5:  { cx: 45,  cy: 300, signNum: ((lagnaSign + 4 - 1) % 12) + 1, path: "M 0,200 L 100,300 L 0,400 Z", numPos: { x: 25, y: 310 } },
+      6:  { cx: 100, cy: 355, signNum: ((lagnaSign + 5 - 1) % 12) + 1, path: "M 0,400 L 100,300 L 200,400 Z", numPos: { x: 90, y: 375 } },
+      7:  { cx: 200, cy: 305, signNum: ((lagnaSign + 6 - 1) % 12) + 1, path: "M 100,300 L 200,200 L 300,300 L 200,400 Z", numPos: { x: 200, y: 365 } },
+      8:  { cx: 300, cy: 355, signNum: ((lagnaSign + 7 - 1) % 12) + 1, path: "M 200,400 L 300,300 L 400,400 Z", numPos: { x: 310, y: 375 } },
+      9:  { cx: 355, cy: 300, signNum: ((lagnaSign + 8 - 1) % 12) + 1, path: "M 400,400 L 300,300 L 400,200 Z", numPos: { x: 375, y: 310 } },
+      10: { cx: 305, cy: 200, signNum: ((lagnaSign + 9 - 1) % 12) + 1, path: "M 400,200 L 300,100 L 200,200 L 300,300 Z", numPos: { x: 365, y: 200 } },
+      11: { cx: 355, cy: 100, signNum: ((lagnaSign + 10 - 1) % 12) + 1, path: "M 400,200 L 300,100 L 400,0 Z", numPos: { x: 375, y: 90 } },
+      12: { cx: 300, cy: 45,  signNum: ((lagnaSign + 11 - 1) % 12) + 1, path: "M 400,0 L 300,100 L 200,0 Z", numPos: { x: 310, y: 25 } }
+    };
+
+    const aspectedSigns = getAspectedHouses(selectedHouse);
+
     return (
-      <svg width="400" height="400" className="north-indian-svg" viewBox="0 0 400 400" style={{ backgroundColor: '#ffffff', borderRadius: '8px' }}>
-        <rect x="0" y="0" width="400" height="400" fill="#ffffff" stroke="var(--border)" strokeWidth="2" />
-        <line x1="0" y1="0" x2="400" y2="400" stroke="var(--border)" strokeWidth="1" />
-        <line x1="400" y1="0" x2="0" y2="400" stroke="var(--border)" strokeWidth="1" />
-        <line x1="200" y1="0" x2="400" y2="200" stroke="var(--border)" strokeWidth="1" />
-        <line x1="400" y1="200" x2="200" y2="400" stroke="var(--border)" strokeWidth="1" />
-        <line x1="200" y1="400" x2="0" y2="200" stroke="var(--border)" strokeWidth="1" />
-        <line x1="0" y1="200" x2="200" y2="0" stroke="var(--border)" strokeWidth="1" />
+      <svg width="100%" height="auto" viewBox="0 0 400 400" className="north-indian-svg" style={{ backgroundColor: '#ffffff', borderRadius: '8px', maxWidth: '400px' }}>
+        <rect x="0" y="0" width="400" height="400" fill="#ffffff" stroke="#c8b89a" strokeWidth="2" />
 
-        <text x="200" y="205" textAnchor="middle" fill="var(--accent-gold)" fontSize="18" fontWeight="bold">
+        {/* House Polygons & Planet Labels */}
+        {Object.entries(northHouseCenters).map(([hNumStr, hData]) => {
+          const houseNum = parseInt(hNumStr);
+          const sign = hData.signNum;
+          const isSelected = selectedHouse === sign;
+          const isAspected = aspectedSigns.includes(sign);
+          const housePlanets = signPlanets[sign];
+
+          return (
+            <g key={houseNum} onClick={() => handleCellClick(sign)} style={{ cursor: 'pointer' }}>
+              <path
+                d={hData.path}
+                fill={isSelected ? 'rgba(255, 107, 0, 0.18)' : isAspected ? 'rgba(232, 93, 4, 0.08)' : '#ffffff'}
+                stroke={isSelected ? 'var(--accent-saffron, #ff6b00)' : '#c8b89a'}
+                strokeWidth={isSelected ? '3' : '1.5'}
+              />
+              
+              {/* House Rashi Sign Number */}
+              <text x={hData.numPos.x} y={hData.numPos.y} textAnchor="middle" fill="#887766" fontSize="11" fontWeight="bold">
+                {sign}
+              </text>
+
+              {/* Planets inside House */}
+              <g transform={`translate(${hData.cx}, ${hData.cy})`}>
+                {housePlanets.map((p, idx) => {
+                  const isLagna = p.planetKey?.toUpperCase() === 'LAGNA';
+                  const row = Math.floor(idx / 2);
+                  const col = idx % 2;
+                  const xOffset = (col - 0.5) * 26;
+                  const yOffset = (row - (housePlanets.length > 2 ? 0.5 : 0)) * 16;
+
+                  return (
+                    <text
+                      key={idx}
+                      x={xOffset}
+                      y={yOffset}
+                      textAnchor="middle"
+                      fill={isLagna ? 'var(--accent-gold)' : 'var(--text-primary)'}
+                      fontSize="12.5"
+                      fontWeight={isLagna ? 'bold' : '600'}
+                    >
+                      {p.shortName}
+                    </text>
+                  );
+                })}
+              </g>
+            </g>
+          );
+        })}
+
+        {/* Title overlay in center diamond */}
+        <text x="200" y="200" textAnchor="middle" fill="var(--accent-gold)" fontSize="15" fontWeight="bold">
           {title}
-        </text>
-
-        {/* North Indian Houses rendering with sign number in center house */}
-        <text x="200" y="140" textAnchor="middle" fill="var(--accent-saffron)" fontSize="14" fontWeight="bold">
-          1 ({lagnaSign})
         </text>
       </svg>
     );
