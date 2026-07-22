@@ -61,22 +61,25 @@ public class AstrologyDiagnosticsService {
             } else if (mSign == vSign || PlanetDignityUtils.isAspecting("Venus", vSign, mSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.venus_aspect");
+            } else if (mSign == moon.getSignNumber()) { // Conjunction with Moon (Chandra-Mangala)
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.benefic_sign");
             } else if (mSign == 5 || mSign == 4) { // Leo or Cancer
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.benefic_sign");
-            } else if (marsFromLagna == 2 && (mSign == 3 || mSign == 6)) { // 2nd in Gemini/Virgo
+            } else if (marsFromLagna == 2 && (mSign == 3 || mSign == 6 || mSign == 10 || mSign == 11)) { // 2nd in Gemini/Virgo/Capricorn/Aquarius
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.house_sign_exemption");
-            } else if (marsFromLagna == 4 && (mSign == 1 || mSign == 8)) { // 4th in Aries/Scorpio
+            } else if (marsFromLagna == 4 && (mSign == 1 || mSign == 8 || mSign == 4)) { // 4th in Aries/Scorpio/Cancer
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.own_exalted");
-            } else if (marsFromLagna == 7 && (mSign == 4 || mSign == 10)) { // 7th in Cancer/Capricorn
+            } else if (marsFromLagna == 7 && (mSign == 4 || mSign == 10 || mSign == 2 || mSign == 7)) { // 7th in Cancer/Capricorn/Taurus/Libra
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.own_exalted");
-            } else if (marsFromLagna == 8 && (mSign == 9 || mSign == 12)) { // 8th in Sagittarius/Pisces
+            } else if (marsFromLagna == 8 && (mSign == 9 || mSign == 12 || mSign == 3 || mSign == 6)) { // 8th in Sagittarius/Pisces/Gemini/Virgo
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.house_sign_exemption");
-            } else if (marsFromLagna == 12 && (mSign == 2 || mSign == 7)) { // 12th in Taurus/Libra
+            } else if (marsFromLagna == 12 && (mSign == 2 || mSign == 7 || mSign == 9 || mSign == 12)) { // 12th in Taurus/Libra/Sagittarius/Pisces
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.house_sign_exemption");
             }
@@ -488,6 +491,23 @@ public class AstrologyDiagnosticsService {
                                 .impactLevel(ts.getLabel("severity.high"))
                                 .build());
                     }
+                }
+            }
+        // Vipareeta Rajayoga (6th, 8th, 12th Lords in 6th, 8th, or 12th House)
+        int[] trikHouses = {6, 8, 12};
+        for (int th : trikHouses) {
+            int trikSign = ((lagnaSign + th - 2 + 12) % 12) + 1;
+            String lord = PlanetDignityUtils.getSignLord(trikSign);
+            PlanetaryPosition lordPos = d1Map.get(lord);
+            if (lordPos != null) {
+                int lordH = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), lagnaSign);
+                if (lordH == 6 || lordH == 8 || lordH == 12) {
+                    yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                            .name(ts.getLabel("yoga.vipareeta") + " (" + ts.getLabel("planet." + lord.toLowerCase()) + ")")
+                            .description(ts.getLabel("yoga.vipareeta.desc"))
+                            .impactLevel(ts.getLabel("severity.high"))
+                            .build());
+                    break;
                 }
             }
         }
