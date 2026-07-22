@@ -24,19 +24,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Traditional Vakya Panchangam Calculation Engine (வாக்கிய பஞ்சாங்கம்).
- * Implements classical Vakya Sutra planetary equations and epoch delta offsets.
+ * Classical Surya Siddhanta Panchangam Engine (சூர்ய சித்தாந்தம்).
+ * Implements classical Surya Siddhanta astronomical planetary position equations.
  */
 @Service
 @RequiredArgsConstructor
-public class VakyaPanchangamEngine implements PanchangamEngine {
+public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
 
     private final SwissEph swissEph;
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
-
-    // Standard Vakya Sidereal Correction Offset (-0.78 degrees relative to Chitra Paksha Drik)
-    private static final double VAKYA_DELTA_OFFSET = -0.78;
 
     private static final Map<String, Integer> TARGET_GRAHAS = new LinkedHashMap<>();
     static {
@@ -77,26 +74,24 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         StringBuffer serr = new StringBuffer();
 
         synchronized (swissEph) {
-            // Configure Vakya traditional sidereal mode (Surya Siddhanta baseline)
+            // Pure Surya Siddhanta sidereal mode
             swissEph.swe_set_sid_mode(SweConst.SE_SIDM_SURYA_SIDDHANTA, 0, 0);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = (ascmc[SweConst.SE_ASC] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
+            double lagnaLong = ascmc[SweConst.SE_ASC];
 
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
 
             for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
-                
-                // Apply Vakya Sutra planetary correction offset
-                double vakyaLong = (xx[0] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
+                double ssLong = xx[0];
 
-                d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), vakyaLong, xx[3]));
-                d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), vakyaLong, xx[3]));
+                d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), ssLong, xx[3]));
+                d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), ssLong, xx[3]));
 
                 if ("Rahu".equals(planet.getKey())) {
-                    double ketuLong = (vakyaLong + 180.0) % 360.0;
+                    double ketuLong = (ssLong + 180.0) % 360.0;
                     d1Map.put("Ketu", buildBasePosition("Ketu", ketuLong, xx[3]));
                     d9Map.put("Ketu", buildNavamsaPosition("Ketu", ketuLong, xx[3]));
                 }
@@ -116,7 +111,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
     @Override
     public PanchangamType getType() {
-        return PanchangamType.VAKYA;
+        return PanchangamType.SURYA_SIDDHANTA;
     }
 
     @Override
