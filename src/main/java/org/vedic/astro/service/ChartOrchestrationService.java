@@ -77,6 +77,7 @@ public class ChartOrchestrationService {
                 .latitude(pay.latitude())
                 .longitude(pay.longitude())
                 .resolvedTimezone(resolvedTz != null ? resolvedTz : "Asia/Kolkata")
+                .ayanamsa(pay.ayanamsa() != null ? pay.ayanamsa() : "LAHIRI")
                 .thithi(computedThithi)
                 .yogam(computedYogam)
                 .karanam(computedKaranam)
