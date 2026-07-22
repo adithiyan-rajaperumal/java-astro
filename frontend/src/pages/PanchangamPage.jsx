@@ -115,8 +115,8 @@ function PanchangamPage({ settings }) {
       }
     }
 
-    // Early morning hours (00:00 AM to 06:30 AM) belong to next calendar day morning
-    if (endMins >= 0 && endMins <= 6 * 60 + 30) {
+    // Early morning hours (00:00 AM to 08:30 AM) belong to next calendar day morning relative to panchangam start
+    if (endMins >= 0 && endMins <= 8 * 60 + 30) {
       return true;
     }
 

@@ -351,7 +351,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             return (coords[1] - coords[0] + 720.0) % 360.0;
         });
         
-        String endTimeStr = formatTransitionTime(endJd, zoneId);
+        String endTimeStr = formatTransitionTime(endJd, jdSunrise, zoneId);
         String computedThithi = formatThithiName(thithiIdx);
 
         String nextName = null, nextLocalized = null, nextEndTime = null;
@@ -363,7 +363,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 double[] coords = getSunMoonLongitude(jd);
                 return (coords[1] - coords[0] + 720.0) % 360.0;
             });
-            nextEndTime = formatTransitionTime(nextEndJd, zoneId);
+            nextEndTime = formatTransitionTime(nextEndJd, jdSunrise, zoneId);
         }
 
         return new PanchangamElementDTO(thithiIdx, "Thithi " + thithiIdx, computedThithi, endTimeStr, nextName, nextLocalized, nextEndTime);
@@ -386,7 +386,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double targetVal = nakIdx * (360.0 / 27.0);
         double endJd = findTransitionTime(jdSunrise, jdSunrise + 1.2, targetVal, this::getMoonLongitude);
         
-        String endTimeStr = formatTransitionTime(endJd, zoneId);
+        String endTimeStr = formatTransitionTime(endJd, jdSunrise, zoneId);
         String name = translationService.getLocalizedNakshatra(nakIdx);
 
         String nextName = null, nextLocalized = null, nextEndTime = null;
@@ -395,7 +395,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             nextName = ZodiacUtils.getNakshatraName((nextIdx * (360.0 / 27.0)) - 1.0);
             nextLocalized = translationService.getLocalizedNakshatra(nextIdx);
             double nextEndJd = findTransitionTime(endJd + 0.01, endJd + 1.2, nextIdx * (360.0 / 27.0), this::getMoonLongitude);
-            nextEndTime = formatTransitionTime(nextEndJd, zoneId);
+            nextEndTime = formatTransitionTime(nextEndJd, jdSunrise, zoneId);
         }
 
         return new PanchangamElementDTO(nakIdx, ZodiacUtils.getNakshatraName(targetVal - 1.0), name, endTimeStr, nextName, nextLocalized, nextEndTime);
@@ -408,7 +408,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             return (coords[0] + coords[1] + 720.0) % 360.0;
         });
 
-        String endTimeStr = formatTransitionTime(endJd, zoneId);
+        String endTimeStr = formatTransitionTime(endJd, jdSunrise, zoneId);
         String name = translationService.getLabel("yogam." + yogamIdx);
 
         String nextName = null, nextLocalized = null, nextEndTime = null;
@@ -420,7 +420,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 double[] coords = getSunMoonLongitude(jd);
                 return (coords[0] + coords[1] + 720.0) % 360.0;
             });
-            nextEndTime = formatTransitionTime(nextEndJd, zoneId);
+            nextEndTime = formatTransitionTime(nextEndJd, jdSunrise, zoneId);
         }
 
         return new PanchangamElementDTO(yogamIdx, "Yogam " + yogamIdx, name, endTimeStr, nextName, nextLocalized, nextEndTime);
@@ -433,7 +433,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             return (coords[1] - coords[0] + 720.0) % 360.0;
         });
 
-        String endTimeStr = formatTransitionTime(endJd, zoneId);
+        String endTimeStr = formatTransitionTime(endJd, jdSunrise, zoneId);
         String name = translationService.getLabel("karanam." + resolveKaranamId(karanamIdx));
 
         String nextName = null, nextLocalized = null, nextEndTime = null;
@@ -445,7 +445,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 double[] coords = getSunMoonLongitude(jd);
                 return (coords[1] - coords[0] + 720.0) % 360.0;
             });
-            nextEndTime = formatTransitionTime(nextEndJd, zoneId);
+            nextEndTime = formatTransitionTime(nextEndJd, jdSunrise, zoneId);
         }
 
         return new PanchangamElementDTO(karanamIdx, "Karanam " + karanamIdx, name, endTimeStr, nextName, nextLocalized, nextEndTime);
@@ -491,13 +491,26 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         return diff;
     }
 
-    private String formatTransitionTime(double jd, ZoneId zoneId) {
+    private String formatTransitionTime(double jd, double jdSunrise, ZoneId zoneId) {
         if (jd <= 0) {
             return translationService.getLabel("panchangam.throughout_day");
         }
         ZonedDateTime zdt = jdToZonedDateTime(jd, zoneId);
+        ZonedDateTime zdtSunrise = jdToZonedDateTime(jdSunrise, zoneId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
-        return zdt.format(formatter);
+        String formatted = zdt.format(formatter);
+
+        if (zdt.toLocalDate().isAfter(zdtSunrise.toLocalDate())) {
+            String nextDayText = translationService.getLabel("panchangam.nextDay");
+            if (nextDayText == null || nextDayText.startsWith("panchangam.")) {
+                nextDayText = translationService.getLabel("nextDay");
+            }
+            if (nextDayText == null || nextDayText.isEmpty() || nextDayText.equals("nextDay")) {
+                nextDayText = "Next Day";
+            }
+            return formatted + " (" + nextDayText + ")";
+        }
+        return formatted;
     }
 
     private List<TimeSlotDTO> calculateNallaNeram(ZonedDateTime sunrise, int dayOfWeek) {
