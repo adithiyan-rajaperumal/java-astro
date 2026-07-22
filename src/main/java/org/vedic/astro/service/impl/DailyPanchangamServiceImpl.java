@@ -284,18 +284,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         int currentNakIdx = nakshatraDTO.number();
         int exactNakIdx = ((currentNakIdx + 12 - 1) % 27) + 1;
         String localized = translationService.getLocalizedNakshatra(exactNakIdx);
-        if (!list.contains(localized)) {
-            list.add(localized);
-        }
-
-        if (nakshatraDTO.nextName() != null) {
-            int nextNakIdx = (currentNakIdx % 27) + 1;
-            int nextExactNakIdx = ((nextNakIdx + 12 - 1) % 27) + 1;
-            String nextLocalized = translationService.getLocalizedNakshatra(nextExactNakIdx);
-            if (!list.contains(nextLocalized)) {
-                list.add(nextLocalized);
-            }
-        }
+        list.add(localized);
 
         return list;
     }
