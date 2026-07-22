@@ -140,23 +140,14 @@ function PanchangamPage({ settings }) {
     if (!elem.endTime) return firstName;
 
     const untilStr = t('until', settings.language);
-    const fromStr = t('from', settings.language);
     const thenStr = t('then', settings.language);
-    const nextDayStr = t('nextDay', settings.language);
 
-    const formattedEndTime = formatTimeString(elem.endTime, null, nextDayStr);
-    let text = `${firstName} ${formattedEndTime} ${untilStr}`;
+    let text = `${firstName} ${elem.endTime} ${untilStr}`;
 
     const nextName = elem.nextLocalizedName || elem.nextName;
     if (nextName) {
-      let nextEnd = elem.nextEndTime;
-      const ignoreKeywords = ['next day', 'அடுத்த நாள்', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം', 'throughout', 'நாள் முழுவதும்', 'दिन भर', 'ಇಡೀ ದಿನ', 'త్రోలట్', 'മുഴുവൻ'];
-      if (nextEnd && !ignoreKeywords.some(k => nextEnd.includes(k))) {
-        nextEnd = `${nextEnd} (${nextDayStr})`;
-      }
-
-      if (nextEnd) {
-        text += `, ${thenStr} ${nextName} ${nextEnd} ${untilStr}`;
+      if (elem.nextEndTime) {
+        text += `, ${thenStr} ${nextName} ${elem.nextEndTime} ${untilStr}`;
       } else {
         text += `, ${thenStr} ${nextName}`;
       }
