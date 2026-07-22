@@ -78,7 +78,7 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
 
         synchronized (swissEph) {
             // Parasara Bhattar traditional sidereal mode
-            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_SURYA_SIDDHANTA, 0, 0);
+            swissEph.swe_set_sid_mode(org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.getMode(), 0, 0);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
             double lagnaLong = (ascmc[SweConst.SE_ASC] + PARASARA_BHATTAR_DELTA + 360.0) % 360.0;
@@ -123,7 +123,7 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
         double[] cusps = new double[13];
         double[] ascmc = new double[10];
         synchronized (swissEph) {
-            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_SURYA_SIDDHANTA, 0, 0);
+            swissEph.swe_set_sid_mode(org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.getMode(), 0, 0);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
         }
 

@@ -78,7 +78,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
         synchronized (swissEph) {
             // Configure Vakya traditional sidereal mode (Surya Siddhanta baseline)
-            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_SURYA_SIDDHANTA, 0, 0);
+            swissEph.swe_set_sid_mode(org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.getMode(), 0, 0);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
             double lagnaLong = (ascmc[SweConst.SE_ASC] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
@@ -124,7 +124,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double[] cusps = new double[13];
         double[] ascmc = new double[10];
         synchronized (swissEph) {
-            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_SURYA_SIDDHANTA, 0, 0);
+            swissEph.swe_set_sid_mode(org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.getMode(), 0, 0);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
         }
 
