@@ -241,7 +241,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         boolean isMuhurthamDay = (date.getDayOfWeek() != DayOfWeek.TUESDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY)
                 && isAuspiciousThithi
                 && isAuspiciousNakshatra
-                && (netram == 2 && jeevan == 1.0);
+                && (netram > 0 && jeevan > 0);
 
         boolean isVasthuDay = (date.getMonthValue() == 1 && date.getDayOfMonth() == 25)
                 || (date.getMonthValue() == 4 && date.getDayOfMonth() == 22)
