@@ -42,30 +42,43 @@ public class AstrologyDiagnosticsService {
         PlanetaryPosition jupiter = d1Map.get("Jupiter");
 
         int marsFromLagna = PlanetDignityUtils.getHouseFromLagna(mars.getSignNumber(), lagna.getSignNumber());
-        int marsFromMoon = PlanetDignityUtils.getHouseFromLagna(mars.getSignNumber(), moon.getSignNumber());
-        int marsFromVenus = PlanetDignityUtils.getHouseFromLagna(mars.getSignNumber(), venus.getSignNumber());
-
-        boolean hasMarsLagna = (marsFromLagna == 1 || marsFromLagna == 2 || marsFromLagna == 4 || marsFromLagna == 7 || marsFromLagna == 8 || marsFromLagna == 12);
-        boolean hasMarsMoon = (marsFromMoon == 1 || marsFromMoon == 2 || marsFromMoon == 4 || marsFromMoon == 7 || marsFromMoon == 8 || marsFromMoon == 12);
-        boolean hasMarsVenus = (marsFromVenus == 1 || marsFromVenus == 2 || marsFromVenus == 4 || marsFromVenus == 7 || marsFromVenus == 8 || marsFromVenus == 12);
-
-        boolean detected = hasMarsLagna || hasMarsMoon || hasMarsVenus;
+        boolean detected = (marsFromLagna == 1 || marsFromLagna == 2 || marsFromLagna == 4 || marsFromLagna == 7 || marsFromLagna == 8 || marsFromLagna == 12);
+        
         boolean nullified = false;
         String reason = null;
 
         if (detected) {
-            if (PlanetDignityUtils.isOwnSign("Mars", mars.getSignNumber()) || PlanetDignityUtils.isExalted("Mars", mars.getSignNumber())) {
+            int mSign = mars.getSignNumber();
+            int jSign = jupiter.getSignNumber();
+            int vSign = venus.getSignNumber();
+
+            if (PlanetDignityUtils.isOwnSign("Mars", mSign) || PlanetDignityUtils.isExalted("Mars", mSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.own_exalted");
-            } else if (mars.getSignNumber() == jupiter.getSignNumber() || PlanetDignityUtils.isAspecting("Jupiter", jupiter.getSignNumber(), mars.getSignNumber())) {
+            } else if (mSign == jSign || PlanetDignityUtils.isAspecting("Jupiter", jSign, mSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.jupiter_aspect");
-            } else if (PlanetDignityUtils.isAspecting("Venus", venus.getSignNumber(), mars.getSignNumber())) {
+            } else if (mSign == vSign || PlanetDignityUtils.isAspecting("Venus", vSign, mSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.venus_aspect");
-            } else if ((marsFromLagna == 1 || marsFromLagna == 2) && (mars.getSignNumber() == 4 || mars.getSignNumber() == 9 || mars.getSignNumber() == 12)) {
+            } else if (mSign == 5 || mSign == 4) { // Leo or Cancer
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.benefic_sign");
+            } else if (marsFromLagna == 2 && (mSign == 3 || mSign == 6)) { // 2nd in Gemini/Virgo
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.house_sign_exemption");
+            } else if (marsFromLagna == 4 && (mSign == 1 || mSign == 8)) { // 4th in Aries/Scorpio
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.own_exalted");
+            } else if (marsFromLagna == 7 && (mSign == 4 || mSign == 10)) { // 7th in Cancer/Capricorn
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.own_exalted");
+            } else if (marsFromLagna == 8 && (mSign == 9 || mSign == 12)) { // 8th in Sagittarius/Pisces
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.house_sign_exemption");
+            } else if (marsFromLagna == 12 && (mSign == 2 || mSign == 7)) { // 12th in Taurus/Libra
+                nullified = true;
+                reason = ts.getLabel("nullification.sevvai.house_sign_exemption");
             }
         }
 
@@ -369,7 +382,56 @@ public class AstrologyDiagnosticsService {
             yogas.add(DiagnosticsDTO.YogaDetail.builder().name(ts.getLabel("yoga.sasa")).description(ts.getLabel("yoga.sasa.desc")).impactLevel(ts.getLabel("severity.high")).build());
         }
 
-        // Neechabhanga Raja Yoga check
+        // Dharma-Karmadhipati Yoga (9th & 10th Lords conjunction or mutual aspect)
+        int sign9 = ((lagnaSign + 8 - 1) % 12) + 1;
+        int sign10 = ((lagnaSign + 9 - 1) % 12) + 1;
+        String lord9 = PlanetDignityUtils.getSignLord(sign9);
+        String lord10 = PlanetDignityUtils.getSignLord(sign10);
+        
+        if (!lord9.equals(lord10) && d1Map.containsKey(lord9) && d1Map.containsKey(lord10)) {
+            PlanetaryPosition p9 = d1Map.get(lord9);
+            PlanetaryPosition p10 = d1Map.get(lord10);
+            if (p9.getSignNumber() == p10.getSignNumber() || PlanetDignityUtils.isAspecting(lord9, p9.getSignNumber(), p10.getSignNumber())) {
+                yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                        .name(ts.getLabel("yoga.dharma_karmadhipati"))
+                        .description(ts.getLabel("yoga.dharma_karmadhipati.desc"))
+                        .impactLevel(ts.getLabel("severity.high"))
+                        .build());
+            }
+        }
+
+        // Kendra-Trikona Rajayogam (Conjunction of Kendra Lord 1,4,7,10 and Trikona Lord 5,9)
+        int[] kendraHouses = {1, 4, 7, 10};
+        int[] trikonaHouses = {5, 9};
+        boolean rajayogaFound = false;
+
+        for (int kh : kendraHouses) {
+            if (rajayogaFound) break;
+            int kSign = ((lagnaSign + kh - 2 + 12) % 12) + 1;
+            String kLord = PlanetDignityUtils.getSignLord(kSign);
+            PlanetaryPosition kPos = d1Map.get(kLord);
+            if (kPos == null) continue;
+
+            for (int th : trikonaHouses) {
+                int tSign = ((lagnaSign + th - 2 + 12) % 12) + 1;
+                String tLord = PlanetDignityUtils.getSignLord(tSign);
+                if (tLord.equals(kLord)) continue;
+                PlanetaryPosition tPos = d1Map.get(tLord);
+                if (tPos == null) continue;
+
+                if (kPos.getSignNumber() == tPos.getSignNumber()) {
+                    yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                            .name(ts.getLabel("yoga.rajayogam"))
+                            .description(ts.getLabel("yoga.rajayogam.desc"))
+                            .impactLevel(ts.getLabel("severity.high"))
+                            .build());
+                    rajayogaFound = true;
+                    break;
+                }
+            }
+        }
+
+        // Neechabhanga Raja Yoga check (Fully localized)
         String[] checkPlanets = {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"};
         for (String pKey : checkPlanets) {
             PlanetaryPosition p = d1Map.get(pKey);
@@ -380,9 +442,11 @@ public class AstrologyDiagnosticsService {
                     int lordHFromLagna = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), lagnaSign);
                     int lordHFromMoon = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), moonSign);
                     if (lordHFromLagna == 1 || lordHFromLagna == 4 || lordHFromLagna == 7 || lordHFromLagna == 10 || lordHFromMoon == 1 || lordHFromMoon == 4 || lordHFromMoon == 7 || lordHFromMoon == 10) {
+                        String localizedPlanet = ts.getLabel("planet." + pKey.toLowerCase());
+                        String localizedLord = ts.getLabel("planet." + lord.toLowerCase());
                         yogas.add(DiagnosticsDTO.YogaDetail.builder()
-                                .name("Neechabhanga Raja Yoga (" + pKey + ")")
-                                .description("Debilitation of " + pKey + " is cancelled by dispositor " + lord + " in kendra.")
+                                .name(ts.getLabel("yoga.neechabhanga") + " (" + localizedPlanet + ")")
+                                .description(ts.getLabel("yoga.neechabhanga.desc") + " (" + localizedPlanet + " / " + localizedLord + ")")
                                 .impactLevel(ts.getLabel("severity.high"))
                                 .build());
                     }
