@@ -53,7 +53,7 @@ function App() {
           <span className="brand-text">{t('appTitle', settings.language)}</span>
         </div>
         <div className="navbar-actions">
-          {settings.location && (
+          {activeTab === 'panchangam' && settings.location && (
             <button
               type="button"
               className="location-pill-btn"
