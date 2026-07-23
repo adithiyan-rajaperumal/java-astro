@@ -211,19 +211,16 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         List<TimeSlotDTO> emagandam = calculateKalam(zdtSunrise, dayDurationHours, getYamagandamPart(dayOfWeek0), translationService.getLabel("panchangam.emagandam"));
         List<TimeSlotDTO> kulikai = calculateKalam(zdtSunrise, dayDurationHours, getKulikaiPart(dayOfWeek0), translationService.getLabel("panchangam.kulikai"));
 
-        List<ZonedDateTime[]> inauspiciousWindows = List.of(
-            getKalamZdtRange(zdtSunrise, dayDurationHours, getRahuPart(dayOfWeek0)),
-            getKalamZdtRange(zdtSunrise, dayDurationHours, getYamagandamPart(dayOfWeek0)),
-            getKalamZdtRange(zdtSunrise, dayDurationHours, getKulikaiPart(dayOfWeek0))
-        );
-
-        // Nalla Neram (excluding Rahu Kalam, Yamagandam, Kulikai overlaps)
-        List<TimeSlotDTO> nallaNeram = calculateNallaNeram(zdtSunrise, dayOfWeek0, inauspiciousWindows);
+        // Dynamic Nalla Neram (derived from Gowri + non-overlapping inauspicious Kalam parts)
+        List<TimeSlotDTO> nallaNeram = calculateDynamicNallaNeram(jdSunrise, jdSunset, jdNextSunrise, dayOfWeek0, zoneId);
 
         List<TimeSlotDTO> gowriNallaNeram = calculateGowriNallaNeram(jdSunrise, jdSunset, jdNextSunrise, dayOfWeek0, zoneId);
 
         // Horais
         List<HoraTimeSlotDTO> horais = calculateHorais(jdSunrise, jdSunset, jdNextSunrise, dayOfWeek0, zoneId);
+
+        // Abhijit Muhurtham (8th of 15 daytime Muhurthams)
+        TimeSlotDTO abhijitMuhurtham = calculateAbhijitMuhurtham(jdSunrise, jdSunset, dayOfWeek0, zoneId);
 
         // Precise Chandrastamam Nakshatra(s) (8th house Nakshatra count relative to today's transiting Moon Nakshatra)
         List<String> chandrastamamNakshatras = getExactChandrastamamNakshatras(nakshatraDTO);
@@ -276,6 +273,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             emagandam,
             kulikai,
             horais,
+            abhijitMuhurtham,
             chandrastamamNakshatras,
             netram,
             jeevan,
@@ -505,95 +503,49 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         return formatted;
     }
 
-    private List<TimeSlotDTO> calculateNallaNeram(ZonedDateTime sunrise, int dayOfWeek, List<ZonedDateTime[]> inauspiciousWindows) {
-        // Morning and Evening offsets
-        double mStart, mEnd, eStart, eEnd;
-        switch (dayOfWeek) {
-            case 0: // Sunday (07:30 - 08:30 & 04:30 - 05:30)
-                mStart = 1.5; mEnd = 2.5;
-                eStart = 10.5; eEnd = 11.5;
-                break;
-            case 1: // Monday (06:00 - 07:30 & 04:30 - 05:30)
-                mStart = 0.0; mEnd = 1.5;
-                eStart = 10.5; eEnd = 11.5;
-                break;
-            case 2: // Tuesday (07:30 - 08:30 & 04:30 - 05:30)
-                mStart = 1.5; mEnd = 2.5;
-                eStart = 10.5; eEnd = 11.5;
-                break;
-            case 3: // Wednesday (09:00 - 10:00 & 04:30 - 05:30)
-                mStart = 3.0; mEnd = 4.0;
-                eStart = 10.5; eEnd = 11.5;
-                break;
-            case 4: // Thursday (10:30 - 11:30 & 04:30 - 05:30 - avoids Kulikai 09:00 - 10:30)
-                mStart = 4.5; mEnd = 5.5;
-                eStart = 10.5; eEnd = 11.5;
-                break;
-            case 5: // Friday (09:00 - 10:00 & 04:30 - 05:30)
-                mStart = 3.0; mEnd = 4.0;
-                eStart = 10.5; eEnd = 11.5;
-                break;
-            default: // Saturday (6) (07:30 - 08:30 & 05:00 - 06:00)
-                mStart = 1.5; mEnd = 2.5;
-                eStart = 11.0; eEnd = 12.0;
-                break;
-        }
-
-        List<ZonedDateTime[]> currentSlots = new ArrayList<>();
-        currentSlots.add(new ZonedDateTime[]{sunrise.plusMinutes((long) (mStart * 60.0)), sunrise.plusMinutes((long) (mEnd * 60.0))});
-        currentSlots.add(new ZonedDateTime[]{sunrise.plusMinutes((long) (eStart * 60.0)), sunrise.plusMinutes((long) (eEnd * 60.0))});
-
-        for (ZonedDateTime[] bad : inauspiciousWindows) {
-            List<ZonedDateTime[]> nextSlots = new ArrayList<>();
-            for (ZonedDateTime[] slot : currentSlots) {
-                nextSlots.addAll(subtractWindow(slot, bad));
-            }
-            currentSlots = nextSlots;
-        }
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+    private List<TimeSlotDTO> calculateDynamicNallaNeram(double jdSunrise, double jdSunset, double jdNextSunrise, int dayOfWeek, ZoneId zoneId) {
         List<TimeSlotDTO> list = new ArrayList<>();
-        for (ZonedDateTime[] slot : currentSlots) {
-            if (Duration.between(slot[0], slot[1]).toMinutes() >= 5) {
-                list.add(new TimeSlotDTO(slot[0].format(formatter), slot[1].format(formatter), translationService.getLabel("panchangam.nalla_neram")));
+        double dayPartDuration = (jdSunset - jdSunrise) / 8.0;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+
+        int rahuP = getRahuPart(dayOfWeek);
+        int yamaP = getYamagandamPart(dayOfWeek);
+        int kulikaiP = getKulikaiPart(dayOfWeek);
+
+        // Day Gowri parts (1 to 8)
+        String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
+        for (int i = 0; i < 8; i++) {
+            int partNum = i + 1;
+            String state = dayStates[i];
+
+            // Auspicious Gowri state AND not Rahu, Yamagandam, or Kulikai
+            if (isGowriAuspicious(state) && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
+                double startJd = jdSunrise + i * dayPartDuration;
+                double endJd = jdSunrise + (i + 1) * dayPartDuration;
+                ZonedDateTime start = jdToZonedDateTime(startJd, zoneId);
+                ZonedDateTime end = jdToZonedDateTime(endJd, zoneId);
+                list.add(new TimeSlotDTO(start.format(formatter), end.format(formatter), translationService.getLabel("panchangam.nalla_neram")));
             }
         }
 
         return list;
     }
 
-    private ZonedDateTime[] getKalamZdtRange(ZonedDateTime sunrise, double dayDurationHours, int part) {
-        double partDurationHours = dayDurationHours / 8.0;
-        double startHour = (part - 1) * partDurationHours;
-        double endHour = part * partDurationHours;
+    private TimeSlotDTO calculateAbhijitMuhurtham(double jdSunrise, double jdSunset, int dayOfWeek, ZoneId zoneId) {
+        double muhurthamDuration = (jdSunset - jdSunrise) / 15.0;
+        double startJd = jdSunrise + 7 * muhurthamDuration;
+        double endJd = jdSunrise + 8 * muhurthamDuration;
 
-        ZonedDateTime start = sunrise.plusMinutes((long) (startHour * 60.0));
-        ZonedDateTime end = sunrise.plusMinutes((long) (endHour * 60.0));
-        return new ZonedDateTime[]{start, end};
-    }
+        ZonedDateTime start = jdToZonedDateTime(startJd, zoneId);
+        ZonedDateTime end = jdToZonedDateTime(endJd, zoneId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
-    private List<ZonedDateTime[]> subtractWindow(ZonedDateTime[] target, ZonedDateTime[] bad) {
-        List<ZonedDateTime[]> result = new ArrayList<>();
-        ZonedDateTime tStart = target[0];
-        ZonedDateTime tEnd = target[1];
-        ZonedDateTime bStart = bad[0];
-        ZonedDateTime bEnd = bad[1];
-
-        // No overlap
-        if (!bEnd.isAfter(tStart) || !bStart.isBefore(tEnd)) {
-            result.add(target);
-            return result;
+        String label = translationService.getLabel("panchangam.abhijit_muhurtham");
+        if (dayOfWeek == 3) { // Wednesday - afflicted / nullified
+            label += " (" + translationService.getLabel("panchangam.nullified") + ")";
         }
 
-        // Overlap exists: portion before bad window
-        if (bStart.isAfter(tStart)) {
-            result.add(new ZonedDateTime[]{tStart, bStart});
-        }
-        // Portion after bad window
-        if (bEnd.isBefore(tEnd)) {
-            result.add(new ZonedDateTime[]{bEnd, tEnd});
-        }
-        return result;
+        return new TimeSlotDTO(start.format(formatter), end.format(formatter), label);
     }
 
     private List<TimeSlotDTO> calculateKalam(ZonedDateTime sunrise, double dayDurationHours, int part, String label) {

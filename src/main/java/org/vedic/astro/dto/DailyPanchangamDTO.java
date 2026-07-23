@@ -19,6 +19,7 @@ public record DailyPanchangamDTO(
     List<TimeSlotDTO> emagandam,
     List<TimeSlotDTO> kulikai,
     List<HoraTimeSlotDTO> horais,
+    TimeSlotDTO abhijitMuhurtham,
     List<String> chandrastamamNakshatras,
     int netram,
     double jeevan,

@@ -289,6 +289,12 @@ function PanchangamPage({ settings }) {
             {/* Card 4: Auspicious & Inauspicious Timings */}
             <div className="card" style={{ margin: 0 }}>
               <h3 className="title-gold" style={{ marginTop: 0 }}>⏱️ {t('auspicious', settings.language)} & {t('inauspicious', settings.language)}</h3>
+              {data.abhijitMuhurtham && (
+                <div style={{ marginBottom: '12px', padding: '10px 12px', backgroundColor: 'rgba(255, 215, 0, 0.08)', borderRadius: '8px', borderLeft: '4px solid var(--accent-gold)' }}>
+                  <div style={{ fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '3px' }}>☀️ {t('abhijitMuhurtham', settings.language)}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{data.abhijitMuhurtham.start} - {data.abhijitMuhurtham.end}</div>
+                </div>
+              )}
               {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
               {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
               <div style={{ margin: '12px 0 10px', borderTop: '1px dashed var(--border)' }}></div>
