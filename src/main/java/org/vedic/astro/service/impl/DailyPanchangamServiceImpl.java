@@ -510,19 +510,19 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Dynamic standard offsets scaled by actual day duration (assuming 12h standard day)
         double mStartOffset, mEndOffset, eStartOffset, eEndOffset;
         switch (dayOfWeek) {
-            case 0: // Sun
+            case 0: // Sun (07:30 - 08:30 & 04:30 - 05:30)
                 mStartOffset = 1.5; mEndOffset = 2.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
-            case 1: // Mon
-                mStartOffset = 0.5; mEndOffset = 1.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
-            case 2: // Tue
+            case 1: // Mon (06:00 - 07:30 & 04:30 - 05:30)
+                mStartOffset = 0.0; mEndOffset = 1.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            case 2: // Tue (07:30 - 08:30 & 04:30 - 05:30)
                 mStartOffset = 1.5; mEndOffset = 2.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
-            case 3: // Wed
+            case 3: // Wed (09:00 - 10:00 & 04:30 - 05:30)
                 mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
-            case 4: // Thu
+            case 4: // Thu (10:30 - 11:30 & 04:30 - 05:30 - avoids Kulikai 09:00 - 10:30)
+                mStartOffset = 4.5; mEndOffset = 5.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            case 5: // Fri (09:00 - 10:00 & 04:30 - 05:30)
                 mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
-            case 5: // Fri
-                mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
-            default: // Sat
+            default: // Sat (07:30 - 08:30 & 05:00 - 06:00)
                 mStartOffset = 1.5; mEndOffset = 2.5; eStartOffset = 11.0; eEndOffset = 12.0; break;
         }
 
@@ -568,7 +568,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             if (gowriFallback != null) {
                 ZonedDateTime s = jdToZonedDateTime(gowriFallback.startJd(), zoneId);
                 ZonedDateTime e = jdToZonedDateTime(gowriFallback.endJd(), zoneId);
-                finalSlots.add(new SlotCandidate(gowriFallback.startJd(), new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram"))));
+                String stateLabel = translationService.getLabel("gowri." + gowriFallback.state().toLowerCase());
+                finalSlots.add(new SlotCandidate(gowriFallback.startJd(), new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
             }
         }
 
@@ -581,25 +582,25 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             if (gowriFallback != null) {
                 ZonedDateTime s = jdToZonedDateTime(gowriFallback.startJd(), zoneId);
                 ZonedDateTime e = jdToZonedDateTime(gowriFallback.endJd(), zoneId);
-                finalSlots.add(new SlotCandidate(gowriFallback.startJd(), new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram"))));
+                String stateLabel = translationService.getLabel("gowri." + gowriFallback.state().toLowerCase());
+                finalSlots.add(new SlotCandidate(gowriFallback.startJd(), new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
             }
         }
 
-        // If ANY collision occurred, check if Amirdha Gowri is available in a clean slot and not already included
-        if (mCollides || eCollides) {
-            String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
-            for (int i = 0; i < 8; i++) {
-                int partNum = i + 1;
-                if ("Amirdha".equals(dayStates[i]) && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
-                    double amStartJd = jdSunrise + i * dayPartDuration;
-                    double amEndJd   = jdSunrise + (i + 1) * dayPartDuration;
+        // Check if Amirdha Gowri is available in a clean slot and not already included
+        String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
+        for (int i = 0; i < 8; i++) {
+            int partNum = i + 1;
+            if ("Amirdha".equals(dayStates[i]) && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
+                double amStartJd = jdSunrise + i * dayPartDuration;
+                double amEndJd   = jdSunrise + (i + 1) * dayPartDuration;
 
-                    boolean alreadyPresent = finalSlots.stream().anyMatch(sc -> isColliding(sc.startJd(), sc.startJd() + (1.0 / 24.0), amStartJd, amEndJd));
-                    if (!alreadyPresent) {
-                        ZonedDateTime s = jdToZonedDateTime(amStartJd, zoneId);
-                        ZonedDateTime e = jdToZonedDateTime(amEndJd, zoneId);
-                        finalSlots.add(new SlotCandidate(amStartJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram"))));
-                    }
+                boolean alreadyPresent = finalSlots.stream().anyMatch(sc -> isColliding(sc.startJd(), sc.startJd() + (1.0 / 24.0), amStartJd, amEndJd));
+                if (!alreadyPresent) {
+                    ZonedDateTime s = jdToZonedDateTime(amStartJd, zoneId);
+                    ZonedDateTime e = jdToZonedDateTime(amEndJd, zoneId);
+                    String stateLabel = translationService.getLabel("gowri.amirdha");
+                    finalSlots.add(new SlotCandidate(amStartJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
                 }
             }
         }
