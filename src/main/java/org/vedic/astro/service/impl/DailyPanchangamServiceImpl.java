@@ -504,7 +504,6 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
     }
 
     private List<TimeSlotDTO> calculateDynamicNallaNeram(double jdSunrise, double jdSunset, double jdNextSunrise, int dayOfWeek, ZoneId zoneId) {
-        List<TimeSlotDTO> list = new ArrayList<>();
         double dayPartDuration = (jdSunset - jdSunrise) / 8.0;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
@@ -512,23 +511,52 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         int yamaP = getYamagandamPart(dayOfWeek);
         int kulikaiP = getKulikaiPart(dayOfWeek);
 
-        // Day Gowri parts (1 to 8)
+        record GowriCandidate(int index, String state, int rank, double startJd, double endJd) {}
+
+        List<GowriCandidate> candidates = new ArrayList<>();
+
         String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
         for (int i = 0; i < 8; i++) {
             int partNum = i + 1;
             String state = dayStates[i];
+            int rank = getGowriRank(state);
 
             // Auspicious Gowri state AND not Rahu, Yamagandam, or Kulikai
-            if (isGowriAuspicious(state) && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
+            if (rank > 0 && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
                 double startJd = jdSunrise + i * dayPartDuration;
                 double endJd = jdSunrise + (i + 1) * dayPartDuration;
-                ZonedDateTime start = jdToZonedDateTime(startJd, zoneId);
-                ZonedDateTime end = jdToZonedDateTime(endJd, zoneId);
-                list.add(new TimeSlotDTO(start.format(formatter), end.format(formatter), translationService.getLabel("panchangam.nalla_neram")));
+                candidates.add(new GowriCandidate(i, state, rank, startJd, endJd));
             }
         }
 
+        // Sort candidates by auspiciousness rank ascending (1 = Amirdha is highest priority)
+        candidates.sort(java.util.Comparator.comparingInt(GowriCandidate::rank));
+
+        // Select top 2 best non-colliding time slots
+        List<GowriCandidate> top2 = candidates.stream().limit(2).collect(java.util.stream.Collectors.toList());
+
+        // Sort top 2 back to chronological order (by start time)
+        top2.sort(java.util.Comparator.comparingDouble(GowriCandidate::startJd));
+
+        List<TimeSlotDTO> list = new ArrayList<>();
+        for (GowriCandidate c : top2) {
+            ZonedDateTime start = jdToZonedDateTime(c.startJd(), zoneId);
+            ZonedDateTime end = jdToZonedDateTime(c.endJd(), zoneId);
+            list.add(new TimeSlotDTO(start.format(formatter), end.format(formatter), translationService.getLabel("panchangam.nalla_neram")));
+        }
+
         return list;
+    }
+
+    private int getGowriRank(String state) {
+        return switch (state) {
+            case "Amirdha" -> 1;
+            case "Laabam" -> 2;
+            case "Dhanam" -> 3;
+            case "Sugam" -> 4;
+            case "Uthi" -> 5;
+            default -> 0; // Inauspicious
+        };
     }
 
     private TimeSlotDTO calculateAbhijitMuhurtham(double jdSunrise, double jdSunset, int dayOfWeek, ZoneId zoneId) {
