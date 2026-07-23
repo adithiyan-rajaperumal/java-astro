@@ -511,9 +511,12 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         int yamaP = getYamagandamPart(dayOfWeek);
         int kulikaiP = getKulikaiPart(dayOfWeek);
 
-        record GowriCandidate(int index, String state, int rank, double startJd, double endJd) {}
+        record GowriCandidate(int index, String state, int rank, double startJd, double endJd, ZonedDateTime startZdt) {}
 
-        List<GowriCandidate> candidates = new ArrayList<>();
+        List<GowriCandidate> morningCandidates = new ArrayList<>();
+        List<GowriCandidate> noonCandidates = new ArrayList<>();
+        List<GowriCandidate> eveningCandidates = new ArrayList<>();
+        List<GowriCandidate> allCandidates = new ArrayList<>();
 
         String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
         for (int i = 0; i < 8; i++) {
@@ -525,22 +528,54 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             if (rank > 0 && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
                 double startJd = jdSunrise + i * dayPartDuration;
                 double endJd = jdSunrise + (i + 1) * dayPartDuration;
-                candidates.add(new GowriCandidate(i, state, rank, startJd, endJd));
+                ZonedDateTime startZdt = jdToZonedDateTime(startJd, zoneId);
+
+                GowriCandidate candidate = new GowriCandidate(i, state, rank, startJd, endJd, startZdt);
+                allCandidates.add(candidate);
+
+                int hour = startZdt.getHour();
+                if (hour < 11) {
+                    morningCandidates.add(candidate);
+                } else if (hour < 15) {
+                    noonCandidates.add(candidate);
+                } else {
+                    eveningCandidates.add(candidate);
+                }
             }
         }
 
-        // Sort candidates by auspiciousness rank ascending (1 = Amirdha is highest priority)
-        candidates.sort(java.util.Comparator.comparingInt(GowriCandidate::rank));
+        List<GowriCandidate> selected = new ArrayList<>();
 
-        // Select top 2 best non-colliding time slots
-        List<GowriCandidate> top2 = candidates.stream().limit(2).collect(java.util.stream.Collectors.toList());
+        // Pick best Morning candidate
+        morningCandidates.stream()
+                .min(java.util.Comparator.comparingInt(GowriCandidate::rank))
+                .ifPresent(selected::add);
 
-        // Sort top 2 back to chronological order (by start time)
-        top2.sort(java.util.Comparator.comparingDouble(GowriCandidate::startJd));
+        // Pick best Noon candidate
+        noonCandidates.stream()
+                .min(java.util.Comparator.comparingInt(GowriCandidate::rank))
+                .ifPresent(selected::add);
+
+        // Pick best Evening candidate
+        eveningCandidates.stream()
+                .min(java.util.Comparator.comparingInt(GowriCandidate::rank))
+                .ifPresent(selected::add);
+
+        // Fallback: If any window was empty, backfill from top ranked unselected candidates
+        if (selected.size() < 3) {
+            allCandidates.stream()
+                    .filter(c -> !selected.contains(c))
+                    .sorted(java.util.Comparator.comparingInt(GowriCandidate::rank))
+                    .limit(3 - selected.size())
+                    .forEach(selected::add);
+        }
+
+        // Sort selected chronologically by start time
+        selected.sort(java.util.Comparator.comparingDouble(GowriCandidate::startJd));
 
         List<TimeSlotDTO> list = new ArrayList<>();
-        for (GowriCandidate c : top2) {
-            ZonedDateTime start = jdToZonedDateTime(c.startJd(), zoneId);
+        for (GowriCandidate c : selected) {
+            ZonedDateTime start = c.startZdt();
             ZonedDateTime end = jdToZonedDateTime(c.endJd(), zoneId);
             list.add(new TimeSlotDTO(start.format(formatter), end.format(formatter), translationService.getLabel("panchangam.nalla_neram")));
         }
