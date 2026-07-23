@@ -144,6 +144,7 @@ function PanchangamPage({ settings }) {
 
   const renderNakshatraYogamsList = (slots) => {
     if (!slots || slots.length === 0) return null;
+    const nextDayText = t('nextDay', settings.language);
     return (
       <div style={{ marginBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 6px' }}>
@@ -158,10 +159,15 @@ function PanchangamPage({ settings }) {
             || s.label.includes('అమృత') || s.label.includes('సిద్ధ')
             || s.label.includes('അമൃത') || s.label.includes('സിദ്ധ');
 
+          const formattedStart = formatTimeString(s.start, null, nextDayText);
+          const formattedEnd = formatTimeString(s.end, s.start, nextDayText);
+
           return (
             <div key={idx} className={`time-slot-bar ${isGood ? 'auspicious' : 'inauspicious'}`}>
               <span style={{ fontWeight: 'bold' }}>{s.label}</span>
-              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>{s.start} - {s.end}</span>
+              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>
+                {formattedStart} - {formattedEnd}
+              </span>
             </div>
           );
         })}
@@ -377,15 +383,7 @@ function PanchangamPage({ settings }) {
               )}
               {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
               {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
-              {renderTimeSlotList(data.nakshatraYogams?.filter(s => {
-                const lbl = (s.label || '').toLowerCase();
-                return lbl.includes('amrita') || lbl.includes('siddha')
-                  || s.label.includes('அமிர்த') || s.label.includes('சித்த')
-                  || s.label.includes('अमृत') || s.label.includes('सिद्ध')
-                  || s.label.includes('ಅಮೃತ') || s.label.includes('ಸಿದ್ಧ')
-                  || s.label.includes('అమృత') || s.label.includes('సిద్ధ')
-                  || s.label.includes('അമൃത') || s.label.includes('സിദ്ധ');
-              }), 'nakshatraYogam', true)}
+              {renderNakshatraYogamsList(data.nakshatraYogams)}
             </div>
 
             {/* Card 4: Inauspicious Kalam Divisions Card */}
@@ -394,16 +392,6 @@ function PanchangamPage({ settings }) {
               {renderTimeSlotList(data.raghuKalam, 'rahuKalam', false)}
               {renderTimeSlotList(data.emagandam, 'yamagandam', false)}
               {renderTimeSlotList(data.kulikai, 'gulikaKalam', false)}
-              {renderTimeSlotList(data.nakshatraYogams?.filter(s => {
-                const lbl = (s.label || '').toLowerCase();
-                const isGood = lbl.includes('amrita') || lbl.includes('siddha')
-                  || s.label.includes('அமிர்த') || s.label.includes('சித்த')
-                  || s.label.includes('अमृत') || s.label.includes('सिद्ध')
-                  || s.label.includes('ಅಮೃತ') || s.label.includes('ಸಿದ್ಧ')
-                  || s.label.includes('అమృత') || s.label.includes('సిద్ధ')
-                  || s.label.includes('അമൃത') || s.label.includes('സിദ്ധ');
-                return !isGood;
-              }), 'nakshatraYogam', false)}
             </div>
 
             {/* Card 5: 24 Horai Table */}
