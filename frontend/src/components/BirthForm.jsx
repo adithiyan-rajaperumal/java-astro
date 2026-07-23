@@ -63,6 +63,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       second: 0,
       latitude: location.latitude,
       longitude: location.longitude,
+      location,
       ayanamsa
     });
   };

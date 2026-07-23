@@ -341,7 +341,13 @@ function HoroscopePage({ settings }) {
       {!report && !loading && (
         <BirthForm
           onSubmit={handleFormSubmit}
-          initialValues={{
+          initialValues={formPayload ? {
+            name: formPayload.name,
+            date: `${formPayload.year}-${String(formPayload.month).padStart(2, '0')}-${String(formPayload.day).padStart(2, '0')}`,
+            time: `${String(formPayload.hour).padStart(2, '0')}:${String(formPayload.minute).padStart(2, '0')}`,
+            location: formPayload.location || settings.location,
+            ayanamsa: formPayload.ayanamsa || settings.ayanamsa
+          } : {
             location: settings.location,
             ayanamsa: settings.ayanamsa
           }}

@@ -509,33 +509,33 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Morning and Evening offsets
         double mStart, mEnd, eStart, eEnd;
         switch (dayOfWeek) {
-            case 0: // Sunday
-                mStart = 1.5; mEnd = 3.0;
-                eStart = 9.5; eEnd = 10.5;
-                break;
-            case 1: // Monday
-                mStart = 3.25; mEnd = 4.25;
-                eStart = 10.75; eEnd = 11.75;
-                break;
-            case 2: // Tuesday
+            case 0: // Sunday (07:30 - 08:30 & 04:30 - 05:30)
                 mStart = 1.5; mEnd = 2.5;
                 eStart = 10.5; eEnd = 11.5;
                 break;
-            case 3: // Wednesday
-                mStart = 3.25; mEnd = 4.25;
-                eStart = 10.75; eEnd = 11.75;
+            case 1: // Monday (06:00 - 07:30 & 04:30 - 05:30)
+                mStart = 0.0; mEnd = 1.5;
+                eStart = 10.5; eEnd = 11.5;
                 break;
-            case 4: // Thursday
-                mStart = 3.25; mEnd = 4.25;
-                eStart = 10.75; eEnd = 11.75;
-                break;
-            case 5: // Friday
-                mStart = 3.25; mEnd = 4.25;
-                eStart = 10.75; eEnd = 11.75;
-                break;
-            default: // Saturday (6)
+            case 2: // Tuesday (07:30 - 08:30 & 04:30 - 05:30)
                 mStart = 1.5; mEnd = 2.5;
-                eStart = 10.75; eEnd = 11.75;
+                eStart = 10.5; eEnd = 11.5;
+                break;
+            case 3: // Wednesday (09:00 - 10:00 & 04:30 - 05:30)
+                mStart = 3.0; mEnd = 4.0;
+                eStart = 10.5; eEnd = 11.5;
+                break;
+            case 4: // Thursday (10:30 - 11:30 & 04:30 - 05:30 - avoids Kulikai 09:00 - 10:30)
+                mStart = 4.5; mEnd = 5.5;
+                eStart = 10.5; eEnd = 11.5;
+                break;
+            case 5: // Friday (09:00 - 10:00 & 04:30 - 05:30)
+                mStart = 3.0; mEnd = 4.0;
+                eStart = 10.5; eEnd = 11.5;
+                break;
+            default: // Saturday (6) (07:30 - 08:30 & 05:00 - 06:00)
+                mStart = 1.5; mEnd = 2.5;
+                eStart = 11.0; eEnd = 12.0;
                 break;
         }
 
