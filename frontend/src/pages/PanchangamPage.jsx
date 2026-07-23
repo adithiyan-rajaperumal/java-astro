@@ -96,9 +96,73 @@ function PanchangamPage({ settings }) {
     return <span style={{ fontWeight: 'bold', flex: '1 1 auto' }}>{label}</span>;
   };
 
+  const formatSlotListTimes = (slots, nextDayText) => {
+    if (!slots || !Array.isArray(slots)) return [];
+    let isOvernight = false;
+    const nextDayKeywords = ['next day', 'அடுத்த நாள்', 'اگلے دن', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം'];
+
+    return slots.map((s, idx) => {
+      if (!s) return s;
+      const startStr = s.start || '';
+      const endStr = s.end || '';
+
+      const startMins = parseTimeToMinutes(startStr);
+      const endMins = parseTimeToMinutes(endStr);
+
+      const hasStartNextDayKey = nextDayKeywords.some(k => startStr.toLowerCase().includes(k.toLowerCase()));
+      const hasEndNextDayKey = nextDayKeywords.some(k => endStr.toLowerCase().includes(k.toLowerCase()));
+
+      let startIsNextDay = isOvernight || hasStartNextDayKey;
+      if (!startIsNextDay && idx > 0 && startMins >= 0 && startMins <= 8 * 60 + 30) {
+        startIsNextDay = true;
+      }
+
+      if (startIsNextDay) {
+        isOvernight = true;
+      }
+
+      let endIsNextDay = isOvernight || hasEndNextDayKey;
+      if (!endIsNextDay && startMins >= 0 && endMins >= 0) {
+        if (endMins < startMins) {
+          endIsNextDay = true;
+        } else if (endMins <= 8 * 60 + 30 && startMins >= 20 * 60) {
+          endIsNextDay = true;
+        }
+      }
+
+      if (endIsNextDay) {
+        isOvernight = true;
+      }
+
+      const formatSingleTime = (timeStr, isNext) => {
+        if (!timeStr) return '';
+        const ignoreKeywords = ['throughout', 'நாள் முழுவதும்', 'दिन भर', 'இಡೀ ದಿನ', 'త్రోలట్', 'മുഴുവൻ'];
+        if (ignoreKeywords.some(k => timeStr.toLowerCase().includes(k.toLowerCase()))) {
+          return timeStr;
+        }
+        const alreadyHasTag = nextDayKeywords.some(k => timeStr.toLowerCase().includes(k.toLowerCase()));
+        if (alreadyHasTag) {
+          return timeStr;
+        }
+        if (isNext) {
+          return `${timeStr} (${nextDayText})`;
+        }
+        return timeStr;
+      };
+
+      return {
+        ...s,
+        formattedStart: formatSingleTime(startStr, startIsNextDay),
+        formattedEnd: formatSingleTime(endStr, endIsNextDay)
+      };
+    });
+  };
+
   const renderTimeSlotList = (slots, titleKey, isAuspicious) => {
     if (!slots || slots.length === 0) return null;
     const nextDayText = t('nextDay', settings.language);
+    const formattedSlots = formatSlotListTimes(slots, nextDayText);
+
     return (
       <div style={{ marginBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 6px' }}>
@@ -126,14 +190,12 @@ function PanchangamPage({ settings }) {
             </button>
           )}
         </div>
-        {slots.map((s, idx) => {
-          const formattedStart = formatTimeString(s.start, null, nextDayText);
-          const formattedEnd = formatTimeString(s.end, s.start, nextDayText);
+        {formattedSlots.map((s, idx) => {
           return (
             <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
               {renderSlotLabelContent(s.label)}
-              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>
-                {formattedStart} - {formattedEnd}
+              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'center' }}>
+                {s.formattedStart} - {s.formattedEnd}
               </span>
             </div>
           );
@@ -145,28 +207,28 @@ function PanchangamPage({ settings }) {
   const renderNakshatraYogamsList = (slots) => {
     if (!slots || slots.length === 0) return null;
     const nextDayText = t('nextDay', settings.language);
+    const formattedSlots = formatSlotListTimes(slots, nextDayText);
+
     return (
       <div style={{ marginBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 6px' }}>
           <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)' }}>🌟 {t('nakshatraYogam', settings.language)}</h4>
         </div>
-        {slots.map((s, idx) => {
+        {formattedSlots.map((s, idx) => {
           const labelLower = (s.label || '').toLowerCase();
           const isGood = labelLower.includes('amrita') || labelLower.includes('siddha') 
+            || s.label.includes('அமிர்த') || s.label.includes('சித்த')
             || s.label.includes('அமிர்த') || s.label.includes('சித்த')
             || s.label.includes('अमृत') || s.label.includes('सिद्ध')
             || s.label.includes('ಅಮೃತ') || s.label.includes('ಸಿದ್ಧ')
             || s.label.includes('అమృత') || s.label.includes('సిద్ధ')
             || s.label.includes('അമൃത') || s.label.includes('സിദ്ധ');
 
-          const formattedStart = formatTimeString(s.start, null, nextDayText);
-          const formattedEnd = formatTimeString(s.end, s.start, nextDayText);
-
           return (
             <div key={idx} className={`time-slot-bar ${isGood ? 'auspicious' : 'inauspicious'}`}>
               <span style={{ fontWeight: 'bold' }}>{s.label}</span>
-              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>
-                {formattedStart} - {formattedEnd}
+              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'center' }}>
+                {s.formattedStart} - {s.formattedEnd}
               </span>
             </div>
           );
@@ -175,7 +237,7 @@ function PanchangamPage({ settings }) {
     );
   };
 
-  const parseTimeToMinutes = (timeStr) => {
+    const parseTimeToMinutes = (timeStr) => {
     if (!timeStr) return -1;
     const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
     if (!match) return -1;
