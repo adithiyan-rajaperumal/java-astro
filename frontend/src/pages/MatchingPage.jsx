@@ -343,6 +343,10 @@ function MatchingPage({ settings }) {
               {result.verdict} ({result.percentage.toFixed(0)}%)
             </div>
             
+            <div style={{ marginTop: '10px', fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
+              🙋‍♂️ {result.boyProfile?.name} ({result.boyProfile?.birthProfile?.nakshatra}) &nbsp;|&nbsp; 🙋‍♀️ {result.girlProfile?.name} ({result.girlProfile?.birthProfile?.nakshatra}) &nbsp;|&nbsp; {t('ayanamsa', settings.language)}: {result.boyProfile?.ayanamsa || ayanamsa}
+            </div>
+            
             <div style={{ marginTop: '20px', display: 'flex', gap: '15px' }}>
               <button onClick={handleDownloadPdf} className="btn-primary">
                 📥 {t('downloadPdf', settings.language)}

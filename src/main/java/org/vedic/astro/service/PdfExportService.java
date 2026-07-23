@@ -353,6 +353,13 @@ public class PdfExportService {
             profiles.addCell(buildTableCell(ts.getLabel("profile.nakshatra"), boldB, Element.ALIGN_LEFT));
             profiles.addCell(buildTableCell(data.getGirlProfile().getBirthProfile().getNakshatra() + " (" + data.getGirlProfile().getBirthProfile().getNakshatraPada() + ")", bFont, Element.ALIGN_LEFT));
 
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.ayanamsa"), boldB, Element.ALIGN_LEFT));
+            String boyAyan = "ayanamsa." + (data.getBoyProfile().getAyanamsa() != null ? data.getBoyProfile().getAyanamsa().toUpperCase() : "LAHIRI");
+            profiles.addCell(buildTableCell(ts.getLabel(boyAyan), bFont, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.ayanamsa"), boldB, Element.ALIGN_LEFT));
+            String girlAyan = "ayanamsa." + (data.getGirlProfile().getAyanamsa() != null ? data.getGirlProfile().getAyanamsa().toUpperCase() : "LAHIRI");
+            profiles.addCell(buildTableCell(ts.getLabel(girlAyan), bFont, Element.ALIGN_LEFT));
+
             document.add(profiles);
 
             PdfPTable scoreTable = new PdfPTable(2);
