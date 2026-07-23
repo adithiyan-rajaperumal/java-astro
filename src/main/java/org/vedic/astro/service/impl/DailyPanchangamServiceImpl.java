@@ -504,8 +504,13 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
     }
 
     private List<TimeSlotDTO> calculateDynamicNallaNeram(double jdSunrise, double jdSunset, double jdNextSunrise, int dayOfWeek, ZoneId zoneId) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        List<TimeSlotDTO> list = new ArrayList<>();
         double dayDuration = jdSunset - jdSunrise;
+        if (dayDuration <= 0 || Double.isNaN(dayDuration)) {
+            return list;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
         // Dynamic standard offsets scaled by actual day duration (assuming 12h standard day)
         double mStartOffset, mEndOffset, eStartOffset, eEndOffset;
@@ -556,34 +561,34 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                             isColliding(stdEStartJd, stdEEndJd, yamaStartJd, yamaEndJd) ||
                             isColliding(stdEStartJd, stdEEndJd, kulikaiStartJd, kulikaiEndJd);
 
-        record SlotCandidate(double startJd, TimeSlotDTO dto) {}
+        record SlotCandidate(double startJd, double endJd, TimeSlotDTO dto) {}
         List<SlotCandidate> finalSlots = new ArrayList<>();
 
         if (!mCollides) {
             ZonedDateTime s = jdToZonedDateTime(stdMStartJd, zoneId);
             ZonedDateTime e = jdToZonedDateTime(stdMEndJd, zoneId);
-            finalSlots.add(new SlotCandidate(stdMStartJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram"))));
+            finalSlots.add(new SlotCandidate(stdMStartJd, stdMEndJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram"))));
         } else {
             GowriSlot gowriFallback = getBestCleanGowriSlot(jdSunrise, jdSunset, dayOfWeek, zoneId, true, rahuP, yamaP, kulikaiP);
             if (gowriFallback != null) {
                 ZonedDateTime s = jdToZonedDateTime(gowriFallback.startJd(), zoneId);
                 ZonedDateTime e = jdToZonedDateTime(gowriFallback.endJd(), zoneId);
                 String stateLabel = translationService.getLabel("gowri." + gowriFallback.state().toLowerCase());
-                finalSlots.add(new SlotCandidate(gowriFallback.startJd(), new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
+                finalSlots.add(new SlotCandidate(gowriFallback.startJd(), gowriFallback.endJd(), new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
             }
         }
 
         if (!eCollides) {
             ZonedDateTime s = jdToZonedDateTime(stdEStartJd, zoneId);
             ZonedDateTime e = jdToZonedDateTime(stdEEndJd, zoneId);
-            finalSlots.add(new SlotCandidate(stdEStartJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram"))));
+            finalSlots.add(new SlotCandidate(stdEStartJd, stdEEndJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram"))));
         } else {
             GowriSlot gowriFallback = getBestCleanGowriSlot(jdSunrise, jdSunset, dayOfWeek, zoneId, false, rahuP, yamaP, kulikaiP);
             if (gowriFallback != null) {
                 ZonedDateTime s = jdToZonedDateTime(gowriFallback.startJd(), zoneId);
                 ZonedDateTime e = jdToZonedDateTime(gowriFallback.endJd(), zoneId);
                 String stateLabel = translationService.getLabel("gowri." + gowriFallback.state().toLowerCase());
-                finalSlots.add(new SlotCandidate(gowriFallback.startJd(), new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
+                finalSlots.add(new SlotCandidate(gowriFallback.startJd(), gowriFallback.endJd(), new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
             }
         }
 
@@ -595,12 +600,12 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 double amStartJd = jdSunrise + i * dayPartDuration;
                 double amEndJd   = jdSunrise + (i + 1) * dayPartDuration;
 
-                boolean alreadyPresent = finalSlots.stream().anyMatch(sc -> isColliding(sc.startJd(), sc.startJd() + (1.0 / 24.0), amStartJd, amEndJd));
+                boolean alreadyPresent = finalSlots.stream().anyMatch(sc -> isColliding(sc.startJd(), sc.endJd(), amStartJd, amEndJd));
                 if (!alreadyPresent) {
                     ZonedDateTime s = jdToZonedDateTime(amStartJd, zoneId);
                     ZonedDateTime e = jdToZonedDateTime(amEndJd, zoneId);
                     String stateLabel = translationService.getLabel("gowri.amirdha");
-                    finalSlots.add(new SlotCandidate(amStartJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
+                    finalSlots.add(new SlotCandidate(amStartJd, amEndJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
                 }
             }
         }
@@ -615,7 +620,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         return Math.max(s1, s2) < Math.min(e1, e2);
     }
 
-    private record GowriSlot(int rank, double startJd, double endJd) {}
+    private record GowriSlot(String state, int rank, double startJd, double endJd) {}
 
     private GowriSlot getBestCleanGowriSlot(double jdSunrise, double jdSunset, int dayOfWeek, ZoneId zoneId, boolean isMorning, int rahuP, int yamaP, int kulikaiP) {
         double dayPartDuration = (jdSunset - jdSunrise) / 8.0;
@@ -635,9 +640,9 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 int hour = sZdt.getHour();
 
                 if (isMorning && hour < 12) {
-                    cands.add(new GowriSlot(rank, sJd, eJd));
+                    cands.add(new GowriSlot(state, rank, sJd, eJd));
                 } else if (!isMorning && hour >= 12) {
-                    cands.add(new GowriSlot(rank, sJd, eJd));
+                    cands.add(new GowriSlot(state, rank, sJd, eJd));
                 }
             }
         }
@@ -650,7 +655,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 if (rank > 0 && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
                     double sJd = jdSunrise + i * dayPartDuration;
                     double eJd = jdSunrise + (i + 1) * dayPartDuration;
-                    cands.add(new GowriSlot(rank, sJd, eJd));
+                    cands.add(new GowriSlot(state, rank, sJd, eJd));
                 }
             }
         }
