@@ -336,40 +336,10 @@ function PanchangamPage({ settings }) {
                 <div className="element-content">{formatElementTiming(data.thithi)}</div>
               </div>
 
-              {/* Nakshatra & Nakshatra Vara Yogam Badges */}
+              {/* Nakshatra */}
               <div className="element-detail-item">
                 <div className="element-label">{t('nakshatra', settings.language)}</div>
-                <div className="element-content">
-                  {formatElementTiming(data.nakshatra)}
-                  {data.nakshatraYogams && data.nakshatraYogams.length > 0 && (
-                    <div style={{ marginTop: '8px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                      {data.nakshatraYogams.map((y, idx) => {
-                        const lbl = y.label || '';
-                        const lblLower = lbl.toLowerCase();
-                        const isGood = lblLower.includes('amrita') || lblLower.includes('siddha')
-                          || lbl.includes('அமிர்த') || lbl.includes('சித்த')
-                          || lbl.includes('अमृत') || lbl.includes('सिद्ध')
-                          || lbl.includes('ಅಮೃತ') || lbl.includes('ಸಿದ್ಧ')
-                          || lbl.includes('అమృత') || lbl.includes('సిద్ధ')
-                          || lbl.includes('അമൃത') || lbl.includes('സിദ്ധ');
-
-                        return (
-                          <span key={idx} style={{
-                            fontSize: '12px',
-                            padding: '3px 8px',
-                            borderRadius: '4px',
-                            fontWeight: 'bold',
-                            backgroundColor: isGood ? 'rgba(76, 175, 80, 0.12)' : 'rgba(244, 67, 54, 0.12)',
-                            color: isGood ? '#2e7d32' : '#c62828',
-                            border: `1px solid ${isGood ? '#4caf50' : '#ef5350'}`
-                          }}>
-                            ✨ {lbl} ({y.start} - {y.end})
-                          </span>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                <div className="element-content">{formatElementTiming(data.nakshatra)}</div>
               </div>
 
               {/* Yogam */}
