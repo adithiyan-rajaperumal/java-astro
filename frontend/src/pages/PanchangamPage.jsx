@@ -265,7 +265,7 @@ function PanchangamPage({ settings }) {
 
       {!loading && !error && data && (
         <div className="panchangam-grid-2col">
-          {/* LEFT COLUMN: Core Astronomical, Panchangam Elements & Horai Table */}
+          {/* LEFT COLUMN: Core Astronomical & Panchangam Elements */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
             {/* Card 1 (TOP): Sunrise, Sunset & Muhurtham / Vasthu Summary */}
@@ -310,7 +310,7 @@ function PanchangamPage({ settings }) {
               </div>
             </div>
 
-            {/* Card 2: Core Panchangam Limbs, Zodiac & Nakshatra Vara Yogams */}
+            {/* Card 2: Core Panchangam Limbs, Zodiac & Nakshatra */}
             <div className="card" style={{ margin: 0 }}>
               <h3 className="title-gold" style={{ marginTop: 0 }}>📜 {t('panchangamElements', settings.language)} & 🌙 {t('rashi', settings.language)}</h3>
               
@@ -355,7 +355,34 @@ function PanchangamPage({ settings }) {
               </div>
             </div>
 
-            {/* Card 3 (Left Column Laptop/Desktop): 24 Horai Table */}
+          </div>
+
+          {/* RIGHT COLUMN: Auspicious & Inauspicious Timings & 24 Horai Table */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            
+            {/* Card 3: Auspicious Timings Card */}
+            <div className="card" style={{ margin: 0, borderLeft: '4px solid var(--accent-gold)' }}>
+              <h3 className="title-gold" style={{ marginTop: 0 }}>🌟 {t('auspicious', settings.language)}</h3>
+              {data.abhijitMuhurtham && (
+                <div style={{ marginBottom: '12px', padding: '10px 12px', backgroundColor: 'rgba(255, 215, 0, 0.08)', borderRadius: '8px', borderLeft: '4px solid var(--accent-gold)' }}>
+                  <div style={{ fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '3px' }}>☀️ {t('abhijitMuhurtham', settings.language)}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{data.abhijitMuhurtham.start} - {data.abhijitMuhurtham.end}</div>
+                </div>
+              )}
+              {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
+              {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
+              {renderNakshatraYogamsList(data.nakshatraYogams)}
+            </div>
+
+            {/* Card 4: Inauspicious Kalam Divisions Card */}
+            <div className="card" style={{ margin: 0, borderLeft: '4px solid var(--danger)' }}>
+              <h3 style={{ marginTop: 0, color: 'var(--danger)' }}>⚠️ {t('inauspicious', settings.language)}</h3>
+              {renderTimeSlotList(data.raghuKalam, 'rahuKalam', false)}
+              {renderTimeSlotList(data.emagandam, 'yamagandam', false)}
+              {renderTimeSlotList(data.kulikai, 'gulikaKalam', false)}
+            </div>
+
+            {/* Card 5: 24 Horai Table */}
             <div className="card" style={{ margin: 0 }}>
               <h3 className="title-gold" style={{ marginTop: 0 }}>⏳ {t('horas', settings.language)}</h3>
               <div className="horai-table-container">
@@ -388,32 +415,6 @@ function PanchangamPage({ settings }) {
                   </tbody>
                 </table>
               </div>
-            </div>
-
-          </div>
-
-          {/* RIGHT COLUMN: Auspicious & Inauspicious Timings Cards */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            
-            {/* Card 4: Auspicious Timings Card */}
-            <div className="card" style={{ margin: 0, borderLeft: '4px solid var(--accent-gold)' }}>
-              <h3 className="title-gold" style={{ marginTop: 0 }}>🌟 {t('auspicious', settings.language)}</h3>
-              {data.abhijitMuhurtham && (
-                <div style={{ marginBottom: '12px', padding: '10px 12px', backgroundColor: 'rgba(255, 215, 0, 0.08)', borderRadius: '8px', borderLeft: '4px solid var(--accent-gold)' }}>
-                  <div style={{ fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '3px' }}>☀️ {t('abhijitMuhurtham', settings.language)}</div>
-                  <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{data.abhijitMuhurtham.start} - {data.abhijitMuhurtham.end}</div>
-                </div>
-              )}
-              {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
-              {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
-            </div>
-
-            {/* Card 5: Inauspicious Kalam Divisions Card */}
-            <div className="card" style={{ margin: 0, borderLeft: '4px solid var(--danger)' }}>
-              <h3 style={{ marginTop: 0, color: 'var(--danger)' }}>⚠️ {t('inauspicious', settings.language)}</h3>
-              {renderTimeSlotList(data.raghuKalam, 'rahuKalam', false)}
-              {renderTimeSlotList(data.emagandam, 'yamagandam', false)}
-              {renderTimeSlotList(data.kulikai, 'gulikaKalam', false)}
             </div>
 
           </div>
