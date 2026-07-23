@@ -15,6 +15,7 @@ public record DailyPanchangamDTO(
     String rashi,
     List<TimeSlotDTO> nallaNeram,
     List<TimeSlotDTO> gowriNallaNeram,
+    List<TimeSlotDTO> nakshatraYogams,
     List<TimeSlotDTO> raghuKalam,
     List<TimeSlotDTO> emagandam,
     List<TimeSlotDTO> kulikai,
