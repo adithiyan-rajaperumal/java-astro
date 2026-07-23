@@ -504,83 +504,141 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
     }
 
     private List<TimeSlotDTO> calculateDynamicNallaNeram(double jdSunrise, double jdSunset, double jdNextSunrise, int dayOfWeek, ZoneId zoneId) {
-        double dayPartDuration = (jdSunset - jdSunrise) / 8.0;
+        List<TimeSlotDTO> list = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        double dayDuration = jdSunset - jdSunrise;
 
+        // Dynamic standard offsets scaled by actual day duration (assuming 12h standard day)
+        double mStartOffset, mEndOffset, eStartOffset, eEndOffset;
+        switch (dayOfWeek) {
+            case 0: // Sun
+                mStartOffset = 1.5; mEndOffset = 2.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            case 1: // Mon
+                mStartOffset = 0.5; mEndOffset = 1.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            case 2: // Tue
+                mStartOffset = 1.5; mEndOffset = 2.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            case 3: // Wed
+                mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            case 4: // Thu
+                mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            case 5: // Fri
+                mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            default: // Sat
+                mStartOffset = 1.5; mEndOffset = 2.5; eStartOffset = 11.0; eEndOffset = 12.0; break;
+        }
+
+        double stdMStartJd = jdSunrise + (mStartOffset / 12.0) * dayDuration;
+        double stdMEndJd   = jdSunrise + (mEndOffset / 12.0) * dayDuration;
+
+        double stdEStartJd = jdSunrise + (eStartOffset / 12.0) * dayDuration;
+        double stdEEndJd   = jdSunrise + (eEndOffset / 12.0) * dayDuration;
+
+        // Inauspicious Kalam dynamic ranges for today
+        double dayPartDuration = dayDuration / 8.0;
         int rahuP = getRahuPart(dayOfWeek);
         int yamaP = getYamagandamPart(dayOfWeek);
         int kulikaiP = getKulikaiPart(dayOfWeek);
 
-        record GowriCandidate(int index, String state, int rank, double startJd, double endJd, ZonedDateTime startZdt) {}
+        double rahuStartJd = jdSunrise + (rahuP - 1) * dayPartDuration;
+        double rahuEndJd = jdSunrise + rahuP * dayPartDuration;
 
-        List<GowriCandidate> morningCandidates = new ArrayList<>();
-        List<GowriCandidate> noonCandidates = new ArrayList<>();
-        List<GowriCandidate> eveningCandidates = new ArrayList<>();
-        List<GowriCandidate> allCandidates = new ArrayList<>();
+        double yamaStartJd = jdSunrise + (yamaP - 1) * dayPartDuration;
+        double yamaEndJd = jdSunrise + yamaP * dayPartDuration;
 
+        double kulikaiStartJd = jdSunrise + (kulikaiP - 1) * dayPartDuration;
+        double kulikaiEndJd = jdSunrise + kulikaiP * dayPartDuration;
+
+        // Check if Standard Morning Slot collides with Rahu, Yamagandam, or Kulikai
+        boolean mCollides = isColliding(stdMStartJd, stdMEndJd, rahuStartJd, rahuEndJd) ||
+                            isColliding(stdMStartJd, stdMEndJd, yamaStartJd, yamaEndJd) ||
+                            isColliding(stdMStartJd, stdMEndJd, kulikaiStartJd, kulikaiEndJd);
+
+        if (!mCollides) {
+            // Standard Morning slot is 100% clean! Use standard dynamic slot.
+            ZonedDateTime s = jdToZonedDateTime(stdMStartJd, zoneId);
+            ZonedDateTime e = jdToZonedDateTime(stdMEndJd, zoneId);
+            list.add(new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram")));
+        } else {
+            // Collision detected! Replace Morning slot with best clean Morning Gowri slot.
+            TimeSlotDTO gowriFallback = getBestCleanGowriSlot(jdSunrise, jdSunset, dayOfWeek, zoneId, true, rahuP, yamaP, kulikaiP);
+            if (gowriFallback != null) {
+                list.add(gowriFallback);
+            }
+        }
+
+        // Check if Standard Evening Slot collides with Rahu, Yamagandam, or Kulikai
+        boolean eCollides = isColliding(stdEStartJd, stdEEndJd, rahuStartJd, rahuEndJd) ||
+                            isColliding(stdEStartJd, stdEEndJd, yamaStartJd, yamaEndJd) ||
+                            isColliding(stdEStartJd, stdEEndJd, kulikaiStartJd, kulikaiEndJd);
+
+        if (!eCollides) {
+            // Standard Evening slot is 100% clean! Use standard dynamic slot.
+            ZonedDateTime s = jdToZonedDateTime(stdEStartJd, zoneId);
+            ZonedDateTime e = jdToZonedDateTime(stdEEndJd, zoneId);
+            list.add(new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram")));
+        } else {
+            // Collision detected! Replace Evening slot with best clean Evening Gowri slot.
+            TimeSlotDTO gowriFallback = getBestCleanGowriSlot(jdSunrise, jdSunset, dayOfWeek, zoneId, false, rahuP, yamaP, kulikaiP);
+            if (gowriFallback != null) {
+                list.add(gowriFallback);
+            }
+        }
+
+        return list;
+    }
+
+    private boolean isColliding(double s1, double e1, double s2, double e2) {
+        return Math.max(s1, s2) < Math.min(e1, e2);
+    }
+
+    private TimeSlotDTO getBestCleanGowriSlot(double jdSunrise, double jdSunset, int dayOfWeek, ZoneId zoneId, boolean isMorning, int rahuP, int yamaP, int kulikaiP) {
+        double dayPartDuration = (jdSunset - jdSunrise) / 8.0;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
         String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
+
+        record GowriCand(int rank, double startJd, double endJd) {}
+        List<GowriCand> cands = new ArrayList<>();
+
         for (int i = 0; i < 8; i++) {
             int partNum = i + 1;
             String state = dayStates[i];
             int rank = getGowriRank(state);
 
-            // Auspicious Gowri state AND not Rahu, Yamagandam, or Kulikai
             if (rank > 0 && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
-                double startJd = jdSunrise + i * dayPartDuration;
-                double endJd = jdSunrise + (i + 1) * dayPartDuration;
-                ZonedDateTime startZdt = jdToZonedDateTime(startJd, zoneId);
+                double sJd = jdSunrise + i * dayPartDuration;
+                double eJd = jdSunrise + (i + 1) * dayPartDuration;
+                ZonedDateTime sZdt = jdToZonedDateTime(sJd, zoneId);
+                int hour = sZdt.getHour();
 
-                GowriCandidate candidate = new GowriCandidate(i, state, rank, startJd, endJd, startZdt);
-                allCandidates.add(candidate);
-
-                int hour = startZdt.getHour();
-                if (hour < 11) {
-                    morningCandidates.add(candidate);
-                } else if (hour < 15) {
-                    noonCandidates.add(candidate);
-                } else {
-                    eveningCandidates.add(candidate);
+                if (isMorning && hour < 12) {
+                    cands.add(new GowriCand(rank, sJd, eJd));
+                } else if (!isMorning && hour >= 12) {
+                    cands.add(new GowriCand(rank, sJd, eJd));
                 }
             }
         }
 
-        List<GowriCandidate> selected = new ArrayList<>();
-
-        // Pick best Morning candidate
-        morningCandidates.stream()
-                .min(java.util.Comparator.comparingInt(GowriCandidate::rank))
-                .ifPresent(selected::add);
-
-        // Pick best Noon candidate
-        noonCandidates.stream()
-                .min(java.util.Comparator.comparingInt(GowriCandidate::rank))
-                .ifPresent(selected::add);
-
-        // Pick best Evening candidate
-        eveningCandidates.stream()
-                .min(java.util.Comparator.comparingInt(GowriCandidate::rank))
-                .ifPresent(selected::add);
-
-        // Fallback: If any window was empty, backfill from top ranked unselected candidates
-        if (selected.size() < 3) {
-            allCandidates.stream()
-                    .filter(c -> !selected.contains(c))
-                    .sorted(java.util.Comparator.comparingInt(GowriCandidate::rank))
-                    .limit(3 - selected.size())
-                    .forEach(selected::add);
+        if (cands.isEmpty()) {
+            for (int i = 0; i < 8; i++) {
+                int partNum = i + 1;
+                String state = dayStates[i];
+                int rank = getGowriRank(state);
+                if (rank > 0 && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
+                    double sJd = jdSunrise + i * dayPartDuration;
+                    double eJd = jdSunrise + (i + 1) * dayPartDuration;
+                    cands.add(new GowriCand(rank, sJd, eJd));
+                }
+            }
         }
 
-        // Sort selected chronologically by start time
-        selected.sort(java.util.Comparator.comparingDouble(GowriCandidate::startJd));
-
-        List<TimeSlotDTO> list = new ArrayList<>();
-        for (GowriCandidate c : selected) {
-            ZonedDateTime start = c.startZdt();
-            ZonedDateTime end = jdToZonedDateTime(c.endJd(), zoneId);
-            list.add(new TimeSlotDTO(start.format(formatter), end.format(formatter), translationService.getLabel("panchangam.nalla_neram")));
-        }
-
-        return list;
+        return cands.stream()
+                .min(java.util.Comparator.comparingInt(GowriCand::rank))
+                .map(c -> {
+                    ZonedDateTime s = jdToZonedDateTime(c.startJd(), zoneId);
+                    ZonedDateTime e = jdToZonedDateTime(c.endJd(), zoneId);
+                    return new TimeSlotDTO(s.format(formatter), e.format(formatter), translationService.getLabel("panchangam.nalla_neram"));
+                })
+                .orElse(null);
     }
 
     private int getGowriRank(String state) {
