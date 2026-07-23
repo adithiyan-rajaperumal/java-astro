@@ -776,3 +776,26 @@ input:focus, select:focus {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Responsive Panchangam Mobile First Grid & Badge Styles */
+.panchangam-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 600px) {
+  .panchangam-summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.slot-time-badge {
+  font-weight: bold;
+  margin-left: auto;
+  align-self: center;
+  text-align: right;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}

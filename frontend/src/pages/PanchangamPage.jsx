@@ -87,7 +87,7 @@ function PanchangamPage({ settings }) {
     const match = label.match(/^(.*?)\s*(\(.*?\))$/);
     if (match) {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '1 1 auto', minWidth: '140px', paddingRight: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '1 1 160px', minWidth: 0, paddingRight: '8px' }}>
           <span style={{ fontWeight: 'bold', fontSize: '13.5px' }}>{match[1]}</span>
           <span style={{ fontSize: '11.5px', opacity: 0.85, fontWeight: 'normal', lineHeight: '1.3' }}>{match[2]}</span>
         </div>
@@ -188,7 +188,7 @@ function PanchangamPage({ settings }) {
           return (
             <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
               {renderSlotLabelContent(s.label)}
-              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'center' }}>
+              <span className="slot-time-badge">
                 {s.formattedStart} - {s.formattedEnd}
               </span>
             </div>
@@ -221,7 +221,7 @@ function PanchangamPage({ settings }) {
           return (
             <div key={idx} className={`time-slot-bar ${isGood ? 'auspicious' : 'inauspicious'}`}>
               <span style={{ fontWeight: 'bold' }}>{s.label}</span>
-              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'center' }}>
+              <span className="slot-time-badge">
                 {s.formattedStart} - {s.formattedEnd}
               </span>
             </div>
@@ -336,7 +336,7 @@ function PanchangamPage({ settings }) {
             <div className="card" style={{ margin: 0 }}>
               <h3 className="title-gold" style={{ marginTop: 0 }}>🌅 {t('sunrise', settings.language)} & 🌇 {t('sunset', settings.language)}</h3>
               
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '10px', marginBottom: '12px' }}>
+              <div className="panchangam-summary-grid">
                 <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
                   <div className="element-label">🌅 {t('sunrise', settings.language)}</div>
                   <strong style={{ fontSize: '14px' }}>{data.sunrise}</strong>
