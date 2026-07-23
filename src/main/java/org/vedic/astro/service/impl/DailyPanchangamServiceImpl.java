@@ -592,20 +592,22 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             }
         }
 
-        // Check if Amirdha Gowri is available in a clean slot and not already included
-        String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
-        for (int i = 0; i < 8; i++) {
-            int partNum = i + 1;
-            if ("Amirdha".equals(dayStates[i]) && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
-                double amStartJd = jdSunrise + i * dayPartDuration;
-                double amEndJd   = jdSunrise + (i + 1) * dayPartDuration;
+        // If ANY collision occurred, check if Amirdha Gowri is available in a clean slot and not already included
+        if (mCollides || eCollides) {
+            String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
+            for (int i = 0; i < 8; i++) {
+                int partNum = i + 1;
+                if ("Amirdha".equals(dayStates[i]) && partNum != rahuP && partNum != yamaP && partNum != kulikaiP) {
+                    double amStartJd = jdSunrise + i * dayPartDuration;
+                    double amEndJd   = jdSunrise + (i + 1) * dayPartDuration;
 
-                boolean alreadyPresent = finalSlots.stream().anyMatch(sc -> isColliding(sc.startJd(), sc.endJd(), amStartJd, amEndJd));
-                if (!alreadyPresent) {
-                    ZonedDateTime s = jdToZonedDateTime(amStartJd, zoneId);
-                    ZonedDateTime e = jdToZonedDateTime(amEndJd, zoneId);
-                    String stateLabel = translationService.getLabel("gowri.amirdha");
-                    finalSlots.add(new SlotCandidate(amStartJd, amEndJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
+                    boolean alreadyPresent = finalSlots.stream().anyMatch(sc -> isColliding(sc.startJd(), sc.endJd(), amStartJd, amEndJd));
+                    if (!alreadyPresent) {
+                        ZonedDateTime s = jdToZonedDateTime(amStartJd, zoneId);
+                        ZonedDateTime e = jdToZonedDateTime(amEndJd, zoneId);
+                        String stateLabel = translationService.getLabel("gowri.amirdha");
+                        finalSlots.add(new SlotCandidate(amStartJd, amEndJd, new TimeSlotDTO(s.format(formatter), e.format(formatter), stateLabel)));
+                    }
                 }
             }
         }
