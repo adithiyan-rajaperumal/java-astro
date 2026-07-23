@@ -98,6 +98,7 @@ function PanchangamPage({ settings }) {
 
   const renderTimeSlotList = (slots, titleKey, isAuspicious) => {
     if (!slots || slots.length === 0) return null;
+    const nextDayText = t('nextDay', settings.language);
     return (
       <div style={{ marginBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 6px' }}>
@@ -125,12 +126,18 @@ function PanchangamPage({ settings }) {
             </button>
           )}
         </div>
-        {slots.map((s, idx) => (
-          <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
-            {renderSlotLabelContent(s.label)}
-            <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>{s.start} - {s.end}</span>
-          </div>
-        ))}
+        {slots.map((s, idx) => {
+          const formattedStart = formatTimeString(s.start, null, nextDayText);
+          const formattedEnd = formatTimeString(s.end, s.start, nextDayText);
+          return (
+            <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
+              {renderSlotLabelContent(s.label)}
+              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>
+                {formattedStart} - {formattedEnd}
+              </span>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -184,12 +191,11 @@ function PanchangamPage({ settings }) {
 
     if (refStartStr) {
       const refMins = parseTimeToMinutes(refStartStr);
-      if (refMins >= 0 && endMins < refMins && refMins >= 12 * 60) {
+      if (refMins >= 0 && endMins < refMins) {
         return true;
       }
     }
 
-    // Early morning hours (00:00 AM to 08:30 AM) belong to next calendar day morning relative to panchangam start
     if (endMins >= 0 && endMins <= 8 * 60 + 30) {
       return true;
     }
@@ -371,7 +377,15 @@ function PanchangamPage({ settings }) {
               )}
               {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
               {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
-              {renderNakshatraYogamsList(data.nakshatraYogams)}
+              {renderTimeSlotList(data.nakshatraYogams?.filter(s => {
+                const lbl = (s.label || '').toLowerCase();
+                return lbl.includes('amrita') || lbl.includes('siddha')
+                  || s.label.includes('அமிர்த') || s.label.includes('சித்த')
+                  || s.label.includes('अमृत') || s.label.includes('सिद्ध')
+                  || s.label.includes('ಅಮೃತ') || s.label.includes('ಸಿದ್ಧ')
+                  || s.label.includes('అమృత') || s.label.includes('సిద్ధ')
+                  || s.label.includes('അമൃത') || s.label.includes('സിദ്ധ');
+              }), 'nakshatraYogam', true)}
             </div>
 
             {/* Card 4: Inauspicious Kalam Divisions Card */}
@@ -380,6 +394,16 @@ function PanchangamPage({ settings }) {
               {renderTimeSlotList(data.raghuKalam, 'rahuKalam', false)}
               {renderTimeSlotList(data.emagandam, 'yamagandam', false)}
               {renderTimeSlotList(data.kulikai, 'gulikaKalam', false)}
+              {renderTimeSlotList(data.nakshatraYogams?.filter(s => {
+                const lbl = (s.label || '').toLowerCase();
+                const isGood = lbl.includes('amrita') || lbl.includes('siddha')
+                  || s.label.includes('அமிர்த') || s.label.includes('சித்த')
+                  || s.label.includes('अमृत') || s.label.includes('सिद्ध')
+                  || s.label.includes('ಅಮೃತ') || s.label.includes('ಸಿದ್ಧ')
+                  || s.label.includes('అమృత') || s.label.includes('సిద్ధ')
+                  || s.label.includes('അമൃത') || s.label.includes('സിദ്ധ');
+                return !isGood;
+              }), 'nakshatraYogam', false)}
             </div>
 
             {/* Card 5: 24 Horai Table */}
