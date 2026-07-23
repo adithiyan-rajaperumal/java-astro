@@ -15,6 +15,7 @@ function MatchingPage({ settings }) {
 
   const [matchingSystem, setMatchingSystem] = useState('ASHTA_KOOTA');
   const [strictness, setStrictness] = useState('MODERATE');
+  const [ayanamsa, setAyanamsa] = useState(settings.ayanamsa || 'LAHIRI');
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -82,7 +83,7 @@ function MatchingPage({ settings }) {
         second: 0,
         latitude: boyLocation.latitude,
         longitude: boyLocation.longitude,
-        ayanamsa: settings.ayanamsa
+        ayanamsa
       },
       girl: {
         name: girlName,
@@ -94,7 +95,7 @@ function MatchingPage({ settings }) {
         second: 0,
         latitude: girlLocation.latitude,
         longitude: girlLocation.longitude,
-        ayanamsa: settings.ayanamsa
+        ayanamsa
       },
       matchingSystem,
       strictness
@@ -144,7 +145,7 @@ function MatchingPage({ settings }) {
         second: 0,
         latitude: boyLocation.latitude,
         longitude: boyLocation.longitude,
-        ayanamsa: settings.ayanamsa
+        ayanamsa
       },
       girl: {
         name: girlName,
@@ -156,7 +157,7 @@ function MatchingPage({ settings }) {
         second: 0,
         latitude: girlLocation.latitude,
         longitude: girlLocation.longitude,
-        ayanamsa: settings.ayanamsa
+        ayanamsa
       },
       matchingSystem,
       strictness
@@ -277,7 +278,7 @@ function MatchingPage({ settings }) {
           </div>
 
           {/* Settings block */}
-          <div className="card grid-2">
+          <div className="card grid-3">
             <div>
               <label>{t('methodology', settings.language)}</label>
               <select value={matchingSystem} onChange={(e) => setMatchingSystem(e.target.value)}>
@@ -291,6 +292,16 @@ function MatchingPage({ settings }) {
                 <option value="LENIENT">Lenient</option>
                 <option value="MODERATE">Moderate</option>
                 <option value="STRICT">Strict</option>
+              </select>
+            </div>
+            <div>
+              <label>{t('ayanamsa', settings.language)}</label>
+              <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
+                <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
+                <option value="KP">KP (Krishnamurti Padhdhati)</option>
+                <option value="RAMAN">B.V. Raman</option>
+                <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
+                <option value="PUSHYAPAKSHA">Pushyapaksha</option>
               </select>
             </div>
           </div>
