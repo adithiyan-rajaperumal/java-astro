@@ -99,9 +99,10 @@ function PanchangamPage({ settings }) {
   const formatSlotListTimes = (slots, nextDayText) => {
     if (!slots || !Array.isArray(slots)) return [];
     let isOvernight = false;
+    let prevMins = -1;
     const nextDayKeywords = ['next day', 'அடுத்த நாள்', 'اگلے دن', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം'];
 
-    return slots.map((s, idx) => {
+    return slots.map((s) => {
       if (!s) return s;
       const startStr = s.start || '';
       const endStr = s.end || '';
@@ -112,21 +113,20 @@ function PanchangamPage({ settings }) {
       const hasStartNextDayKey = nextDayKeywords.some(k => startStr.toLowerCase().includes(k.toLowerCase()));
       const hasEndNextDayKey = nextDayKeywords.some(k => endStr.toLowerCase().includes(k.toLowerCase()));
 
-      let startIsNextDay = isOvernight || hasStartNextDayKey;
-      if (startIsNextDay) {
-        isOvernight = true;
+      let startIsNextDay = Boolean(s.startNextDay) || isOvernight || hasStartNextDayKey;
+      if (!startIsNextDay && prevMins >= 0 && startMins >= 0 && startMins < prevMins) {
+        startIsNextDay = true;
       }
+      if (startIsNextDay) isOvernight = true;
 
-      let endIsNextDay = isOvernight || hasEndNextDayKey;
-      if (!endIsNextDay && startMins >= 0 && endMins >= 0) {
-        if (endMins < startMins) {
-          endIsNextDay = true;
-        }
+      let endIsNextDay = Boolean(s.endNextDay) || isOvernight || hasEndNextDayKey;
+      if (!endIsNextDay && startMins >= 0 && endMins >= 0 && endMins < startMins) {
+        endIsNextDay = true;
       }
+      if (endIsNextDay) isOvernight = true;
 
-      if (endIsNextDay) {
-        isOvernight = true;
-      }
+      if (endMins >= 0) prevMins = endMins;
+      else if (startMins >= 0) prevMins = startMins;
 
       const formatSingleTime = (timeStr, isNext) => {
         if (!timeStr) return '';
