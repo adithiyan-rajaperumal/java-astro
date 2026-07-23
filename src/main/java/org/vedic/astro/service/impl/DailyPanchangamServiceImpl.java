@@ -253,28 +253,40 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         int netram = calculateNetram(dDiff);
         double jeevan = calculateJeevan(dDiff);
 
-        // Muhurtham and Vasthu Days
+        // Nakshatra-Vara Yogam type at sunrise (0=Amrita, 1=Siddha, 2=Marana, 3=Prabalarishta)
+        int yogamTypeAtSunrise = NAKSHATRA_VARA_YOGAMS[dayOfWeek0][nakIdx - 1];
+
+        // Agni Nakshathiram (Sun in Krittika Nakshatra = 3rd Nakshatra)
+        boolean isAgniNakshathiram = (sunNakNum == 3);
+
+        // Auspicious Thithi Expansion (Include Dwadashi 12 & Purnima 15; exclude Rikta 4,9,14,19,24,29 & Amavasya 30)
         boolean isAuspiciousThithi = (thithiIdx == 2 || thithiIdx == 3 || thithiIdx == 5 || thithiIdx == 7 || thithiIdx == 10 
-                || thithiIdx == 11 || thithiIdx == 13 || thithiIdx == 17 || thithiIdx == 18 || thithiIdx == 20 
-                || thithiIdx == 22 || thithiIdx == 25 || thithiIdx == 26 || thithiIdx == 28);
-                
+                || thithiIdx == 11 || thithiIdx == 12 || thithiIdx == 13 || thithiIdx == 15 || thithiIdx == 17 
+                || thithiIdx == 18 || thithiIdx == 20 || thithiIdx == 22 || thithiIdx == 25 || thithiIdx == 26 || thithiIdx == 28);
+
+        // Auspicious Nakshatra
         boolean isAuspiciousNakshatra = (nakIdx == 1 || nakIdx == 4 || nakIdx == 5 || nakIdx == 8 || nakIdx == 12 
                 || nakIdx == 13 || nakIdx == 14 || nakIdx == 15 || nakIdx == 17 || nakIdx == 21 
                 || nakIdx == 22 || nakIdx == 23 || nakIdx == 24 || nakIdx == 26 || nakIdx == 27);
 
+        // Karanam check (Exclude Vishti Karanam = 7)
+        boolean isAuspiciousKaranam = (karanamIdx != 7);
+
+        // Solar Rashi (Exclude Margazhi = 9)
+        int solarRashi = (int) (coordinatesSun[0] / 30.0) + 1;
+        boolean isAuspiciousMonth = (solarRashi != 9);
+
+        // Subha Muhurtham Day Calculation
         boolean isMuhurthamDay = (date.getDayOfWeek() != DayOfWeek.TUESDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY)
                 && isAuspiciousThithi
                 && isAuspiciousNakshatra
+                && isAuspiciousKaranam
+                && isAuspiciousMonth
+                && (yogamTypeAtSunrise == 0 || yogamTypeAtSunrise == 1) // Must be Amrita or Siddha Yogam
                 && (netram > 0 && jeevan > 0);
 
-        boolean isVasthuDay = (date.getMonthValue() == 1 && date.getDayOfMonth() == 25)
-                || (date.getMonthValue() == 4 && date.getDayOfMonth() == 22)
-                || (date.getMonthValue() == 6 && date.getDayOfMonth() == 4)
-                || (date.getMonthValue() == 7 && date.getDayOfMonth() == 27)
-                || (date.getMonthValue() == 8 && date.getDayOfMonth() == 21)
-                || (date.getMonthValue() == 9 && date.getDayOfMonth() == 22)
-                || (date.getMonthValue() == 10 && date.getDayOfMonth() == 27)
-                || (date.getMonthValue() == 11 && date.getDayOfMonth() == 23);
+        // Vasthu Result
+        VasthuResult vasthu = calculateVasthuDetails(jdSunrise, jdSunset, coordinatesSun[0], dayOfWeek0, yogamTypeAtSunrise, zoneId);
 
         return new DailyPanchangamDTO(
             date.toString(),
@@ -299,8 +311,75 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             netram,
             jeevan,
             isMuhurthamDay,
-            isVasthuDay
+            vasthu.isVasthuDay(),
+            vasthu.isVasthuAuspicious(),
+            isAgniNakshathiram,
+            vasthu.vasthuNeram(),
+            vasthu.vasthuPujaNeram()
         );
+    }
+
+    private record VasthuResult(
+        boolean isVasthuDay,
+        boolean isVasthuAuspicious,
+        TimeSlotDTO vasthuNeram,
+        TimeSlotDTO vasthuPujaNeram
+    ) {}
+
+    private VasthuResult calculateVasthuDetails(double jdSunrise, double jdSunset, double sunLong, int dayOfWeek, int yogamType, ZoneId zoneId) {
+        int solarRashi = (int) (sunLong / 30.0) + 1; // 1=Chithirai, 2=Vaikasi, ..., 12=Panguni
+        double targetVal = (solarRashi - 1) * 30.0;
+
+        // Find exact Sankranti ingress time for active Solar Rashi
+        double jdSankranti = findTransitionTime(jdSunrise - 32.0, jdSunrise, targetVal, this::getSunLongitude);
+        int solarDay = (int) Math.floor(jdSunrise - jdSankranti) + 1;
+
+        // Canonical Vasthu Solar Days & Awake Nazhigai (after sunrise)
+        int targetSolarDay = -1;
+        double awakeNazhigai = -1;
+
+        switch (solarRashi) {
+            case 1: targetSolarDay = 10; awakeNazhigai = 8.0; break;  // Chithirai
+            case 2: targetSolarDay = 21; awakeNazhigai = 10.0; break; // Vaikasi
+            case 4: targetSolarDay = 8;  awakeNazhigai = 2.0; break;  // Aadi
+            case 5: targetSolarDay = 6;  awakeNazhigai = 18.0; break; // Avani
+            case 6: targetSolarDay = 6;  awakeNazhigai = 18.0; break; // Purattasi
+            case 7: targetSolarDay = 11; awakeNazhigai = 2.0; break;  // Aippasi
+            case 8: targetSolarDay = 8;  awakeNazhigai = 10.0; break; // Karthigai
+            case 10: targetSolarDay = 12; awakeNazhigai = 10.0; break; // Thai
+            default: break; // No Vasthu days in 3 (Aani), 9 (Margazhi), 11 (Masi), 12 (Panguni)
+        }
+
+        if (targetSolarDay == -1 || Math.abs(solarDay - targetSolarDay) > 0) {
+            return new VasthuResult(false, false, null, null);
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        ZonedDateTime zdtSunrise = jdToZonedDateTime(jdSunrise, zoneId);
+
+        double dayDurationDays = (jdSunset - jdSunrise);
+        double startAwakeJd = jdSunrise + (awakeNazhigai / 60.0) * dayDurationDays;
+        double endAwakeJd = startAwakeJd + (3.0 / 60.0) * dayDurationDays; // 3 Nazhigai = 90 mins
+
+        double startPujaJd = startAwakeJd + (1.2 / 60.0) * dayDurationDays; // 36 mins after awake start
+        double endPujaJd = startAwakeJd + (2.4 / 60.0) * dayDurationDays;   // lasts 36 mins
+
+        ZonedDateTime awakeStart = jdToZonedDateTime(startAwakeJd, zoneId);
+        ZonedDateTime awakeEnd = jdToZonedDateTime(endAwakeJd, zoneId);
+        ZonedDateTime pujaStart = jdToZonedDateTime(startPujaJd, zoneId);
+        ZonedDateTime pujaEnd = jdToZonedDateTime(endPujaJd, zoneId);
+
+        String vasthuLabel = translationService.getLabel("panchangam.vasthu_neram");
+        if (vasthuLabel == null || vasthuLabel.startsWith("panchangam.")) vasthuLabel = "Vasthu Neram";
+        String pujaLabel = translationService.getLabel("panchangam.vasthu_puja_neram");
+        if (pujaLabel == null || pujaLabel.startsWith("panchangam.")) pujaLabel = "Vasthu Puja Neram";
+
+        TimeSlotDTO vasthuNeram = createTimeSlotDTO(awakeStart, awakeEnd, vasthuLabel, zdtSunrise, formatter);
+        TimeSlotDTO vasthuPujaNeram = createTimeSlotDTO(pujaStart, pujaEnd, pujaLabel, zdtSunrise, formatter);
+
+        boolean isAuspicious = (dayOfWeek != 2 && dayOfWeek != 6) && (yogamType != 2);
+
+        return new VasthuResult(true, isAuspicious, vasthuNeram, vasthuPujaNeram);
     }
 
     private List<String> getExactChandrastamamNakshatras(PanchangamElementDTO nakshatraDTO) {

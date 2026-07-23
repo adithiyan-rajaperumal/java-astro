@@ -25,7 +25,11 @@ public record DailyPanchangamDTO(
     int netram,
     double jeevan,
     boolean muhurthamDay,
-    boolean vasthuDay
+    boolean vasthuDay,
+    boolean vasthuAuspicious,
+    boolean agniNakshathiram,
+    TimeSlotDTO vasthuNeram,
+    TimeSlotDTO vasthuPujaNeram
 ) {
     public record PanchangamElementDTO(
         int number,

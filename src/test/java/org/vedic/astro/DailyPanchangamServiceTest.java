@@ -113,4 +113,30 @@ public class DailyPanchangamServiceTest {
         assertNotNull(result.nakshatraYogams());
         assertFalse(result.nakshatraYogams().isEmpty());
     }
+
+    @Test
+    public void testVasthuNeramAndMuhurthamDetails() {
+        PanchangamRequestDTO requestVasthu = new PanchangamRequestDTO(
+            "2026-01-26",
+            13.0827,
+            80.2707,
+            "ta",
+            "LAHIRI"
+        );
+        DailyPanchangamDTO vasthuResult = dailyPanchangamService.calculateDailyPanchangam(requestVasthu);
+        assertNotNull(vasthuResult);
+        assertTrue(vasthuResult.vasthuDay(), "Jan 26 (Thai 12th) should be a Vasthu Day");
+        assertNotNull(vasthuResult.vasthuNeram(), "Vasthu Neram time slot should not be null");
+        assertNotNull(vasthuResult.vasthuPujaNeram(), "Vasthu Puja Neram time slot should not be null");
+
+        PanchangamRequestDTO requestJul = new PanchangamRequestDTO(
+            "2026-07-23",
+            13.0827,
+            80.2707,
+            "ta",
+            "LAHIRI"
+        );
+        DailyPanchangamDTO julResult = dailyPanchangamService.calculateDailyPanchangam(requestJul);
+        assertNotNull(julResult);
+    }
 }
