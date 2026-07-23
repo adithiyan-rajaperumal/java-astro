@@ -113,10 +113,6 @@ function PanchangamPage({ settings }) {
       const hasEndNextDayKey = nextDayKeywords.some(k => endStr.toLowerCase().includes(k.toLowerCase()));
 
       let startIsNextDay = isOvernight || hasStartNextDayKey;
-      if (!startIsNextDay && idx > 0 && startMins >= 0 && startMins <= 8 * 60 + 30) {
-        startIsNextDay = true;
-      }
-
       if (startIsNextDay) {
         isOvernight = true;
       }
@@ -124,8 +120,6 @@ function PanchangamPage({ settings }) {
       let endIsNextDay = isOvernight || hasEndNextDayKey;
       if (!endIsNextDay && startMins >= 0 && endMins >= 0) {
         if (endMins < startMins) {
-          endIsNextDay = true;
-        } else if (endMins <= 8 * 60 + 30 && startMins >= 20 * 60) {
           endIsNextDay = true;
         }
       }
