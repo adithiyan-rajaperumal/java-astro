@@ -358,12 +358,18 @@ function PanchangamPage({ settings }) {
               <div className="element-detail-item" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px' }}>
-                    {data.muhurthamDay ? '✅ ' + t('auspiciousDay', settings.language) : '❌ ' + t('inauspiciousDay', settings.language)}
+                    {data.muhurthamDay ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) : '❌ ' + t('inauspiciousDay', settings.language)}
                   </div>
+
+                  {data.isAgniNakshathiram && (
+                    <div style={{ background: 'rgba(255, 152, 0, 0.15)', border: '1px solid #ff9800', color: '#ff9800', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px' }}>
+                      🔥 {t('agniNakshathiram', settings.language)}
+                    </div>
+                  )}
 
                   {data.vasthuDay && (
                     <div style={{ background: '#e8f5e9', border: '1px solid #a5d6a7', color: '#2e7d32', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px' }}>
-                      🏡 {t('vasthuDay', settings.language)}
+                      🏡 {t('vasthuTitle', settings.language)}
                     </div>
                   )}
                 </div>
@@ -431,6 +437,40 @@ function PanchangamPage({ settings }) {
                 <div style={{ marginBottom: '12px', padding: '10px 12px', backgroundColor: 'rgba(255, 215, 0, 0.08)', borderRadius: '8px', borderLeft: '4px solid var(--accent-gold)' }}>
                   <div style={{ fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '3px' }}>☀️ {t('abhijitMuhurtham', settings.language)}</div>
                   <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{data.abhijitMuhurtham.start} - {data.abhijitMuhurtham.end}</div>
+                </div>
+              )}
+              {data.vasthuDay && data.vasthuNeram && (
+                <div style={{
+                  marginBottom: '14px',
+                  padding: '12px',
+                  backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                  borderRadius: '10px',
+                  borderLeft: '4px solid #4caf50',
+                  border: '1px solid rgba(76, 175, 80, 0.25)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                    <span style={{ fontWeight: 'bold', fontSize: '15px', color: '#4caf50' }}>
+                      🏠 {t('vasthuTitle', settings.language)}
+                    </span>
+                    <span style={{
+                      fontSize: '11.5px',
+                      padding: '3px 8px',
+                      borderRadius: '12px',
+                      fontWeight: 'bold',
+                      backgroundColor: data.vasthuAuspicious ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
+                      color: data.vasthuAuspicious ? '#4caf50' : '#ef5350'
+                    }}>
+                      {data.vasthuAuspicious ? `✓ ${t('bhoomiPujaSuitable', settings.language)}` : `⚠️ ${t('bhoomiPujaAvoid', settings.language)}`}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                    ⏰ <strong>{t('vasthuAwakeTime', settings.language)}:</strong> {data.vasthuNeram.formattedStart || data.vasthuNeram.start} - {data.vasthuNeram.formattedEnd || data.vasthuNeram.end}
+                  </div>
+                  {data.vasthuPujaNeram && (
+                    <div style={{ fontSize: '13px', color: 'var(--accent-gold)', fontWeight: 'bold' }}>
+                      🙏 <strong>{t('vasthuPujaTime', settings.language)}:</strong> {data.vasthuPujaNeram.formattedStart || data.vasthuPujaNeram.start} - {data.vasthuPujaNeram.formattedEnd || data.vasthuPujaNeram.end}
+                    </div>
+                  )}
                 </div>
               )}
               {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
