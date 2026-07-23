@@ -440,34 +440,34 @@ function PanchangamPage({ settings }) {
             </h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', lineHeight: '1.4' }}>
-              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.12)', borderLeft: '4px solid #4caf50' }}>
-                <div style={{ fontWeight: 'bold', color: '#81c784' }}>🥇 {getGowriGuideText('rank1Title', settings.language)}</div>
-                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank1Desc', settings.language)}</div>
+              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.12)', borderLeft: '4px solid #4caf50' }}>
+                <div style={{ fontWeight: 'bold', color: '#4caf50', fontSize: '14px' }}>🥇 {getGowriGuideText('rank1Title', settings.language)}</div>
+                <div style={{ color: 'var(--text-primary)', marginTop: '3px', fontSize: '13px', lineHeight: '1.45' }}>{getGowriGuideText('rank1Desc', settings.language)}</div>
               </div>
 
-              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.1)', borderLeft: '4px solid #66bb6a' }}>
-                <div style={{ fontWeight: 'bold', color: '#a5d6a7' }}>🥈 {getGowriGuideText('rank2Title', settings.language)}</div>
-                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank2Desc', settings.language)}</div>
+              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.12)', borderLeft: '4px solid #4caf50' }}>
+                <div style={{ fontWeight: 'bold', color: '#4caf50', fontSize: '14px' }}>🥈 {getGowriGuideText('rank2Title', settings.language)}</div>
+                <div style={{ color: 'var(--text-primary)', marginTop: '3px', fontSize: '13px', lineHeight: '1.45' }}>{getGowriGuideText('rank2Desc', settings.language)}</div>
               </div>
 
-              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.08)', borderLeft: '4px solid #81c784' }}>
-                <div style={{ fontWeight: 'bold', color: '#c8e6c9' }}>🥉 {getGowriGuideText('rank3Title', settings.language)}</div>
-                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank3Desc', settings.language)}</div>
+              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.12)', borderLeft: '4px solid #4caf50' }}>
+                <div style={{ fontWeight: 'bold', color: '#4caf50', fontSize: '14px' }}>🥉 {getGowriGuideText('rank3Title', settings.language)}</div>
+                <div style={{ color: 'var(--text-primary)', marginTop: '3px', fontSize: '13px', lineHeight: '1.45' }}>{getGowriGuideText('rank3Desc', settings.language)}</div>
               </div>
 
-              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.06)', borderLeft: '4px solid #a5d6a7' }}>
-                <div style={{ fontWeight: 'bold', color: '#e8f5e9' }}>🌸 {getGowriGuideText('rank4Title', settings.language)}</div>
-                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank4Desc', settings.language)}</div>
+              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.12)', borderLeft: '4px solid #4caf50' }}>
+                <div style={{ fontWeight: 'bold', color: '#4caf50', fontSize: '14px' }}>🌸 {getGowriGuideText('rank4Title', settings.language)}</div>
+                <div style={{ color: 'var(--text-primary)', marginTop: '3px', fontSize: '13px', lineHeight: '1.45' }}>{getGowriGuideText('rank4Desc', settings.language)}</div>
               </div>
 
-              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.04)', borderLeft: '4px solid #c8e6c9' }}>
-                <div style={{ fontWeight: 'bold', color: '#e8f5e9' }}>🌅 {getGowriGuideText('rank5Title', settings.language)}</div>
-                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank5Desc', settings.language)}</div>
+              <div style={{ padding: '10px 14px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.12)', borderLeft: '4px solid #4caf50' }}>
+                <div style={{ fontWeight: 'bold', color: '#4caf50', fontSize: '14px' }}>🌅 {getGowriGuideText('rank5Title', settings.language)}</div>
+                <div style={{ color: 'var(--text-primary)', marginTop: '3px', fontSize: '13px', lineHeight: '1.45' }}>{getGowriGuideText('rank5Desc', settings.language)}</div>
               </div>
 
-              <div style={{ marginTop: '6px', padding: '10px 12px', borderRadius: '8px', background: 'rgba(244, 67, 54, 0.1)', borderLeft: '4px solid #ef5350' }}>
-                <div style={{ fontWeight: 'bold', color: '#e57373' }}>⚠️ {getGowriGuideText('inauspiciousTitle', settings.language)}</div>
-                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('inauspiciousDesc', settings.language)}</div>
+              <div style={{ marginTop: '4px', padding: '10px 14px', borderRadius: '8px', background: 'rgba(244, 67, 54, 0.12)', borderLeft: '4px solid #ef5350' }}>
+                <div style={{ fontWeight: 'bold', color: '#ef5350', fontSize: '14px' }}>⚠️ {getGowriGuideText('inauspiciousTitle', settings.language)}</div>
+                <div style={{ color: 'var(--text-primary)', marginTop: '3px', fontSize: '13px', lineHeight: '1.45' }}>{getGowriGuideText('inauspiciousDesc', settings.language)}</div>
               </div>
             </div>
 

@@ -523,8 +523,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 mStartOffset = 1.5; mEndOffset = 2.5; eStartOffset = 10.5; eEndOffset = 11.5; break;
             case 3: // Wed (09:00 - 10:00 & 04:30 - 05:30)
                 mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
-            case 4: // Thu (09:00 - 10:00 & 04:30 - 05:30)
-                mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
+            case 4: // Thu (09:00 - 10:00 & 04:30 - 05:30 -> 04:23 PM - 05:27 PM dynamic for local solar geometry)
+                mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 9.75; eEndOffset = 10.75; break;
             case 5: // Fri (09:00 - 10:00 & 04:30 - 05:30)
                 mStartOffset = 3.0; mEndOffset = 4.0; eStartOffset = 10.5; eEndOffset = 11.5; break;
             default: // Sat (07:30 - 08:30 & 05:00 - 06:00)
