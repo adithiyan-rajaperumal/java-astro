@@ -135,6 +135,33 @@ function PanchangamPage({ settings }) {
     );
   };
 
+  const renderNakshatraYogamsList = (slots) => {
+    if (!slots || slots.length === 0) return null;
+    return (
+      <div style={{ marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 6px' }}>
+          <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)' }}>🌟 {t('nakshatraYogam', settings.language)}</h4>
+        </div>
+        {slots.map((s, idx) => {
+          const labelLower = (s.label || '').toLowerCase();
+          const isGood = labelLower.includes('amrita') || labelLower.includes('siddha') 
+            || s.label.includes('அமிர்த') || s.label.includes('சித்த')
+            || s.label.includes('अमृत') || s.label.includes('सिद्ध')
+            || s.label.includes('ಅಮೃತ') || s.label.includes('ಸಿದ್ಧ')
+            || s.label.includes('అమృత') || s.label.includes('సిద్ధ')
+            || s.label.includes('അമൃത') || s.label.includes('സിദ്ധ');
+
+          return (
+            <div key={idx} className={`time-slot-bar ${isGood ? 'auspicious' : 'inauspicious'}`}>
+              <span style={{ fontWeight: 'bold' }}>{s.label}</span>
+              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>{s.start} - {s.end}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   const parseTimeToMinutes = (timeStr) => {
     if (!timeStr) return -1;
     const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
@@ -344,6 +371,7 @@ function PanchangamPage({ settings }) {
               )}
               {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}
               {renderTimeSlotList(data.gowriNallaNeram, 'gowriNallaNeram', true)}
+              {renderNakshatraYogamsList(data.nakshatraYogams)}
               <div style={{ margin: '12px 0 10px', borderTop: '1px dashed var(--border)' }}></div>
               {renderTimeSlotList(data.raghuKalam, 'rahuKalam', false)}
               {renderTimeSlotList(data.emagandam, 'yamagandam', false)}
