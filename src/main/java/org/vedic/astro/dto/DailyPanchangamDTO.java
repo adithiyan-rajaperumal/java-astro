@@ -40,8 +40,14 @@ public record DailyPanchangamDTO(
     public record TimeSlotDTO(
         String start,
         String end,
-        String label
-    ) {}
+        String label,
+        boolean startNextDay,
+        boolean endNextDay
+    ) {
+        public TimeSlotDTO(String start, String end, String label) {
+            this(start, end, label, false, false);
+        }
+    }
 
     public record HoraTimeSlotDTO(
         int hour,
