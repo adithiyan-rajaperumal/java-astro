@@ -132,7 +132,23 @@ const translations = {
     veryStrong: "Very Strong",
     optimum: "Optimum",
     strong: "Strong",
-    weak: "Weak"
+    weak: "Weak",
+    gowriGuide: {
+      title: "Gowri Panchangam Hierarchy & Guide",
+      rank1Title: "1. Amirdha (Rank 1 - Supreme)",
+      rank1Desc: "Nectar of Immortality. Best for all auspicious starts, marriage, housewarming & travel.",
+      rank2Title: "2. Laabam (Rank 2)",
+      rank2Desc: "Profit & Gain. Best for business launches, investments, trading & buying assets.",
+      rank3Title: "3. Dhanam (Rank 3)",
+      rank3Desc: "Wealth. Best for banking, financial transactions, receiving money & buying gold.",
+      rank4Title: "4. Sugam (Rank 4)",
+      rank4Desc: "Comfort & Peace. Best for health recovery, domestic harmony & social functions.",
+      rank5Title: "5. Uthi (Rank 5)",
+      rank5Desc: "Growth & Rising. Best for job interviews, career moves, exams & meeting authorities.",
+      inauspiciousTitle: "Inauspicious Gowri Hours (To Avoid)",
+      inauspiciousDesc: "Visham (Toxic), Rogam (Illness), and Soram (Loss) should be avoided for major endeavors.",
+      close: "Close"
+    }
   },
   ta: {
     panchangam: "பஞ்சாங்கம்",
@@ -267,7 +283,23 @@ const translations = {
     veryStrong: "மிகவும் வலிமை",
     optimum: "சராசரி வலிமை",
     strong: "வலிமை",
-    weak: "பலவீனம்"
+    weak: "பலவீனம்",
+    gowriGuide: {
+      title: "கௌரி பஞ்சாங்கம் தரவரிசை வழிகாட்டி",
+      rank1Title: "1. அமிர்தம் (தரவரிசை 1 - முதன்மை)",
+      rank1Desc: "அமுத நிலை. அனைத்து சுப காரியங்கள், திருமணம், கிரகப்பிரவேசம் & பயணங்களுக்கு மிக உத்தமம்.",
+      rank2Title: "2. லாபம் (தரவரிசை 2)",
+      rank2Desc: "வியாபார வளர்ச்சி & லாபம். புதிய தொழில், முதலீடு & ஆஸ்தி வாங்க உத்தமம்.",
+      rank3Title: "3. தனம் (தரவரிசை 3)",
+      rank3Desc: "தன சேர்க்கை. பண பரிவர்த்தனைகள், வங்கி விஷயங்கள் & நகை வாங்க உத்தமம்.",
+      rank4Title: "4. சுகம் (தரவரிசை 4)",
+      rank4Desc: "ஆரோக்கியம் & சுகம். குடும்ப சுப நிகழ்ச்சிகள், ஓய்வு & ஆரோக்கியத்திற்கு நல்லது.",
+      rank5Title: "5. உதி (தரவரிசை 5)",
+      rank5Desc: "உன்னதி & உயர்வு. வேலை வாய்ப்பு, நேர்காணல், தேர்வு & அதிகாரிகளை சந்திக்க நல்லது.",
+      inauspiciousTitle: "கெட்ட கௌரி நேரங்கள் (தவிர்க்க வேண்டியவை)",
+      inauspiciousDesc: "விஷம், ரோகம் மற்றும் சோரம் ஆகியவை சுப காரியங்களுக்கு தவிர்க்கப்பட வேண்டும்.",
+      close: "மூடுக"
+    }
   },
   hi: {
     panchangam: "पंचांग",
@@ -401,7 +433,23 @@ const translations = {
     veryStrong: "बहुत मजबूत",
     optimum: "इष्टतम",
     strong: "मजबूत",
-    weak: "कमजोर"
+    weak: "कमजोर",
+    gowriGuide: {
+      title: "गौरी पंचांग श्रेणी और मार्गदर्शिका",
+      rank1Title: "1. अमृत (श्रेणी 1 - सर्वोत्तम)",
+      rank1Desc: "अमृत काल। सभी शुभ कार्यों, विवाह, गृह प्रवेश और यात्रा के लिए सर्वोत्तम।",
+      rank2Title: "2. लाभ (श्रेणी 2)",
+      rank2Desc: "लाभ और प्रगति। व्यापार शुरू करने, निवेश और संपत्ति खरीदने के लिए शुभ।",
+      rank3Title: "3. धन (श्रेणी 3)",
+      rank3Desc: "धन संचय। वित्तीय लेनदेन, बैंकिंग और स्वर्ण खरीद के लिए शुभ।",
+      rank4Title: "4. सुख (श्रेणी 4)",
+      rank4Desc: "स्वास्थ्य, शांति और पारिवारिक कार्यक्रमों के लिए शुभ।",
+      rank5Title: "5. उदि/उन्नति (श्रेणी 5)",
+      rank5Desc: "नौकरी के साक्षात्कार, परीक्षा और अधिकारियों से मिलने के लिए शुभ।",
+      inauspiciousTitle: "अशुभ गौरी समय (त्याज्य)",
+      inauspiciousDesc: "विष, रोग और चोर काल महत्वपूर्ण कार्यों के लिए त्याज्य हैं।",
+      close: "बंद करें"
+    }
   },
   kn: {
     panchangam: "ಪಂಚಾಂಗ",
@@ -535,7 +583,23 @@ const translations = {
     veryStrong: "ಬಹಳ ಬಲಶಾಲಿ",
     optimum: "ಅತ್ಯುತ್ತಮ",
     strong: "ಬಲಶಾಲಿ",
-    weak: "ದುರ್ಬಲ"
+    weak: "ದುರ್ಬಲ",
+    gowriGuide: {
+      title: "ಗೌರಿ ಪಂಚಾಂಗ ಶ್ರೇಣಿ ಮತ್ತು ಮಾರ್ಗದರ್ಶಿ",
+      rank1Title: "1. ಅಮೃತ (ಶ್ರೇಣಿ 1 - ಅತ್ಯುತ್ತಮ)",
+      rank1Desc: "ಅಮೃತ ಕಾಲ. ಎಲ್ಲಾ ಶುಭ ಕಾರ್ಯಗಳು, ಮದುವೆ, ಗೃಹಪ್ರವೇಶ ಮತ್ತು ಪ್ರಯಾಣಕ್ಕೆ ಅತ್ಯುತ್ತಮ.",
+      rank2Title: "2. ಲಾಭ (ಶ್ರೇಣಿ 2)",
+      rank2Desc: "ಲಾಭ ಮತ್ತು ಪ್ರಗತಿ. ವ್ಯಾಪಾರ, ಹೂಡಿಕೆ ಮತ್ತು ಆಸ್ತಿ ಖರೀದಿಗೆ ಉತ್ತಮ.",
+      rank3Title: "3. ಧನ (ಶ್ರೇಣಿ 3)",
+      rank3Desc: "ಸಂಪತ್ತು. ಆರ್ಥಿಕ ವ್ಯವಹಾರ, ಬ್ಯಾಂಕಿಂಗ್ ಮತ್ತು ಚಿನ್ನ ಖರೀದಿಗೆ ಶುಭ.",
+      rank4Title: "4. ಸುಖ (ಶ್ರೇಣಿ 4)",
+      rank4Desc: "ಆರೋಗ್ಯ ಮತ್ತು ಸುಖ. ಕೌಟುಂಬಿಕ ಕಾರ್ಯಕ್ರಮಗಳಿಗೆ ಶುಭ.",
+      rank5Title: "5. ಉದಿ/ಉನ್ನತಿ (ಶ್ರೇಣಿ 5)",
+      rank5Desc: "ಪ್ರಗತಿ. ಉದ್ಯೋಗ ಸಂದರ್ಶನ, ಪರೀಕ್ಷೆ ಮತ್ತು ಅಧಿಕಾರಿಗಳ ಭೇಟಿಗೆ ಶುಭ.",
+      inauspiciousTitle: "ಅಶುಭ ಗೌರಿ ಸಮಯಗಳು",
+      inauspiciousDesc: "ವಿಷ, ರೋಗ ಮತ್ತು ಚೋರ ಸಮಯಗಳನ್ನು ಮುಖ್ಯ ಕೆಲಸಗಳಿಗೆ ತಪ್ಪಿಸಬೇಕು.",
+      close: "ಮುಚ್ಚಿ"
+    }
   },
   te: {
     panchangam: "పంచాంగం",
@@ -669,7 +733,23 @@ const translations = {
     veryStrong: "చాలా బలం",
     optimum: "ఉత్తమం",
     strong: "బలమైనది",
-    weak: "బలహీనం"
+    weak: "బలహీనం",
+    gowriGuide: {
+      title: "గౌరీ పంచాంగం ర్యాంకింగ్ మార్గదర్శి",
+      rank1Title: "1. అమృతం (ర్యాంక్ 1 - అత్యుత్తమం)",
+      rank1Desc: "అమృత కాలం. అన్ని శుభ కార్యాలు, వివాహం, గృహప్రవేశం మరియు ప్రయాణాలకు అత్యుత్తమం.",
+      rank2Title: "2. లాభం (ర్యాంక్ 2)",
+      rank2Desc: "లాభం మరియు పురోగతి. వ్యాపార ప్రారంభం, పెట్టుబడులు మరియు ఆస్తుల కొనుగోలుకు మంచిది.",
+      rank3Title: "3. ధనం (ర్యాంక్ 3)",
+      rank3Desc: "ధన ప్రాప్తి. ఆర్థిక లావాదేవీలు, బ్యాంకింగ్ మరియు బంగారం కొనుగోలుకు మంచిది.",
+      rank4Title: "4. సుఖం (ర్యాంక్ 4)",
+      rank4Desc: "ఆరోగ్యం మరియు సుఖం. కుటుంబ కార్యక్రమాలకు మంచిది.",
+      rank5Title: "5. ఉది/ఉన్నతి (ర్యాంక్ 5)",
+      rank5Desc: "పురోగతి. ఉద్యోగ ఇంటర్వ్యూలు, పరీక్షలు మరియు అధికారుల భేటీకి మంచిది.",
+      inauspiciousTitle: "అశుభ గౌరీ సమయాలు",
+      inauspiciousDesc: "విషం, రోగం మరియు చోరం సమయాల్లో ముఖ్యమైన పనులు చేయవద్దు.",
+      close: "మూసివేయి"
+    }
   },
   ml: {
     panchangam: "പഞ്ചാംഗം",
@@ -803,7 +883,23 @@ const translations = {
     veryStrong: "വളരെ ശക്തം",
     optimum: "ആവശ്യമായ ബലം",
     strong: "ശക്തം",
-    weak: "ദുർബലം"
+    weak: "ദുർബലം",
+    gowriGuide: {
+      title: "ഗൗരി പഞ്ചാംഗം ഗൈഡ് & റാങ്കിംഗ്",
+      rank1Title: "1. അമൃതം (റാങ്ക് 1 - ഉത്തമം)",
+      rank1Desc: "അമൃത കാലം. എല്ലാ ശുഭ കാര്യങ്ങൾക്കും, വിവാഹം, ഗൃഹപ്രവേശം & യാത്രകൾക്ക് ഉത്തമം.",
+      rank2Title: "2. ലാഭം (റാങ്ക് 2)",
+      rank2Desc: "ലാഭവും വളർച്ചയും. ബിസിനസ്സ്, നിക്ഷേപം & സ്വത്ത് വാങ്ങലിന് ഉത്തമം.",
+      rank3Title: "3. ധനം (റാങ്ക് 3)",
+      rank3Desc: "ധനം. സാമ്പത്തിക ഇടപാടുകൾക്കും സ്വർണം വാങ്ങലിനും ഉത്തമം.",
+      rank4Title: "4. സുഖം (റാങ്ക് 4)",
+      rank4Desc: "ആരോഗ്യവും സമാധാനവും. കുടുംബ ചടങ്ങുകൾക്ക് നല്ലത്.",
+      rank5Title: "5. ഉതി/ഉന്നതി (റാങ്ക് 5)",
+      rank5Desc: "ഉന്നതി. ജോലിക്കായുള്ള ഇന്റർവ്യൂകൾക്കും പരീക്ഷകൾക്കും നല്ലത്.",
+      inauspiciousTitle: "അശുഭ ഗൗരി സമയങ്ങൾ",
+      inauspiciousDesc: "വിഷം, രോഗം, ചോരം എന്നിവ പ്രധാന കാര്യങ്ങൾക്ക് ഒഴിവാക്കണം.",
+      close: "അടയ്ക്കുക"
+    }
   }
 };
 

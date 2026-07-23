@@ -27,6 +27,15 @@ function PanchangamPage({ settings }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showGowriModal, setShowGowriModal] = useState(false);
+
+  const getGowriGuideText = (subKey, lang) => {
+    const guideObj = t('gowriGuide', lang);
+    if (typeof guideObj === 'object' && guideObj[subKey]) {
+      return guideObj[subKey];
+    }
+    return t(`gowriGuide.${subKey}`, lang);
+  };
 
   const fetchPanchangam = async (dateStr) => {
     if (!settings.location) return;
@@ -91,7 +100,31 @@ function PanchangamPage({ settings }) {
     if (!slots || slots.length === 0) return null;
     return (
       <div style={{ marginBottom: '12px' }}>
-        <h4 style={{ margin: '10px 0 6px', fontSize: '14px', color: 'var(--text-secondary)' }}>{t(titleKey, settings.language)}</h4>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 6px' }}>
+          <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)' }}>{t(titleKey, settings.language)}</h4>
+          {titleKey === 'gowriNallaNeram' && (
+            <button
+              onClick={() => setShowGowriModal(true)}
+              style={{
+                background: 'rgba(255, 215, 0, 0.12)',
+                border: '1px solid var(--accent-gold)',
+                color: 'var(--accent-gold)',
+                borderRadius: '50%',
+                width: '22px',
+                height: '22px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+              title="Gowri Panchangam Guide"
+            >
+              ℹ️
+            </button>
+          )}
+        </div>
         {slots.map((s, idx) => (
           <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
             {renderSlotLabelContent(s.label)}
@@ -352,6 +385,108 @@ function PanchangamPage({ settings }) {
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {showGowriModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+          onClick={() => setShowGowriModal(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'var(--bg-card, #1e1e24)',
+              color: 'var(--text-primary, #ffffff)',
+              borderRadius: '14px',
+              padding: '22px',
+              maxWidth: '500px',
+              width: '100%',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              border: '1px solid var(--accent-gold, #ffd700)',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setShowGowriModal(false)}
+              style={{
+                position: 'absolute',
+                top: '14px',
+                right: '16px',
+                background: 'none',
+                border: 'none',
+                fontSize: '20px',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer'
+              }}
+            >
+              ✕
+            </button>
+            <h3 style={{ margin: '0 0 14px', color: 'var(--accent-gold)', fontSize: '17px', borderBottom: '1px dashed var(--border)', paddingBottom: '10px' }}>
+              ℹ️ {getGowriGuideText('title', settings.language)}
+            </h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px', lineHeight: '1.4' }}>
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.12)', borderLeft: '4px solid #4caf50' }}>
+                <div style={{ fontWeight: 'bold', color: '#81c784' }}>🥇 {getGowriGuideText('rank1Title', settings.language)}</div>
+                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank1Desc', settings.language)}</div>
+              </div>
+
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.1)', borderLeft: '4px solid #66bb6a' }}>
+                <div style={{ fontWeight: 'bold', color: '#a5d6a7' }}>🥈 {getGowriGuideText('rank2Title', settings.language)}</div>
+                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank2Desc', settings.language)}</div>
+              </div>
+
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.08)', borderLeft: '4px solid #81c784' }}>
+                <div style={{ fontWeight: 'bold', color: '#c8e6c9' }}>🥉 {getGowriGuideText('rank3Title', settings.language)}</div>
+                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank3Desc', settings.language)}</div>
+              </div>
+
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.06)', borderLeft: '4px solid #a5d6a7' }}>
+                <div style={{ fontWeight: 'bold', color: '#e8f5e9' }}>🌸 {getGowriGuideText('rank4Title', settings.language)}</div>
+                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank4Desc', settings.language)}</div>
+              </div>
+
+              <div style={{ padding: '10px 12px', borderRadius: '8px', background: 'rgba(76, 175, 80, 0.04)', borderLeft: '4px solid #c8e6c9' }}>
+                <div style={{ fontWeight: 'bold', color: '#e8f5e9' }}>🌅 {getGowriGuideText('rank5Title', settings.language)}</div>
+                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('rank5Desc', settings.language)}</div>
+              </div>
+
+              <div style={{ marginTop: '6px', padding: '10px 12px', borderRadius: '8px', background: 'rgba(244, 67, 54, 0.1)', borderLeft: '4px solid #ef5350' }}>
+                <div style={{ fontWeight: 'bold', color: '#e57373' }}>⚠️ {getGowriGuideText('inauspiciousTitle', settings.language)}</div>
+                <div style={{ opacity: 0.9, marginTop: '2px' }}>{getGowriGuideText('inauspiciousDesc', settings.language)}</div>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setShowGowriModal(false)}
+              style={{
+                marginTop: '16px',
+                width: '100%',
+                padding: '10px',
+                backgroundColor: 'var(--accent-gold)',
+                color: '#000',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              {getGowriGuideText('close', settings.language)}
+            </button>
           </div>
         </div>
       )}
