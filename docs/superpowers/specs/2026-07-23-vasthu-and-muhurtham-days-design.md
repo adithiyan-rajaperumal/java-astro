@@ -1,13 +1,13 @@
-# Design Specification: Vasthu Days, Vasthu Neram & Subha Muhurtham Engine
+# Design Specification: Vasthu Days, Vasthu Neram & Comprehensive Subha Muhurtham Engine
 
 ## 1. Overview
-This specification details the design for accurate astronomical calculation of **Vasthu Days**, **Vasthu Neram** (awake and Puja time windows), and **Subha Muhurtham Days** (auspicious days) in the Vedic Panchangam engine (`DailyPanchangamServiceImpl.java`) and frontend rendering (`PanchangamPage.jsx`).
+This specification details the design for accurate astronomical calculation of **Vasthu Days**, **Vasthu Neram** (awake and Puja time windows), **Agni Nakshathiram**, and **Subha Muhurtham Days** (auspicious days) in the Vedic Panchangam engine (`DailyPanchangamServiceImpl.java`) and frontend rendering (`PanchangamPage.jsx`).
 
 ---
 
 ## 2. Technical Requirements
 
-### 2.1 Vasthu Days & Vasthu Neram Calculation
+### 2.1 Vasthu Days, Vasthu Neram & Vasthu Affliction Check
 1. **Solar Month & Solar Date Calculation**:
    - Determine Sun's sidereal longitude `sunLong`.
    - Identify active Solar Rashi `solarRashi = (int)(sunLong / 30.0) + 1` (1=Chithirai, 2=Vaikasi, ..., 12=Panguni).
@@ -30,27 +30,36 @@ This specification details the design for accurate astronomical calculation of *
    - `vasthuNeram`: `[awakeStart, awakeStart + 90 mins]`.
    - `vasthuPujaNeram`: `[awakeStart + 36 mins, awakeStart + 72 mins]` (the 36-minute middle Puja window).
 
+4. **Vasthu Ground-Breaking Affliction Check (`isVasthuAuspicious`)**:
+   - `isVasthuAuspicious = isVasthuDay && (dayOfWeek != TUESDAY && dayOfWeek != SATURDAY) && (yogamType != 2)`.
+   - Flags if a Vasthu Day is suitable for *Bhoomi Puja* ground-breaking.
+
 ---
 
-### 2.2 Subha Muhurtham Day Calculation
+### 2.2 Subha Muhurtham Day Calculation & Agni Nakshathiram
 1. **Weekday Filter**: Exclude Tuesday & Saturday (`date.getDayOfWeek() != TUESDAY && date.getDayOfWeek() != SATURDAY`).
-2. **Thithi Expansion**:
+2. **Thithi Expansion & Rikta Exclusion**:
    - Include `12` (**Dwadashi**) and `15` (**Purnima** / Full Moon) in `isAuspiciousThithi`.
+   - Strictly exclude Rikta Thithis (`4`, `9`, `14`, `19`, `24`, `29`) and Amavasya (`30`).
    - Auspicious Thithis: `[2, 3, 5, 7, 10, 11, 12, 13, 15, 17, 18, 20, 22, 25, 26, 28]`.
 3. **Nakshatra Validation**:
    - Auspicious Nakshatras: `[1, 4, 5, 8, 12, 13, 14, 15, 17, 21, 22, 23, 24, 26, 27]`.
 4. **Nakshatra-Vara Yogam Filter**:
    - Require `yogamType == 0 || yogamType == 1` (**Amrita Yogam** or **Siddha Yogam**).
    - Explicitly reject **Marana Yogam** (2) and **Prabalarishta Yogam** (3).
-5. **Netram & Jeevan Validation**: `netram > 0 && jeevan > 0`.
-6. **Solar Month Exclusion**: Exclude *Margazhi* (`solarRashi == 9`).
+5. **Karanam Filter**:
+   - Exclude Vishti / Bhadra Karanam (`karanamIdx != 7` and not Vishti).
+6. **Netram & Jeevan Validation**: `netram > 0 && jeevan > 0`.
+7. **Solar Month Exclusion**: Exclude *Margazhi* (`solarRashi == 9`).
+8. **Agni Nakshathiram (Katheri) Detection**:
+   - `isAgniNakshathiram = (sunNakNum == 3)` (when Sun is in Krittika Nakshatra, approx May 4 – May 28).
 
 ---
 
 ## 3. Data Model Changes
 
 ### 3.1 `DailyPanchangamDTO.java`
-Update `DailyPanchangamDTO` record to include `vasthuNeram` and `vasthuPujaNeram`:
+Update `DailyPanchangamDTO` record to include `vasthuNeram`, `vasthuPujaNeram`, `isVasthuAuspicious`, and `isAgniNakshathiram`:
 ```java
 public record DailyPanchangamDTO(
     String date,
@@ -76,6 +85,8 @@ public record DailyPanchangamDTO(
     double jeevan,
     boolean isMuhurthamDay,
     boolean isVasthuDay,
+    boolean isVasthuAuspicious,
+    boolean isAgniNakshathiram,
     TimeSlotDTO vasthuNeram,
     TimeSlotDTO vasthuPujaNeram
 ) {}
@@ -90,16 +101,20 @@ public record DailyPanchangamDTO(
    - 🏠 **Vasthu Day / வாஸ்து நாள்**
    - ⏰ **Vasthu Awake Window (வாஸ்து நேரம்)**: `data.vasthuNeram.start` - `data.vasthuNeram.end`
    - 🙏 **Vasthu Puja Window (பூஜை செய்ய உத்தம நேரம்)**: `data.vasthuPujaNeram.start` - `data.vasthuPujaNeram.end`
-2. **Subha Muhurtham Badge**: Highlight `isMuhurthamDay` in the page header card.
+   - ⚠️ **Ground-Breaking Status**: If `isVasthuAuspicious` is false, show a warning note: *(Tuesday/Saturday/Marana Yogam - Bhoomi Puja discouraged)*.
+2. **Subha Muhurtham Badge & Agni Nakshathiram Warning**:
+   - Highlight `isMuhurthamDay` in the page header card.
+   - Show 🔥 **Agni Nakshathiram / கத்திரி வெயில்** badge during Katheri period.
 
 ---
 
 ## 5. Verification Plan
 
 1. **Backend Unit Tests (`DailyPanchangamServiceTest.java`)**:
-   - Verify `isVasthuDay` and `vasthuNeram` for canonical Vasthu dates (e.g., Thai 12th / Jan 25).
-   - Verify `isMuhurthamDay` is false when a day has Marana Yogam.
+   - Verify `isVasthuDay`, `vasthuNeram`, and `vasthuPujaNeram` on canonical Vasthu solar days.
+   - Verify `isMuhurthamDay` returns `false` when a day has Marana Yogam or Vishti Karanam.
    - Verify Purnima (`thithiIdx == 15`) and Dwadashi (`thithiIdx == 12`) are treated as auspicious thithis.
+   - Verify `isAgniNakshathiram` is detected when Sun is in Krittika Nakshatra.
 2. **Build Verification**:
-   - Backend: `./mvnw compile` / `$env:JAVA_HOME=... mvn test`.
+   - Backend: `$env:JAVA_HOME=... mvn test`.
    - Frontend: `npm run build` inside `frontend/`.
