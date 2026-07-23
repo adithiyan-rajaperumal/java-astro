@@ -546,6 +546,9 @@ input:focus, select:focus {
   margin-bottom: 6px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   font-size: 13px;
   font-weight: 600;
 }
@@ -560,6 +563,9 @@ input:focus, select:focus {
   margin-bottom: 6px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   font-size: 13px;
   font-weight: 600;
 }

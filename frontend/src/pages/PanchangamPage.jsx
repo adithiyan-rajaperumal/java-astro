@@ -197,13 +197,9 @@ function PanchangamPage({ settings }) {
 
     if (refStartStr) {
       const refMins = parseTimeToMinutes(refStartStr);
-      if (refMins >= 0 && endMins < refMins) {
+      if (refMins >= 0 && endMins <= refMins) {
         return true;
       }
-    }
-
-    if (endMins >= 0 && endMins <= 8 * 60 + 30) {
-      return true;
     }
 
     return false;
