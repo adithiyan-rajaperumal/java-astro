@@ -706,6 +706,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
 
         ZonedDateTime start = jdToZonedDateTime(startJd, zoneId);
         ZonedDateTime end = jdToZonedDateTime(endJd, zoneId);
+        ZonedDateTime zdtSunrise = jdToZonedDateTime(jdSunrise, zoneId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
         String label = translationService.getLabel("panchangam.abhijit_muhurtham");
@@ -713,7 +714,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             label += " (" + translationService.getLabel("panchangam.nullified") + ")";
         }
 
-        return new TimeSlotDTO(start.format(formatter), end.format(formatter), label);
+        return createTimeSlotDTO(start, end, label, zdtSunrise, formatter);
     }
 
     private List<TimeSlotDTO> calculateKalam(ZonedDateTime sunrise, double dayDurationHours, int part, String label) {
@@ -726,8 +727,15 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
         List<TimeSlotDTO> list = new ArrayList<>();
-        list.add(new TimeSlotDTO(start.format(formatter), end.format(formatter), label));
+        list.add(createTimeSlotDTO(start, end, label, sunrise, formatter));
         return list;
+    }
+
+    private TimeSlotDTO createTimeSlotDTO(ZonedDateTime start, ZonedDateTime end, String label, ZonedDateTime zdtSunrise, DateTimeFormatter formatter) {
+        LocalDate panchangamDate = zdtSunrise.toLocalDate();
+        boolean startNextDay = start.toLocalDate().isAfter(panchangamDate);
+        boolean endNextDay = end.toLocalDate().isAfter(panchangamDate);
+        return new TimeSlotDTO(start.format(formatter), end.format(formatter), label, startNextDay, endNextDay);
     }
 
     private int getRahuPart(int dayOfWeek) {
@@ -754,6 +762,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double nightPartDuration = (jdNextSunrise - jdSunset) / 8.0;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        ZonedDateTime zdtSunrise = jdToZonedDateTime(jdSunrise, zoneId);
 
         // Day Gowri
         String[] dayStates = GOWRI_DAY_STATES[dayOfWeek];
@@ -765,7 +774,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 ZonedDateTime start = jdToZonedDateTime(startJd, zoneId);
                 ZonedDateTime end = jdToZonedDateTime(endJd, zoneId);
                 String stateLabel = translationService.getLabel("gowri." + state.toLowerCase());
-                list.add(new TimeSlotDTO(start.format(formatter), end.format(formatter), stateLabel));
+                list.add(createTimeSlotDTO(start, end, stateLabel, zdtSunrise, formatter));
             }
         }
 
@@ -779,7 +788,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 ZonedDateTime start = jdToZonedDateTime(startJd, zoneId);
                 ZonedDateTime end = jdToZonedDateTime(endJd, zoneId);
                 String stateLabel = translationService.getLabel("gowri." + state.toLowerCase());
-                list.add(new TimeSlotDTO(start.format(formatter), end.format(formatter), stateLabel));
+                list.add(createTimeSlotDTO(start, end, stateLabel, zdtSunrise, formatter));
             }
         }
 
@@ -848,6 +857,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
     private List<TimeSlotDTO> calculateNakshatraYogams(int nakIdx, double jdSunrise, double jdNextSunrise, int dayOfWeek, ZoneId zoneId) {
         List<TimeSlotDTO> list = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+        ZonedDateTime zdtSunrise = jdToZonedDateTime(jdSunrise, zoneId);
 
         double targetVal = nakIdx * (360.0 / 27.0);
         double endJd = findTransitionTime(jdSunrise, jdSunrise + 1.2, targetVal, this::getMoonLongitude);
@@ -863,7 +873,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             case 2 -> "gowri.marana_yogam";
             default -> "gowri.prabalarishta_yogam";
         };
-        list.add(new TimeSlotDTO(s1.format(formatter), e1.format(formatter), translationService.getLabel(key1)));
+        list.add(createTimeSlotDTO(s1, e1, translationService.getLabel(key1), zdtSunrise, formatter));
 
         if (endJd > 0 && endJd < jdNextSunrise) {
             int nextNakIdx = (nakIdx % 27) + 1;
@@ -877,7 +887,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 case 2 -> "gowri.marana_yogam";
                 default -> "gowri.prabalarishta_yogam";
             };
-            list.add(new TimeSlotDTO(s2.format(formatter), e2.format(formatter), translationService.getLabel(key2)));
+            list.add(createTimeSlotDTO(s2, e2, translationService.getLabel(key2), zdtSunrise, formatter));
         }
 
         return list;
