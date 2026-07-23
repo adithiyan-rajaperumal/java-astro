@@ -73,15 +73,29 @@ function PanchangamPage({ settings }) {
     setCurrentDate(`${year}-${month}-${day}`);
   };
 
-  const renderTimeSlotList = (slots = [], titleKey, isAuspicious) => {
+  const renderSlotLabelContent = (label) => {
+    if (!label) return null;
+    const match = label.match(/^(.*?)\s*(\(.*?\))$/);
+    if (match) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '1 1 auto', minWidth: '140px', paddingRight: '8px' }}>
+          <span style={{ fontWeight: 'bold', fontSize: '13.5px' }}>{match[1]}</span>
+          <span style={{ fontSize: '11.5px', opacity: 0.85, fontWeight: 'normal', lineHeight: '1.3' }}>{match[2]}</span>
+        </div>
+      );
+    }
+    return <span style={{ fontWeight: 'bold', flex: '1 1 auto' }}>{label}</span>;
+  };
+
+  const renderTimeSlotList = (slots, titleKey, isAuspicious) => {
     if (!slots || slots.length === 0) return null;
     return (
-      <div className="time-slot-container">
-        <h4 style={{ margin: '10px 0 5px', fontSize: '14px', color: 'var(--text-secondary)' }}>{t(titleKey, settings.language)}</h4>
+      <div style={{ marginBottom: '12px' }}>
+        <h4 style={{ margin: '10px 0 6px', fontSize: '14px', color: 'var(--text-secondary)' }}>{t(titleKey, settings.language)}</h4>
         {slots.map((s, idx) => (
           <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
-            <span>{s.label}</span>
-            <span>{s.start} - {s.end}</span>
+            {renderSlotLabelContent(s.label)}
+            <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>{s.start} - {s.end}</span>
           </div>
         ))}
       </div>
