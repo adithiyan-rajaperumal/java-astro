@@ -87,7 +87,7 @@ function PanchangamPage({ settings }) {
     const match = label.match(/^(.*?)\s*(\(.*?\))$/);
     if (match) {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '1 1 auto', minWidth: '140px', paddingRight: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: '1 1 160px', minWidth: 0, paddingRight: '8px' }}>
           <span style={{ fontWeight: 'bold', fontSize: '13.5px' }}>{match[1]}</span>
           <span style={{ fontSize: '11.5px', opacity: 0.85, fontWeight: 'normal', lineHeight: '1.3' }}>{match[2]}</span>
         </div>
@@ -96,8 +96,67 @@ function PanchangamPage({ settings }) {
     return <span style={{ fontWeight: 'bold', flex: '1 1 auto' }}>{label}</span>;
   };
 
+  const formatSlotListTimes = (slots, nextDayText) => {
+    if (!slots || !Array.isArray(slots)) return [];
+    let isOvernight = false;
+    let prevMins = -1;
+    const nextDayKeywords = ['next day', 'அடுத்த நாள்', 'اگلے دن', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം'];
+
+    return slots.map((s) => {
+      if (!s) return s;
+      const startStr = s.start || '';
+      const endStr = s.end || '';
+
+      const startMins = parseTimeToMinutes(startStr);
+      const endMins = parseTimeToMinutes(endStr);
+
+      const hasStartNextDayKey = nextDayKeywords.some(k => startStr.toLowerCase().includes(k.toLowerCase()));
+      const hasEndNextDayKey = nextDayKeywords.some(k => endStr.toLowerCase().includes(k.toLowerCase()));
+
+      let startIsNextDay = Boolean(s.startNextDay) || isOvernight || hasStartNextDayKey;
+      if (!startIsNextDay && prevMins >= 0 && startMins >= 0 && startMins < prevMins) {
+        startIsNextDay = true;
+      }
+      if (startIsNextDay) isOvernight = true;
+
+      let endIsNextDay = Boolean(s.endNextDay) || isOvernight || hasEndNextDayKey;
+      if (!endIsNextDay && startMins >= 0 && endMins >= 0 && endMins < startMins) {
+        endIsNextDay = true;
+      }
+      if (endIsNextDay) isOvernight = true;
+
+      if (endMins >= 0) prevMins = endMins;
+      else if (startMins >= 0) prevMins = startMins;
+
+      const formatSingleTime = (timeStr, isNext) => {
+        if (!timeStr) return '';
+        const ignoreKeywords = ['throughout', 'நாள் முழுவதும்', 'दिन भर', 'இಡೀ ದಿನ', 'త్రోలట్', 'മുഴുവൻ'];
+        if (ignoreKeywords.some(k => timeStr.toLowerCase().includes(k.toLowerCase()))) {
+          return timeStr;
+        }
+        const alreadyHasTag = nextDayKeywords.some(k => timeStr.toLowerCase().includes(k.toLowerCase()));
+        if (alreadyHasTag) {
+          return timeStr;
+        }
+        if (isNext) {
+          return `${timeStr} (${nextDayText})`;
+        }
+        return timeStr;
+      };
+
+      return {
+        ...s,
+        formattedStart: formatSingleTime(startStr, startIsNextDay),
+        formattedEnd: formatSingleTime(endStr, endIsNextDay)
+      };
+    });
+  };
+
   const renderTimeSlotList = (slots, titleKey, isAuspicious) => {
     if (!slots || slots.length === 0) return null;
+    const nextDayText = t('nextDay', settings.language);
+    const formattedSlots = formatSlotListTimes(slots, nextDayText);
+
     return (
       <div style={{ marginBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 6px' }}>
@@ -125,26 +184,34 @@ function PanchangamPage({ settings }) {
             </button>
           )}
         </div>
-        {slots.map((s, idx) => (
-          <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
-            {renderSlotLabelContent(s.label)}
-            <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>{s.start} - {s.end}</span>
-          </div>
-        ))}
+        {formattedSlots.map((s, idx) => {
+          return (
+            <div key={idx} className={`time-slot-bar ${isAuspicious ? 'auspicious' : 'inauspicious'}`}>
+              {renderSlotLabelContent(s.label)}
+              <span className="slot-time-badge">
+                {s.formattedStart} - {s.formattedEnd}
+              </span>
+            </div>
+          );
+        })}
       </div>
     );
   };
 
   const renderNakshatraYogamsList = (slots) => {
     if (!slots || slots.length === 0) return null;
+    const nextDayText = t('nextDay', settings.language);
+    const formattedSlots = formatSlotListTimes(slots, nextDayText);
+
     return (
       <div style={{ marginBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 6px' }}>
           <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)' }}>🌟 {t('nakshatraYogam', settings.language)}</h4>
         </div>
-        {slots.map((s, idx) => {
+        {formattedSlots.map((s, idx) => {
           const labelLower = (s.label || '').toLowerCase();
           const isGood = labelLower.includes('amrita') || labelLower.includes('siddha') 
+            || s.label.includes('அமிர்த') || s.label.includes('சித்த')
             || s.label.includes('அமிர்த') || s.label.includes('சித்த')
             || s.label.includes('अमृत') || s.label.includes('सिद्ध')
             || s.label.includes('ಅಮೃತ') || s.label.includes('ಸಿದ್ಧ')
@@ -154,7 +221,9 @@ function PanchangamPage({ settings }) {
           return (
             <div key={idx} className={`time-slot-bar ${isGood ? 'auspicious' : 'inauspicious'}`}>
               <span style={{ fontWeight: 'bold' }}>{s.label}</span>
-              <span style={{ whiteSpace: 'nowrap', fontWeight: 'bold', marginLeft: 'auto', alignSelf: 'flex-start' }}>{s.start} - {s.end}</span>
+              <span className="slot-time-badge">
+                {s.formattedStart} - {s.formattedEnd}
+              </span>
             </div>
           );
         })}
@@ -162,7 +231,7 @@ function PanchangamPage({ settings }) {
     );
   };
 
-  const parseTimeToMinutes = (timeStr) => {
+    const parseTimeToMinutes = (timeStr) => {
     if (!timeStr) return -1;
     const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
     if (!match) return -1;
@@ -184,14 +253,9 @@ function PanchangamPage({ settings }) {
 
     if (refStartStr) {
       const refMins = parseTimeToMinutes(refStartStr);
-      if (refMins >= 0 && endMins < refMins && refMins >= 12 * 60) {
+      if (refMins >= 0 && endMins <= refMins) {
         return true;
       }
-    }
-
-    // Early morning hours (00:00 AM to 08:30 AM) belong to next calendar day morning relative to panchangam start
-    if (endMins >= 0 && endMins <= 8 * 60 + 30) {
-      return true;
     }
 
     return false;
@@ -272,7 +336,7 @@ function PanchangamPage({ settings }) {
             <div className="card" style={{ margin: 0 }}>
               <h3 className="title-gold" style={{ marginTop: 0 }}>🌅 {t('sunrise', settings.language)} & 🌇 {t('sunset', settings.language)}</h3>
               
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '10px', marginBottom: '12px' }}>
+              <div className="panchangam-summary-grid">
                 <div className="element-detail-item" style={{ margin: 0, textAlign: 'center' }}>
                   <div className="element-label">🌅 {t('sunrise', settings.language)}</div>
                   <strong style={{ fontSize: '14px' }}>{data.sunrise}</strong>
@@ -294,12 +358,18 @@ function PanchangamPage({ settings }) {
               <div className="element-detail-item" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px' }}>
-                    {data.muhurthamDay ? '✅ ' + t('auspiciousDay', settings.language) : '❌ ' + t('inauspiciousDay', settings.language)}
+                    {data.muhurthamDay ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) : '❌ ' + t('inauspiciousDay', settings.language)}
                   </div>
+
+                  {data.isAgniNakshathiram && (
+                    <div style={{ background: 'rgba(255, 152, 0, 0.15)', border: '1px solid #ff9800', color: '#ff9800', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px' }}>
+                      🔥 {t('agniNakshathiram', settings.language)}
+                    </div>
+                  )}
 
                   {data.vasthuDay && (
                     <div style={{ background: '#e8f5e9', border: '1px solid #a5d6a7', color: '#2e7d32', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px' }}>
-                      🏡 {t('vasthuDay', settings.language)}
+                      🏡 {t('vasthuTitle', settings.language)}
                     </div>
                   )}
                 </div>
@@ -367,6 +437,40 @@ function PanchangamPage({ settings }) {
                 <div style={{ marginBottom: '12px', padding: '10px 12px', backgroundColor: 'rgba(255, 215, 0, 0.08)', borderRadius: '8px', borderLeft: '4px solid var(--accent-gold)' }}>
                   <div style={{ fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '3px' }}>☀️ {t('abhijitMuhurtham', settings.language)}</div>
                   <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{data.abhijitMuhurtham.start} - {data.abhijitMuhurtham.end}</div>
+                </div>
+              )}
+              {data.vasthuDay && data.vasthuNeram && (
+                <div style={{
+                  marginBottom: '14px',
+                  padding: '12px',
+                  backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                  borderRadius: '10px',
+                  borderLeft: '4px solid #4caf50',
+                  border: '1px solid rgba(76, 175, 80, 0.25)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                    <span style={{ fontWeight: 'bold', fontSize: '15px', color: '#4caf50' }}>
+                      🏠 {t('vasthuTitle', settings.language)}
+                    </span>
+                    <span style={{
+                      fontSize: '11.5px',
+                      padding: '3px 8px',
+                      borderRadius: '12px',
+                      fontWeight: 'bold',
+                      backgroundColor: data.vasthuAuspicious ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
+                      color: data.vasthuAuspicious ? '#4caf50' : '#ef5350'
+                    }}>
+                      {data.vasthuAuspicious ? `✓ ${t('bhoomiPujaSuitable', settings.language)}` : `⚠️ ${t('bhoomiPujaAvoid', settings.language)}`}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                    ⏰ <strong>{t('vasthuAwakeTime', settings.language)}:</strong> {data.vasthuNeram.formattedStart || data.vasthuNeram.start} - {data.vasthuNeram.formattedEnd || data.vasthuNeram.end}
+                  </div>
+                  {data.vasthuPujaNeram && (
+                    <div style={{ fontSize: '13px', color: 'var(--accent-gold)', fontWeight: 'bold' }}>
+                      🙏 <strong>{t('vasthuPujaTime', settings.language)}:</strong> {data.vasthuPujaNeram.formattedStart || data.vasthuPujaNeram.start} - {data.vasthuPujaNeram.formattedEnd || data.vasthuPujaNeram.end}
+                    </div>
+                  )}
                 </div>
               )}
               {renderTimeSlotList(data.nallaNeram, 'nallaNeram', true)}

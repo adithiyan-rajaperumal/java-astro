@@ -87,4 +87,56 @@ public class DailyPanchangamServiceTest {
         assertEquals("राहु काल", resultHi.raghuKalam().get(0).label());
         assertEquals("सूर्य", resultHi.horais().get(0).localizedPlanet());
     }
+
+    @Test
+    public void testGowriNallaNeramAndNakshatraYogamNextDayFlags() {
+        PanchangamRequestDTO request = new PanchangamRequestDTO(
+            "2026-07-23",
+            13.0827,
+            80.2707,
+            "ta",
+            "LAHIRI"
+        );
+        DailyPanchangamDTO result = dailyPanchangamService.calculateDailyPanchangam(request);
+
+        assertNotNull(result);
+        assertNotNull(result.gowriNallaNeram());
+        assertFalse(result.gowriNallaNeram().isEmpty());
+
+        for (DailyPanchangamDTO.TimeSlotDTO slot : result.gowriNallaNeram()) {
+            if (slot.start().toUpperCase().contains("AM") && (slot.start().startsWith("12:") || slot.start().startsWith("01:") || slot.start().startsWith("02:") || slot.start().startsWith("03:") || slot.start().startsWith("04:"))) {
+                assertTrue(slot.startNextDay(), "Post-midnight start time " + slot.start() + " should have startNextDay=true");
+                assertTrue(slot.endNextDay(), "Post-midnight end time " + slot.end() + " should have endNextDay=true");
+            }
+        }
+
+        assertNotNull(result.nakshatraYogams());
+        assertFalse(result.nakshatraYogams().isEmpty());
+    }
+
+    @Test
+    public void testVasthuNeramAndMuhurthamDetails() {
+        PanchangamRequestDTO requestVasthu = new PanchangamRequestDTO(
+            "2026-01-26",
+            13.0827,
+            80.2707,
+            "ta",
+            "LAHIRI"
+        );
+        DailyPanchangamDTO vasthuResult = dailyPanchangamService.calculateDailyPanchangam(requestVasthu);
+        assertNotNull(vasthuResult);
+        assertTrue(vasthuResult.vasthuDay(), "Jan 26 (Thai 12th) should be a Vasthu Day");
+        assertNotNull(vasthuResult.vasthuNeram(), "Vasthu Neram time slot should not be null");
+        assertNotNull(vasthuResult.vasthuPujaNeram(), "Vasthu Puja Neram time slot should not be null");
+
+        PanchangamRequestDTO requestJul = new PanchangamRequestDTO(
+            "2026-07-23",
+            13.0827,
+            80.2707,
+            "ta",
+            "LAHIRI"
+        );
+        DailyPanchangamDTO julResult = dailyPanchangamService.calculateDailyPanchangam(requestJul);
+        assertNotNull(julResult);
+    }
 }
