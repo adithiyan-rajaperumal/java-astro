@@ -1,65 +1,128 @@
-# Design Specification: Gowri Nalla Neram Time Formatting & Alignment Engine
+# Design Specification: Java-Driven Next-Day Time Slot Formatting
 
 ## 1. Overview
-This specification details the design for interval-based time slot formatting and placement in the Gowri Panchangam and standard Panchangam time slot cards (`renderTimeSlotList`) within `PanchangamPage.jsx`.
+This specification details the Java backend-driven design for interval-based time slot formatting in Panchangam time slot cards (`TimeSlotDTO`), specifically addressing Gowri Nalla Neram and Nakshatra Yogam slots in `PanchangamPage.jsx`.
 
-The system ensures that Next Day indicators (`(அடுத்த நாள்)`, `(Next Day)`, `(اگلے دن)`, `(अगले दिन)`, etc.) are triggered **only when a time slot crosses 12:00 AM (midnight)**, leaving all pre-midnight daytime and evening slots clean. Furthermore, time ranges are vertically centered and right-aligned with flex wrapping support.
-
----
-
-## 2. Requirements & Capabilities
-
-1. **Selective Midnight Next-Day Indicator**:
-   - Pre-midnight time points (daytime and evening slots before 12:00 AM) carry no Next Day tag.
-   - Transition end times (crossing 12:00 AM, where `endMins < startMins`) trigger the `isOvernight` flag and carry the Next Day tag on the end timestamp.
-   - Post-midnight time points (occurring after midnight transition before next sunrise) carry Next Day tags on both start and end timestamps.
-
-2. **Unified Slot Formatting**:
-   - Reusable helper `formatSlotListTimes(slots, nextDayText)` used by both Gowri Panchangam slots (`renderTimeSlotList`) and Nakshatra Yogam slots (`renderNakshatraYogamsList`).
-
-3. **UI Layout & Placement Correction**:
-   - Vertically center time range badges (`alignSelf: 'center'`) alongside title/description labels.
-   - Right-aligned (`marginLeft: 'auto'`), with responsive wrapping to prevent overflow on mobile.
+By leveraging `ZonedDateTime.toLocalDate().isAfter(zdtSunrise.toLocalDate())` on the Java backend, exact calendar date boundaries are evaluated for both start and end timestamps. Next Day indicators (`(அடுத்த நாள்)`, `(Next Day)`, etc.) are accurately attached whenever a timestamp falls on the post-midnight date relative to the Panchangam day's sunrise.
 
 ---
 
-## 3. Data Model & Formatting Algorithm
+## 2. Requirements & Architecture
 
-### `formatSlotListTimes(slots, nextDayText)` Algorithm
+1. **Java Data Model (`TimeSlotDTO`) Extension**:
+   - Add `boolean startNextDay` and `boolean endNextDay` to `TimeSlotDTO`.
+   - Maintain overloaded constructors to ensure backwards compatibility.
 
-For each slot `s` in `slots`:
-1. Parse `startMins` and `endMins` in minutes from midnight (0 to 1439).
-2. Maintain `isOvernight` flag initialized to `false`.
-3. Determine `startIsNextDay`:
-   - `true` if `isOvernight` is already true, or `startStr` contains next-day keywords.
-   - If `startIsNextDay` is true, set `isOvernight = true`.
-4. Determine `endIsNextDay`:
-   - `true` if `isOvernight` is true, or `endStr` contains next-day keywords.
-   - `true` if `startMins >= 0 && endMins >= 0 && endMins < startMins` (slot crosses 12:00 AM midnight).
-   - If `endIsNextDay` is true, set `isOvernight = true`.
-5. Format times:
-   - `formattedStart = startIsNextDay ? "${s.start} (${nextDayText})" : s.start`
-   - `formattedEnd = endIsNextDay ? "${s.end} (${nextDayText})" : s.end`
+2. **Backend Date Boundary Calculation**:
+   - For all time slots generated in `DailyPanchangamServiceImpl.java` (including `calculateGowriNallaNeram`, `calculateNakshatraYogams`, `calculateKalam`, and `calculateDynamicNallaNeram`):
+     - `startNextDay = startZdt.toLocalDate().isAfter(zdtSunrise.toLocalDate())`
+     - `endNextDay = endZdt.toLocalDate().isAfter(zdtSunrise.toLocalDate())`
+
+3. **Frontend Formatting (`PanchangamPage.jsx`)**:
+   - In `formatSlotListTimes(slots, nextDayText)`, evaluate `s.startNextDay` and `s.endNextDay`.
+   - Append `(${nextDayText})` to `formattedStart` and `formattedEnd` whenever the respective boolean flag is `true`.
+   - Retain sequence fallback check (`startMins < prevMins` or `endMins < startMins`) for resiliency.
 
 ---
 
-## 4. Multi-Language Key Support
+## 3. Detailed Component Changes
 
-Uses the existing `nextDay` key from `translations.js`:
-- **English (`en`)**: `Next Day`
-- **Tamil (`ta`)**: `அடுத்த நாள்`
-- **Hindi (`hi`)**: `अगले दिन`
-- **Kannada (`kn`)**: `ಮುಂದಿನ ದಿನ`
-- **Telugu (`te`)**: `తరువాత రోజు`
-- **Malayalam (`ml`)**: `അടുത്ത ദിവസം`
+### 3.1 Backend: `TimeSlotDTO.java`
+Update `TimeSlotDTO` record definition:
+```java
+package org.vedic.astro.dto;
+
+public record TimeSlotDTO(
+    String start,
+    String end,
+    String label,
+    boolean startNextDay,
+    boolean endNextDay
+) {
+    public TimeSlotDTO(String start, String end, String label) {
+        this(start, end, label, false, false);
+    }
+}
+```
+
+### 3.2 Backend: `DailyPanchangamServiceImpl.java`
+Helper method to construct `TimeSlotDTO` with automatic sunrise date comparison:
+```java
+private TimeSlotDTO createTimeSlotDTO(ZonedDateTime start, ZonedDateTime end, String label, ZonedDateTime zdtSunrise, DateTimeFormatter formatter) {
+    LocalDate panchangamDate = zdtSunrise.toLocalDate();
+    boolean startNextDay = start.toLocalDate().isAfter(panchangamDate);
+    boolean endNextDay = end.toLocalDate().isAfter(panchangamDate);
+    return new TimeSlotDTO(start.format(formatter), end.format(formatter), label, startNextDay, endNextDay);
+}
+```
+Apply `createTimeSlotDTO` across:
+- `calculateGowriNallaNeram` (Day and Night Gowri loops)
+- `calculateNakshatraYogams` (Span 1 and Span 2 slots)
+- `calculateKalam` (Rahu Kalam, Yamagandam, Gulikai)
+- `calculateDynamicNallaNeram`
+
+### 3.3 Frontend: `PanchangamPage.jsx`
+Update `formatSlotListTimes`:
+```javascript
+const formatSlotListTimes = (slots, nextDayText) => {
+  if (!slots || !Array.isArray(slots)) return [];
+  let isOvernight = false;
+  let prevMins = -1;
+  const nextDayKeywords = ['next day', 'அடுத்த நாள்', 'اگلے دن', 'अगले दिन', 'ಮುಂದಿನ ದಿನ', 'తరువాత రోజు', 'അടുത്ത ദിവസം'];
+
+  return slots.map((s) => {
+    if (!s) return s;
+    const startStr = s.start || '';
+    const endStr = s.end || '';
+
+    const startMins = parseTimeToMinutes(startStr);
+    const endMins = parseTimeToMinutes(endStr);
+
+    const hasStartNextDayKey = nextDayKeywords.some(k => startStr.toLowerCase().includes(k.toLowerCase()));
+    const hasEndNextDayKey = nextDayKeywords.some(k => endStr.toLowerCase().includes(k.toLowerCase()));
+
+    // Use backend boolean flags if present, otherwise fallback to sequence checks
+    let startIsNextDay = s.startNextDay || isOvernight || hasStartNextDayKey;
+    if (!startIsNextDay && prevMins >= 0 && startMins >= 0 && startMins < prevMins) {
+      startIsNextDay = true;
+    }
+    if (startIsNextDay) isOvernight = true;
+
+    let endIsNextDay = s.endNextDay || isOvernight || hasEndNextDayKey;
+    if (!endIsNextDay && startMins >= 0 && endMins >= 0 && endMins < startMins) {
+      endIsNextDay = true;
+    }
+    if (endIsNextDay) isOvernight = true;
+
+    if (endMins >= 0) prevMins = endMins;
+    else if (startMins >= 0) prevMins = startMins;
+
+    const formatSingleTime = (timeStr, isNext) => {
+      if (!timeStr) return '';
+      const ignoreKeywords = ['throughout', 'நாள் முழுவதும்', 'दिन भर', 'இಡೀ ದಿನ', 'త్రోలట్', 'മുഴുവൻ'];
+      if (ignoreKeywords.some(k => timeStr.toLowerCase().includes(k.toLowerCase()))) return timeStr;
+      if (nextDayKeywords.some(k => timeStr.toLowerCase().includes(k.toLowerCase()))) return timeStr;
+      return isNext ? `${timeStr} (${nextDayText})` : timeStr;
+    };
+
+    return {
+      ...s,
+      formattedStart: formatSingleTime(startStr, startIsNextDay),
+      formattedEnd: formatSingleTime(endStr, endIsNextDay)
+    };
+  });
+};
+```
 
 ---
 
-## 5. Verification Plan
+## 4. Verification & Testing Strategy
 
-1. **Unit Verification**: Test `formatSlotListTimes` with exact Gowri sequence:
-   - `05:52 AM - 07:28 AM` $\rightarrow$ `05:52 AM - 07:28 AM` *(Clean)*
-   - `07:28 AM - 09:03 AM` $\rightarrow$ `07:28 AM - 09:03 AM` *(Clean)*
-   - `10:51 PM - 12:15 AM` $\rightarrow$ `10:51 PM - 12:15 AM (அடுத்த நாள்)` *(Transition)*
-   - `12:15 AM - 01:39 AM` $\rightarrow$ `12:15 AM (அடுத்த நாள்) - 01:39 AM (அடுத்த நாள்)` *(Post-midnight)*
-2. **Frontend Build**: Run `npm run build` in `frontend/` to ensure zero compilation errors.
+1. **Unit Test Scenarios**:
+   - Post-midnight Gowri slots (e.g. `12:15 AM - 01:39 AM`, `03:04 AM - 04:28 AM`) $\rightarrow$ `12:15 AM (அடுத்த நாள்) - 01:39 AM (அடுத்த நாள்)`.
+   - Daytime/evening Gowri slots (e.g. `07:28 AM - 09:04 AM`, `09:26 PM - 10:51 PM`) $\rightarrow$ Clean (no tag).
+   - Micro-span Nakshatra Yogam (e.g. `05:52 AM - 05:53 AM`) $\rightarrow$ Clean (no tag).
+   - Overnight Nakshatra Yogam (e.g. `07:34 AM - 05:53 AM`) $\rightarrow$ `07:34 AM - 05:53 AM (அடுத்த நாள்)`.
+2. **Build Verification**:
+   - Backend: `mvn test-compile` / `./gradlew compileJava` or Java compilation.
+   - Frontend: `npm run build` inside `frontend/`.
