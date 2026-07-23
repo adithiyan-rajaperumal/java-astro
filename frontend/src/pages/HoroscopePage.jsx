@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BirthForm from '../components/BirthForm';
 import IndianChart from '../components/IndianChart';
 import { t } from '../i18n/translations';
@@ -10,6 +10,10 @@ function HoroscopePage({ settings }) {
   const [activeSubTab, setActiveSubTab] = useState('charts');
   const [expandedDasa, setExpandedDasa] = useState(null);
   const [formPayload, setFormPayload] = useState(null);
+
+  useEffect(() => {
+    setReport(null);
+  }, [settings.language]);
 
   const handleFormSubmit = async (payload) => {
     setLoading(true);

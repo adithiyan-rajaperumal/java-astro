@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LocationSearch from '../components/LocationSearch';
 import { t } from '../i18n/translations';
 
@@ -19,6 +19,10 @@ function MatchingPage({ settings }) {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setResult(null);
+  }, [settings.language]);
 
   const handleDateChange = (val, setter) => {
     const clean = val.replace(/\D/g, '');
