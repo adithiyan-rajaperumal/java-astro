@@ -358,11 +358,12 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         ZonedDateTime zdtSunrise = jdToZonedDateTime(jdSunrise, zoneId);
 
         double dayDurationDays = (jdSunset - jdSunrise);
-        double startAwakeJd = jdSunrise + (awakeNazhigai / 60.0) * dayDurationDays;
-        double endAwakeJd = startAwakeJd + (3.0 / 60.0) * dayDurationDays; // 3 Nazhigai = 90 mins
+        // Daytime consists of 30 Nazhigai (1 Nazhigai = 24 mins).
+        double startAwakeJd = jdSunrise + (awakeNazhigai / 30.0) * dayDurationDays;
+        double endAwakeJd = startAwakeJd + (3.75 / 30.0) * dayDurationDays; // 3.75 Nazhigai = 90 mins
 
-        double startPujaJd = startAwakeJd + (1.2 / 60.0) * dayDurationDays; // 36 mins after awake start
-        double endPujaJd = startAwakeJd + (2.4 / 60.0) * dayDurationDays;   // lasts 36 mins
+        double startPujaJd = startAwakeJd + (1.5 / 30.0) * dayDurationDays; // 1.5 Nazhigai (36 mins) after awake start
+        double endPujaJd = startPujaJd + (1.5 / 30.0) * dayDurationDays;     // lasts 1.5 Nazhigai (36 mins)
 
         ZonedDateTime awakeStart = jdToZonedDateTime(startAwakeJd, zoneId);
         ZonedDateTime awakeEnd = jdToZonedDateTime(endAwakeJd, zoneId);

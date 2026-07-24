@@ -141,6 +141,8 @@ public class DailyPanchangamServiceTest {
         DailyPanchangamDTO resultAadi = dailyPanchangamService.calculateDailyPanchangam(requestAadi);
         assertNotNull(resultAadi);
         assertTrue(resultAadi.vasthuDay(), "Jul 27 (Aadi 11th) should be a Vasthu Day");
+        System.out.println("Aadi 11 Vasthu Awake: " + resultAadi.vasthuNeram().start() + " - " + resultAadi.vasthuNeram().end());
+        System.out.println("Aadi 11 Vasthu Puja: " + resultAadi.vasthuPujaNeram().start() + " - " + resultAadi.vasthuPujaNeram().end());
 
         // Masi 22nd (Mar 06, 2026) -> Vasthu Day
         PanchangamRequestDTO requestMasi = new PanchangamRequestDTO(
