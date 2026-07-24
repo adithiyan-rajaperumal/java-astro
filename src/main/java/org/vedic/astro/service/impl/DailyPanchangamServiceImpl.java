@@ -957,7 +957,11 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         if (endJd > 0 && endJd < jdNextSunrise) {
             int nextNakIdx = (nakIdx % 27) + 1;
             ZonedDateTime s2 = jdToZonedDateTime(endJd, zoneId);
-            ZonedDateTime e2 = jdToZonedDateTime(jdNextSunrise, zoneId);
+
+            double targetVal2 = nextNakIdx * (360.0 / 27.0);
+            double endJd2 = findTransitionTime(endJd + 0.01, endJd + 1.2, targetVal2, this::getMoonLongitude);
+            double span2EndJd = (endJd2 > 0 && endJd2 < jdNextSunrise) ? endJd2 : jdNextSunrise;
+            ZonedDateTime e2 = jdToZonedDateTime(span2EndJd, zoneId);
 
             int yogamType2 = NAKSHATRA_VARA_YOGAMS[dayOfWeek][nextNakIdx - 1];
             String key2 = switch (yogamType2) {
@@ -966,6 +970,20 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 default -> "gowri.marana_yogam";
             };
             list.add(createTimeSlotDTO(s2, e2, translationService.getLabel(key2), zdtSunrise, formatter));
+
+            if (endJd2 > 0 && endJd2 < jdNextSunrise) {
+                int thirdNakIdx = (nextNakIdx % 27) + 1;
+                ZonedDateTime s3 = jdToZonedDateTime(endJd2, zoneId);
+                ZonedDateTime e3 = jdToZonedDateTime(jdNextSunrise, zoneId);
+
+                int yogamType3 = NAKSHATRA_VARA_YOGAMS[dayOfWeek][thirdNakIdx - 1];
+                String key3 = switch (yogamType3) {
+                    case 0 -> "gowri.amirdha_yogam";
+                    case 1 -> "gowri.siddha_yogam";
+                    default -> "gowri.marana_yogam";
+                };
+                list.add(createTimeSlotDTO(s3, e3, translationService.getLabel(key3), zdtSunrise, formatter));
+            }
         }
 
         return list;
