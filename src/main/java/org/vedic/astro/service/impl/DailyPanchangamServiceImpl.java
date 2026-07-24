@@ -339,18 +339,18 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double awakeNazhigai = -1;
 
         switch (solarRashi) {
-            case 1: targetSolarDay = 10; awakeNazhigai = 8.0; break;  // Chithirai
-            case 2: targetSolarDay = 21; awakeNazhigai = 10.0; break; // Vaikasi
-            case 4: targetSolarDay = 8;  awakeNazhigai = 2.0; break;  // Aadi
-            case 5: targetSolarDay = 6;  awakeNazhigai = 18.0; break; // Avani
-            case 6: targetSolarDay = 6;  awakeNazhigai = 18.0; break; // Purattasi
-            case 7: targetSolarDay = 11; awakeNazhigai = 2.0; break;  // Aippasi
-            case 8: targetSolarDay = 8;  awakeNazhigai = 10.0; break; // Karthigai
-            case 10: targetSolarDay = 12; awakeNazhigai = 10.0; break; // Thai
-            default: break; // No Vasthu days in 3 (Aani), 9 (Margazhi), 11 (Masi), 12 (Panguni)
+            case 1:  targetSolarDay = 10; awakeNazhigai = 8.0;  break; // Chithirai 10
+            case 2:  targetSolarDay = 21; awakeNazhigai = 10.0; break; // Vaikasi 21
+            case 4:  targetSolarDay = 11; awakeNazhigai = 2.0;  break; // Aadi 11
+            case 5:  targetSolarDay = 6;  awakeNazhigai = 18.0; break; // Avani 6
+            case 7:  targetSolarDay = 11; awakeNazhigai = 2.0;  break; // Aippasi 11
+            case 8:  targetSolarDay = 8;  awakeNazhigai = 10.0; break; // Karthigai 8
+            case 10: targetSolarDay = 12; awakeNazhigai = 10.0; break; // Thai 12
+            case 11: targetSolarDay = 22; awakeNazhigai = 10.0; break; // Masi 22
+            default: break; // No Vasthu days in 3 (Aani), 6 (Purattasi), 9 (Margazhi), 12 (Panguni)
         }
 
-        if (targetSolarDay == -1 || Math.abs(solarDay - targetSolarDay) > 0) {
+        if (jdSankranti < 0 || targetSolarDay == -1 || Math.abs(solarDay - targetSolarDay) > 0) {
             return new VasthuResult(false, false, null, null);
         }
 

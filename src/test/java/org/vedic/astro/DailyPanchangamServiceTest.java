@@ -116,27 +116,54 @@ public class DailyPanchangamServiceTest {
 
     @Test
     public void testVasthuNeramAndMuhurthamDetails() {
-        PanchangamRequestDTO requestVasthu = new PanchangamRequestDTO(
+        // Thai 12th (Jan 26, 2026) -> Vasthu Day
+        PanchangamRequestDTO requestThai = new PanchangamRequestDTO(
             "2026-01-26",
             13.0827,
             80.2707,
             "ta",
             "LAHIRI"
         );
-        DailyPanchangamDTO vasthuResult = dailyPanchangamService.calculateDailyPanchangam(requestVasthu);
-        assertNotNull(vasthuResult);
-        assertTrue(vasthuResult.vasthuDay(), "Jan 26 (Thai 12th) should be a Vasthu Day");
-        assertNotNull(vasthuResult.vasthuNeram(), "Vasthu Neram time slot should not be null");
-        assertNotNull(vasthuResult.vasthuPujaNeram(), "Vasthu Puja Neram time slot should not be null");
+        DailyPanchangamDTO resultThai = dailyPanchangamService.calculateDailyPanchangam(requestThai);
+        assertNotNull(resultThai);
+        assertTrue(resultThai.vasthuDay(), "Jan 26 (Thai 12th) should be a Vasthu Day");
+        assertNotNull(resultThai.vasthuNeram(), "Vasthu Neram time slot should not be null");
+        assertNotNull(resultThai.vasthuPujaNeram(), "Vasthu Puja Neram time slot should not be null");
 
-        PanchangamRequestDTO requestJul = new PanchangamRequestDTO(
-            "2026-07-23",
+        // Aadi 11th (Jul 27, 2026) -> Vasthu Day
+        PanchangamRequestDTO requestAadi = new PanchangamRequestDTO(
+            "2026-07-27",
             13.0827,
             80.2707,
             "ta",
             "LAHIRI"
         );
-        DailyPanchangamDTO julResult = dailyPanchangamService.calculateDailyPanchangam(requestJul);
-        assertNotNull(julResult);
+        DailyPanchangamDTO resultAadi = dailyPanchangamService.calculateDailyPanchangam(requestAadi);
+        assertNotNull(resultAadi);
+        assertTrue(resultAadi.vasthuDay(), "Jul 27 (Aadi 11th) should be a Vasthu Day");
+
+        // Masi 22nd (Mar 06, 2026) -> Vasthu Day
+        PanchangamRequestDTO requestMasi = new PanchangamRequestDTO(
+            "2026-03-06",
+            13.0827,
+            80.2707,
+            "ta",
+            "LAHIRI"
+        );
+        DailyPanchangamDTO resultMasi = dailyPanchangamService.calculateDailyPanchangam(requestMasi);
+        assertNotNull(resultMasi);
+        assertTrue(resultMasi.vasthuDay(), "Mar 06 (Masi 22nd) should be a Vasthu Day");
+
+        // July 24, 2026 (Aadi 8th) -> NOT a Vasthu Day
+        PanchangamRequestDTO requestJul24 = new PanchangamRequestDTO(
+            "2026-07-24",
+            13.0827,
+            80.2707,
+            "ta",
+            "LAHIRI"
+        );
+        DailyPanchangamDTO resultJul24 = dailyPanchangamService.calculateDailyPanchangam(requestJul24);
+        assertNotNull(resultJul24);
+        assertFalse(resultJul24.vasthuDay(), "Jul 24 (Aadi 8th) should NOT be a Vasthu Day");
     }
 }
