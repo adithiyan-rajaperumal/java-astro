@@ -1,0 +1,277 @@
+import React from 'react';
+import AstroLogo from './AstroLogo';
+import { t } from '../i18n/translations';
+
+export function PanchangamShareCard({ data, currentDate, settings }) {
+  if (!data) return null;
+
+  const lang = settings?.language || 'ta';
+  const untilStr = t('until', lang);
+  const thenStr = t('then', lang);
+
+  const formatElementTiming = (elem) => {
+    if (!elem) return '';
+    const firstName = elem.localizedName || elem.name;
+    if (!elem.endTime) return firstName;
+    let text = `${firstName} (${elem.endTime} ${untilStr})`;
+    const nextName = elem.nextLocalizedName || elem.nextName;
+    if (nextName) {
+      if (elem.nextEndTime) {
+        text += `, ${thenStr} ${nextName} (${elem.nextEndTime} ${untilStr})`;
+      } else {
+        text += `, ${thenStr} ${nextName}`;
+      }
+    }
+    return text;
+  };
+
+  return (
+    <div
+      id="panchangam-share-card"
+      style={{
+        width: '1080px',
+        padding: '20px',
+        backgroundColor: '#fffdf7',
+        color: '#1a1a1a',
+        fontFamily: "'Segoe UI', Roboto, 'Mukta', 'Noto Sans Tamil', sans-serif",
+        boxSizing: 'border-box',
+        borderRadius: '16px',
+        border: '6px double #b71c1c',
+        boxShadow: '0 15px 40px rgba(0,0,0,0.3)',
+        position: 'relative'
+      }}
+    >
+      {/* Top Header Banner with Official AstroLogo */}
+      <div style={{
+        backgroundColor: '#b71c1c',
+        color: '#ffffff',
+        padding: '16px 20px',
+        borderRadius: '10px',
+        border: '2px solid #ffd700',
+        marginBottom: '14px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '24px', color: '#ffecb3', fontWeight: 'bold' }}>
+          <AstroLogo size={36} />
+          <span>{t('appTitle', lang)} • {t('panchangam', lang)}</span>
+        </div>
+        <div style={{ fontSize: '34px', fontWeight: '900', color: '#ffffff', margin: '4px 0' }}>
+          📅 {currentDate} | 📍 {settings?.location?.name || 'Chennai'}
+        </div>
+
+        {/* Sun & Moon Times with whiteSpace: nowrap */}
+        <div style={{
+          display: 'flex',
+          justify: 'center',
+          gap: '20px',
+          marginTop: '8px',
+          paddingTop: '8px',
+          borderTop: '1px dashed rgba(255, 255, 255, 0.4)',
+          fontSize: '15.5px',
+          fontWeight: 'bold',
+          color: '#ffffff',
+          whiteSpace: 'nowrap'
+        }}>
+          <span style={{ whiteSpace: 'nowrap' }}>🌅 {t('sunrise', lang)}: {data.sunrise}</span>
+          <span style={{ whiteSpace: 'nowrap' }}>🌇 {t('sunset', lang)}: {data.sunset}</span>
+          <span style={{ whiteSpace: 'nowrap' }}>🌕 {t('moonrise', lang)}: {data.moonrise}</span>
+          <span style={{ whiteSpace: 'nowrap' }}>🌕 {t('moonset', lang)}: {data.moonset}</span>
+        </div>
+      </div>
+
+      {/* Badges Bar */}
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '8px',
+        justify: 'space-between',
+        alignItems: 'center',
+        backgroundColor: '#fff3e0',
+        padding: '10px 16px',
+        borderRadius: '8px',
+        border: '1px solid #ffe0b2',
+        marginBottom: '14px',
+        fontSize: '15px',
+        fontWeight: 'bold'
+      }}>
+        <div style={{ color: data.muhurthamDay ? '#2e7d32' : '#c62828' }}>
+          {data.muhurthamDay ? '✅ ' + t('subhaMuhurtham', lang) : '❌ ' + t('inauspiciousDay', lang)}
+        </div>
+
+        {data.vasthuDay && (
+          <div style={{ backgroundColor: '#e8f5e9', color: '#1b5e20', padding: '4px 10px', borderRadius: '14px', border: '1px solid #a5d6a7' }}>
+            🏡 {t('vasthuTitle', lang)}: {data.vasthuNeram?.start} - {data.vasthuNeram?.end}
+          </div>
+        )}
+
+        {data.isAgniNakshathiram && (
+          <div style={{ backgroundColor: '#fff3e0', color: '#e65100', padding: '4px 10px', borderRadius: '14px', border: '1px solid #ffcc80' }}>
+            🔥 {t('agniNakshathiram', lang)}
+          </div>
+        )}
+
+        <div style={{ color: '#424242' }}>
+          👁️ {t('netram', lang)}: <strong>{data.netram}</strong> | 🌿 {t('jeevan', lang)}: <strong>{data.jeevan}</strong>
+        </div>
+      </div>
+
+      {/* Core 5 Limbs & Zodiac Section */}
+      <div style={{
+        backgroundColor: '#ffffff',
+        border: '1.5px solid #d84315',
+        borderRadius: '10px',
+        padding: '14px 18px',
+        marginBottom: '14px'
+      }}>
+        <h4 style={{ margin: '0 0 10px', color: '#d84315', fontSize: '18px', borderBottom: '1.5px solid #ffccbc', paddingBottom: '4px' }}>
+          📜 {t('panchangamElements', lang)} & 🌙 {t('rashi', lang)}
+        </h4>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '16px', lineHeight: '1.5' }}>
+          <div>
+            <div><span style={{ color: '#d84315', fontWeight: 'bold' }}>{t('rashi', lang)}: </span><strong style={{ fontSize: '17px', color: '#bf360c' }}>{data.rashi}</strong></div>
+            <div><span style={{ color: '#d84315', fontWeight: 'bold' }}>{t('thithi', lang)}: </span>{formatElementTiming(data.thithi)}</div>
+            <div><span style={{ color: '#d84315', fontWeight: 'bold' }}>{t('nakshatra', lang)}: </span>{formatElementTiming(data.nakshatra)}</div>
+          </div>
+
+          <div>
+            <div><span style={{ color: '#c62828', fontWeight: 'bold' }}>{t('chandrastamam', lang)}: </span><strong style={{ color: '#c62828' }}>{Array.isArray(data.chandrastamamNakshatras) ? data.chandrastamamNakshatras.join(', ') : (data.chandrastamamRashi || '')}</strong></div>
+            <div><span style={{ color: '#d84315', fontWeight: 'bold' }}>{t('yogam', lang)}: </span>{formatElementTiming(data.yogam)}</div>
+            <div><span style={{ color: '#d84315', fontWeight: 'bold' }}>{t('karanam', lang)}: </span>{formatElementTiming(data.karanam)}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Auspicious Timings: Left Col (Nalla Neram + Abhijit + Nakshatra Yogam), Right Col (Gowri Nalla Neram Mini-Table) */}
+      <div style={{
+        backgroundColor: '#f1f8e9',
+        border: '1.5px solid #558b2f',
+        borderRadius: '10px',
+        padding: '14px 18px',
+        marginBottom: '14px'
+      }}>
+        <h4 style={{ margin: '0 0 10px', color: '#2e7d32', fontSize: '18px', borderBottom: '1.5px solid #c8e6c9', paddingBottom: '4px' }}>
+          🌟 {t('auspicious', lang)}
+        </h4>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '15px' }}>
+          {/* Left Column: Nalla Neram + Abhijit Muhurtham + Nakshatra Yogam */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div>
+              <div style={{ fontWeight: 'bold', color: '#1b5e20', marginBottom: '4px' }}>☀️ {t('nallaNeram', lang)}:</div>
+              {data.nallaNeram?.map((s, i) => (
+                <div key={i} style={{ backgroundColor: '#ffffff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #c8e6c9', marginBottom: '4px' }}>
+                  <strong>{s.label}:</strong> {s.start} - {s.end}
+                </div>
+              ))}
+            </div>
+
+            {data.abhijitMuhurtham && (
+              <div>
+                <div style={{ fontWeight: 'bold', color: '#1b5e20', marginBottom: '4px' }}>☀️ {t('abhijitMuhurtham', lang)}:</div>
+                <div style={{ backgroundColor: '#ffffff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #c8e6c9' }}>
+                  <strong>{data.abhijitMuhurtham.label || t('abhijitMuhurtham', lang)}:</strong> {data.abhijitMuhurtham.start} - {data.abhijitMuhurtham.end}
+                </div>
+              </div>
+            )}
+
+            {data.nakshatraYogams && data.nakshatraYogams.length > 0 && (
+              <div>
+                <div style={{ fontWeight: 'bold', color: '#1b5e20', marginBottom: '4px' }}>🌟 {t('nakshatraYogam', lang)}:</div>
+                {data.nakshatraYogams.map((s, i) => (
+                  <div key={i} style={{ backgroundColor: '#ffffff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #c8e6c9', marginBottom: '4px' }}>
+                    <strong>{s.label}:</strong> {s.start} - {s.end}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Gowri Nalla Neram Mini-Table */}
+          <div>
+            <div style={{ fontWeight: 'bold', color: '#1b5e20', marginBottom: '6px' }}>🌙 {t('gowriNallaNeram', lang)}:</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {data.gowriNallaNeram?.map((s, i) => (
+                <div key={i} style={{
+                  backgroundColor: '#ffffff',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid #a5d6a7',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{ fontWeight: 'bold', color: '#2e7d32' }}>{s.label}</span>
+                  <span style={{ color: '#1b5e20', fontWeight: '600' }}>{s.start} - {s.end}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Inauspicious Timings */}
+      <div style={{
+        backgroundColor: '#ffebee',
+        border: '1.5px solid #c62828',
+        borderRadius: '10px',
+        padding: '12px 18px',
+        marginBottom: '14px'
+      }}>
+        <h4 style={{ margin: '0 0 8px', color: '#c62828', fontSize: '18px', borderBottom: '1.5px solid #ffcdd2', paddingBottom: '4px' }}>
+          ⚠️ {t('inauspicious', lang)}
+        </h4>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', fontSize: '15px' }}>
+          <div><strong style={{ color: '#b71c1c' }}>{t('rahuKalam', lang)}:</strong> {data.raghuKalam?.map(s => `${s.start} - ${s.end}`).join(', ')}</div>
+          <div><strong style={{ color: '#b71c1c' }}>{t('yamagandam', lang)}:</strong> {data.emagandam?.map(s => `${s.start} - ${s.end}`).join(', ')}</div>
+          <div><strong style={{ color: '#b71c1c' }}>{t('gulikaKalam', lang)}:</strong> {data.kulikai?.map(s => `${s.start} - ${s.end}`).join(', ')}</div>
+        </div>
+      </div>
+
+      {/* 24 Horai Table showing exact time ranges + Planet Badges */}
+      <div style={{
+        backgroundColor: '#ffffff',
+        border: '1.5px solid #f57c00',
+        borderRadius: '10px',
+        padding: '12px 16px',
+        marginBottom: '14px'
+      }}>
+        <h4 style={{ margin: '0 0 8px', color: '#e65100', fontSize: '18px', borderBottom: '1.5px solid #ffe0b2', paddingBottom: '4px' }}>
+          ⏳ {t('horas', lang)}
+        </h4>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', fontSize: '13.5px' }}>
+          {data.horais?.map((h, idx) => (
+            <div key={idx} style={{
+              backgroundColor: '#fff8e1',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ffe082',
+              display: 'flex',
+              justify: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: '#bf360c', fontWeight: 'bold' }}>{h.start} - {h.end}</span>
+              <span style={{ fontWeight: 'bold', color: '#424242' }}>{h.localizedPlanet || h.planet}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer Branding */}
+      <div style={{
+        textAlign: 'center',
+        borderTop: '1.5px dashed #b71c1c',
+        paddingTop: '10px',
+        fontSize: '17px',
+        color: '#b71c1c',
+        fontWeight: 'bold'
+      }}>
+        Generated by https://tinyurl.com/drik-vedic
+      </div>
+    </div>
+  );
+}
