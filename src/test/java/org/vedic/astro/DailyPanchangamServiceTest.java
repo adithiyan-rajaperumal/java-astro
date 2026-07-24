@@ -7,6 +7,7 @@ import org.vedic.astro.dto.DailyPanchangamDTO;
 import org.vedic.astro.dto.PanchangamRequestDTO;
 import org.vedic.astro.service.DailyPanchangamService;
 
+import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -176,5 +177,33 @@ public class DailyPanchangamServiceTest {
         assertTrue(augResult.vasthuDay(), "Aug 23 (Avani 6th) should be a Vasthu Day");
         System.out.println("Avani 6 Vasthu Awake: " + augResult.vasthuNeram().start() + " - " + augResult.vasthuNeram().end());
         System.out.println("Avani 6 Vasthu Puja: " + augResult.vasthuPujaNeram().start() + " - " + augResult.vasthuPujaNeram().end());
+    }
+
+    @Test
+    void testNext90DaysNakshatraYogams() {
+        LocalDate startDate = LocalDate.of(2026, 7, 24);
+        System.out.println("=== NEXT 90 DAYS NAKSHATRA YOGAMS FOR CHENNAI ===");
+        for (int i = 0; i < 90; i++) {
+            LocalDate date = startDate.plusDays(i);
+            PanchangamRequestDTO req = new PanchangamRequestDTO(
+                date.toString(),
+                13.0827,
+                80.2707,
+                "ta",
+                "LAHIRI"
+            );
+            DailyPanchangamDTO res = dailyPanchangamService.calculateDailyPanchangam(req);
+            assertNotNull(res);
+            StringBuilder sb = new StringBuilder();
+            sb.append(date).append(" (").append(date.getDayOfWeek()).append("): ")
+              .append(res.nakshatra().localizedName()).append(" [");
+            if (res.nakshatraYogams() != null) {
+                for (DailyPanchangamDTO.TimeSlotDTO slot : res.nakshatraYogams()) {
+                    sb.append(slot.label()).append(" (").append(slot.start()).append("-").append(slot.end()).append(") ");
+                }
+            }
+            sb.append("]");
+            System.out.println(sb.toString());
+        }
     }
 }
