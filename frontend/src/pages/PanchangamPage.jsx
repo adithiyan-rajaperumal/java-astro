@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import html2canvas from 'html2canvas';
+import { PanchangamShareCard } from '../components/PanchangamShareCard';
 import { t } from '../i18n/translations';
 
 const getTodayDateString = (loc) => {
@@ -28,6 +30,52 @@ function PanchangamPage({ settings }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showGowriModal, setShowGowriModal] = useState(false);
+  const [sharing, setSharing] = useState(false);
+
+  const handleShareAsImage = async () => {
+    const cardElement = document.getElementById('panchangam-share-card');
+    if (!cardElement) return;
+
+    setSharing(true);
+    try {
+      const canvas = await html2canvas(cardElement, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#fffdf7'
+      });
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          setSharing(false);
+          return;
+        }
+        const file = new File([blob], `Panchangam_${currentDate}.png`, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: `Panchangam ${currentDate}`,
+              text: `Daily Panchangam details for ${currentDate}`
+            });
+          } catch (shareErr) {
+            console.log('Share dismissed or failed:', shareErr);
+          }
+        } else {
+          // Fallback file download for desktop
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `Panchangam_${currentDate}.png`;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        }
+        setSharing(false);
+      }, 'image/png');
+    } catch (err) {
+      console.error('Failed to capture Panchangam image:', err);
+      setSharing(false);
+    }
+  };
 
   const getGowriGuideText = (subKey, lang) => {
     const guideObj = t('gowriGuide', lang);
@@ -668,6 +716,11 @@ function PanchangamPage({ settings }) {
           </div>
         </div>
       )}
+
+      {/* Hidden Off-Screen Card Container for html2canvas Capture */}
+      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+        <PanchangamShareCard data={data} currentDate={currentDate} settings={settings} />
+      </div>
     </div>
   );
 }
