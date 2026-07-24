@@ -341,9 +341,9 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         switch (solarRashi) {
             case 1:  targetSolarDay = 10; awakeNazhigai = 7.25;  break; // Chithirai 10 (Puja ~08:54 AM)
             case 2:  targetSolarDay = 21; awakeNazhigai = 10.25; break; // Vaikasi 21 (Puja ~09:58 AM)
-            case 4:  targetSolarDay = 11; awakeNazhigai = 4.25;  break; // Aadi 11 (Awake 07:41 AM - 09:17 AM)
-            case 5:  targetSolarDay = 6;  awakeNazhigai = 3.3;   break; // Avani 6 (Awake 07:18 AM / Puja 07:23 AM - 07:59 AM)
-            case 7:  targetSolarDay = 11; awakeNazhigai = 4.25;  break; // Aippasi 11 (Awake 07:41 AM - 09:17 AM)
+            case 4:  targetSolarDay = 11; awakeNazhigai = 4.33;  break; // Aadi 11 (Awake 07:44 AM - 09:14 AM)
+            case 5:  targetSolarDay = 6;  awakeNazhigai = 3.3;   break; // Avani 6 (Awake 07:19 AM / Puja 07:23 AM - 07:59 AM)
+            case 7:  targetSolarDay = 11; awakeNazhigai = 4.33;  break; // Aippasi 11 (Awake 07:44 AM - 09:14 AM)
             case 8:  targetSolarDay = 8;  awakeNazhigai = 13.25; break; // Karthigai 8 (Puja ~11:29 AM)
             case 10: targetSolarDay = 12; awakeNazhigai = 11.5;  break; // Thai 12 (Puja ~10:41 AM)
             case 11: targetSolarDay = 22; awakeNazhigai = 11.25; break; // Masi 22 (Puja ~10:32 AM)
