@@ -339,18 +339,18 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double awakeNazhigai = -1;
 
         switch (solarRashi) {
-            case 1:  targetSolarDay = 10; awakeNazhigai = 7.25;  break; // Chithirai 10 (Puja ~08:54 AM)
-            case 2:  targetSolarDay = 21; awakeNazhigai = 10.25; break; // Vaikasi 21 (Puja ~09:58 AM)
-            case 4:  targetSolarDay = 11; awakeNazhigai = 4.33;  break; // Aadi 11 (Awake 07:44 AM - 09:14 AM)
-            case 5:  targetSolarDay = 6;  awakeNazhigai = 3.3;   break; // Avani 6 (Awake 07:19 AM / Puja 07:23 AM - 07:59 AM)
-            case 7:  targetSolarDay = 11; awakeNazhigai = 4.33;  break; // Aippasi 11 (Awake 07:44 AM - 09:14 AM)
-            case 8:  targetSolarDay = 8;  awakeNazhigai = 13.25; break; // Karthigai 8 (Puja ~11:29 AM)
-            case 10: targetSolarDay = 12; awakeNazhigai = 11.5;  break; // Thai 12 (Puja ~10:41 AM)
-            case 11: targetSolarDay = 22; awakeNazhigai = 11.25; break; // Masi 22 (Puja ~10:32 AM)
+            case 1:  targetSolarDay = 10; awakeNazhigai = 7.25;  break; // Chithirai 10
+            case 2:  targetSolarDay = 21; awakeNazhigai = 10.25; break; // Vaikasi 21
+            case 4:  targetSolarDay = 11; awakeNazhigai = 4.25;  break; // Aadi 11
+            case 5:  targetSolarDay = 6;  awakeNazhigai = 3.75;  break; // Avani 6
+            case 7:  targetSolarDay = 11; awakeNazhigai = 4.25;  break; // Aippasi 11
+            case 8:  targetSolarDay = 8;  awakeNazhigai = 13.25; break; // Karthigai 8
+            case 10: targetSolarDay = 12; awakeNazhigai = 11.50; break; // Thai 12
+            case 11: targetSolarDay = 22; awakeNazhigai = 11.25; break; // Masi 22
             default: break; // No Vasthu days in 3 (Aani), 6 (Purattasi), 9 (Margazhi), 12 (Panguni)
         }
 
-        if (jdSankranti < 0 || targetSolarDay == -1 || Math.abs(solarDay - targetSolarDay) > 0) {
+        if (jdSankranti < 0 || targetSolarDay == -1 || Math.abs(solarDay - targetSolarDay) > 0 || awakeNazhigai < 0) {
             return new VasthuResult(false, false, null, null);
         }
 
@@ -358,12 +358,12 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         ZonedDateTime zdtSunrise = jdToZonedDateTime(jdSunrise, zoneId);
 
         double dayDurationDays = (jdSunset - jdSunrise);
-        // Daytime consists of 30 Nazhigai (1 Nazhigai = 24 mins).
+        // Strict Swiss Ephemeris Drik calculation: 1 daytime Nazhigai = (jdSunset - jdSunrise) / 30.0
         double startAwakeJd = jdSunrise + (awakeNazhigai / 30.0) * dayDurationDays;
         double endAwakeJd = startAwakeJd + (3.75 / 30.0) * dayDurationDays; // 3.75 Nazhigai = 90 mins
 
         double startPujaJd = startAwakeJd + (1.5 / 30.0) * dayDurationDays; // 1.5 Nazhigai (36 mins) after awake start
-        double endPujaJd = startPujaJd + (1.5 / 30.0) * dayDurationDays;     // lasts 1.5 Nazhigai (36 mins)
+        double endPujaJd = startPujaJd + (1.5 / 30.0) * dayDurationDays;     // 1.5 Nazhigai (36 mins) Puja duration
 
         ZonedDateTime awakeStart = jdToZonedDateTime(startAwakeJd, zoneId);
         ZonedDateTime awakeEnd = jdToZonedDateTime(endAwakeJd, zoneId);
