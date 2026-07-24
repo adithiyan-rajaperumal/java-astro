@@ -173,11 +173,8 @@ public class DailyPanchangamServiceTest {
         );
         DailyPanchangamDTO augResult = dailyPanchangamService.calculateDailyPanchangam(requestAug);
         assertNotNull(augResult);
-        System.out.println("Aug 23, 2026 Nakshatra: " + augResult.nakshatra().name() + " (" + augResult.nakshatra().number() + ")");
-        if (augResult.nakshatraYogams() != null) {
-            for (DailyPanchangamDTO.TimeSlotDTO slot : augResult.nakshatraYogams()) {
-                System.out.println("Yogam Slot: " + slot.label() + " -> " + slot.start() + " - " + slot.end());
-            }
-        }
+        assertTrue(augResult.vasthuDay(), "Aug 23 (Avani 6th) should be a Vasthu Day");
+        System.out.println("Avani 6 Vasthu Awake: " + augResult.vasthuNeram().start() + " - " + augResult.vasthuNeram().end());
+        System.out.println("Avani 6 Vasthu Puja: " + augResult.vasthuPujaNeram().start() + " - " + augResult.vasthuPujaNeram().end());
     }
 }
