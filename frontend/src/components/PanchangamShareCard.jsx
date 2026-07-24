@@ -25,6 +25,27 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
     return text;
   };
 
+  const getDayName = (dateStr, l) => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr + 'T12:00:00');
+      const localeMap = {
+        ta: 'ta-IN',
+        hi: 'hi-IN',
+        te: 'te-IN',
+        kn: 'kn-IN',
+        ml: 'ml-IN',
+        en: 'en-US'
+      };
+      const locale = localeMap[l] || 'en-US';
+      return d.toLocaleDateString(locale, { weekday: 'long' });
+    } catch {
+      return '';
+    }
+  };
+
+  const dayName = getDayName(currentDate, lang);
+
   return (
     <div
       id="panchangam-share-card"
@@ -58,7 +79,7 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
           <span>{t('appTitle', lang)} • {t('panchangam', lang)}</span>
         </div>
         <div style={{ fontSize: '34px', fontWeight: '900', color: '#ffffff', margin: '4px 0' }}>
-          📅 {currentDate} | 📍 {settings?.location?.name || 'Chennai'}
+          {currentDate} {dayName ? `(${dayName})` : ''} | 📍 {settings?.location?.name || 'Chennai'}
         </div>
 
         {/* Sun & Moon Times with whiteSpace: nowrap */}
@@ -247,15 +268,16 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
           {data.horais?.map((h, idx) => (
             <div key={idx} style={{
               backgroundColor: '#fff8e1',
-              padding: '6px 10px',
+              padding: '6px 12px',
               borderRadius: '6px',
               border: '1px solid #ffe082',
               display: 'flex',
               justify: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              gap: '12px'
             }}>
-              <span style={{ color: '#bf360c', fontWeight: 'bold' }}>{h.start} - {h.end}</span>
-              <span style={{ fontWeight: 'bold', color: '#424242' }}>{h.localizedPlanet || h.planet}</span>
+              <span style={{ color: '#bf360c', fontWeight: 'bold', marginRight: '8px', whiteSpace: 'nowrap' }}>{h.start} - {h.end}</span>
+              <span style={{ fontWeight: 'bold', color: '#424242', whiteSpace: 'nowrap' }}>{h.localizedPlanet || h.planet}</span>
             </div>
           ))}
         </div>
