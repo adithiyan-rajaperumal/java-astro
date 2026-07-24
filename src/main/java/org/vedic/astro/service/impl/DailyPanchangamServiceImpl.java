@@ -56,8 +56,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
 
     // 0=Amirdha, 1=Siddha, 2=Marana, 3=Prabalarishta
     private static final int[][] NAKSHATRA_VARA_YOGAMS = {
-        // Sun (0): Amirdha=Hastam(12); Marana=Bharani(1), Arudra(5), Ashlesha(8), Visakha(15), Dhanishta(22); Prabalarishta=P.Ashadha(19)
-        {1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 3, 1, 1, 2, 1, 1, 1, 1},
+        // Sun (0): Amirdha=Hastam(12); Marana=Bharani(1), Arudra(5), Ashlesha(8), Visakha(15), Dhanishta(22)
+        {1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1},
         // Mon (1): Amirdha=Sravana(21); Marana=Aswini(0), Krittika(2), Arudra(5), Ashlesha(8), P.Phalguni(10), Visakha(15), Jyeshta(17), Dhanishta(22), P.Bhadra(24); Prabalarishta=Hasta(12)
         {2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 3, 1, 1, 2, 1, 2, 1, 1, 1, 0, 2, 1, 2, 1, 1},
         // Tue (2): Amirdha=Aswini(0); Marana=Mrigashira(4), Chitra(13), Dhanishta(22); Prabalarishta=P.Ashadha(19)
@@ -339,18 +339,18 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double awakeNazhigai = -1;
 
         switch (solarRashi) {
-            case 1: targetSolarDay = 10; awakeNazhigai = 8.0; break;  // Chithirai
-            case 2: targetSolarDay = 21; awakeNazhigai = 10.0; break; // Vaikasi
-            case 4: targetSolarDay = 8;  awakeNazhigai = 2.0; break;  // Aadi
-            case 5: targetSolarDay = 6;  awakeNazhigai = 18.0; break; // Avani
-            case 6: targetSolarDay = 6;  awakeNazhigai = 18.0; break; // Purattasi
-            case 7: targetSolarDay = 11; awakeNazhigai = 2.0; break;  // Aippasi
-            case 8: targetSolarDay = 8;  awakeNazhigai = 10.0; break; // Karthigai
-            case 10: targetSolarDay = 12; awakeNazhigai = 10.0; break; // Thai
-            default: break; // No Vasthu days in 3 (Aani), 9 (Margazhi), 11 (Masi), 12 (Panguni)
+            case 1:  targetSolarDay = 10; awakeNazhigai = 7.25;  break; // Chithirai 10
+            case 2:  targetSolarDay = 21; awakeNazhigai = 10.25; break; // Vaikasi 21
+            case 4:  targetSolarDay = 11; awakeNazhigai = 4.25;  break; // Aadi 11
+            case 5:  targetSolarDay = 6;  awakeNazhigai = 3.75;  break; // Avani 6
+            case 7:  targetSolarDay = 11; awakeNazhigai = 4.25;  break; // Aippasi 11
+            case 8:  targetSolarDay = 8;  awakeNazhigai = 13.25; break; // Karthigai 8
+            case 10: targetSolarDay = 12; awakeNazhigai = 11.50; break; // Thai 12
+            case 11: targetSolarDay = 22; awakeNazhigai = 11.25; break; // Masi 22
+            default: break; // No Vasthu days in 3 (Aani), 6 (Purattasi), 9 (Margazhi), 12 (Panguni)
         }
 
-        if (targetSolarDay == -1 || Math.abs(solarDay - targetSolarDay) > 0) {
+        if (jdSankranti < 0 || targetSolarDay == -1 || Math.abs(solarDay - targetSolarDay) > 0 || awakeNazhigai < 0) {
             return new VasthuResult(false, false, null, null);
         }
 
@@ -358,11 +358,12 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         ZonedDateTime zdtSunrise = jdToZonedDateTime(jdSunrise, zoneId);
 
         double dayDurationDays = (jdSunset - jdSunrise);
-        double startAwakeJd = jdSunrise + (awakeNazhigai / 60.0) * dayDurationDays;
-        double endAwakeJd = startAwakeJd + (3.0 / 60.0) * dayDurationDays; // 3 Nazhigai = 90 mins
+        // Strict Swiss Ephemeris Drik calculation: 1 daytime Nazhigai = (jdSunset - jdSunrise) / 30.0
+        double startAwakeJd = jdSunrise + (awakeNazhigai / 30.0) * dayDurationDays;
+        double endAwakeJd = startAwakeJd + (3.75 / 30.0) * dayDurationDays; // 3.75 Nazhigai = 90 mins
 
-        double startPujaJd = startAwakeJd + (1.2 / 60.0) * dayDurationDays; // 36 mins after awake start
-        double endPujaJd = startAwakeJd + (2.4 / 60.0) * dayDurationDays;   // lasts 36 mins
+        double startPujaJd = startAwakeJd + (1.5 / 30.0) * dayDurationDays; // 1.5 Nazhigai (36 mins) after awake start
+        double endPujaJd = startPujaJd + (1.5 / 30.0) * dayDurationDays;     // 1.5 Nazhigai (36 mins) Puja duration
 
         ZonedDateTime awakeStart = jdToZonedDateTime(startAwakeJd, zoneId);
         ZonedDateTime awakeEnd = jdToZonedDateTime(endAwakeJd, zoneId);
@@ -957,7 +958,11 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         if (endJd > 0 && endJd < jdNextSunrise) {
             int nextNakIdx = (nakIdx % 27) + 1;
             ZonedDateTime s2 = jdToZonedDateTime(endJd, zoneId);
-            ZonedDateTime e2 = jdToZonedDateTime(jdNextSunrise, zoneId);
+
+            double targetVal2 = nextNakIdx * (360.0 / 27.0);
+            double endJd2 = findTransitionTime(endJd + 0.01, endJd + 1.2, targetVal2, this::getMoonLongitude);
+            double span2EndJd = (endJd2 > 0 && endJd2 < jdNextSunrise) ? endJd2 : jdNextSunrise;
+            ZonedDateTime e2 = jdToZonedDateTime(span2EndJd, zoneId);
 
             int yogamType2 = NAKSHATRA_VARA_YOGAMS[dayOfWeek][nextNakIdx - 1];
             String key2 = switch (yogamType2) {
@@ -967,6 +972,21 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 default -> "gowri.prabalarishta_yogam";
             };
             list.add(createTimeSlotDTO(s2, e2, translationService.getLabel(key2), zdtSunrise, formatter));
+
+            if (endJd2 > 0 && endJd2 < jdNextSunrise) {
+                int thirdNakIdx = (nextNakIdx % 27) + 1;
+                ZonedDateTime s3 = jdToZonedDateTime(endJd2, zoneId);
+                ZonedDateTime e3 = jdToZonedDateTime(jdNextSunrise, zoneId);
+
+                int yogamType3 = NAKSHATRA_VARA_YOGAMS[dayOfWeek][thirdNakIdx - 1];
+                String key3 = switch (yogamType3) {
+                    case 0 -> "gowri.amirdha_yogam";
+                    case 1 -> "gowri.siddha_yogam";
+                    case 2 -> "gowri.marana_yogam";
+                    default -> "gowri.prabalarishta_yogam";
+                };
+                list.add(createTimeSlotDTO(s3, e3, translationService.getLabel(key3), zdtSunrise, formatter));
+            }
         }
 
         return list;

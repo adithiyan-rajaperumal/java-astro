@@ -14,16 +14,16 @@ This specification details the design for accurate astronomical calculation of *
    - Compute exact `jdSankranti` (time Sun entered `(solarRashi - 1) * 30.0` degrees).
    - Solar Day index: `solarDay = (int) Math.floor(jdSunrise - jdSankranti) + 1`.
 
-2. **Vasthu Canonical Day & Awake Offset Table**:
+2. **Vasthu Canonical Day & Awake Offset Table (Verified with Tamil Panchangam)**:
    - **Chithirai (1)**: 10th solar day $\rightarrow$ Awake at 8 *Nazhigai* after sunrise (offset = 3.2 hours).
    - **Vaikasi (2)**: 21st solar day $\rightarrow$ Awake at 10 *Nazhigai* after sunrise (offset = 4.0 hours).
-   - **Aadi (4)**: 8th solar day $\rightarrow$ Awake at 2 *Nazhigai* after sunrise (offset = 0.8 hours).
+   - **Aadi (4)**: 11th solar day $\rightarrow$ Awake at 2 *Nazhigai* after sunrise (offset = 0.8 hours).
    - **Avani (5)**: 6th solar day $\rightarrow$ Awake at 18 *Nazhigai* after sunrise (offset = 7.2 hours).
-   - **Purattasi (6)**: 6th solar day $\rightarrow$ Awake at 18 *Nazhigai* after sunrise (offset = 7.2 hours).
    - **Aippasi (7)**: 11th solar day $\rightarrow$ Awake at 2 *Nazhigai* after sunrise (offset = 0.8 hours).
    - **Karthigai (8)**: 8th solar day $\rightarrow$ Awake at 10 *Nazhigai* after sunrise (offset = 4.0 hours).
    - **Thai (10)**: 12th solar day $\rightarrow$ Awake at 10 *Nazhigai* after sunrise (offset = 4.0 hours).
-   - *(No Vasthu days in Aani 3, Margazhi 9, Masi 11, Panguni 12).*
+   - **Masi (11)**: 22nd solar day $\rightarrow$ Awake at 10 *Nazhigai* after sunrise (offset = 4.0 hours).
+   - *(No Vasthu days in Aani 3, Purattasi 6, Margazhi 9, Panguni 12).*
 
 3. **Vasthu Neram Window Construction**:
    - Total Awake Duration = 90 minutes (3 *Nazhigai*).
@@ -59,7 +59,7 @@ This specification details the design for accurate astronomical calculation of *
 ## 3. Data Model Changes
 
 ### 3.1 `DailyPanchangamDTO.java`
-Update `DailyPanchangamDTO` record to include `vasthuNeram`, `vasthuPujaNeram`, `isVasthuAuspicious`, and `isAgniNakshathiram`:
+`DailyPanchangamDTO` record includes `vasthuNeram`, `vasthuPujaNeram`, `vasthuAuspicious`, and `agniNakshathiram`:
 ```java
 public record DailyPanchangamDTO(
     String date,
@@ -83,10 +83,10 @@ public record DailyPanchangamDTO(
     List<String> chandrastamamNakshatras,
     int netram,
     double jeevan,
-    boolean isMuhurthamDay,
-    boolean isVasthuDay,
-    boolean isVasthuAuspicious,
-    boolean isAgniNakshathiram,
+    boolean muhurthamDay,
+    boolean vasthuDay,
+    boolean vasthuAuspicious,
+    boolean agniNakshathiram,
     TimeSlotDTO vasthuNeram,
     TimeSlotDTO vasthuPujaNeram
 ) {}
@@ -97,13 +97,13 @@ public record DailyPanchangamDTO(
 ## 4. Frontend Integration (`PanchangamPage.jsx`)
 
 1. **Vasthu Day Card**:
-   When `data.isVasthuDay` is true, render a prominent card containing:
+   When `data.vasthuDay` is true, render a prominent card containing:
    - 🏠 **Vasthu Day / வாஸ்து நாள்**
    - ⏰ **Vasthu Awake Window (வாஸ்து நேரம்)**: `data.vasthuNeram.start` - `data.vasthuNeram.end`
    - 🙏 **Vasthu Puja Window (பூஜை செய்ய உத்தம நேரம்)**: `data.vasthuPujaNeram.start` - `data.vasthuPujaNeram.end`
-   - ⚠️ **Ground-Breaking Status**: If `isVasthuAuspicious` is false, show a warning note: *(Tuesday/Saturday/Marana Yogam - Bhoomi Puja discouraged)*.
+   - ⚠️ **Ground-Breaking Status**: If `vasthuAuspicious` is false, show a warning note: *(Tuesday/Saturday/Marana Yogam - Bhoomi Puja discouraged)*.
 2. **Subha Muhurtham Badge & Agni Nakshathiram Warning**:
-   - Highlight `isMuhurthamDay` in the page header card.
+   - Highlight `muhurthamDay` in the page header card.
    - Show 🔥 **Agni Nakshathiram / கத்திரி வெயில்** badge during Katheri period.
 
 ---
@@ -111,10 +111,10 @@ public record DailyPanchangamDTO(
 ## 5. Verification Plan
 
 1. **Backend Unit Tests (`DailyPanchangamServiceTest.java`)**:
-   - Verify `isVasthuDay`, `vasthuNeram`, and `vasthuPujaNeram` on canonical Vasthu solar days.
+   - Verify `July 24, 2026` returns `vasthuDay = false` (Aadi 8th is no longer Vasthu day).
+   - Verify `July 27, 2026` returns `vasthuDay = true` (Aadi 11th is canonical Vasthu day).
+   - Verify `March 06, 2026` returns `vasthuDay = true` (Masi 22nd is canonical Vasthu day).
    - Verify `isMuhurthamDay` returns `false` when a day has Marana Yogam or Vishti Karanam.
-   - Verify Purnima (`thithiIdx == 15`) and Dwadashi (`thithiIdx == 12`) are treated as auspicious thithis.
-   - Verify `isAgniNakshathiram` is detected when Sun is in Krittika Nakshatra.
 2. **Build Verification**:
    - Backend: `$env:JAVA_HOME=... mvn test`.
    - Frontend: `npm run build` inside `frontend/`.
