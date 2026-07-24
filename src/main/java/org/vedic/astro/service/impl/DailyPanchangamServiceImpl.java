@@ -58,8 +58,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
     private static final int[][] NAKSHATRA_VARA_YOGAMS = {
         // Sun (0): Amirdha=Hastam(12); Marana=Bharani(1), Arudra(5), Ashlesha(8), Visakha(15), Dhanishta(22)
         {1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1},
-        // Mon (1): Amirdha=Sravana(21); Marana=Aswini(0), Krittika(2), Arudra(5), Ashlesha(8), P.Phalguni(10), Visakha(15), Jyeshta(17), Dhanishta(22), P.Bhadra(24); Prabalarishta=Hasta(12)
-        {2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 3, 1, 1, 2, 1, 2, 1, 1, 1, 0, 2, 1, 2, 1, 1},
+        // Mon (1): Marana=Aswini(0), Krittika(2), Arudra(5), Ashlesha(8), P.Phalguni(10), Visakha(15), Jyeshta(17), Dhanishta(22), P.Bhadra(24); Prabalarishta=Hasta(12); Siddha=Sravana(21)
+        {2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 3, 1, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1, 2, 1, 1},
         // Tue (2): Amirdha=Aswini(0); Marana=Mrigashira(4), Chitra(13), Dhanishta(22); Prabalarishta=P.Ashadha(19)
         {0, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 3, 1, 1, 2, 1, 1, 1, 1},
         // Wed (3): Amirdha=Anuradha(16); Marana=Arudra(5), Ashlesha(8), Jyeshta(17), Shatabhisha(23); Prabalarishta=Krittika(2)
