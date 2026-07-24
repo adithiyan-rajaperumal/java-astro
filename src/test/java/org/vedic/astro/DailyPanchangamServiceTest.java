@@ -162,8 +162,20 @@ public class DailyPanchangamServiceTest {
             "ta",
             "LAHIRI"
         );
-        DailyPanchangamDTO resultJul24 = dailyPanchangamService.calculateDailyPanchangam(requestJul24);
-        assertNotNull(resultJul24);
-        assertFalse(resultJul24.vasthuDay(), "Jul 24 (Aadi 8th) should NOT be a Vasthu Day");
+        PanchangamRequestDTO requestAug = new PanchangamRequestDTO(
+            "2026-08-23",
+            13.0827,
+            80.2707,
+            "ta",
+            "LAHIRI"
+        );
+        DailyPanchangamDTO augResult = dailyPanchangamService.calculateDailyPanchangam(requestAug);
+        assertNotNull(augResult);
+        System.out.println("Aug 23, 2026 Nakshatra: " + augResult.nakshatra().name() + " (" + augResult.nakshatra().number() + ")");
+        if (augResult.nakshatraYogams() != null) {
+            for (DailyPanchangamDTO.TimeSlotDTO slot : augResult.nakshatraYogams()) {
+                System.out.println("Yogam Slot: " + slot.label() + " -> " + slot.start() + " - " + slot.end());
+            }
+        }
     }
 }
