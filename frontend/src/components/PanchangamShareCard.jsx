@@ -247,15 +247,16 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
           {data.horais?.map((h, idx) => (
             <div key={idx} style={{
               backgroundColor: '#fff8e1',
-              padding: '6px 10px',
+              padding: '6px 12px',
               borderRadius: '6px',
               border: '1px solid #ffe082',
               display: 'flex',
               justify: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              gap: '12px'
             }}>
-              <span style={{ color: '#bf360c', fontWeight: 'bold' }}>{h.start} - {h.end}</span>
-              <span style={{ fontWeight: 'bold', color: '#424242' }}>{h.localizedPlanet || h.planet}</span>
+              <span style={{ color: '#bf360c', fontWeight: 'bold', marginRight: '8px', whiteSpace: 'nowrap' }}>{h.start} - {h.end}</span>
+              <span style={{ fontWeight: 'bold', color: '#424242', whiteSpace: 'nowrap' }}>{h.localizedPlanet || h.planet}</span>
             </div>
           ))}
         </div>
