@@ -54,22 +54,22 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         "SUN", "VENUS", "MERCURY", "MOON", "SATURN", "JUPITER", "MARS"
     };
 
-    // 0=Amirdha, 1=Siddha, 2=Marana
+    // 0=Amirdha, 1=Siddha, 2=Marana, 3=Prabalarishta
     private static final int[][] NAKSHATRA_VARA_YOGAMS = {
-        // Sun (0): Amirdha=Hastam(12); Marana=Bharani(1), Krittika(2), Ashlesha(8), Magha(9), Visakha(15), Jyeshta(17), Dhanishta(22), Shatabhisha(23)
-        {1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 0, 1, 1, 2, 1, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1},
-        // Mon (1): Amirdha=Sravana(21); Marana=Aswini(0), Krittika(2), Arudra(5), Ashlesha(8), P.Phalguni(10), Visakha(15), Jyeshta(17), Dhanishta(22), P.Bhadra(24)
-        {2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 0, 2, 1, 2, 1, 1},
-        // Tue (2): Amirdha=Aswini(0); Marana=Mrigashira(4), Chitra(13), Dhanishta(22)
-        {0, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1},
-        // Wed (3): Amirdha=Anuradha(16); Marana=Arudra(5), Ashlesha(8), Jyeshta(17), Shatabhisha(23)
-        {1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1},
+        // Sun (0): Amirdha=Hastam(12); Marana=Bharani(1), Arudra(5), Ashlesha(8), Visakha(15), Dhanishta(22)
+        {1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1},
+        // Mon (1): Amirdha=Sravana(21); Marana=Aswini(0), Krittika(2), Arudra(5), Ashlesha(8), P.Phalguni(10), Visakha(15), Jyeshta(17), Dhanishta(22), P.Bhadra(24); Prabalarishta=Hasta(12)
+        {2, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 1, 3, 1, 1, 2, 1, 2, 1, 1, 1, 0, 2, 1, 2, 1, 1},
+        // Tue (2): Amirdha=Aswini(0); Marana=Mrigashira(4), Chitra(13), Dhanishta(22); Prabalarishta=P.Ashadha(19)
+        {0, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 3, 1, 1, 2, 1, 1, 1, 1},
+        // Wed (3): Amirdha=Anuradha(16); Marana=Arudra(5), Ashlesha(8), Jyeshta(17), Shatabhisha(23); Prabalarishta=Krittika(2)
+        {1, 1, 3, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1},
         // Thu (4): Amirdha=Pushya(7); Marana=Arudra(5), Ashlesha(8), Visakha(15), Jyeshta(17)
         {1, 1, 1, 1, 1, 2, 1, 0, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        // Fri (5): Amirdha=Revati(26); Marana=Arudra(5), Ashlesha(8)
-        {1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-        // Sat (6): Amirdha=Rohini(3); Marana=Ashlesha(8), Visakha(15), Jyeshta(17)
-        {1, 1, 1, 0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+        // Fri (5): Amirdha=Revati(26); Marana=Arudra(5), Ashlesha(8); Prabalarishta=Mrigashira(4)
+        {1, 1, 1, 1, 3, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+        // Sat (6): Amirdha=Rohini(3); Marana=Ashlesha(8), Visakha(15), Jyeshta(17); Prabalarishta=P.Ashadha(19)
+        {1, 1, 1, 0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1}
     };
 
     @Override
@@ -950,7 +950,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         String key1 = switch (yogamType1) {
             case 0 -> "gowri.amirdha_yogam";
             case 1 -> "gowri.siddha_yogam";
-            default -> "gowri.marana_yogam";
+            case 2 -> "gowri.marana_yogam";
+            default -> "gowri.prabalarishta_yogam";
         };
         list.add(createTimeSlotDTO(s1, e1, translationService.getLabel(key1), zdtSunrise, formatter));
 
@@ -967,7 +968,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             String key2 = switch (yogamType2) {
                 case 0 -> "gowri.amirdha_yogam";
                 case 1 -> "gowri.siddha_yogam";
-                default -> "gowri.marana_yogam";
+                case 2 -> "gowri.marana_yogam";
+                default -> "gowri.prabalarishta_yogam";
             };
             list.add(createTimeSlotDTO(s2, e2, translationService.getLabel(key2), zdtSunrise, formatter));
 
@@ -980,7 +982,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 String key3 = switch (yogamType3) {
                     case 0 -> "gowri.amirdha_yogam";
                     case 1 -> "gowri.siddha_yogam";
-                    default -> "gowri.marana_yogam";
+                    case 2 -> "gowri.marana_yogam";
+                    default -> "gowri.prabalarishta_yogam";
                 };
                 list.add(createTimeSlotDTO(s3, e3, translationService.getLabel(key3), zdtSunrise, formatter));
             }
