@@ -339,14 +339,14 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double awakeNazhigai = -1;
 
         switch (solarRashi) {
-            case 1:  targetSolarDay = 10; awakeNazhigai = 8.0;  break; // Chithirai 10
-            case 2:  targetSolarDay = 21; awakeNazhigai = 10.0; break; // Vaikasi 21
-            case 4:  targetSolarDay = 11; awakeNazhigai = 2.0;  break; // Aadi 11
-            case 5:  targetSolarDay = 6;  awakeNazhigai = 18.0; break; // Avani 6
-            case 7:  targetSolarDay = 11; awakeNazhigai = 2.0;  break; // Aippasi 11
-            case 8:  targetSolarDay = 8;  awakeNazhigai = 10.0; break; // Karthigai 8
-            case 10: targetSolarDay = 12; awakeNazhigai = 10.0; break; // Thai 12
-            case 11: targetSolarDay = 22; awakeNazhigai = 10.0; break; // Masi 22
+            case 1:  targetSolarDay = 10; awakeNazhigai = 7.25;  break; // Chithirai 10 (Puja ~08:54 AM)
+            case 2:  targetSolarDay = 21; awakeNazhigai = 10.25; break; // Vaikasi 21 (Puja ~09:58 AM)
+            case 4:  targetSolarDay = 11; awakeNazhigai = 4.25;  break; // Aadi 11 (Awake 07:44 AM - 09:14 AM)
+            case 5:  targetSolarDay = 6;  awakeNazhigai = 18.25; break; // Avani 6 (Puja ~01:48 PM)
+            case 7:  targetSolarDay = 11; awakeNazhigai = 4.25;  break; // Aippasi 11 (Awake 07:44 AM - 09:14 AM)
+            case 8:  targetSolarDay = 8;  awakeNazhigai = 13.25; break; // Karthigai 8 (Puja ~11:29 AM)
+            case 10: targetSolarDay = 12; awakeNazhigai = 11.5;  break; // Thai 12 (Puja ~10:41 AM)
+            case 11: targetSolarDay = 22; awakeNazhigai = 11.25; break; // Masi 22 (Puja ~10:32 AM)
             default: break; // No Vasthu days in 3 (Aani), 6 (Purattasi), 9 (Margazhi), 12 (Panguni)
         }
 
