@@ -881,7 +881,11 @@ const translations = {
     ayanamsaFixedVakya: "వాక్య పంచాంగం (స్థిరం)",
     ayanamsaFixedSurya: "సూర్య సిద్ధాంతం (జగన్నాథ హోరా)",
     ayanamsaFixedParasara: "పరాశర భట్టర్ (స్థిరం)",
-    ayanamsaPushyapaksha: "పుష్యపక్ష అయనాంశ (22°39'34.88\")"
+    ayanamsaPushyapaksha: "పుష్యపక్ష అయనాంశ (22°39'34.88\")",
+    ayanamsaLahiri: "లాహిరి (చిత్ర పక్షం)",
+    ayanamsaKP: "కే.పి (కృష్ణమూర్తి పద్ధతి)",
+    ayanamsaRaman: "బి.వి. రామన్",
+    ayanamsaSurya: "సూర్య సిద్ధాంతం"
   },
   ml: {
     panchangam: "പഞ്ചാംഗം",
