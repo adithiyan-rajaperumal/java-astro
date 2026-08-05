@@ -399,7 +399,7 @@ function PanchangamPage({ settings }) {
             gap: '6px'
           }}
         >
-          📲 {sharing ? 'Generating...' : 'Share as Image (பஞ்சாங்கம் பகிர்க)'}
+          📲 {sharing ? t('generatingImage', settings.language) : t('shareAsImage', settings.language)}
         </button>
       </div>
 
@@ -448,19 +448,21 @@ function PanchangamPage({ settings }) {
 
               <div className="element-detail-item" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                  <div style={{ color: data.muhurthamDay ? 'var(--success)' : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px' }}>
-                    {data.muhurthamDay ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) : '❌ ' + t('inauspiciousDay', settings.language)}
+                  <div style={{ color: data.muhurthamDay ? (data.isTheiPirai ? '#e65100' : 'var(--success)') : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px', lineHeight: '1.5', wordBreak: 'break-word' }}>
+                    {data.muhurthamDay 
+                      ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : '')
+                      : '❌ ' + t('inauspiciousDay', settings.language)}
                   </div>
 
                   {data.isAgniNakshathiram && (
-                    <div style={{ background: 'rgba(255, 152, 0, 0.15)', border: '1px solid #ff9800', color: '#ff9800', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px' }}>
+                    <div style={{ background: 'rgba(255, 152, 0, 0.15)', border: '1px solid #ff9800', color: '#ff9800', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
                       🔥 {t('agniNakshathiram', settings.language)}
                     </div>
                   )}
 
                   {data.vasthuDay && (
-                    <div style={{ background: '#e8f5e9', border: '1px solid #a5d6a7', color: '#2e7d32', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px' }}>
-                      🏡 {t('vasthuTitle', settings.language)}
+                    <div style={{ background: data.isTheiPirai ? '#fff3e0' : '#e8f5e9', border: `1px solid ${data.isTheiPirai ? '#ffe0b2' : '#a5d6a7'}`, color: data.isTheiPirai ? '#e65100' : '#2e7d32', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4', wordBreak: 'break-word' }}>
+                      🏡 {t('vasthuTitle', settings.language)} {data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', settings.language)}` : ''}
                     </div>
                   )}
                 </div>

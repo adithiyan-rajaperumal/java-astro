@@ -18,6 +18,12 @@ public class IndicPreShaper {
     public static String shape(String text) {
         if (text == null || text.isEmpty()) return text;
 
+        // Only apply manual character re-ordering in PDF mode.
+        // Browsers handle Unicode combining characters natively and correctly.
+        // Applying shaping to API responses conflicts with browser OpenType engines,
+        // producing orphaned combining marks (visible as dotted circles in Malayalam).
+        if (!isPdfMode()) return text;
+
         // If the text contains Tamil characters, convert to Bamini instead!
         boolean hasTamil = false;
         for (int idx = 0; idx < text.length(); idx++) {

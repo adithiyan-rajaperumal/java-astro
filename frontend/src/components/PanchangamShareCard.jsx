@@ -79,7 +79,7 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
           <span>{t('appTitle', lang)} • {t('panchangam', lang)}</span>
         </div>
         <div style={{ fontSize: '34px', fontWeight: '900', color: '#ffffff', margin: '4px 0' }}>
-          {currentDate} {dayName ? `(${dayName})` : ''} | 📍 {settings?.location?.name || 'Chennai'}
+          {currentDate} {dayName ? `(${dayName})` : ''} | 📍 {settings?.location?.name || (settings?.location?.label ? settings.location.label.split(',')[0].trim() : (settings?.location?.city || t('defaultLocationFallback', lang)))}
         </div>
 
         {/* Sun & Moon Times with whiteSpace: nowrap */}
@@ -117,13 +117,15 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
         fontSize: '15px',
         fontWeight: 'bold'
       }}>
-        <div style={{ color: data.muhurthamDay ? '#2e7d32' : '#c62828' }}>
-          {data.muhurthamDay ? '✅ ' + t('subhaMuhurtham', lang) : '❌ ' + t('inauspiciousDay', lang)}
+        <div style={{ color: data.muhurthamDay ? (data.isTheiPirai ? '#d84315' : '#2e7d32') : '#c62828' }}>
+          {data.muhurthamDay 
+            ? '✅ ' + t('subhaMuhurtham', lang) + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', lang)}` : '')
+            : '❌ ' + t('inauspiciousDay', lang)}
         </div>
 
         {data.vasthuDay && (
-          <div style={{ backgroundColor: '#e8f5e9', color: '#1b5e20', padding: '4px 10px', borderRadius: '14px', border: '1px solid #a5d6a7' }}>
-            🏡 {t('vasthuTitle', lang)}: {data.vasthuNeram?.start} - {data.vasthuNeram?.end}
+          <div style={{ backgroundColor: data.isTheiPirai ? '#fff3e0' : '#e8f5e9', color: data.isTheiPirai ? '#d84315' : '#1b5e20', padding: '4px 10px', borderRadius: '14px', border: `1px solid ${data.isTheiPirai ? '#ffcc80' : '#a5d6a7'}` }}>
+            🏡 {t('vasthuTitle', lang)}: {data.vasthuNeram?.start} - {data.vasthuNeram?.end} {data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', lang)}` : ''}
           </div>
         )}
 

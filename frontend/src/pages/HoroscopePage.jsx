@@ -298,8 +298,10 @@ function HoroscopePage({ settings }) {
 
               return (
                 <div key={idx} className="dosha-card">
-                  <span className={`dosha-badge ${badgeClass}`}>{badgeText}</span>
-                  <h4 style={{ margin: '0 0 10px', width: '70%', color: 'var(--text-primary)' }}>{dosha.name}</h4>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                    <h4 style={{ margin: 0, color: 'var(--text-primary)', flex: '1 1 180px', fontSize: '15px', lineHeight: '1.45' }}>{dosha.name}</h4>
+                    <span className={`dosha-badge ${badgeClass}`}>{badgeText}</span>
+                  </div>
                   
                   {nullified && (
                     <p style={{ fontSize: '13px', color: 'var(--success)', marginTop: '5px' }}>

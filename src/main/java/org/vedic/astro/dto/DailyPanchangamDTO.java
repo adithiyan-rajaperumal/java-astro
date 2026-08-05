@@ -28,6 +28,7 @@ public record DailyPanchangamDTO(
     boolean vasthuDay,
     boolean vasthuAuspicious,
     boolean agniNakshathiram,
+    boolean isTheiPirai,
     TimeSlotDTO vasthuNeram,
     TimeSlotDTO vasthuPujaNeram
 ) {

@@ -23,7 +23,7 @@ public enum AyanamsaType {
         if (val == null || val.trim().isEmpty()) {
             return LAHIRI;
         }
-        String clean = val.trim().toUpperCase().replace("-", "_").replace(" ", "_");
+        String clean = val.trim().toUpperCase().replace("-", "_").replace(" ", "_").replace(".", "");
         if (clean.contains("SURYA") || clean.contains("SIDDHANT")) {
             return SURYA_SIDDHANTA;
         }
@@ -33,7 +33,7 @@ public enum AyanamsaType {
         if (clean.contains("KP") || clean.contains("KRISHNAMURTI")) {
             return KP;
         }
-        if (clean.contains("RAMAN")) {
+        if (clean.contains("RAMAN") || clean.contains("BV")) {
             return RAMAN;
         }
         try {
