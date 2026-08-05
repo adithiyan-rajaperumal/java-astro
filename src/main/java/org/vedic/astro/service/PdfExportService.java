@@ -102,6 +102,10 @@ public class PdfExportService {
             String ayanKey = "ayanamsa." + (data.getAyanamsa() != null ? data.getAyanamsa().toUpperCase() : "LAHIRI");
             info.addCell(buildTableCell(ts.getLabel(ayanKey), bFont, Element.ALIGN_LEFT));
 
+            info.addCell(buildTableCell(ts.getLabel("pdf.info.panchangam_system"), boldB, Element.ALIGN_LEFT));
+            String sysKey = "system." + (data.getPanchangamSystem() != null ? data.getPanchangamSystem().toUpperCase() : "DRIK_TIRUKANITHAM");
+            info.addCell(buildTableCell(ts.getLabel(sysKey), bFont, Element.ALIGN_LEFT));
+
             info.addCell(buildTableCell(ts.getLabel("pdf.info.lat"), boldB, Element.ALIGN_LEFT));
             info.addCell(buildTableCell(String.valueOf(data.getLatitude()), engBFont, Element.ALIGN_LEFT));
             info.addCell(buildTableCell(ts.getLabel("pdf.info.long"), boldB, Element.ALIGN_LEFT));
@@ -359,6 +363,12 @@ public class PdfExportService {
             profiles.addCell(buildTableCell(ts.getLabel("pdf.info.ayanamsa"), boldB, Element.ALIGN_LEFT));
             String girlAyan = "ayanamsa." + (data.getGirlProfile().getAyanamsa() != null ? data.getGirlProfile().getAyanamsa().toUpperCase() : "LAHIRI");
             profiles.addCell(buildTableCell(ts.getLabel(girlAyan), bFont, Element.ALIGN_LEFT));
+
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.panchangam_system"), boldB, Element.ALIGN_LEFT));
+            String pSys = "system." + (data.getPanchangamSystem() != null ? data.getPanchangamSystem().toUpperCase() : "DRIK_TIRUKANITHAM");
+            profiles.addCell(buildTableCell(ts.getLabel(pSys), bFont, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel("pdf.info.panchangam_system"), boldB, Element.ALIGN_LEFT));
+            profiles.addCell(buildTableCell(ts.getLabel(pSys), bFont, Element.ALIGN_LEFT));
 
             document.add(profiles);
 

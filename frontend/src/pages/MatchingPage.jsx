@@ -368,7 +368,7 @@ function MatchingPage({ settings }) {
             </div>
             
             <div style={{ marginTop: '10px', fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
-              🙋‍♂️ {result.boyProfile?.name} ({result.boyProfile?.birthProfile?.nakshatra}) &nbsp;|&nbsp; 🙋‍♀️ {result.girlProfile?.name} ({result.girlProfile?.birthProfile?.nakshatra}) &nbsp;|&nbsp; {t('ayanamsa', settings.language)}: {result.boyProfile?.ayanamsa || ayanamsa}
+              🙋‍♂️ {result.boyProfile?.name} ({result.boyProfile?.birthProfile?.nakshatra}) &nbsp;|&nbsp; 🙋‍♀️ {result.girlProfile?.name} ({result.girlProfile?.birthProfile?.nakshatra}) &nbsp;|&nbsp; {t('ayanamsa', settings.language)}: {result.boyProfile?.ayanamsa || ayanamsa} &nbsp;|&nbsp; {t('panchangamSystem', settings.language)}: {t('system' + (result.panchangamSystem === 'VAKYA' ? 'Vakya' : result.panchangamSystem === 'PARASARA_BHATTAR' ? 'ParasaraBhattar' : result.panchangamSystem === 'SURYA_SIDDHANTA' ? 'SuryaSiddhanta' : 'Drik'), settings.language)}
             </div>
             
             <div style={{ marginTop: '20px', display: 'flex', gap: '15px' }}>

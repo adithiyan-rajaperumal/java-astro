@@ -18,6 +18,7 @@ public class ChartUiResponseDTO {
     private double longitude;
     private String resolvedTimezone;
     private String ayanamsa;
+    private String panchangamSystem;
 
     private ChartResponseDTO.BirthProfile birthProfile;
     private List<ChartResponseDTO.PositionDetail> d1Chart;

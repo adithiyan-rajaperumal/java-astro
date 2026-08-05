@@ -19,6 +19,7 @@ public class MatchingResponseDTO {
     private String verdict;
     private List<KootaResultDTO> kootas;
     private List<String> warnings;
+    private String panchangamSystem;
     private ChartUiResponseDTO boyProfile;
     private ChartUiResponseDTO girlProfile;
 }

@@ -78,6 +78,7 @@ public class ChartOrchestrationService {
                 .longitude(pay.longitude())
                 .resolvedTimezone(resolvedTz != null ? resolvedTz : "Asia/Kolkata")
                 .ayanamsa(pay.ayanamsa() != null ? pay.ayanamsa() : "LAHIRI")
+                .panchangamSystem("DRIK_TIRUKANITHAM")
                 .thithi(computedThithi)
                 .yogam(computedYogam)
                 .karanam(computedKaranam)
@@ -89,6 +90,12 @@ public class ChartOrchestrationService {
                 .shadbalaStrengths(shadbalaService.calculateShadbala(d1))
                 .structuralDiagnostics(diagnosticsService.runHoroscopeDiagnostics(d1))
                 .build();
+    }
+
+    public ChartUiResponseDTO convertToUiDashboardResponse(ChartResult res, BirthDetailsDTO pay, String panchangamSystem) {
+        ChartUiResponseDTO dto = convertToUiDashboardResponse(res, pay);
+        dto.setPanchangamSystem(panchangamSystem != null ? panchangamSystem : "DRIK_TIRUKANITHAM");
+        return dto;
     }
 
     public ComprehensiveReportDTO compileComprehensivePdfData(ChartResult res, BirthDetailsDTO pay, double[] cusps) {
@@ -157,6 +164,7 @@ public class ChartOrchestrationService {
                 .yogam(computedYogam)
                 .karanam(computedKaranam)
                 .ayanamsa(pay.ayanamsa() != null ? pay.ayanamsa() : "LAHIRI")
+                .panchangamSystem("DRIK_TIRUKANITHAM")
                 .birthProfile(buildProfileHeader(d1))
                 .birthPlanetaryPositions(d1.entrySet().stream()
                         .map(e -> mapToDetail(e.getKey().toUpperCase(), e.getValue())).collect(Collectors.toList()))
