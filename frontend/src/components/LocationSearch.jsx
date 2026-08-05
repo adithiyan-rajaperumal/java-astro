@@ -72,17 +72,23 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
         onFocus={() => query.trim() && setShowDropdown(true)}
         placeholder={placeholder}
       />
-      {showDropdown && suggestions.length > 0 && (
+      {showDropdown && (
         <div className="autocomplete-dropdown">
-          {suggestions.map((item, idx) => (
-            <div
-              key={idx}
-              className="autocomplete-item"
-              onClick={() => handleSelect(item)}
-            >
-              {item.label}
+          {suggestions.length > 0 ? (
+            suggestions.map((item, idx) => (
+              <div
+                key={idx}
+                className="autocomplete-item"
+                onClick={() => handleSelect(item)}
+              >
+                {item.label}
+              </div>
+            ))
+          ) : (
+            <div className="autocomplete-item" style={{ color: 'var(--text-secondary)', cursor: 'default', fontSize: '13px' }}>
+              No places found. Try typing city or state name.
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>

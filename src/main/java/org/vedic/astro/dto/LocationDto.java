@@ -28,15 +28,54 @@ public class LocationDto {
             String city,
             String state,
             String country,
-            String postcode
+            String postcode,
+            String osm_key,
+            String osm_value
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record NominatimResult(
+            String display_name,
+            String lat,
+            String lon,
+            String type,
+            String category,
+            NominatimAddress address
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record NominatimAddress(
+            String city,
+            String town,
+            String village,
+            String hamlet,
+            String suburb,
+            String locality,
+            String district,
+            String county,
+            String state_district,
+            String state,
+            String country
     ) {}
 
     /**
      * Streamlined data transferred directly to your frontend autocomplete selector.
      */
     public record LocationSuggestionDTO(
-            String label,       // Friendly descriptive label: "Apollo Hospital, Chennai, Tamil Nadu, India"
+            String name,        // Short city/town/village name e.g. "Chennai"
+            String state,       // State/Region e.g. "Tamil Nadu"
+            String country,     // Country e.g. "India"
+            String label,       // Friendly descriptive label: "Chennai, Tamil Nadu, India"
             double latitude,    // High-precision geographic latitude
             double longitude    // High-precision geographic longitude
-    ) {}
+    ) {
+        public LocationSuggestionDTO(String label, double latitude, double longitude) {
+            this(extractFirstName(label), "", "", label, latitude, longitude);
+        }
+
+        private static String extractFirstName(String label) {
+            if (label == null || label.isEmpty()) return "";
+            return label.split(",")[0].trim();
+        }
+    }
 }

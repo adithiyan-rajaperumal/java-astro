@@ -159,7 +159,12 @@ const translations = {
       inauspiciousTitle: "Inauspicious Gowri Hours (To Avoid)",
       inauspiciousDesc: "Visha (Toxic), Roga (Illness), and Chora (Loss) should be avoided for major endeavors.",
       close: "Close"
-    }
+    },
+    shareAsImage: "Share as Image",
+    generatingImage: "Generating...",
+    defaultLocationFallback: "Location",
+    clickHouseForAspect: "Click on any house to view its aspect lines",
+    theiPiraiCaution: "(Thei Pirai / Krishna Paksha)"
   },
   ta: {
     panchangam: "பஞ்சாங்கம்",
@@ -321,7 +326,12 @@ const translations = {
       inauspiciousTitle: "கெட்ட கௌரி நேரங்கள் (தவிர்க்க வேண்டியவை)",
       inauspiciousDesc: "விஷம், ரோகம் மற்றும் சோரம் ஆகியவை சுப காரியங்களுக்கு தவிர்க்கப்பட வேண்டும்.",
       close: "மூடுக"
-    }
+    },
+    shareAsImage: "படமாக பகிர்க",
+    generatingImage: "உருவாக்குகிறது...",
+    defaultLocationFallback: "இடம்",
+    clickHouseForAspect: "எந்த வீட்டின் மீதும் அழுத்தி பார்வை கோடுகளை காணவும்",
+    theiPiraiCaution: "(தேய்பிறை)"
   },
   hi: {
     panchangam: "पंचांग",
@@ -479,7 +489,12 @@ const translations = {
       inauspiciousTitle: "अशुभ गौरी समय (त्याज्य)",
       inauspiciousDesc: "विष, रोग और चोर काल महत्वपूर्ण कार्यों के लिए त्याज्य हैं।",
       close: "बंद करें"
-    }
+    },
+    shareAsImage: "चित्र के रूप में साझा करें",
+    generatingImage: "बना रहा है...",
+    defaultLocationFallback: "स्थान",
+    clickHouseForAspect: "किसी भी भाव पर क्लिक करके दृष्टि रेखाएँ देखें",
+    theiPiraiCaution: "(कृष्ण पक्ष)"
   },
   kn: {
     panchangam: "ಪಂಚಾಂಗ",
@@ -637,7 +652,12 @@ const translations = {
       inauspiciousTitle: "ಅಶುಭ ಗೌರಿ ಸಮಯಗಳು",
       inauspiciousDesc: "ವಿಷ, ರೋಗ ಮತ್ತು ಚೋರ ಸಮಯಗಳನ್ನು ಮುಖ್ಯ ಕೆಲಸಗಳಿಗೆ ತಪ್ಪಿಸಬೇಕು.",
       close: "ಮುಚ್ಚಿ"
-    }
+    },
+    shareAsImage: "ಚಿತ್ರವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ",
+    generatingImage: "ರಚಿಸಲಾಗುತ್ತಿದೆ...",
+    defaultLocationFallback: "ಸ್ಥಳ",
+    clickHouseForAspect: "ಯಾವುದೇ ಭಾವದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ದೃಷ್ಟಿ ರೇಖೆಗಳನ್ನು ನೋಡಿ",
+    theiPiraiCaution: "(ಕೃಷ್ಣ ಪಕ್ಷ)"
   },
   te: {
     panchangam: "పంచాంగం",
@@ -795,7 +815,12 @@ const translations = {
       inauspiciousTitle: "అశుభ గౌరీ సమయాలు",
       inauspiciousDesc: "విషం, రోగం మరియు చోరం సమయాల్లో ముఖ్యమైన పనులు చేయవద్దు.",
       close: "మూసివేయి"
-    }
+    },
+    shareAsImage: "చిత్రంగా భాగస్వామ్యం చేయండి",
+    generatingImage: "రూపొందిస్తోంది...",
+    defaultLocationFallback: "ప్రదేశం",
+    clickHouseForAspect: "ఏదైనా భావంపై క్లిక్ చేసి దృష్టి రేఖలను చూడండి",
+    theiPiraiCaution: "(కృష్ణ పక్షం)"
   },
   ml: {
     panchangam: "പഞ്ചാംഗം",
@@ -954,7 +979,12 @@ const translations = {
       inauspiciousTitle: "അശുഭ ഗൗരി സമയങ്ങൾ",
       inauspiciousDesc: "വിഷം, രോഗം, ചോരം എന്നിവ പ്രധാന കാര്യങ്ങൾക്ക് ഒഴിവാക്കണം.",
       close: "അടയ്ക്കുക"
-    }
+    },
+    shareAsImage: "ചിത്രമായി പങ്കിടുക",
+    generatingImage: "നിർമ്മിക്കുന്നു...",
+    defaultLocationFallback: "സ്ഥലം",
+    clickHouseForAspect: "ഏതെങ്കിലും ഭാവത്തിൽ ക്ലിക്ക് ചെയ്ത് ദൃഷ്ടി രേഖകൾ കാണുക",
+    theiPiraiCaution: "(കൃഷ്ണ പക്ഷം)"
   }
 };
 

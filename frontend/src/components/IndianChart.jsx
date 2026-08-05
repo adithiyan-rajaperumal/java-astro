@@ -85,28 +85,37 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
     return activeDignityMap.neutral;
   };
 
-  // Calculate aspects from selected house
+  // Calculate aspects from selected house (Graha Drishti)
   const getAspectedHouses = (sign) => {
     if (!sign) return [];
-    const house = getHouseNumber(sign);
     const planetsInHouse = positions.filter((p) => p.signNumber === sign);
-    const aspectHouses = new Set([ (house + 6) % 12 || 12 ]);
+    if (planetsInHouse.length === 0) return []; // Empty house casts no Graha Drishti
+
+    const aspectedSigns = new Set();
 
     planetsInHouse.forEach((p) => {
-      const name = p.planetKey?.toLowerCase();
-      if (name?.includes('mars')) {
-        aspectHouses.add((house + 3) % 12 || 12);
-        aspectHouses.add((house + 7) % 12 || 12);
-      } else if (name?.includes('jupiter')) {
-        aspectHouses.add((house + 4) % 12 || 12);
-        aspectHouses.add((house + 8) % 12 || 12);
-      } else if (name?.includes('saturn')) {
-        aspectHouses.add((house + 2) % 12 || 12);
-        aspectHouses.add((house + 9) % 12 || 12);
+      const name = (p.planetKey || p.displayName || '').toLowerCase();
+      
+      // Every planet has 7th house aspect (6 sign offset)
+      let offsets = [6];
+
+      if (name.includes('mars') || name.includes('செ') || name.includes('मं') || name.includes('ചൊ')) {
+        offsets = [3, 6, 7]; // 4th, 7th, 8th
+      } else if (name.includes('jupiter') || name.includes('கு') || name.includes('गु') || name.includes('ഗു')) {
+        offsets = [4, 6, 8]; // 5th, 7th, 9th
+      } else if (name.includes('saturn') || name.includes('சனி') || name.includes('श') || name.includes('ശ')) {
+        offsets = [2, 6, 9]; // 3rd, 7th, 10th
+      } else if (name.includes('rahu') || name.includes('ரா') || name.includes('രാ') || name.includes('ketu') || name.includes('கே') || name.includes('കേ')) {
+        offsets = [4, 6, 8]; // Rahu & Ketu cast 5th, 7th, 9th aspects in Parashari system
       }
+
+      offsets.forEach((offset) => {
+        const targetSign = ((sign - 1 + offset) % 12) + 1;
+        aspectedSigns.add(targetSign);
+      });
     });
 
-    return Array.from(aspectHouses).map((h) => ((h + lagnaSign - 2) % 12) + 1);
+    return Array.from(aspectedSigns);
   };
 
   const handleCellClick = (sign) => {
@@ -288,6 +297,27 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
         <text x="200" y="200" textAnchor="middle" fill="var(--accent-gold)" fontSize="15" fontWeight="bold">
           {title}
         </text>
+
+        {/* Aspect lines overlay for North Indian chart */}
+        {selectedHouse && aspectedSigns.map((targetSign, idx) => {
+          const startHouseEntry = Object.values(northHouseCenters).find(h => h.signNum === selectedHouse);
+          const endHouseEntry = Object.values(northHouseCenters).find(h => h.signNum === targetSign);
+          if (!startHouseEntry || !endHouseEntry) return null;
+
+          return (
+            <line
+              key={idx}
+              x1={startHouseEntry.cx}
+              y1={startHouseEntry.cy}
+              x2={endHouseEntry.cx}
+              y2={endHouseEntry.cy}
+              stroke="var(--accent-saffron, #ff6b00)"
+              strokeDasharray="4,4"
+              strokeWidth="2.5"
+              style={{ pointerEvents: 'none' }}
+            />
+          );
+        })}
       </svg>
     );
   };
@@ -297,12 +327,22 @@ function IndianChart({ positions = [], style = 'south', title = 'D1 Rasi', lang 
       <div className="chart-box">
         {activeChartStyle === 'north' ? renderNorthIndian() : renderSouthIndian()}
       </div>
+      <p style={{
+        textAlign: 'center',
+        fontSize: '12px',
+        color: 'var(--text-secondary)',
+        margin: '8px 0 0',
+        opacity: 0.8,
+        fontStyle: 'italic'
+      }}>
+        {t('clickHouseForAspect', lang)}
+      </p>
 
       {/* House detail panel below chart on house click */}
       {selectedHouse && (
         <div className="card" style={{ marginTop: '15px', width: '100%', maxWidth: '400px', padding: '15px' }}>
           <h4 style={{ margin: '0 0 10px', color: 'var(--accent-gold)' }}>
-            {t('houseDetails', lang)} ({t('house', lang)} {getHouseNumber(selectedHouse)} — {t('signLord', lang)}: {t('planet.' + (signLords[selectedHouse] || '').toLowerCase(), lang)})
+            {t('houseDetails', lang)} — {t('house', lang)} {getHouseNumber(selectedHouse)}, {t('signLord', lang)}: {t('planet.' + (signLords[selectedHouse] || '').toLowerCase(), lang)}
           </h4>
           {selectedPlanets.length === 0 ? (
             <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)' }}>{t('noPlanetsInHouse', lang)}</p>
