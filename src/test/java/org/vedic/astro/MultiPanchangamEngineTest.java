@@ -57,32 +57,51 @@ public class MultiPanchangamEngineTest {
     }
 
     @Test
+    public void testParasaraBhattarWithPushyapakshaAyanamsa() {
+        BirthDetailsDTO bhattarLahiri = new BirthDetailsDTO("Bhattar Lahiri", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "LAHIRI");
+        BirthDetailsDTO bhattarPushya = new BirthDetailsDTO("Bhattar Pushya", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "PUSHYAPAKSHA");
+
+        var chartLahiri = panchangamFactory.getEngine(PanchangamType.PARASARA_BHATTAR).calculate(bhattarLahiri);
+        var chartPushya = panchangamFactory.getEngine(PanchangamType.PARASARA_BHATTAR).calculate(bhattarPushya);
+
+        assertNotNull(chartLahiri);
+        assertNotNull(chartPushya);
+
+        double sunLahiri = chartLahiri.getD1Positions().get("Sun").getAbsoluteLongitude();
+        double sunPushya = chartPushya.getD1Positions().get("Sun").getAbsoluteLongitude();
+
+        // Pushyapaksha Ayanamsa (~22.66°) shifts positions relative to Lahiri (~23.79°) by ~1.13 degrees
+        assertNotEquals(sunLahiri, sunPushya, 0.001);
+    }
+
+    @Test
     public void testDailyPanchangamWithMultiPanchangamSystems() {
         PanchangamRequestDTO requestDrik = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "DRIK_TIRUKANITHAM");
         PanchangamRequestDTO requestVakya = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "VAKYA");
         PanchangamRequestDTO requestParasara = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "PARASARA_BHATTAR");
+        PanchangamRequestDTO requestParasaraPushya = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "PUSHYAPAKSHA", "PARASARA_BHATTAR");
         PanchangamRequestDTO requestSurya = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "SURYA_SIDDHANTA");
 
         DailyPanchangamDTO resultDrik = dailyPanchangamService.calculateDailyPanchangam(requestDrik);
         DailyPanchangamDTO resultVakya = dailyPanchangamService.calculateDailyPanchangam(requestVakya);
         DailyPanchangamDTO resultParasara = dailyPanchangamService.calculateDailyPanchangam(requestParasara);
+        DailyPanchangamDTO resultParasaraPushya = dailyPanchangamService.calculateDailyPanchangam(requestParasaraPushya);
         DailyPanchangamDTO resultSurya = dailyPanchangamService.calculateDailyPanchangam(requestSurya);
 
         assertNotNull(resultDrik);
         assertNotNull(resultVakya);
         assertNotNull(resultParasara);
+        assertNotNull(resultParasaraPushya);
         assertNotNull(resultSurya);
     }
 
     @Test
     public void testCornerCasesSankrantiAndElongationThresholds() {
-        // Thai Sankranti Ingress date
         PanchangamRequestDTO sankrantiReq = new PanchangamRequestDTO("2026-01-14", 13.0827, 80.2707, "en", "LAHIRI", "VAKYA");
         DailyPanchangamDTO sankrantiRes = dailyPanchangamService.calculateDailyPanchangam(sankrantiReq);
         assertNotNull(sankrantiRes);
         assertNotNull(sankrantiRes.thithi());
 
-        // Amavasya / Purnima elongation boundary
         PanchangamRequestDTO purnimaReq = new PanchangamRequestDTO("2026-02-01", 13.0827, 80.2707, "en", "LAHIRI", "SURYA_SIDDHANTA");
         DailyPanchangamDTO purnimaRes = dailyPanchangamService.calculateDailyPanchangam(purnimaReq);
         assertNotNull(purnimaRes);

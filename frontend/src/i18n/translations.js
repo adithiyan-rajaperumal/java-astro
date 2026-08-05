@@ -172,7 +172,8 @@ const translations = {
     systemSuryaSiddhanta: "Surya Siddhanta",
     ayanamsaFixedVakya: "Vakya Traditional (Fixed)",
     ayanamsaFixedSurya: "Surya Siddhanta (Jagannatha Hora Match)",
-    ayanamsaFixedParasara: "Parasara Bhattar Traditional (Fixed)"
+    ayanamsaFixedParasara: "Parasara Bhattar Traditional (Fixed)",
+    ayanamsaPushyapaksha: "Pushyapaksha Ayanamsa (22°39'34.88\")"
   },
   ta: {
     panchangam: "பஞ்சாங்கம்",
@@ -347,7 +348,8 @@ const translations = {
     systemSuryaSiddhanta: "சூரிய சித்தாந்தம்",
     ayanamsaFixedVakya: "வாக்கிய பஞ்சாங்கம் (நிலையானது)",
     ayanamsaFixedSurya: "சூரிய சித்தாந்தம் (ஜெகன்னாத ஹோரா)",
-    ayanamsaFixedParasara: "பராசர பட்டர் (நிலையானது)"
+    ayanamsaFixedParasara: "பராசர பட்டர் (நிலையானது)",
+    ayanamsaPushyapaksha: "புஷ்யபக்ஷ அயனாம்சம் (22°39'34.88\")"
   },
   hi: {
     panchangam: "पंचांग",
@@ -518,7 +520,8 @@ const translations = {
     systemSuryaSiddhanta: "सूर्य सिद्धान्त",
     ayanamsaFixedVakya: "वाक्य पंचांग (निश्चित)",
     ayanamsaFixedSurya: "सूर्य सिद्धान्त (जगन्नाथ होरा)",
-    ayanamsaFixedParasara: "पराशर भट्टर (निश्चित)"
+    ayanamsaFixedParasara: "पराशर भट्टर (निश्चित)",
+    ayanamsaPushyapaksha: "पुष्यपक्ष अयानांश (22°39'34.88\")"
   },
   kn: {
     panchangam: "ಪಂಚಾಂಗ",
@@ -689,7 +692,8 @@ const translations = {
     systemSuryaSiddhanta: "ಸೂರ್ಯ ಸಿದ್ಧಾಂತ",
     ayanamsaFixedVakya: "ವಾಕ್ಯ ಪಂಚಾಂಗ (ಸ್ಥಿರ)",
     ayanamsaFixedSurya: "ಸೂರ್ಯ ಸಿದ್ಧಾಂತ (ಜಗನ್ನಾಥ ಹೋರಾ)",
-    ayanamsaFixedParasara: "ಪರಾಶರ ಭಟ್ಟರ್ (ಸ್ಥಿರ)"
+    ayanamsaFixedParasara: "ಪರಾಶರ ಭಟ್ಟರ್ (ಸ್ಥಿರ)",
+    ayanamsaPushyapaksha: "ಪುಷ್ಯಪಕ್ಷ ಅಯನಾಂಶ (22°39'34.88\")"
   },
   te: {
     panchangam: "పంచాంగం",
@@ -860,7 +864,8 @@ const translations = {
     systemSuryaSiddhanta: "సూర్య సిద్ధాంతం",
     ayanamsaFixedVakya: "వాక్య పంచాంగం (స్థిరం)",
     ayanamsaFixedSurya: "సూర్య సిద్ధాంతం (జగన్నాథ హోరా)",
-    ayanamsaFixedParasara: "పరాశర భట్టర్ (స్థిరం)"
+    ayanamsaFixedParasara: "పరాశర భట్టర్ (స్థిరం)",
+    ayanamsaPushyapaksha: "పుష్యపక్ష అయనాంశ (22°39'34.88\")"
   },
   ml: {
     panchangam: "പഞ്ചാംഗം",
@@ -1032,7 +1037,8 @@ const translations = {
     systemSuryaSiddhanta: "സൂര്യ സിദ്ധാന്തം",
     ayanamsaFixedVakya: "വാക്യ പഞ്ചാംഗം (സ്ഥിരം)",
     ayanamsaFixedSurya: "സൂര്യ സിദ്ധാന്തം (ജഗന്നാഥ ഹോരാ)",
-    ayanamsaFixedParasara: "പരാശര ഭട്ടർ (സ്ഥിരം)"
+    ayanamsaFixedParasara: "പരാശര ഭട്ടർ (സ്ഥിരം)",
+    ayanamsaPushyapaksha: "പുഷ്യപക്ഷ അയനാംശം (22°39'34.88\")"
   }
 };
 

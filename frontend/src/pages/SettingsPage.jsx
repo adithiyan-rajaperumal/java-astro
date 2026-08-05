@@ -82,8 +82,9 @@ function SettingsPage({ settings, onSettingsChange }) {
             <option value="SURYA_SIDDHANTA">{t('ayanamsaFixedSurya', settings.language)}</option>
           </select>
         ) : settings.panchangamSystem === 'PARASARA_BHATTAR' ? (
-          <select value="PARASARA_BHATTAR" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
-            <option value="PARASARA_BHATTAR">{t('ayanamsaFixedParasara', settings.language)}</option>
+          <select value={settings.ayanamsa === 'PUSHYAPAKSHA' ? 'PUSHYAPAKSHA' : 'LAHIRI'} onChange={handleAyanamsaChange}>
+            <option value="LAHIRI">{t('ayanamsaFixedParasara', settings.language)}</option>
+            <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', settings.language)}</option>
           </select>
         ) : (
           <select value={settings.ayanamsa} onChange={handleAyanamsaChange}>
