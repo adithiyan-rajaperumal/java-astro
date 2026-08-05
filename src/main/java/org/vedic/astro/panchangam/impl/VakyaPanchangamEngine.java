@@ -35,8 +35,8 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
 
-    // Standard Vakya Sidereal Correction Offset (-0.78 degrees relative to Chitra Paksha Drik)
-    private static final double VAKYA_DELTA_OFFSET = -0.78;
+    // Standard Vakya Sidereal Correction Offset (-1.65 degrees relative to Chitra Paksha Drik)
+    private static final double VAKYA_DELTA_OFFSET = -1.65;
 
     private static final Map<String, Integer> TARGET_GRAHAS = new LinkedHashMap<>();
     static {

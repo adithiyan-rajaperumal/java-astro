@@ -390,18 +390,6 @@ function PanchangamPage({ settings }) {
           style={{ height: '36px', padding: '4px 10px', fontSize: '14px' }}
         />
 
-        <select
-          value={selectedSystem}
-          onChange={(e) => setSelectedSystem(e.target.value)}
-          className="date-picker-input"
-          style={{ height: '36px', padding: '4px 10px', fontSize: '13.5px', borderRadius: '8px' }}
-          title={t('panchangamSystem', settings.language)}
-        >
-          <option value="DRIK_TIRUKANITHAM">{t('systemDrik', settings.language)}</option>
-          <option value="VAKYA">{t('systemVakya', settings.language)}</option>
-          <option value="PARASARA_BHATTAR">{t('systemParasaraBhattar', settings.language)}</option>
-          <option value="SURYA_SIDDHANTA">{t('systemSuryaSiddhanta', settings.language)}</option>
-        </select>
 
         <button
           onClick={handleShareAsImage}

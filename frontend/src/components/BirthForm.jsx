@@ -142,11 +142,11 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
             </select>
           ) : (
             <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
-              <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
-              <option value="KP">KP (Krishnamurti Padhdhati)</option>
-              <option value="RAMAN">B.V. Raman</option>
-              <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
-              <option value="PUSHYAPAKSHA">Pushyapaksha</option>
+              <option value="LAHIRI">{t('ayanamsaLahiri', lang)}</option>
+              <option value="KP">{t('ayanamsaKP', lang)}</option>
+              <option value="RAMAN">{t('ayanamsaRaman', lang)}</option>
+              <option value="SURYA_SIDDHANTA">{t('ayanamsaSurya', lang)}</option>
+              <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', lang)}</option>
             </select>
           )}
         </div>

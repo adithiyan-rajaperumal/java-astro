@@ -424,19 +424,24 @@ input:focus, select:focus {
 .horai-table-container {
   max-height: 440px;
   overflow-y: auto;
+  overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  -webkit-overflow-scrolling: touch;
 }
 .horai-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 500px;
 }
 .horai-table th, .horai-table td {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border);
   font-size: 13.5px;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 .horai-table th {
   background: linear-gradient(135deg, #fff4e5 0%, #ffe8d6 100%);

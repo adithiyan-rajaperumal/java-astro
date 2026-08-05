@@ -173,7 +173,11 @@ const translations = {
     ayanamsaFixedVakya: "Vakya Traditional (Fixed)",
     ayanamsaFixedSurya: "Surya Siddhanta (Jagannatha Hora Match)",
     ayanamsaFixedParasara: "Parasara Bhattar Traditional (Fixed)",
-    ayanamsaPushyapaksha: "Pushyapaksha Ayanamsa (22°39'34.88\")"
+    ayanamsaPushyapaksha: "Pushyapaksha Ayanamsa (22°39'34.88\")",
+    ayanamsaLahiri: "Lahiri (Chitra Paksha)",
+    ayanamsaKP: "KP (Krishnamurti Padhdhati)",
+    ayanamsaRaman: "B.V. Raman",
+    ayanamsaSurya: "Surya Siddhanta"
   },
   ta: {
     panchangam: "பஞ்சாங்கம்",
@@ -349,7 +353,11 @@ const translations = {
     ayanamsaFixedVakya: "வாக்கிய பஞ்சாங்கம் (நிலையானது)",
     ayanamsaFixedSurya: "சூரிய சித்தாந்தம் (ஜெகன்னாத ஹோரா)",
     ayanamsaFixedParasara: "பராசர பட்டர் (நிலையானது)",
-    ayanamsaPushyapaksha: "புஷ்யபக்ஷ அயனாம்சம் (22°39'34.88\")"
+    ayanamsaPushyapaksha: "புஷ்யபக்ஷ அயனாம்சம் (22°39'34.88\")",
+    ayanamsaLahiri: "லஹிரி (சித்திர பக்கம்)",
+    ayanamsaKP: "கே.பி (கிருஷ்ணமூர்த்தி பத்தாதி)",
+    ayanamsaRaman: "பி.வி. ராமன்",
+    ayanamsaSurya: "சூரிய சித்தாந்தம்"
   },
   hi: {
     panchangam: "पंचांग",
@@ -521,7 +529,11 @@ const translations = {
     ayanamsaFixedVakya: "वाक्य पंचांग (निश्चित)",
     ayanamsaFixedSurya: "सूर्य सिद्धान्त (जगन्नाथ होरा)",
     ayanamsaFixedParasara: "पराशर भट्टर (निश्चित)",
-    ayanamsaPushyapaksha: "पुष्यपक्ष अयानांश (22°39'34.88\")"
+    ayanamsaPushyapaksha: "पुष्यपक्ष अयानांश (22°39'34.88\")",
+    ayanamsaLahiri: "लाहिड़ी (चित्रा पक्ष)",
+    ayanamsaKP: "के.पी. (कृष्णमूर्ति पद्धति)",
+    ayanamsaRaman: "बी.वी. रमन",
+    ayanamsaSurya: "सूर्य सिद्धान्त"
   },
   kn: {
     panchangam: "ಪಂಚಾಂಗ",
@@ -693,7 +705,11 @@ const translations = {
     ayanamsaFixedVakya: "ವಾಕ್ಯ ಪಂಚಾಂಗ (ಸ್ಥಿರ)",
     ayanamsaFixedSurya: "ಸೂರ್ಯ ಸಿದ್ಧಾಂತ (ಜಗನ್ನಾಥ ಹೋರಾ)",
     ayanamsaFixedParasara: "ಪರಾಶರ ಭಟ್ಟರ್ (ಸ್ಥಿರ)",
-    ayanamsaPushyapaksha: "ಪುಷ್ಯಪಕ್ಷ ಅಯನಾಂಶ (22°39'34.88\")"
+    ayanamsaPushyapaksha: "ಪುಷ್ಯಪಕ್ಷ ಅಯನಾಂಶ (22°39'34.88\")",
+    ayanamsaLahiri: "ಲಾಹಿರಿ (ಚಿತ್ರ ಪಕ್ಷ)",
+    ayanamsaKP: "ಕೆ.ಪಿ (ಕೃಷ್ಣಮೂರ್ತಿ ಪದ್ಧತಿ)",
+    ayanamsaRaman: "ಬಿ.ವಿ. ರಾಮನ್",
+    ayanamsaSurya: "ಸೂರ್ಯ ಸಿದ್ಧಾಂತ"
   },
   te: {
     panchangam: "పంచాంగం",
@@ -1038,7 +1054,11 @@ const translations = {
     ayanamsaFixedVakya: "വാക്യ പഞ്ചാംഗം (സ്ഥിരം)",
     ayanamsaFixedSurya: "സൂര്യ സിദ്ധാന്തം (ജഗന്നാഥ ഹോരാ)",
     ayanamsaFixedParasara: "പരാശര ഭട്ടർ (സ്ഥിരം)",
-    ayanamsaPushyapaksha: "പുഷ്യപക്ഷ അയനാംശം (22°39'34.88\")"
+    ayanamsaPushyapaksha: "പുഷ്യപക്ഷ അയനാംശം (22°39'34.88\")",
+    ayanamsaLahiri: "ലാഹിരി (ചിത്ര പക്ഷം)",
+    ayanamsaKP: "കെ.പി (കൃഷ്ണമൂർത്തി പദ്ധതി)",
+    ayanamsaRaman: "ബി.വി. രാമൻ",
+    ayanamsaSurya: "സൂര്യ സിദ്ധാന്തം"
   }
 };
 

@@ -52,8 +52,8 @@ public class MultiPanchangamEngineTest {
 
         assertNotEquals(sunDrik, sunVakya, 0.001);
         assertNotEquals(sunDrik, sunParasara, 0.001);
-        assertEquals(sunDrik - 0.78, sunVakya, 0.05);
-        assertEquals(sunDrik - 1.40, sunParasara, 0.05);
+        assertEquals(sunDrik - 1.65, sunVakya, 0.05);
+        assertEquals(sunDrik - 1.83, sunParasara, 0.05);
     }
 
     @Test

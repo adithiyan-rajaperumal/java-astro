@@ -35,8 +35,8 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
 
-    // Classical Parasara Bhattar Srirangam almanac offset (-1.40 degrees relative to modern Drik)
-    private static final double PARASARA_BHATTAR_DELTA = -1.40;
+    // Classical Parasara Bhattar Srirangam almanac offset (-1.83 degrees relative to modern Drik)
+    private static final double PARASARA_BHATTAR_DELTA = -1.83;
 
     private static final Map<String, Integer> TARGET_GRAHAS = new LinkedHashMap<>();
     static {
