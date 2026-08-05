@@ -355,12 +355,12 @@ function PanchangamPage({ settings }) {
     <div>
       {/* Mobile-First Responsive Date Navigation Top Bar */}
       <div className="panchangam-top-bar" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <button 
             onClick={() => changeDate(-1)} 
             className="today-btn"
             title="Previous Day"
-            style={{ padding: '6px 14px', fontSize: '13px' }}
+            style={{ padding: '6px 12px', fontSize: '13px' }}
           >
             ◀ Prev
           </button>
@@ -376,7 +376,7 @@ function PanchangamPage({ settings }) {
             onClick={() => changeDate(1)} 
             className="today-btn"
             title="Next Day"
-            style={{ padding: '6px 14px', fontSize: '13px' }}
+            style={{ padding: '6px 12px', fontSize: '13px' }}
           >
             Next ▶
           </button>
@@ -406,7 +406,9 @@ function PanchangamPage({ settings }) {
             boxShadow: '0 4px 12px rgba(255, 215, 0, 0.3)',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '6px'
+            justifyContent: 'center',
+            gap: '6px',
+            whiteSpace: 'nowrap'
           }}
         >
           📲 {sharing ? t('generatingImage', settings.language) : t('shareAsImage', settings.language)}
