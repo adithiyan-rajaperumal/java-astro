@@ -15,6 +15,10 @@ public class LocationService {
     private final RestClient photonClient;
     private final RestClient nominatimClient;
 
+    private static final java.util.Set<String> EXCLUDED_OSM_KEYS = java.util.Set.of(
+        "highway", "amenity", "shop", "building", "tourism", "railway", "leisure", "landuse", "office", "craft"
+    );
+
     public LocationService() {
         this.photonClient = RestClient.builder()
                 .baseUrl("https://photon.komoot.io")
@@ -27,7 +31,10 @@ public class LocationService {
 
     /**
      * Searches location using Photon primary geocoder, falling back to Nominatim API
-     * if zero matches are found. Formats labels as "Village/Town/City, State, Country".
+     * if zero matches are found. Enforces 3-tier hierarchy:
+     * - Village: Village, City/District, State, Country
+     * - Town: Town, City/District, State, Country
+     * - City: City, State, Country
      */
     public List<LocationDto.LocationSuggestionDTO> searchLocations(String query) {
         if (query == null || query.trim().length() < 2) {
@@ -53,7 +60,7 @@ public class LocationService {
                     .uri(uriBuilder -> uriBuilder
                             .path("/api")
                             .queryParam("q", query)
-                            .queryParam("limit", "15")
+                            .queryParam("limit", "25")
                             .build())
                     .retrieve()
                     .body(LocationDto.PhotonResponse.class);
@@ -69,16 +76,22 @@ public class LocationService {
                 var props = feature.properties();
                 if (props == null || props.name() == null || props.name().isBlank()) continue;
 
+                // Filter out non-place POIs (shops, bus stops, buildings, restaurants)
+                if (props.osm_key() != null && EXCLUDED_OSM_KEYS.contains(props.osm_key().toLowerCase())) {
+                    continue;
+                }
+
                 double lon = feature.geometry().coordinates().get(0);
                 double lat = feature.geometry().coordinates().get(1);
 
-                String shortName = deriveShortName(props.name(), props.city(), props.locality(), props.suburb());
+                String primaryName = props.name().trim();
+                String parentCityOrDistrict = deriveParentCityOrDistrict(props.city(), props.district(), props.county());
                 String state = props.state() != null ? props.state().trim() : "";
                 String country = props.country() != null ? props.country().trim() : "";
 
-                String label = buildFormattedLabel(shortName, state, country);
+                String label = build3TierLabel(primaryName, parentCityOrDistrict, state, country);
                 if (seenLabels.add(label.toLowerCase())) {
-                    suggestions.add(new LocationDto.LocationSuggestionDTO(shortName, state, country, label, lat, lon));
+                    suggestions.add(new LocationDto.LocationSuggestionDTO(primaryName, state, country, label, lat, lon));
                 }
             }
 
@@ -97,7 +110,7 @@ public class LocationService {
                             .queryParam("q", query)
                             .queryParam("format", "json")
                             .queryParam("addressdetails", "1")
-                            .queryParam("limit", "15")
+                            .queryParam("limit", "25")
                             .build())
                     .retrieve()
                     .body(LocationDto.NominatimResult[].class);
@@ -112,27 +125,37 @@ public class LocationService {
             for (var item : response) {
                 if (item.lat() == null || item.lon() == null) continue;
 
+                // Filter out non-place POIs
+                if (item.category() != null && EXCLUDED_OSM_KEYS.contains(item.category().toLowerCase())) {
+                    continue;
+                }
+
                 double lat = Double.parseDouble(item.lat());
                 double lon = Double.parseDouble(item.lon());
 
                 var addr = item.address();
-                String shortName = item.display_name().split(",")[0].trim();
+                String primaryName = item.display_name().split(",")[0].trim();
+                String parentCityOrDistrict = "";
                 String state = "";
                 String country = "";
 
                 if (addr != null) {
-                    if (addr.city() != null && !addr.city().isBlank()) shortName = addr.city().trim();
-                    else if (addr.town() != null && !addr.town().isBlank()) shortName = addr.town().trim();
-                    else if (addr.village() != null && !addr.village().isBlank()) shortName = addr.village().trim();
-                    else if (addr.suburb() != null && !addr.suburb().isBlank()) shortName = addr.suburb().trim();
+                    if (addr.village() != null && !addr.village().isBlank()) primaryName = addr.village().trim();
+                    else if (addr.hamlet() != null && !addr.hamlet().isBlank()) primaryName = addr.hamlet().trim();
+                    else if (addr.town() != null && !addr.town().isBlank()) primaryName = addr.town().trim();
+                    else if (addr.city() != null && !addr.city().isBlank()) primaryName = addr.city().trim();
+                    else if (addr.suburb() != null && !addr.suburb().isBlank()) primaryName = addr.suburb().trim();
+                    else if (addr.locality() != null && !addr.locality().isBlank()) primaryName = addr.locality().trim();
+
+                    parentCityOrDistrict = deriveParentCityOrDistrict(addr.city(), addr.district(), addr.state_district() != null ? addr.state_district() : addr.county());
 
                     if (addr.state() != null) state = addr.state().trim();
                     if (addr.country() != null) country = addr.country().trim();
                 }
 
-                String label = buildFormattedLabel(shortName, state, country);
+                String label = build3TierLabel(primaryName, parentCityOrDistrict, state, country);
                 if (seenLabels.add(label.toLowerCase())) {
-                    suggestions.add(new LocationDto.LocationSuggestionDTO(shortName, state, country, label, lat, lon));
+                    suggestions.add(new LocationDto.LocationSuggestionDTO(primaryName, state, country, label, lat, lon));
                 }
             }
 
@@ -143,21 +166,32 @@ public class LocationService {
         }
     }
 
-    private String deriveShortName(String name, String city, String locality, String suburb) {
+    private String deriveParentCityOrDistrict(String city, String district, String county) {
         if (city != null && !city.isBlank()) return city.trim();
-        if (locality != null && !locality.isBlank()) return locality.trim();
-        if (suburb != null && !suburb.isBlank()) return suburb.trim();
-        return name != null ? name.trim() : "";
+        if (district != null && !district.isBlank()) return district.trim();
+        if (county != null && !county.isBlank()) return county.trim();
+        return "";
     }
 
-    private String buildFormattedLabel(String shortName, String state, String country) {
-        StringBuilder sb = new StringBuilder(shortName);
-        if (!state.isBlank() && !state.equalsIgnoreCase(shortName)) {
+    /**
+     * Enforces the 3-Tier Label Formatting Rule:
+     * - Village: Village, City/District, State, Country
+     * - Town: Town, City/District, State, Country
+     * - City: City, State, Country
+     */
+    private String build3TierLabel(String primaryName, String parentCityOrDistrict, String state, String country) {
+        StringBuilder sb = new StringBuilder(primaryName);
+
+        if (!parentCityOrDistrict.isBlank() && !parentCityOrDistrict.equalsIgnoreCase(primaryName)) {
+            sb.append(", ").append(parentCityOrDistrict);
+        }
+        if (!state.isBlank() && !state.equalsIgnoreCase(primaryName) && !state.equalsIgnoreCase(parentCityOrDistrict)) {
             sb.append(", ").append(state);
         }
         if (!country.isBlank()) {
             sb.append(", ").append(country);
         }
+
         return sb.toString();
     }
 }

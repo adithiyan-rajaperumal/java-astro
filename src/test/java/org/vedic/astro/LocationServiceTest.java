@@ -32,12 +32,17 @@ public class LocationServiceTest {
     }
 
     @Test
-    public void testSearchLocationsHandlesObscureQueryWithFallback() {
-        // Query that might fail Photon or require fallback
-        List<LocationDto.LocationSuggestionDTO> results = locationService.searchLocations("Mylapore");
+    public void testSearchLocationsHierarchicalFormatting() {
+        List<LocationDto.LocationSuggestionDTO> results = locationService.searchLocations("Kovilpatti");
 
         assertNotNull(results);
         assertFalse(results.isEmpty());
-        assertTrue(results.get(0).label().toLowerCase().contains("mylapore") || results.get(0).label().toLowerCase().contains("chennai"));
+
+        LocationDto.LocationSuggestionDTO item = results.get(0);
+        assertNotNull(item.name());
+        assertNotNull(item.label());
+        // Label should contain Kovilpatti and at least state/country
+        assertTrue(item.label().contains("Kovilpatti"));
+        assertTrue(item.label().split(",").length >= 2);
     }
 }

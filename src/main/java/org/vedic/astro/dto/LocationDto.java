@@ -28,7 +28,9 @@ public class LocationDto {
             String city,
             String state,
             String country,
-            String postcode
+            String postcode,
+            String osm_key,
+            String osm_value
     ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -36,6 +38,8 @@ public class LocationDto {
             String display_name,
             String lat,
             String lon,
+            String type,
+            String category,
             NominatimAddress address
     ) {}
 
@@ -44,10 +48,12 @@ public class LocationDto {
             String city,
             String town,
             String village,
+            String hamlet,
             String suburb,
             String locality,
             String district,
             String county,
+            String state_district,
             String state,
             String country
     ) {}
