@@ -14,6 +14,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
   const [time, setTime] = useState(initialValues.time || '');
   const [location, setLocation] = useState(initialValues.location || null);
   const [ayanamsa, setAyanamsa] = useState(initialValues.ayanamsa || 'LAHIRI');
+  const [panchangamSystem, setPanchangamSystem] = useState(initialValues.panchangamSystem || 'DRIK_TIRUKANITHAM');
 
   const handleDateChange = (val) => {
     const clean = val.replace(/\D/g, '');
@@ -64,7 +65,8 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       latitude: location.latitude,
       longitude: location.longitude,
       location,
-      ayanamsa
+      ayanamsa,
+      panchangamSystem
     });
   };
 
@@ -113,15 +115,40 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
         />
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
-        <label>{t('ayanamsa', lang)}</label>
-        <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
-          <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
-          <option value="KP">KP (Krishnamurti Padhdhati)</option>
-          <option value="RAMAN">B.V. Raman</option>
-          <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
-          <option value="PUSHYAPAKSHA">Pushyapaksha</option>
-        </select>
+      <div className="grid-2" style={{ marginBottom: '20px' }}>
+        <div>
+          <label>{t('panchangamSystem', lang)}</label>
+          <select value={panchangamSystem} onChange={(e) => setPanchangamSystem(e.target.value)}>
+            <option value="DRIK_TIRUKANITHAM">{t('systemDrik', lang)}</option>
+            <option value="VAKYA">{t('systemVakya', lang)}</option>
+            <option value="PARASARA_BHATTAR">{t('systemParasaraBhattar', lang)}</option>
+            <option value="SURYA_SIDDHANTA">{t('systemSuryaSiddhanta', lang)}</option>
+          </select>
+        </div>
+        <div>
+          <label>{t('ayanamsa', lang)}</label>
+          {panchangamSystem === 'VAKYA' ? (
+            <select value="VAKYA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+              <option value="VAKYA">{t('ayanamsaFixedVakya', lang)}</option>
+            </select>
+          ) : panchangamSystem === 'SURYA_SIDDHANTA' ? (
+            <select value="SURYA_SIDDHANTA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+              <option value="SURYA_SIDDHANTA">{t('ayanamsaFixedSurya', lang)}</option>
+            </select>
+          ) : panchangamSystem === 'PARASARA_BHATTAR' ? (
+            <select value="PARASARA_BHATTAR" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+              <option value="PARASARA_BHATTAR">{t('ayanamsaFixedParasara', lang)}</option>
+            </select>
+          ) : (
+            <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
+              <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
+              <option value="KP">KP (Krishnamurti Padhdhati)</option>
+              <option value="RAMAN">B.V. Raman</option>
+              <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
+              <option value="PUSHYAPAKSHA">Pushyapaksha</option>
+            </select>
+          )}
+        </div>
       </div>
 
       <button type="submit" className="btn-primary" style={{ width: '100%' }}>

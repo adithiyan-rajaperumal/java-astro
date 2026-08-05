@@ -24,19 +24,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Parasara Bhattar Traditional Srirangam Panchangam Engine (பராசர பட்டர் கணிதம்).
- * Implements Srirangam Ranganathaswamy Temple traditional Parasara Bhattar ephemeris offsets.
+ * Traditional Surya Siddhanta Panchangam Engine (சூரிய சித்தாந்தம்).
+ * Uses classical Surya Siddhanta astronomical constants (Swiss Ephemeris Mode 21).
  */
 @Service
 @RequiredArgsConstructor
-public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
+public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
 
     private final SwissEph swissEph;
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
-
-    // Classical Parasara Bhattar Srirangam almanac offset (-1.40 degrees relative to modern Drik)
-    private static final double PARASARA_BHATTAR_DELTA = -1.40;
 
     private static final Map<String, Integer> TARGET_GRAHAS = new LinkedHashMap<>();
     static {
@@ -77,29 +74,30 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
         StringBuffer serr = new StringBuffer();
 
         synchronized (swissEph) {
-            org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(dto.ayanamsa());
-            swissEph.swe_set_sid_mode(ayanamsaType.getMode(), 0, 0);
+            // Force Surya Siddhanta Ayanamsa Mode 21
+            swissEph.swe_set_sid_mode(21, 0, 0);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = (ascmc[SweConst.SE_ASC] + PARASARA_BHATTAR_DELTA + 360.0) % 360.0;
+            double lagnaLong = ascmc[SweConst.SE_ASC];
 
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
 
             for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
+                double absoluteLong = xx[0];
 
-                double bhattarLong = (xx[0] + PARASARA_BHATTAR_DELTA + 360.0) % 360.0;
-
-                d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), bhattarLong, xx[3]));
-                d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), bhattarLong, xx[3]));
+                d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), absoluteLong, xx[3]));
+                d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), absoluteLong, xx[3]));
 
                 if ("Rahu".equals(planet.getKey())) {
-                    double ketuLong = (bhattarLong + 180.0) % 360.0;
+                    double ketuLong = (absoluteLong + 180.0) % 360.0;
                     d1Map.put("Ketu", buildBasePosition("Ketu", ketuLong, xx[3]));
                     d9Map.put("Ketu", buildNavamsaPosition("Ketu", ketuLong, xx[3]));
                 }
             }
+            // Reset back to default Lahiri mode
+            swissEph.swe_set_sid_mode(0, 0, 0);
         }
 
         return ChartResult.builder()
@@ -115,7 +113,7 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
 
     @Override
     public PanchangamType getType() {
-        return PanchangamType.PARASARA_BHATTAR;
+        return PanchangamType.SURYA_SIDDHANTA;
     }
 
     @Override
@@ -123,9 +121,9 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
         double[] cusps = new double[13];
         double[] ascmc = new double[10];
         synchronized (swissEph) {
-            org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(payload.ayanamsa());
-            swissEph.swe_set_sid_mode(ayanamsaType.getMode(), 0, 0);
+            swissEph.swe_set_sid_mode(21, 0, 0);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
+            swissEph.swe_set_sid_mode(0, 0, 0);
         }
 
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);

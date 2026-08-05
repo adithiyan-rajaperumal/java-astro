@@ -85,7 +85,15 @@ function PanchangamPage({ settings }) {
     return t(`gowriGuide.${subKey}`, lang);
   };
 
-  const fetchPanchangam = async (dateStr) => {
+  const [selectedSystem, setSelectedSystem] = useState(settings.panchangamSystem || 'DRIK_TIRUKANITHAM');
+
+  useEffect(() => {
+    if (settings.panchangamSystem) {
+      setSelectedSystem(settings.panchangamSystem);
+    }
+  }, [settings.panchangamSystem]);
+
+  const fetchPanchangam = async (dateStr, activeSys) => {
     if (!settings.location) return;
     setLoading(true);
     setError(null);
@@ -101,7 +109,8 @@ function PanchangamPage({ settings }) {
           latitude: settings.location.latitude,
           longitude: settings.location.longitude,
           language: settings.language,
-          ayanamsa: settings.ayanamsa
+          ayanamsa: settings.ayanamsa,
+          panchangamSystem: activeSys || selectedSystem || 'DRIK_TIRUKANITHAM'
         })
       });
       if (response.ok) {
@@ -118,8 +127,8 @@ function PanchangamPage({ settings }) {
   };
 
   useEffect(() => {
-    fetchPanchangam(currentDate);
-  }, [currentDate, settings.location, settings.language, settings.ayanamsa]);
+    fetchPanchangam(currentDate, selectedSystem);
+  }, [currentDate, settings.location, settings.language, settings.ayanamsa, selectedSystem]);
 
   const changeDate = (days) => {
     const d = new Date(currentDate + 'T12:00:00');
@@ -380,6 +389,19 @@ function PanchangamPage({ settings }) {
           onChange={(e) => e.target.value && setCurrentDate(e.target.value)}
           style={{ height: '36px', padding: '4px 10px', fontSize: '14px' }}
         />
+
+        <select
+          value={selectedSystem}
+          onChange={(e) => setSelectedSystem(e.target.value)}
+          className="date-picker-input"
+          style={{ height: '36px', padding: '4px 10px', fontSize: '13.5px', borderRadius: '8px' }}
+          title={t('panchangamSystem', settings.language)}
+        >
+          <option value="DRIK_TIRUKANITHAM">{t('systemDrik', settings.language)}</option>
+          <option value="VAKYA">{t('systemVakya', settings.language)}</option>
+          <option value="PARASARA_BHATTAR">{t('systemParasaraBhattar', settings.language)}</option>
+          <option value="SURYA_SIDDHANTA">{t('systemSuryaSiddhanta', settings.language)}</option>
+        </select>
 
         <button
           onClick={handleShareAsImage}

@@ -164,7 +164,15 @@ const translations = {
     generatingImage: "Generating...",
     defaultLocationFallback: "Location",
     clickHouseForAspect: "Click on any house to view its aspect lines",
-    theiPiraiCaution: "(Thei Pirai / Krishna Paksha)"
+    theiPiraiCaution: "(Thei Pirai / Krishna Paksha)",
+    panchangamSystem: "Panchangam System",
+    systemDrik: "Drik / Thirukanitham",
+    systemVakya: "Vakya (Traditional)",
+    systemParasaraBhattar: "Parasara Bhattar",
+    systemSuryaSiddhanta: "Surya Siddhanta",
+    ayanamsaFixedVakya: "Vakya Traditional (Fixed)",
+    ayanamsaFixedSurya: "Surya Siddhanta (Jagannatha Hora Match)",
+    ayanamsaFixedParasara: "Parasara Bhattar Traditional (Fixed)"
   },
   ta: {
     panchangam: "பஞ்சாங்கம்",
@@ -331,7 +339,15 @@ const translations = {
     generatingImage: "உருவாக்குகிறது...",
     defaultLocationFallback: "இடம்",
     clickHouseForAspect: "எந்த வீட்டின் மீதும் அழுத்தி பார்வை கோடுகளை காணவும்",
-    theiPiraiCaution: "(தேய்பிறை)"
+    theiPiraiCaution: "(தேய்பிறை)",
+    panchangamSystem: "பஞ்சாங்கக் கணிதம்",
+    systemDrik: "திருக்கணிதம்",
+    systemVakya: "வாக்கிய பஞ்சாங்கம்",
+    systemParasaraBhattar: "பராசர பட்டர்",
+    systemSuryaSiddhanta: "சூரிய சித்தாந்தம்",
+    ayanamsaFixedVakya: "வாக்கிய பஞ்சாங்கம் (நிலையானது)",
+    ayanamsaFixedSurya: "சூரிய சித்தாந்தம் (ஜெகன்னாத ஹோரா)",
+    ayanamsaFixedParasara: "பராசர பட்டர் (நிலையானது)"
   },
   hi: {
     panchangam: "पंचांग",
@@ -494,7 +510,15 @@ const translations = {
     generatingImage: "बना रहा है...",
     defaultLocationFallback: "स्थान",
     clickHouseForAspect: "किसी भी भाव पर क्लिक करके दृष्टि रेखाएँ देखें",
-    theiPiraiCaution: "(कृष्ण पक्ष)"
+    theiPiraiCaution: "(कृष्ण पक्ष)",
+    panchangamSystem: "पंचांग पद्धति",
+    systemDrik: "दृक् / दृक्कणितम्",
+    systemVakya: "वाक्य पंचांग",
+    systemParasaraBhattar: "पराशर भट्टर",
+    systemSuryaSiddhanta: "सूर्य सिद्धान्त",
+    ayanamsaFixedVakya: "वाक्य पंचांग (निश्चित)",
+    ayanamsaFixedSurya: "सूर्य सिद्धान्त (जगन्नाथ होरा)",
+    ayanamsaFixedParasara: "पराशर भट्टर (निश्चित)"
   },
   kn: {
     panchangam: "ಪಂಚಾಂಗ",
@@ -657,7 +681,15 @@ const translations = {
     generatingImage: "ರಚಿಸಲಾಗುತ್ತಿದೆ...",
     defaultLocationFallback: "ಸ್ಥಳ",
     clickHouseForAspect: "ಯಾವುದೇ ಭಾವದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ದೃಷ್ಟಿ ರೇಖೆಗಳನ್ನು ನೋಡಿ",
-    theiPiraiCaution: "(ಕೃಷ್ಣ ಪಕ್ಷ)"
+    theiPiraiCaution: "(ಕೃಷ್ಣ ಪಕ್ಷ)",
+    panchangamSystem: "ಪಂಚಾಂಗ ಪದ್ಧತಿ",
+    systemDrik: "ದೃಕ್ / ತಿರುಕಣಿತಂ",
+    systemVakya: "ವಾಕ್ಯ ಪಂಚಾಂಗ",
+    systemParasaraBhattar: "ಪರಾಶರ ಭಟ್ಟರ್",
+    systemSuryaSiddhanta: "ಸೂರ್ಯ ಸಿದ್ಧಾಂತ",
+    ayanamsaFixedVakya: "ವಾಕ್ಯ ಪಂಚಾಂಗ (ಸ್ಥಿರ)",
+    ayanamsaFixedSurya: "ಸೂರ್ಯ ಸಿದ್ಧಾಂತ (ಜಗನ್ನಾಥ ಹೋರಾ)",
+    ayanamsaFixedParasara: "ಪರಾಶರ ಭಟ್ಟರ್ (ಸ್ಥಿರ)"
   },
   te: {
     panchangam: "పంచాంగం",
@@ -820,7 +852,15 @@ const translations = {
     generatingImage: "రూపొందిస్తోంది...",
     defaultLocationFallback: "ప్రదేశం",
     clickHouseForAspect: "ఏదైనా భావంపై క్లిక్ చేసి దృష్టి రేఖలను చూడండి",
-    theiPiraiCaution: "(కృష్ణ పక్షం)"
+    theiPiraiCaution: "(కృష్ణ పక్షం)",
+    panchangamSystem: "పంచాంగ పద్ధతి",
+    systemDrik: "దృక్ / తిరుకణితం",
+    systemVakya: "వాక్య పంచాంగం",
+    systemParasaraBhattar: "పరాశర భట్టర్",
+    systemSuryaSiddhanta: "సూర్య సిద్ధాంతం",
+    ayanamsaFixedVakya: "వాక్య పంచాంగం (స్థిరం)",
+    ayanamsaFixedSurya: "సూర్య సిద్ధాంతం (జగన్నాథ హోరా)",
+    ayanamsaFixedParasara: "పరాశర భట్టర్ (స్థిరం)"
   },
   ml: {
     panchangam: "പഞ്ചാംഗം",
@@ -984,7 +1024,15 @@ const translations = {
     generatingImage: "നിർമ്മിക്കുന്നു...",
     defaultLocationFallback: "സ്ഥലം",
     clickHouseForAspect: "ഏതെങ്കിലും ഭാവത്തിൽ ക്ലിക്ക് ചെയ്ത് ദൃഷ്ടി രേഖകൾ കാണുക",
-    theiPiraiCaution: "(കൃഷ്ണ പക്ഷം)"
+    theiPiraiCaution: "(കൃഷ്ണ പക്ഷം)",
+    panchangamSystem: "പഞ്ചാംഗ പദ്ധതി",
+    systemDrik: "ദൃക് / തിരുക്കണിതം",
+    systemVakya: "വാക്യ പഞ്ചാംഗം",
+    systemParasaraBhattar: "പരാശര ഭട്ടർ",
+    systemSuryaSiddhanta: "സൂര്യ സിദ്ധാന്തം",
+    ayanamsaFixedVakya: "വാക്യ പഞ്ചാംഗം (സ്ഥിരം)",
+    ayanamsaFixedSurya: "സൂര്യ സിദ്ധാന്തം (ജഗന്നാഥ ഹോരാ)",
+    ayanamsaFixedParasara: "പരാശര ഭട്ടർ (സ്ഥിരം)"
   }
 };
 

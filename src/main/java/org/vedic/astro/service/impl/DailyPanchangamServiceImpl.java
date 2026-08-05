@@ -14,6 +14,7 @@ import org.vedic.astro.dto.PanchangamRequestDTO;
 import org.vedic.astro.service.DailyPanchangamService;
 import org.vedic.astro.service.TimezoneService;
 import org.vedic.astro.service.TranslationService;
+import org.vedic.astro.panchangam.PanchangamFactory;
 import org.vedic.astro.util.ZodiacUtils;
 
 import java.time.*;
@@ -29,6 +30,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
     private final SwissEph swissEph;
     private final TimezoneService timezoneService;
     private final TranslationService translationService;
+    private final PanchangamFactory panchangamFactory;
 
     private static final String[][] GOWRI_DAY_STATES = {
         {"Uthi", "Amirdha", "Rogam", "Laabam", "Dhanam", "Sugam", "Soram", "Visham"}, // Sun
@@ -173,8 +175,10 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         String moonriseStr = tretMoonRise.val > 0 ? jdToZonedDateTime(tretMoonRise.val, zoneId).format(timeFormatter) : "--:--";
         String moonsetStr = tretMoonSet.val > 0 ? jdToZonedDateTime(tretMoonSet.val, zoneId).format(timeFormatter) : "--:--";
 
-        // Fetch planetary positions at Sunrise
-        double[] coordinates = getSunMoonLongitude(jdSunrise);
+        // Fetch planetary positions at Sunrise using requested Panchangam System & Ayanamsa
+        org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(request.ayanamsa());
+        org.vedic.astro.panchangam.PanchangamType pType = org.vedic.astro.panchangam.PanchangamType.fromString(request.panchangamSystem());
+        double[] coordinates = getSunMoonLongitude(jdSunrise, pType, ayanamsaType.getMode());
         double sunLong = coordinates[0];
         double moonLong = coordinates[1];
 
@@ -246,7 +250,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         List<String> chandrastamamNakshatras = getExactChandrastamamNakshatras(nakshatraDTO);
 
         // Netram and Jeevan
-        double[] coordinatesSun = getSunMoonLongitude(jdSunrise); // reload coordinates just in case
+        double[] coordinatesSun = getSunMoonLongitude(jdSunrise, pType, ayanamsaType.getMode()); // reload coordinates just in case
         int sunNakNum = (int) (coordinatesSun[0] / (360.0 / 27.0)) + 1;
         int dDiff = (nakIdx - sunNakNum + 27) % 27;
 
@@ -403,19 +407,39 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(epochMs), zoneId);
     }
 
-    private double[] getSunMoonLongitude(double jd) {
+    private double[] getSunMoonLongitude(double jd, org.vedic.astro.panchangam.PanchangamType pType, int ayanamsaMode) {
         int calculationFlags = SweConst.SEFLG_SWIEPH | SweConst.SEFLG_SIDEREAL;
         double[] xx = new double[6];
         StringBuffer serr = new StringBuffer();
         
+        double deltaOffset = 0.0;
+        int sidMode = ayanamsaMode;
+
+        if (pType == org.vedic.astro.panchangam.PanchangamType.VAKYA) {
+            deltaOffset = -0.78;
+        } else if (pType == org.vedic.astro.panchangam.PanchangamType.PARASARA_BHATTAR) {
+            deltaOffset = -1.40;
+        } else if (pType == org.vedic.astro.panchangam.PanchangamType.SURYA_SIDDHANTA) {
+            sidMode = 21;
+        }
+
         double sunLong, moonLong;
         synchronized (swissEph) {
+            swissEph.swe_set_sid_mode(sidMode, 0, 0);
             swissEph.swe_calc_ut(jd, SweConst.SE_SUN, calculationFlags, xx, serr);
-            sunLong = xx[0];
+            sunLong = (xx[0] + deltaOffset + 360.0) % 360.0;
             swissEph.swe_calc_ut(jd, SweConst.SE_MOON, calculationFlags, xx, serr);
-            moonLong = xx[0];
+            moonLong = (xx[0] + deltaOffset + 360.0) % 360.0;
         }
         return new double[]{sunLong, moonLong};
+    }
+
+    private double[] getSunMoonLongitude(double jd, org.vedic.astro.panchangam.PanchangamType pType) {
+        return getSunMoonLongitude(jd, pType, 0);
+    }
+
+    private double[] getSunMoonLongitude(double jd) {
+        return getSunMoonLongitude(jd, org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM, 0);
     }
 
     private double getMoonLongitude(double jd) {

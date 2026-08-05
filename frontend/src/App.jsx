@@ -10,6 +10,7 @@ import { t } from './i18n/translations';
 const DEFAULT_SETTINGS = {
   language: 'en',
   ayanamsa: 'LAHIRI',
+  panchangamSystem: 'DRIK_TIRUKANITHAM',
   location: {
     label: 'Chennai, Tamil Nadu, India',
     latitude: 13.0827,

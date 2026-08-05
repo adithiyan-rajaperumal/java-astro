@@ -23,6 +23,10 @@ function SettingsPage({ settings, onSettingsChange }) {
     onSettingsChange({ ...settings, ayanamsa: e.target.value });
   };
 
+  const handlePanchangamSystemChange = (e) => {
+    onSettingsChange({ ...settings, panchangamSystem: e.target.value });
+  };
+
   return (
     <div>
       <h2 className="title-gold">{t('settings', settings.language)}</h2>
@@ -59,14 +63,37 @@ function SettingsPage({ settings, onSettingsChange }) {
 
       <div className="card">
         <h3 style={{ marginTop: 0, color: 'var(--accent-gold)' }}>{t('calculationEngineSettings', settings.language)}</h3>
-        <label>{t('ayanamsa', settings.language)}</label>
-        <select value={settings.ayanamsa} onChange={handleAyanamsaChange}>
-          <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
-          <option value="KP">KP (Krishnamurti Padhdhati)</option>
-          <option value="RAMAN">B.V. Raman</option>
-          <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
-          <option value="PUSHYAPAKSHA">Pushyapaksha</option>
+        
+        <label>{t('panchangamSystem', settings.language)}</label>
+        <select value={settings.panchangamSystem || 'DRIK_TIRUKANITHAM'} onChange={handlePanchangamSystemChange}>
+          <option value="DRIK_TIRUKANITHAM">{t('systemDrik', settings.language)}</option>
+          <option value="VAKYA">{t('systemVakya', settings.language)}</option>
+          <option value="PARASARA_BHATTAR">{t('systemParasaraBhattar', settings.language)}</option>
+          <option value="SURYA_SIDDHANTA">{t('systemSuryaSiddhanta', settings.language)}</option>
         </select>
+
+        <label style={{ marginTop: '12px' }}>{t('ayanamsa', settings.language)}</label>
+        {settings.panchangamSystem === 'VAKYA' ? (
+          <select value="VAKYA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+            <option value="VAKYA">{t('ayanamsaFixedVakya', settings.language)}</option>
+          </select>
+        ) : settings.panchangamSystem === 'SURYA_SIDDHANTA' ? (
+          <select value="SURYA_SIDDHANTA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+            <option value="SURYA_SIDDHANTA">{t('ayanamsaFixedSurya', settings.language)}</option>
+          </select>
+        ) : settings.panchangamSystem === 'PARASARA_BHATTAR' ? (
+          <select value="PARASARA_BHATTAR" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+            <option value="PARASARA_BHATTAR">{t('ayanamsaFixedParasara', settings.language)}</option>
+          </select>
+        ) : (
+          <select value={settings.ayanamsa} onChange={handleAyanamsaChange}>
+            <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
+            <option value="KP">KP (Krishnamurti Padhdhati)</option>
+            <option value="RAMAN">B.V. Raman</option>
+            <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
+            <option value="PUSHYAPAKSHA">Pushyapaksha</option>
+          </select>
+        )}
       </div>
 
       <div className="card" style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>

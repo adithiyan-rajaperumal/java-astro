@@ -16,10 +16,17 @@ function MatchingPage({ settings }) {
   const [matchingSystem, setMatchingSystem] = useState('ASHTA_KOOTA');
   const [strictness, setStrictness] = useState('MODERATE');
   const [ayanamsa, setAyanamsa] = useState(settings.ayanamsa || 'LAHIRI');
+  const [panchangamSystem, setPanchangamSystem] = useState(settings.panchangamSystem || 'DRIK_TIRUKANITHAM');
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (settings.panchangamSystem) {
+      setPanchangamSystem(settings.panchangamSystem);
+    }
+  }, [settings.panchangamSystem]);
 
   useEffect(() => {
     setResult(null);
@@ -44,33 +51,29 @@ function MatchingPage({ settings }) {
     const day = parseInt(match[1]);
     const month = parseInt(match[2]);
     const year = parseInt(match[3]);
-    if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1800 || year > 2100) {
-      return null;
-    }
-    return { year, month, day };
+    if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1800 || year > 2100) return null;
+    return { day, month, year };
   };
 
   const handleMatch = async (e) => {
     e.preventDefault();
-    if (!boyName.trim() || !boyDate || !boyTime || !boyLocation ||
-        !girlName.trim() || !girlDate || !girlTime || !girlLocation) {
-      alert('Please fill in all details for both Boy and Girl.');
+    if (!boyLocation || !girlLocation) {
+      alert('Please select valid birth locations for both boy and girl from search suggestions.');
       return;
     }
 
     const bDateParsed = parseDateText(boyDate);
     const gDateParsed = parseDateText(girlDate);
-
     if (!bDateParsed || !gDateParsed) {
-      alert('Please enter valid dates in DD/MM/YYYY format (e.g. 15/05/1995).');
+      alert('Please enter valid dates in DD/MM/YYYY format.');
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
     const [bHour, bMinute] = boyTime.split(':').map(Number);
     const [gHour, gMinute] = girlTime.split(':').map(Number);
+
+    setLoading(true);
+    setError(null);
 
     const payload = {
       boy: {
@@ -102,7 +105,7 @@ function MatchingPage({ settings }) {
     };
 
     try {
-      const response = await fetch('/api/v1/astrology/match', {
+      const response = await fetch(`/api/v1/astrology/match/calculate?systemType=${panchangamSystem}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -114,7 +117,8 @@ function MatchingPage({ settings }) {
         const data = await response.json();
         setResult(data);
       } else {
-        throw new Error('Failed to compute compatibility score.');
+        const errText = await response.text();
+        throw new Error(errText || 'Failed to calculate compatibility match.');
       }
     } catch (err) {
       setError(err.message);
@@ -124,13 +128,9 @@ function MatchingPage({ settings }) {
   };
 
   const handleDownloadPdf = async () => {
-    if (!result) return;
+    if (!boyLocation || !girlLocation || !result) return;
     const bDateParsed = parseDateText(boyDate);
     const gDateParsed = parseDateText(girlDate);
-    if (!bDateParsed || !gDateParsed) {
-      alert('Please enter valid dates in DD/MM/YYYY format (e.g. 15/05/1995).');
-      return;
-    }
     const [bHour, bMinute] = boyTime.split(':').map(Number);
     const [gHour, gMinute] = girlTime.split(':').map(Number);
 
@@ -164,7 +164,7 @@ function MatchingPage({ settings }) {
     };
 
     try {
-      const response = await fetch(`/api/v1/astrology/match/download-pdf?systemType=DRIK_TIRUKANITHAM`, {
+      const response = await fetch(`/api/v1/astrology/match/download-pdf?systemType=${panchangamSystem}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -278,7 +278,16 @@ function MatchingPage({ settings }) {
           </div>
 
           {/* Settings block */}
-          <div className="card grid-3">
+          <div className="card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+            <div>
+              <label>{t('panchangamSystem', settings.language)}</label>
+              <select value={panchangamSystem} onChange={(e) => setPanchangamSystem(e.target.value)}>
+                <option value="DRIK_TIRUKANITHAM">{t('systemDrik', settings.language)}</option>
+                <option value="VAKYA">{t('systemVakya', settings.language)}</option>
+                <option value="PARASARA_BHATTAR">{t('systemParasaraBhattar', settings.language)}</option>
+                <option value="SURYA_SIDDHANTA">{t('systemSuryaSiddhanta', settings.language)}</option>
+              </select>
+            </div>
             <div>
               <label>{t('methodology', settings.language)}</label>
               <select value={matchingSystem} onChange={(e) => setMatchingSystem(e.target.value)}>
@@ -296,13 +305,27 @@ function MatchingPage({ settings }) {
             </div>
             <div>
               <label>{t('ayanamsa', settings.language)}</label>
-              <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
-                <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
-                <option value="KP">KP (Krishnamurti Padhdhati)</option>
-                <option value="RAMAN">B.V. Raman</option>
-                <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
-                <option value="PUSHYAPAKSHA">Pushyapaksha</option>
-              </select>
+              {panchangamSystem === 'VAKYA' ? (
+                <select value="VAKYA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+                  <option value="VAKYA">{t('ayanamsaFixedVakya', settings.language)}</option>
+                </select>
+              ) : panchangamSystem === 'SURYA_SIDDHANTA' ? (
+                <select value="SURYA_SIDDHANTA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+                  <option value="SURYA_SIDDHANTA">{t('ayanamsaFixedSurya', settings.language)}</option>
+                </select>
+              ) : panchangamSystem === 'PARASARA_BHATTAR' ? (
+                <select value="PARASARA_BHATTAR" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
+                  <option value="PARASARA_BHATTAR">{t('ayanamsaFixedParasara', settings.language)}</option>
+                </select>
+              ) : (
+                <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
+                  <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
+                  <option value="KP">KP (Krishnamurti Padhdhati)</option>
+                  <option value="RAMAN">B.V. Raman</option>
+                  <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
+                  <option value="PUSHYAPAKSHA">Pushyapaksha</option>
+                </select>
+              )}
             </div>
           </div>
 
