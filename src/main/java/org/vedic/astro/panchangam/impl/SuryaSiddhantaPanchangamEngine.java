@@ -258,9 +258,11 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
             de.thmac.swisseph.DblObj tret = new de.thmac.swisseph.DblObj();
             StringBuffer serr = new StringBuffer();
 
+            double searchStartJd = julianDayUT - 0.5;
+
             int searchFlags = SweConst.SE_CALC_RISE | SweConst.SE_BIT_DISC_CENTER;
             int result = swissEph.swe_rise_trans(
-                    julianDayUT, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
+                    searchStartJd, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
                     searchFlags, new double[] { longitude, latitude, 0.0 }, 0.0, 0.0, tret, serr);
 
             return (result == SweConst.OK) ? tret.val : (julianDayUT - 0.25);
