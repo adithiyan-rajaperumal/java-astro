@@ -91,12 +91,7 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
 
         // 4. Compute Traditional Parasara Bhattar Sunrise LMT & Ghatikas
         double sunriseLmtHours = calculateParasaraSunriseLocalTime(sunTrue, dto.latitude());
-        double birthLmtHours = (hourFraction + (dto.longitude() * 4.0 / 60.0) % 24.0 + 24.0) % 24.0;
-        double elapsedHours = birthLmtHours - sunriseLmtHours;
-        if (elapsedHours < 0) {
-            elapsedHours += 24.0;
-        }
-        double ghatikasSinceSunrise = elapsedHours * 2.5;
+        double ghatikasSinceSunrise = calculateUdayadiGhatikas(localTime.toLocalTime(), sunriseLmtHours);
 
         // 5. Compute Parasara Bhattar Longitudes
         Map<String, Double> longitudes = calculateParasaraLongitudes(aharganaExact, aharganaInt, ghatikasSinceSunrise,
@@ -236,6 +231,26 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
 
         double degreeInLagna = (g / rasimana[currentRasiIdx]) * 30.0;
         return ((currentRasiIdx * 30.0) + degreeInLagna) % 360.0;
+    }
+
+    /**
+     * Converts birth timestamp and pure engine sunrise into Udayadi Ghatikas.
+     * 1 Hour = 2.5 Ghatikas (1 Ghatika / Nazhi = 24 minutes).
+     */
+    public double calculateUdayadiGhatikas(java.time.LocalTime birthTimeLmt, double sunriseLmtHours) {
+        double birthTimeHours = birthTimeLmt.getHour() +
+                (birthTimeLmt.getMinute() / 60.0) +
+                (birthTimeLmt.getSecond() / 3600.0);
+
+        double diffHours = birthTimeHours - sunriseLmtHours;
+
+        // Handle birth before sunrise (previous day's Ghatikas)
+        if (diffHours < 0) {
+            diffHours += 24.0;
+        }
+
+        // 1 Hour = 2.5 Ghatikas (60 Ghatikas in 24 Hours)
+        return diffHours * 2.5;
     }
 
     /**

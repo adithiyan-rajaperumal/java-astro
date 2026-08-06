@@ -105,13 +105,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
         double sunLong = calculateVakyaSunLongitude(aharganaExact, dto.month(), dto.day());
         double sunriseLmtHours = calculateVakyaSunriseLocalTime(sunLong, dto.latitude());
-
-        double birthLmtHours = (hourFraction + (dto.longitude() * 4.0 / 60.0) % 24.0 + 24.0) % 24.0;
-        double elapsedHours = birthLmtHours - sunriseLmtHours;
-        if (elapsedHours < 0) {
-            elapsedHours += 24.0;
-        }
-        double ghatikasSinceSunrise = elapsedHours * 2.5;
+        double ghatikasSinceSunrise = calculateUdayadiGhatikas(localTime.toLocalTime(), sunriseLmtHours);
 
         Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt,
                 ghatikasSinceSunrise, dto.latitude(), dto.month(), dto.day());
@@ -245,6 +239,26 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
      * Computes Traditional Vakya Sunrise without Swiss Ephemeris
      * using Charakhanda (Ascensional Difference) equations.
      */
+    /**
+     * Converts birth timestamp and pure engine sunrise into Udayadi Ghatikas.
+     * 1 Hour = 2.5 Ghatikas (1 Ghatika / Nazhi = 24 minutes).
+     */
+    public double calculateUdayadiGhatikas(java.time.LocalTime birthTimeLmt, double sunriseLmtHours) {
+        double birthTimeHours = birthTimeLmt.getHour() +
+                (birthTimeLmt.getMinute() / 60.0) +
+                (birthTimeLmt.getSecond() / 3600.0);
+
+        double diffHours = birthTimeHours - sunriseLmtHours;
+
+        // Handle birth before sunrise (previous day's Ghatikas)
+        if (diffHours < 0) {
+            diffHours += 24.0;
+        }
+
+        // 1 Hour = 2.5 Ghatikas (60 Ghatikas in 24 Hours)
+        return diffHours * 2.5;
+    }
+
     private double calculateVakyaSunriseLocalTime(double sunLongitude, double latitude) {
         // 1. Obliquity of Ecliptic in Classical Sidereal Systems (24.0 degrees)
         double epsilonRad = Math.toRadians(24.0);
