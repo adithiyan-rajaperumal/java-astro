@@ -78,7 +78,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
         synchronized (swissEph) {
             org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(dto.ayanamsa());
-            swissEph.swe_set_sid_mode(ayanamsaType.getMode(), 0, 0);
+            ayanamsaType.applyTo(swissEph);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
             double lagnaLong = (ascmc[SweConst.SE_ASC] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
@@ -125,7 +125,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double[] ascmc = new double[10];
         synchronized (swissEph) {
             org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(payload.ayanamsa());
-            swissEph.swe_set_sid_mode(ayanamsaType.getMode(), 0, 0);
+            ayanamsaType.applyTo(swissEph);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
             for (int i = 1; i <= 12; i++) {
                 cusps[i] = (cusps[i] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;

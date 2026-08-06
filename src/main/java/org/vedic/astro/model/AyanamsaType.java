@@ -1,13 +1,14 @@
 package org.vedic.astro.model;
 
 import de.thmac.swisseph.SweConst;
+import de.thmac.swisseph.SwissEph;
 
 public enum AyanamsaType {
     LAHIRI(SweConst.SE_SIDM_LAHIRI),
     RAMAN(SweConst.SE_SIDM_RAMAN),
     KP(SweConst.SE_SIDM_KRISHNAMURTI),
     SURYA_SIDDHANTA(21),
-    PUSHYAPAKSHA(29);
+    PUSHYAPAKSHA(SweConst.SE_SIDM_USER);
 
     private final int mode;
 
@@ -17,6 +18,15 @@ public enum AyanamsaType {
 
     public int getMode() {
         return mode;
+    }
+
+    public void applyTo(SwissEph swissEph) {
+        if (this == PUSHYAPAKSHA) {
+            // True Pushyapaksha (PVRN Rao definition): J2000 epoch JD = 2451545.0, ayanamsa at J2000 = 22.72238333°
+            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_USER, 2451545.0, 22.72238333);
+        } else {
+            swissEph.swe_set_sid_mode(this.mode, 0, 0);
+        }
     }
 
     public static AyanamsaType fromString(String val) {
