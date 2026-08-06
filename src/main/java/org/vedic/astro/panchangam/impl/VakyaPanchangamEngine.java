@@ -25,8 +25,10 @@ import java.util.Map;
 
 /**
  * Traditional Vakya Panchangam Engine (வாக்கிய பஞ்சாங்கம்).
- * Pure mathematical implementation using Kalisuddhadinam (Ahargana), Kanni Base Epoch Offset (162.956°),
- * Vararuchi 248 Chandra Vakyas, Budha Sighra logic, and Charakhanda IST sunrise calculations.
+ * Pure mathematical implementation using Kalisuddhadinam (Ahargana), Kanni Base
+ * Epoch Offset (162.956°),
+ * Vararuchi 248 Chandra Vakyas, Budha Sighra logic, and Charakhanda IST sunrise
+ * calculations.
  */
 @Service
 @RequiredArgsConstructor
@@ -73,7 +75,8 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
      */
     @Override
     public ChartResult calculate(BirthDetailsDTO dto) {
-        LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(), dto.second());
+        LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(),
+                dto.second());
         String resolvedZoneId = timezoneService.getTimezoneFromCoordinates(dto.latitude(), dto.longitude());
         ZoneId zoneId = ZoneId.of(resolvedZoneId);
 
@@ -81,7 +84,8 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         LocalDateTime utcTime = zonedBirthTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 
         double hourFraction = utcTime.getHour() + (utcTime.getMinute() / 60.0) + (utcTime.getSecond() / 3600.0);
-        SweDate sweDate = new SweDate(utcTime.getYear(), utcTime.getMonthValue(), utcTime.getDayOfMonth(), hourFraction);
+        SweDate sweDate = new SweDate(utcTime.getYear(), utcTime.getMonthValue(), utcTime.getDayOfMonth(),
+                hourFraction);
         double julianDayUT = sweDate.getJulDay();
 
         // 1. Compute Kalisuddhadinam (Ahargana)
@@ -99,10 +103,12 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double ghatikasSinceSunrise = calculateUdayadiGhatikas(birthIstHours, sunriseIstHours);
 
         // 5. Calculate All Vakya Planetary Longitudes
-        Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt, ghatikasSinceSunrise, dto.latitude());
+        Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt,
+                ghatikasSinceSunrise, dto.latitude());
 
         // 6. Build D1 and D9 Charts
-        Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(vakyaLongitudes, this::getVakyaSpeed);
+        Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(vakyaLongitudes,
+                this::getVakyaSpeed);
         Map<String, PlanetaryPosition> d9Map = vargaService.generateVargaChart(d1Map, VargaType.D9_NAVAMSA);
 
         double longitudeOffsetMinutes = dto.longitude() * 4.0;
@@ -130,11 +136,13 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         }
 
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);
-        deepReportData.setResolvedTimezone(timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
+        deepReportData.setResolvedTimezone(
+                timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
         return deepReportData;
     }
 
-    private Map<String, Double> calculateAllVakyaLongitudes(double aharganaExact, long aharganaInt, double ghatikas, double latitude) {
+    private Map<String, Double> calculateAllVakyaLongitudes(double aharganaExact, long aharganaInt, double ghatikas,
+            double latitude) {
         Map<String, Double> longitudes = new LinkedHashMap<>();
 
         // 1. Sun
