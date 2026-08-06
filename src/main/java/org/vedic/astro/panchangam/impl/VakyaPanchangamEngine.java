@@ -1,7 +1,6 @@
 package org.vedic.astro.panchangam.impl;
 
 import de.thmac.swisseph.SweDate;
-import de.thmac.swisseph.SwissEph;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.vedic.astro.dto.BirthDetailsDTO;
@@ -31,7 +30,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VakyaPanchangamEngine implements PanchangamEngine {
 
-    private final SwissEph swissEph;
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
     private final VargaCalculationService vargaService;
