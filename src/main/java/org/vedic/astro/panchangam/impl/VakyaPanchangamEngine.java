@@ -204,14 +204,29 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
     }
 
     private double calculateVakyaSunLongitude(double aharganaExact, int month, int day) {
-        // Estimate Tamil month index starting around April 14 (Chithirai = Month 0)
-        int dayOfYear = (month >= 4) ? ((month - 4) * 30 + day) : ((month + 8) * 30 + day);
-        int solarMonthIdx = Math.min(11, Math.max(0, (dayOfYear / 30)));
+        // Compute day of year starting from April 14 (Chithirai 1 = Day 0)
+        int[] daysBeforeMonth = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+        int gregDayOfYear = daysBeforeMonth[month - 1] + day;
+        int chithirai1DayOfYear = 104; // April 14
+
+        int daysFromChithirai1 = (gregDayOfYear >= chithirai1DayOfYear)
+                ? (gregDayOfYear - chithirai1DayOfYear)
+                : (gregDayOfYear + 365 - chithirai1DayOfYear);
+
+        double accumulatedDays = 0.0;
+        int solarMonthIdx = 0;
+        for (int i = 0; i < 12; i++) {
+            if (accumulatedDays + SURYA_VAKYA_MONTH_DAYS[i] > daysFromChithirai1) {
+                solarMonthIdx = i;
+                break;
+            }
+            accumulatedDays += SURYA_VAKYA_MONTH_DAYS[i];
+        }
+
+        double dayOffsetInMonth = daysFromChithirai1 - accumulatedDays;
+        double daysInCurrentMonth = SURYA_VAKYA_MONTH_DAYS[solarMonthIdx];
 
         double baseRasiDegree = solarMonthIdx * 30.0;
-        double daysInCurrentMonth = SURYA_VAKYA_MONTH_DAYS[solarMonthIdx];
-        double dayOffsetInMonth = dayOfYear % 30;
-
         double meanSunInSign = (dayOffsetInMonth / daysInCurrentMonth) * 30.0;
         double meanSun = baseRasiDegree + meanSunInSign;
 
