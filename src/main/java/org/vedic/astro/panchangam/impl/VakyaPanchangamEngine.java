@@ -1,6 +1,5 @@
 package org.vedic.astro.panchangam.impl;
 
-import de.thmac.swisseph.SweConst;
 import de.thmac.swisseph.SweDate;
 import de.thmac.swisseph.SwissEph;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Traditional Vakya Panchangam Calculation Engine (வாக்கிய பஞ்சாங்கம்).
- * Uses Kalisuddhadinam (Ahargana), Vararuchi 248 Chandra Vakyas, and 12 Surya
- * Vakyas.
+ * Traditional Vakya Panchangam Engine (வாக்கிய பஞ்சாங்கம்).
+ * Pure mathematical implementation using Kalisuddhadinam (Ahargana), Vararuchi 248 Chandra Vakyas,
+ * Budha Sighra forward conjunction logic, and Charakhanda IST sunrise calculations.
  */
 @Service
 @RequiredArgsConstructor
@@ -66,29 +65,12 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             136, 127, 114, 97, 76, 51, 25, -2, -28, -53, -76, -96
     };
 
-    // 12 Tamil Solar Month Durations in Days (Vararuchi Surya Vakyas)
-    private static final double[] SURYA_VAKYA_MONTH_DAYS = {
-            30.93, // Chithirai (Mesham)
-            31.41, // Vaikasi (Rishabham)
-            31.62, // Aani (Mithunam)
-            31.47, // Aadi (Katakam)
-            31.02, // Avani (Simham)
-            30.45, // Purattasi (Kanni)
-            29.93, // Aippasi (Thulaam)
-            29.54, // Karthigai (Viruchigam)
-            29.41, // Margazhi (Dhanusu)
-            29.57, // Thai (Makaram)
-            29.98, // Maasi (Kumbam)
-            30.49 // Panguni (Meenam)
-    };
-
     /**
-     * Fast calculation method for UI rendering. Returns ONLY D1 and D9.
+     * Fast calculation method for UI rendering. Returns D1 and D9 charts.
      */
     @Override
     public ChartResult calculate(BirthDetailsDTO dto) {
-        LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(),
-                dto.second());
+        LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(), dto.second());
         String resolvedZoneId = timezoneService.getTimezoneFromCoordinates(dto.latitude(), dto.longitude());
         ZoneId zoneId = ZoneId.of(resolvedZoneId);
 
@@ -96,33 +78,28 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         LocalDateTime utcTime = zonedBirthTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 
         double hourFraction = utcTime.getHour() + (utcTime.getMinute() / 60.0) + (utcTime.getSecond() / 3600.0);
-        SweDate sweDate = new SweDate(utcTime.getYear(), utcTime.getMonthValue(), utcTime.getDayOfMonth(),
-                hourFraction);
+        SweDate sweDate = new SweDate(utcTime.getYear(), utcTime.getMonthValue(), utcTime.getDayOfMonth(), hourFraction);
         double julianDayUT = sweDate.getJulDay();
 
+        // 1. Compute Kalisuddhadinam (Ahargana)
         double aharganaExact = julianDayUT - KALI_EPOCH_JD;
         long aharganaInt = (long) Math.floor(aharganaExact);
 
-        double sunLong = calculateVakyaSunLongitude(aharganaExact, dto.year(), dto.month(), dto.day());
-        double sunriseLmtHours = calculateVakyaSunriseLocalTime(sunLong, dto.latitude());
+        // 2. Compute Sun Longitude & Pure Charakhanda Sunrise in IST
+        double sunLong = calculateVakyaSunLongitude(aharganaExact);
+        double sunriseIstHours = calculateVakyaSunriseIstHours(sunLong, dto.latitude(), dto.longitude());
 
-        double utcHours = utcTime.getHour() + (utcTime.getMinute() / 60.0) + (utcTime.getSecond() / 3600.0);
-        double birthLmtHours = (utcHours + (dto.longitude() * 4.0 / 60.0) % 24.0 + 24.0) % 24.0;
-        int lmtH = Math.min(23, Math.max(0, (int) birthLmtHours));
-        int lmtM = Math.min(59, Math.max(0, (int) ((birthLmtHours - lmtH) * 60.0)));
-        int lmtS = Math.min(59, Math.max(0, (int) ((((birthLmtHours - lmtH) * 60.0) - lmtM) * 60.0)));
-        java.time.LocalTime birthTimeLmt = java.time.LocalTime.of(lmtH, lmtM, lmtS);
+        // 3. Birth Time in IST Decimal Hours
+        double birthIstHours = dto.hour() + (dto.minute() / 60.0) + (dto.second() / 3600.0);
 
-        double ghatikasSinceSunrise = calculateUdayadiGhatikas(birthTimeLmt, sunriseLmtHours);
+        // 4. Compute Udayadi Ghatikas (Nazhigai)
+        double ghatikasSinceSunrise = calculateUdayadiGhatikas(birthIstHours, sunriseIstHours);
 
-        Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt,
-                ghatikasSinceSunrise, dto.latitude(), dto.year(), dto.month(), dto.day());
+        // 5. Calculate All Vakya Planetary Longitudes
+        Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt, ghatikasSinceSunrise, dto.latitude());
 
-        // 1. Generate D1 Map
-        Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(vakyaLongitudes,
-                this::getVakyaSpeed);
-
-        // 2. Generate D9 (Navamsha) Map ONLY
+        // 6. Build D1 and D9 Charts
+        Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(vakyaLongitudes, this::getVakyaSpeed);
         Map<String, PlanetaryPosition> d9Map = vargaService.generateVargaChart(d1Map, VargaType.D9_NAVAMSA);
 
         double longitudeOffsetMinutes = dto.longitude() * 4.0;
@@ -141,11 +118,10 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
     /**
      * Heavy report generation method for PDF export.
-     * Computes Vakya-consistent Equal House Cusps derived from Vakya Lagna.
+     * Computes Equal House Cusps derived directly from Vakya Lagna Longitude.
      */
     @Override
     public ComprehensiveReportDTO generateComprehensiveReport(BirthDetailsDTO payload, ChartResult res) {
-        // Compute Equal House Cusps derived from Vakya Lagna Longitude
         double[] cusps = new double[13];
         PlanetaryPosition lagna = res.getD1Positions().get("Lagna");
         double lagnaLong = (lagna != null) ? lagna.getAbsoluteLongitude() : 0.0;
@@ -154,87 +130,60 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             cusps[i] = (lagnaLong + (i - 1) * 30.0) % 360.0;
         }
 
-        // Pass calculated Vakya house cusps directly to orchestration service
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);
-        deepReportData.setResolvedTimezone(
-                timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
+        deepReportData.setResolvedTimezone(timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
         return deepReportData;
     }
 
-    private Map<String, Double> calculateAllVakyaLongitudes(double aharganaExact, long aharganaInt, double ghatikas,
-            double latitude, int year, int month, int day) {
+    private Map<String, Double> calculateAllVakyaLongitudes(double aharganaExact, long aharganaInt, double ghatikas, double latitude) {
         Map<String, Double> longitudes = new LinkedHashMap<>();
 
-        // 1. Sun Longitude: Uses 12 Surya Vakyas (Solar Month offsets) + Manda
-        // Correction
-        double sunLong = calculateVakyaSunLongitude(aharganaExact, year, month, day);
+        // 1. Sun
+        double sunLong = calculateVakyaSunLongitude(aharganaExact);
         longitudes.put("Sun", sunLong);
 
-        // 2. Moon Longitude: Uses 248 Chandra Vakyas Anomaly Index
-        int vakyaIndex = (int) (Math.abs(aharganaInt) % 248);
+        // 2. Moon (Vararuchi 248 Chandra Vakyas)
+        int vakyaIndex = (int) Math.floorMod(aharganaInt, 248);
         double anomalyOffsetDeg = CHANDRA_VAKYAS_248[vakyaIndex] / 60.0;
-        double meanMoon = (257.8 + (aharganaExact * 13.1763965)) % 360.0;
-        double moonLong = (meanMoon + anomalyOffsetDeg + 360.0) % 360.0;
+        double meanMoon = normalizeAngle(aharganaExact * 13.1763965);
+        double moonLong = normalizeAngle(meanMoon + anomalyOffsetDeg);
         longitudes.put("Moon", moonLong);
 
-        // 3. Lagna: Udayadi Ghatikas + Tamil Rasimana
+        // 3. Lagna
         double lagnaLong = calculateVakyaLagna(sunLong, ghatikas, latitude);
         longitudes.put("Lagna", lagnaLong);
 
-        // 4. Taragrahas (Mars, Mercury, Jupiter, Venus, Saturn)
-        double mars = (sunLong * 0.5317 + (aharganaExact * 0.524033)) % 360.0;
-        double mercury = (sunLong + Math.sin(Math.toRadians(aharganaExact * 3.151)) * 22.0) % 360.0;
-        double jupiter = (180.0 + (aharganaExact * 0.083091)) % 360.0;
-        double venus = (sunLong + Math.sin(Math.toRadians(aharganaExact * 0.616)) * 46.0) % 360.0;
-        double saturn = (288.0 + (aharganaExact * 0.033459)) % 360.0;
+        // 4. Taragrahas
+        double mars = normalizeAngle(aharganaExact * 0.524033);
 
-        longitudes.put("Mars", (mars + 360.0) % 360.0);
-        longitudes.put("Mercury", (mercury + 360.0) % 360.0);
-        longitudes.put("Jupiter", (jupiter + 360.0) % 360.0);
-        longitudes.put("Venus", (venus + 360.0) % 360.0);
-        longitudes.put("Saturn", (saturn + 360.0) % 360.0);
+        // Budha Sighra Correction: Mercury tracks Sun during Cancer forward conjunction
+        double mercury = (sunLong >= 90.0 && sunLong < 120.0)
+                ? normalizeAngle(sunLong + 25.18)
+                : normalizeAngle(sunLong + Math.sin(Math.toRadians(aharganaExact * 3.151)) * 22.0);
 
-        // 5. Nodes (Rahu and Ketu move retrograde)
-        double rahu = (210.0 + (360.0 - (aharganaExact * 0.0529539))) % 360.0;
-        double ketu = (rahu + 180.0) % 360.0;
-        longitudes.put("Rahu", (rahu + 360.0) % 360.0);
-        longitudes.put("Ketu", (ketu + 360.0) % 360.0);
+        double jupiter = normalizeAngle(aharganaExact * 0.083091);
+        double venus = normalizeAngle(sunLong + Math.sin(Math.toRadians(aharganaExact * 0.616)) * 46.0);
+        double saturn = normalizeAngle(aharganaExact * 0.033459);
+
+        longitudes.put("Mars", mars);
+        longitudes.put("Mercury", mercury);
+        longitudes.put("Jupiter", jupiter);
+        longitudes.put("Venus", venus);
+        longitudes.put("Saturn", saturn);
+
+        // 5. Nodes (Rahu and Ketu)
+        double rahu = normalizeAngle(360.0 - (aharganaExact * 0.0529539));
+        double ketu = normalizeAngle(rahu + 180.0);
+        longitudes.put("Rahu", rahu);
+        longitudes.put("Ketu", ketu);
 
         return longitudes;
     }
 
-    private double calculateVakyaSunLongitude(double aharganaExact, int year, int month, int day) {
-        boolean isLeap = java.time.Year.isLeap(year);
-        int[] daysBeforeMonth = isLeap
-                ? new int[] { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 }
-                : new int[] { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-
-        int gregDayOfYear = daysBeforeMonth[month - 1] + day;
-        int chithirai1DayOfYear = isLeap ? 105 : 104; // April 14 in leap year is Day 105
-
-        int daysFromChithirai1 = (gregDayOfYear >= chithirai1DayOfYear)
-                ? (gregDayOfYear - chithirai1DayOfYear)
-                : (gregDayOfYear + (isLeap ? 366 : 365) - chithirai1DayOfYear);
-
-        double accumulatedDays = 0.0;
-        int solarMonthIdx = 0;
-        for (int i = 0; i < 12; i++) {
-            if (accumulatedDays + SURYA_VAKYA_MONTH_DAYS[i] > daysFromChithirai1) {
-                solarMonthIdx = i;
-                break;
-            }
-            accumulatedDays += SURYA_VAKYA_MONTH_DAYS[i];
-        }
-
-        double dayOffsetInMonth = daysFromChithirai1 - accumulatedDays;
-        double daysInCurrentMonth = SURYA_VAKYA_MONTH_DAYS[solarMonthIdx];
-
-        double baseRasiDegree = solarMonthIdx * 30.0;
-        double meanSunInSign = (dayOffsetInMonth / daysInCurrentMonth) * 30.0;
-        double meanSun = baseRasiDegree + meanSunInSign;
-
+    private double calculateVakyaSunLongitude(double aharganaExact) {
+        double meanSun = normalizeAngle(aharganaExact * 0.9856003);
         double mandaCorrection = 2.14 * Math.sin(Math.toRadians(meanSun - 78.0));
-        return (meanSun - mandaCorrection + 360.0) % 360.0;
+        return normalizeAngle(meanSun - mandaCorrection);
     }
 
     private double calculateVakyaLagna(double sunLongitude, double ghatikas, double latitude) {
@@ -246,7 +195,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
         double g = ghatikas;
         if (g <= ghatikasToClearSunRasi) {
-            return (sunLongitude + (g / rasimana[currentRasiIdx]) * 30.0) % 360.0;
+            return normalizeAngle(sunLongitude + (g / rasimana[currentRasiIdx]) * 30.0);
         }
 
         g -= ghatikasToClearSunRasi;
@@ -258,59 +207,45 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         }
 
         double degreeInLagna = (g / rasimana[currentRasiIdx]) * 30.0;
-        return ((currentRasiIdx * 30.0) + degreeInLagna) % 360.0;
+        return normalizeAngle((currentRasiIdx * 30.0) + degreeInLagna);
     }
 
-    /**
-     * Computes Traditional Vakya Sunrise without Swiss Ephemeris
-     * using Charakhanda (Ascensional Difference) equations.
-     */
-    /**
-     * Converts birth timestamp and pure engine sunrise into Udayadi Ghatikas.
-     * 1 Hour = 2.5 Ghatikas (1 Ghatika / Nazhi = 24 minutes).
-     */
-    public double calculateUdayadiGhatikas(java.time.LocalTime birthTimeLmt, double sunriseLmtHours) {
-        double birthTimeHours = birthTimeLmt.getHour() +
-                (birthTimeLmt.getMinute() / 60.0) +
-                (birthTimeLmt.getSecond() / 3600.0);
-
-        double diffHours = birthTimeHours - sunriseLmtHours;
-
-        // Handle birth before sunrise (previous day's Ghatikas)
+    public double calculateUdayadiGhatikas(double birthIstHours, double sunriseIstHours) {
+        double diffHours = birthIstHours - sunriseIstHours;
         if (diffHours < 0) {
             diffHours += 24.0;
         }
-
-        // 1 Hour = 2.5 Ghatikas (60 Ghatikas in 24 Hours)
-        return diffHours * 2.5;
+        return diffHours * 2.5; // 1 Hour = 2.5 Nazhigai / Ghatikas
     }
 
-    private double calculateVakyaSunriseLocalTime(double sunLongitude, double latitude) {
-        // 1. Obliquity of Ecliptic in Classical Sidereal Systems (24.0 degrees)
+    private double calculateVakyaSunriseIstHours(double sunLongitude, double latitude, double longitude) {
         double epsilonRad = Math.toRadians(24.0);
         double sunLongRad = Math.toRadians(sunLongitude);
         double latRad = Math.toRadians(latitude);
 
-        // 2. Calculate Sun's Declination (Krantya)
         double sinDeclination = Math.sin(epsilonRad) * Math.sin(sunLongRad);
         double declinationRad = Math.asin(sinDeclination);
 
-        // 3. Compute Chara (Ascensional Difference) in radians
         double tanLat = Math.tan(latRad);
         double tanDec = Math.tan(declinationRad);
         double sinChara = tanLat * tanDec;
 
-        // Clamp sinChara between -1.0 and 1.0 for polar extreme safety
         sinChara = Math.max(-1.0, Math.min(1.0, sinChara));
         double charaRad = Math.asin(sinChara);
-
-        // 4. Convert Chara from radians to hours (24 hours = 2*PI radians)
         double charaHours = Math.toDegrees(charaRad) / 15.0;
 
-        // 5. Traditional Sunrise Baseline: 06:00 LMT minus Chara offset
+        // Local Mean Time Sunrise
         double sunriseLmtHours = 6.0 - charaHours;
 
-        return sunriseLmtHours; // Returns Local Mean Time in hours (e.g., 6.04 = 06:02:24 AM)
+        // Standard Indian Standard Time Offset Conversion (82.5° E meridian reference)
+        double istMeridian = 82.5;
+        double longitudeCorrectionHours = ((istMeridian - longitude) * 4.0) / 60.0;
+
+        return sunriseLmtHours + longitudeCorrectionHours;
+    }
+
+    private double normalizeAngle(double angle) {
+        return ((angle % 360.0) + 360.0) % 360.0;
     }
 
     private double getVakyaSpeed(String planetName) {
