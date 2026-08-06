@@ -316,7 +316,7 @@ function MatchingPage({ settings }) {
               ) : panchangamSystem === 'PARASARA_BHATTAR' ? (
                 <select value={ayanamsa === 'PUSHYAPAKSHA' ? 'PUSHYAPAKSHA' : 'LAHIRI'} onChange={(e) => setAyanamsa(e.target.value)}>
                   <option value="LAHIRI">{t('ayanamsaFixedParasara', settings.language)}</option>
-                  <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', settings.language)}</option>
+                  <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapakshaParasara', settings.language)}</option>
                 </select>
               ) : (
                 <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>

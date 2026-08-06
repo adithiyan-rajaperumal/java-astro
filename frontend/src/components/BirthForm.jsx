@@ -150,7 +150,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
           ) : panchangamSystem === 'PARASARA_BHATTAR' ? (
             <select value={ayanamsa === 'PUSHYAPAKSHA' ? 'PUSHYAPAKSHA' : 'LAHIRI'} onChange={(e) => setAyanamsa(e.target.value)}>
               <option value="LAHIRI">{t('ayanamsaFixedParasara', lang)}</option>
-              <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', lang)}</option>
+              <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapakshaParasara', lang)}</option>
             </select>
           ) : (
             <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>

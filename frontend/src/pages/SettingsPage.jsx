@@ -84,7 +84,7 @@ function SettingsPage({ settings, onSettingsChange }) {
         ) : settings.panchangamSystem === 'PARASARA_BHATTAR' ? (
           <select value={settings.ayanamsa === 'PUSHYAPAKSHA' ? 'PUSHYAPAKSHA' : 'LAHIRI'} onChange={handleAyanamsaChange}>
             <option value="LAHIRI">{t('ayanamsaFixedParasara', settings.language)}</option>
-            <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', settings.language)}</option>
+            <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapakshaParasara', settings.language)}</option>
           </select>
         ) : (
           <select value={settings.ayanamsa} onChange={handleAyanamsaChange}>

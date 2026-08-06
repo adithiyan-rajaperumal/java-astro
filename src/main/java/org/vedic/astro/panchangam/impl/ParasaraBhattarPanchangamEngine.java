@@ -80,8 +80,10 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
             org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(dto.ayanamsa());
             ayanamsaType.applyTo(swissEph);
 
+            double effectiveDelta = (ayanamsaType == org.vedic.astro.model.AyanamsaType.PUSHYAPAKSHA) ? 0.0 : PARASARA_BHATTAR_DELTA;
+
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = (ascmc[SweConst.SE_ASC] + PARASARA_BHATTAR_DELTA + 360.0) % 360.0;
+            double lagnaLong = (ascmc[SweConst.SE_ASC] + effectiveDelta + 360.0) % 360.0;
 
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
@@ -89,7 +91,7 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
             for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
 
-                double bhattarLong = (xx[0] + PARASARA_BHATTAR_DELTA + 360.0) % 360.0;
+                double bhattarLong = (xx[0] + effectiveDelta + 360.0) % 360.0;
 
                 d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), bhattarLong, xx[3]));
                 d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), bhattarLong, xx[3]));
@@ -126,8 +128,9 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
             org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(payload.ayanamsa());
             ayanamsaType.applyTo(swissEph);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
+            double effectiveDelta = (ayanamsaType == org.vedic.astro.model.AyanamsaType.PUSHYAPAKSHA) ? 0.0 : PARASARA_BHATTAR_DELTA;
             for (int i = 1; i <= 12; i++) {
-                cusps[i] = (cusps[i] + PARASARA_BHATTAR_DELTA + 360.0) % 360.0;
+                cusps[i] = (cusps[i] + effectiveDelta + 360.0) % 360.0;
             }
         }
 

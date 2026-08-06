@@ -416,9 +416,9 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         int sidMode = ayanamsaMode;
 
         if (pType == org.vedic.astro.panchangam.PanchangamType.VAKYA) {
-            deltaOffset = -1.65;
+            deltaOffset = (sidMode == SweConst.SE_SIDM_USER) ? 0.0 : -1.65;
         } else if (pType == org.vedic.astro.panchangam.PanchangamType.PARASARA_BHATTAR) {
-            deltaOffset = -1.83;
+            deltaOffset = (sidMode == SweConst.SE_SIDM_USER) ? 0.0 : -1.83;
         } else if (pType == org.vedic.astro.panchangam.PanchangamType.SURYA_SIDDHANTA) {
             sidMode = 21;
         }
