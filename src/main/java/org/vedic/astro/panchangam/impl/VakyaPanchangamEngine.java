@@ -14,6 +14,7 @@ import org.vedic.astro.service.ChartOrchestrationService;
 import org.vedic.astro.service.TimezoneService;
 import org.vedic.astro.service.impl.VargaCalculationService;
 import org.vedic.astro.service.impl.VargaCalculationService.VargaType;
+import org.vedic.astro.util.TamilCalendarUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -190,39 +191,27 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         return longitudes;
     }
 
-    private double calculateVakyaSunLongitude(int year, int month, int day, int hour) {
-        boolean isLeap = java.time.Year.isLeap(year);
-        int[] daysBeforeMonth = isLeap
-                ? new int[] { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 }
-                : new int[] { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+    /**
+     * Calculates exact Vakya Sun longitude using Tamil Month Progress
+     * matching AstroSeva and Kovai Kalaimagal PDFs.
+     */
+    private double calculateVakyaSunLongitude(int year, int month, int day, double hourFraction) {
+        TamilCalendarUtils.TamilDate tDate = TamilCalendarUtils.getTamilDate(year, month, day, hourFraction);
 
-        int gregDayOfYear = daysBeforeMonth[month - 1] + day;
-        int chithirai1DayOfYear = isLeap ? 105 : 104; // April 14 in Gregorian calendar
+        int monthIdx = tDate.monthIndex();
+        double dayOffset = tDate.dayFraction();
+        double monthDuration = TamilCalendarUtils.SURYA_VAKYA_MONTH_DAYS[monthIdx];
 
-        int daysFromChithirai1 = (gregDayOfYear >= chithirai1DayOfYear)
-                ? (gregDayOfYear - chithirai1DayOfYear)
-                : (gregDayOfYear + (isLeap ? 366 : 365) - chithirai1DayOfYear);
+        // Base Rasi Degree (Chithirai = 0°, Vaikasi = 30°, Aani = 60°, Aadi = 90° ...)
+        double baseRasiDegree = monthIdx * 30.0;
 
-        double totalDays = daysFromChithirai1 + (hour / 24.0);
-
-        double accumulatedDays = 0.0;
-        int solarMonthIdx = 0;
-        for (int i = 0; i < 12; i++) {
-            if (accumulatedDays + SURYA_VAKYA_MONTH_DAYS[i] > totalDays) {
-                solarMonthIdx = i;
-                break;
-            }
-            accumulatedDays += SURYA_VAKYA_MONTH_DAYS[i];
-        }
-
-        double dayOffsetInMonth = totalDays - accumulatedDays;
-        double daysInCurrentMonth = SURYA_VAKYA_MONTH_DAYS[solarMonthIdx];
-
-        double baseRasiDegree = solarMonthIdx * 30.0;
-        double meanSunInSign = (dayOffsetInMonth / daysInCurrentMonth) * 30.0;
+        // Linear motion within the Tamil month
+        double meanSunInSign = (dayOffset / monthDuration) * 30.0;
         double meanSun = baseRasiDegree + meanSunInSign;
 
+        // Apply Manda Phala (Equation of Center)
         double mandaCorrection = 2.14 * Math.sin(Math.toRadians(meanSun - 78.0));
+
         return normalizeAngle(meanSun - mandaCorrection);
     }
 
