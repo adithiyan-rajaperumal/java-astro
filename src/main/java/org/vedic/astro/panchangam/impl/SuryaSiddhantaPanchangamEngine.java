@@ -94,7 +94,15 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
 
         // 5. Compute Pure Surya Siddhanta Sunrise LMT & Ghatikas
         double sunriseLmtHours = calculateSuryaSiddhantaSunriseLocalTime(sunTrue, dto.latitude(), dto.longitude());
-        double ghatikasSinceSunrise = calculateUdayadiGhatikas(localTime.toLocalTime(), sunriseLmtHours);
+
+        double utcHours = utcTime.getHour() + (utcTime.getMinute() / 60.0) + (utcTime.getSecond() / 3600.0);
+        double birthLmtHours = (utcHours + (dto.longitude() * 4.0 / 60.0) % 24.0 + 24.0) % 24.0;
+        int lmtH = Math.min(23, Math.max(0, (int) birthLmtHours));
+        int lmtM = Math.min(59, Math.max(0, (int) ((birthLmtHours - lmtH) * 60.0)));
+        int lmtS = Math.min(59, Math.max(0, (int) ((((birthLmtHours - lmtH) * 60.0) - lmtM) * 60.0)));
+        java.time.LocalTime birthTimeLmt = java.time.LocalTime.of(lmtH, lmtM, lmtS);
+
+        double ghatikasSinceSunrise = calculateUdayadiGhatikas(birthTimeLmt, sunriseLmtHours);
 
         // 6. Compute Surya Siddhanta Longitudes
         Map<String, Double> longitudes = calculateSuryaSiddhantaLongitudes(aharganaExact, ghatikasSinceSunrise,
