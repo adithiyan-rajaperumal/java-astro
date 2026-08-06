@@ -78,7 +78,7 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
 
         synchronized (swissEph) {
             org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(dto.ayanamsa());
-            ayanamsaType.applyTo(swissEph);
+            ayanamsaType.applyTo(swissEph, PanchangamType.PARASARA_BHATTAR);
 
             double effectiveDelta = (ayanamsaType == org.vedic.astro.model.AyanamsaType.PUSHYAPAKSHA) ? 0.0 : PARASARA_BHATTAR_DELTA;
 
@@ -126,7 +126,7 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
         double[] ascmc = new double[10];
         synchronized (swissEph) {
             org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(payload.ayanamsa());
-            ayanamsaType.applyTo(swissEph);
+            ayanamsaType.applyTo(swissEph, PanchangamType.PARASARA_BHATTAR);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
             double effectiveDelta = (ayanamsaType == org.vedic.astro.model.AyanamsaType.PUSHYAPAKSHA) ? 0.0 : PARASARA_BHATTAR_DELTA;
             for (int i = 1; i <= 12; i++) {

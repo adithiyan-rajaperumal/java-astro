@@ -101,7 +101,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         synchronized (swissEph) {
             String ayanamsa = request.ayanamsa() != null ? request.ayanamsa() : "LAHIRI";
             org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(ayanamsa);
-            ayanamsaType.applyTo(swissEph);
+            org.vedic.astro.panchangam.PanchangamType pType = org.vedic.astro.panchangam.PanchangamType.fromString(request.panchangamSystem());
+            ayanamsaType.applyTo(swissEph, pType);
 
             // Search for Sunrise starting at midnight
             swissEph.swe_rise_trans(
@@ -426,7 +427,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double sunLong, moonLong;
         synchronized (swissEph) {
             if (sidMode == SweConst.SE_SIDM_USER) {
-                swissEph.swe_set_sid_mode(SweConst.SE_SIDM_USER, 2451545.0, 22.72238333);
+                org.vedic.astro.model.AyanamsaType.PUSHYAPAKSHA.applyTo(swissEph, pType);
             } else {
                 swissEph.swe_set_sid_mode(sidMode, 0, 0);
             }
