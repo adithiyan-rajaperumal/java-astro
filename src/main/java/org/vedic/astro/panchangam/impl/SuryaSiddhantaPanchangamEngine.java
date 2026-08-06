@@ -85,16 +85,23 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
         // 2. Compute Ahargana from Epoch
         double aharganaExact = (julianDayUT - KALI_EPOCH_JD) + (desantaraHours / 24.0);
 
-        // 3. Compute Local Sunrise for Udayadi Ghatika derivation
-        double sunriseJulDay = calculateLocalSunrise(julianDayUT, dto.latitude(), dto.longitude());
-        double ghatikasSinceSunrise = (julianDayUT - sunriseJulDay) * 24.0 * 2.5;
-        if (ghatikasSinceSunrise < 0)
-            ghatikasSinceSunrise += 60.0;
-
-        // 4. Calculate Ayanamsa Offset if configured
+        // 3. Calculate Ayanamsa Offset if configured
         double ayanamsaOffset = calculateAyanamsaOffset(julianDayUT, dto.ayanamsa());
 
-        // 5. Compute Surya Siddhanta Longitudes
+        // 4. Compute Sun Longitude for Charakhanda Sunrise calculation
+        double sunMean = calculateMeanLongitude(aharganaExact, REV_SUN);
+        double sunTrue = (applyMandaCorrection(sunMean, 77.23, 14.0) + ayanamsaOffset + 360.0) % 360.0;
+
+        // 5. Compute Pure Surya Siddhanta Sunrise LMT & Ghatikas
+        double sunriseLmtHours = calculateSuryaSiddhantaSunriseLocalTime(sunTrue, dto.latitude(), dto.longitude());
+        double birthLmtHours = (hourFraction + (dto.longitude() * 4.0 / 60.0) % 24.0 + 24.0) % 24.0;
+        double elapsedHours = birthLmtHours - sunriseLmtHours;
+        if (elapsedHours < 0) {
+            elapsedHours += 24.0;
+        }
+        double ghatikasSinceSunrise = elapsedHours * 2.5;
+
+        // 6. Compute Surya Siddhanta Longitudes
         Map<String, Double> longitudes = calculateSuryaSiddhantaLongitudes(aharganaExact, ghatikasSinceSunrise,
                 dto.latitude(), ayanamsaOffset);
 
@@ -253,20 +260,33 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
         }
     }
 
-    private double calculateLocalSunrise(double julianDayUT, double latitude, double longitude) {
-        synchronized (swissEph) {
-            de.thmac.swisseph.DblObj tret = new de.thmac.swisseph.DblObj();
-            StringBuffer serr = new StringBuffer();
+    /**
+     * Computes Pure Surya Siddhanta Sunrise Local Mean Time.
+     * Incorporates Surya Siddhanta Chara-Sutra and Ujjain Prime Meridian Desantara.
+     */
+    private double calculateSuryaSiddhantaSunriseLocalTime(double sunLongitude, double latitude, double longitude) {
+        // 1. Classical Surya Siddhanta Obliquity (24.0 degrees)
+        double epsilonRad = Math.toRadians(24.0);
+        double sunLongRad = Math.toRadians(sunLongitude);
+        double latRad = Math.toRadians(latitude);
 
-            double searchStartJd = julianDayUT - 0.5;
+        // 2. Sun's Declination (Krantya)
+        double sinDeclination = Math.sin(epsilonRad) * Math.sin(sunLongRad);
+        double declinationRad = Math.asin(sinDeclination);
 
-            int searchFlags = SweConst.SE_CALC_RISE | SweConst.SE_BIT_DISC_CENTER;
-            int result = swissEph.swe_rise_trans(
-                    searchStartJd, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
-                    searchFlags, new double[] { longitude, latitude, 0.0 }, 0.0, 0.0, tret, serr);
+        // 3. Ascensional Difference (Chara)
+        double sinChara = Math.tan(latRad) * Math.tan(declinationRad);
+        sinChara = Math.max(-1.0, Math.min(1.0, sinChara));
+        double charaRad = Math.asin(sinChara);
+        double charaHours = Math.toDegrees(charaRad) / 15.0;
 
-            return (result == SweConst.OK) ? tret.val : (julianDayUT - 0.25);
-        }
+        // 4. Ujjain Prime Meridian Desantara Time Correction
+        // Ancient Ujjain Longitude = 75.768°E
+        double ujjainLongitude = 75.768;
+        double desantaraHours = ((longitude - ujjainLongitude) * 4.0) / 60.0;
+
+        // 5. Surya Siddhanta Sunrise LMT = 06:00 - Chara + Desantara Correction
+        return (6.0 - charaHours) + desantaraHours;
     }
 
     private double getSuryaSiddhantaSpeed(String planetName) {
