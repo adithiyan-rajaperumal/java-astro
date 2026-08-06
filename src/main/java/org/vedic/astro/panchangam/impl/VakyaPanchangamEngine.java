@@ -165,7 +165,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         // 2. Moon Longitude: Uses 248 Chandra Vakyas Anomaly Index
         int vakyaIndex = (int) (Math.abs(aharganaInt) % 248);
         double anomalyOffsetDeg = CHANDRA_VAKYAS_248[vakyaIndex] / 60.0;
-        double meanMoon = (aharganaExact * 13.1763965) % 360.0;
+        double meanMoon = (265.0 + (aharganaExact * 13.1763965)) % 360.0;
         double moonLong = (meanMoon + anomalyOffsetDeg + 360.0) % 360.0;
         longitudes.put("Moon", moonLong);
 
@@ -176,9 +176,9 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         // 4. Taragrahas (Mars, Mercury, Jupiter, Venus, Saturn)
         double mars = (sunLong * 0.5317 + (aharganaExact * 0.524033)) % 360.0;
         double mercury = (sunLong + Math.sin(Math.toRadians(aharganaExact * 3.151)) * 22.0) % 360.0;
-        double jupiter = (aharganaExact * 0.083091) % 360.0;
+        double jupiter = (180.0 + (aharganaExact * 0.083091)) % 360.0;
         double venus = (sunLong + Math.sin(Math.toRadians(aharganaExact * 0.616)) * 46.0) % 360.0;
-        double saturn = (aharganaExact * 0.033459) % 360.0;
+        double saturn = (288.0 + (aharganaExact * 0.033459)) % 360.0;
 
         longitudes.put("Mars", (mars + 360.0) % 360.0);
         longitudes.put("Mercury", (mercury + 360.0) % 360.0);
@@ -187,7 +187,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         longitudes.put("Saturn", (saturn + 360.0) % 360.0);
 
         // 5. Nodes (Rahu and Ketu move retrograde)
-        double rahu = (360.0 - (aharganaExact * 0.0529539)) % 360.0;
+        double rahu = (210.0 + (360.0 - (aharganaExact * 0.0529539))) % 360.0;
         double ketu = (rahu + 180.0) % 360.0;
         longitudes.put("Rahu", (rahu + 360.0) % 360.0);
         longitudes.put("Ketu", (ketu + 360.0) % 360.0);
