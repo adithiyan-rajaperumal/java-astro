@@ -7,13 +7,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.vedic.astro.dto.BirthDetailsDTO;
 import org.vedic.astro.dto.ComprehensiveReportDTO;
+import org.vedic.astro.model.AyanamsaType;
 import org.vedic.astro.model.ChartResult;
 import org.vedic.astro.model.PlanetaryPosition;
 import org.vedic.astro.panchangam.PanchangamEngine;
 import org.vedic.astro.panchangam.PanchangamType;
 import org.vedic.astro.service.ChartOrchestrationService;
 import org.vedic.astro.service.TimezoneService;
-import org.vedic.astro.util.ZodiacUtils;
+import org.vedic.astro.service.impl.VargaCalculationService;
+import org.vedic.astro.service.impl.VargaCalculationService.VargaType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,7 +27,9 @@ import java.util.Map;
 
 /**
  * Traditional Surya Siddhanta Panchangam Engine (சூரிய சித்தாந்தம்).
- * Uses classical Surya Siddhanta astronomical constants (Swiss Ephemeris Mode 21).
+ * Implements Mahayuga revolution constants, Ujjain prime meridian Desantara
+ * corrections,
+ * and epicyclic equations of center (Manda and Sighra phala).
  */
 @Service
 @RequiredArgsConstructor
@@ -34,22 +38,34 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
     private final SwissEph swissEph;
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
+    private final VargaCalculationService vargaService;
 
-    private static final Map<String, Integer> TARGET_GRAHAS = new LinkedHashMap<>();
-    static {
-        TARGET_GRAHAS.put("Sun", SweConst.SE_SUN);
-        TARGET_GRAHAS.put("Moon", SweConst.SE_MOON);
-        TARGET_GRAHAS.put("Mars", SweConst.SE_MARS);
-        TARGET_GRAHAS.put("Mercury", SweConst.SE_MERCURY);
-        TARGET_GRAHAS.put("Jupiter", SweConst.SE_JUPITER);
-        TARGET_GRAHAS.put("Venus", SweConst.SE_VENUS);
-        TARGET_GRAHAS.put("Saturn", SweConst.SE_SATURN);
-        TARGET_GRAHAS.put("Rahu", SweConst.SE_TRUE_NODE);
-    }
+    // Kali Yuga Epoch: February 18, 3102 BCE (Julian Day = 588465.5)
+    private static final double KALI_EPOCH_JD = 588465.5;
 
+    // Surya Siddhanta Mahayuga Civil Days (1 Mahayuga = 4,320,000 Solar Years)
+    private static final double MAHAYUGA_CIVIL_DAYS = 1577917828.0;
+
+    // Ancient Prime Meridian of Ujjain
+    private static final double UJJAIN_LONGITUDE_DEG = 75.768;
+
+    // Mahayuga Revolutions
+    private static final double REV_SUN = 4320000.0;
+    private static final double REV_MOON = 57753336.0;
+    private static final double REV_MARS = 2296832.0;
+    private static final double REV_MERCURY_SIGHRA = 17937060.0;
+    private static final double REV_JUPITER = 364220.0;
+    private static final double REV_VENUS_SIGHRA = 7022376.0;
+    private static final double REV_SATURN = 146568.0;
+    private static final double REV_RAHU = 232238.0;
+
+    /**
+     * Fast calculation method for UI rendering. Returns ONLY D1 and D9.
+     */
     @Override
     public ChartResult calculate(BirthDetailsDTO dto) {
-        LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(), dto.second());
+        LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(),
+                dto.second());
 
         String resolvedZoneId = timezoneService.getTimezoneFromCoordinates(dto.latitude(), dto.longitude());
         ZoneId zoneId = ZoneId.of(resolvedZoneId);
@@ -57,48 +73,40 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
         ZonedDateTime zonedBirthTime = ZonedDateTime.of(localTime, zoneId);
         LocalDateTime utcTime = zonedBirthTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 
-        double longitudeOffsetMinutes = dto.longitude() * 4.0;
-        LocalDateTime localMeanTime = utcTime.plusSeconds((long) (longitudeOffsetMinutes * 60));
-
         double hourFraction = utcTime.getHour() + (utcTime.getMinute() / 60.0) + (utcTime.getSecond() / 3600.0);
-        SweDate sweDate = new SweDate(utcTime.getYear(), utcTime.getMonthValue(), utcTime.getDayOfMonth(), hourFraction);
+        SweDate sweDate = new SweDate(utcTime.getYear(), utcTime.getMonthValue(), utcTime.getDayOfMonth(),
+                hourFraction);
         double julianDayUT = sweDate.getJulDay();
 
-        Map<String, PlanetaryPosition> d1Map = new LinkedHashMap<>();
-        Map<String, PlanetaryPosition> d9Map = new LinkedHashMap<>();
-        int calculationFlags = SweConst.SEFLG_SWIEPH | SweConst.SEFLG_SIDEREAL | SweConst.SEFLG_SPEED;
+        // 1. Compute Desantara (Longitudinal time shift relative to Ujjain Prime
+        // Meridian)
+        double desantaraHours = ((dto.longitude() - UJJAIN_LONGITUDE_DEG) * 4.0) / 60.0;
 
-        double[] cusps = new double[13];
-        double[] ascmc = new double[10];
-        double[] xx = new double[6];
-        StringBuffer serr = new StringBuffer();
-        
-        double SURYA_SIDDHANTA_DELTA_OFFSET = -3.40; // Exact empirical offset to match JHora epicycles
+        // 2. Compute Ahargana from Epoch
+        double aharganaExact = (julianDayUT - KALI_EPOCH_JD) + (desantaraHours / 24.0);
 
-        synchronized (swissEph) {
-            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph);
+        // 3. Compute Local Sunrise for Udayadi Ghatika derivation
+        double sunriseJulDay = calculateLocalSunrise(julianDayUT, dto.latitude(), dto.longitude());
+        double ghatikasSinceSunrise = (julianDayUT - sunriseJulDay) * 24.0 * 2.5;
+        if (ghatikasSinceSunrise < 0)
+            ghatikasSinceSunrise += 60.0;
 
-            swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = ascmc[SweConst.SE_ASC];
+        // 4. Calculate Ayanamsa Offset if configured
+        double ayanamsaOffset = calculateAyanamsaOffset(julianDayUT, dto.ayanamsa());
 
-            d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, ascmc[2] / 15.0));
-            d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, ascmc[2] / 15.0));
+        // 5. Compute Surya Siddhanta Longitudes
+        Map<String, Double> longitudes = calculateSuryaSiddhantaLongitudes(aharganaExact, ghatikasSinceSunrise,
+                dto.latitude(), ayanamsaOffset);
 
-            for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
-                swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
-                double absoluteLong = (xx[0] + SURYA_SIDDHANTA_DELTA_OFFSET + 360.0) % 360.0;
+        // 6. Generate D1 Map
+        Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(longitudes,
+                this::getSuryaSiddhantaSpeed);
 
-                d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), absoluteLong, xx[3]));
-                d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), absoluteLong, xx[3]));
+        // 7. Generate D9 (Navamsha) Map ONLY
+        Map<String, PlanetaryPosition> d9Map = vargaService.generateVargaChart(d1Map, VargaType.D9_NAVAMSA);
 
-                if ("Rahu".equals(planet.getKey())) {
-                    double ketuLong = (absoluteLong + 180.0) % 360.0;
-                    d1Map.put("Ketu", buildBasePosition("Ketu", ketuLong, xx[3]));
-                    d9Map.put("Ketu", buildNavamsaPosition("Ketu", ketuLong, xx[3]));
-                }
-            }
-            swissEph.swe_set_sid_mode(0, 0, 0);
-        }
+        double longitudeOffsetMinutes = dto.longitude() * 4.0;
+        LocalDateTime localMeanTime = utcTime.plusSeconds((long) (longitudeOffsetMinutes * 60));
 
         return ChartResult.builder()
                 .name(dto.name())
@@ -111,64 +119,169 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
                 .build();
     }
 
-    @Override
-    public PanchangamType getType() {
-        return PanchangamType.SURYA_SIDDHANTA;
-    }
-
+    /**
+     * Heavy report generation method for PDF export.
+     * Computes Surya Siddhanta-consistent Equal House Cusps derived from SS Lagna.
+     */
     @Override
     public ComprehensiveReportDTO generateComprehensiveReport(BirthDetailsDTO payload, ChartResult res) {
+        // Compute Equal House Cusps derived from Surya Siddhanta Lagna Longitude
         double[] cusps = new double[13];
-        double[] ascmc = new double[10];
-        synchronized (swissEph) {
-            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph);
-            swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
-            swissEph.swe_set_sid_mode(0, 0, 0);
+        PlanetaryPosition lagna = res.getD1Positions().get("Lagna");
+        double lagnaLong = (lagna != null) ? lagna.getAbsoluteLongitude() : 0.0;
+
+        for (int i = 1; i <= 12; i++) {
+            cusps[i] = (lagnaLong + (i - 1) * 30.0) % 360.0;
         }
 
+        // Pass calculated house cusps directly to orchestration service
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);
-        deepReportData.setResolvedTimezone(timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
+        deepReportData.setResolvedTimezone(
+                timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
         return deepReportData;
     }
 
-    private PlanetaryPosition buildBasePosition(String name, double absoluteLongitude, double speed) {
-        int signNumber = (int) (absoluteLongitude / 30.0) + 1;
-        return PlanetaryPosition.builder()
-                .name(name)
-                .absoluteLongitude(absoluteLongitude)
-                .signNumber(signNumber)
-                .signName(ZodiacUtils.getSignName(signNumber))
-                .rashi(ZodiacUtils.getVedicRashi(signNumber))
-                .nakshatra(ZodiacUtils.getNakshatraName(absoluteLongitude))
-                .pada(ZodiacUtils.getNakshatraPada(absoluteLongitude))
-                .degreeInSign(absoluteLongitude % 30.0)
-                .speed(speed)
-                .build();
+    private Map<String, Double> calculateSuryaSiddhantaLongitudes(double ahargana, double ghatikas, double latitude,
+            double ayanamsaOffset) {
+        Map<String, Double> longitudes = new LinkedHashMap<>();
+
+        // 1. Mean Longitudes (Madhyama Graha)
+        double sunMean = calculateMeanLongitude(ahargana, REV_SUN);
+        double moonMean = calculateMeanLongitude(ahargana, REV_MOON);
+
+        // 2. Manda Correction (Equation of Center)
+        double sunTrue = (applyMandaCorrection(sunMean, 77.23, 14.0) + ayanamsaOffset + 360.0) % 360.0;
+        double moonTrue = (applyMandaCorrection(moonMean, 90.0, 31.83) + ayanamsaOffset + 360.0) % 360.0;
+
+        longitudes.put("Sun", sunTrue);
+        longitudes.put("Moon", moonTrue);
+
+        // 3. Lagna via Udayadi Ghatikas
+        double lagnaLong = (calculateSiddhantaLagna(sunTrue, ghatikas, latitude) + ayanamsaOffset + 360.0) % 360.0;
+        longitudes.put("Lagna", lagnaLong);
+
+        // 4. Taragrahas (Mars, Mercury, Jupiter, Venus, Saturn)
+        longitudes.put("Mars",
+                (calculateTaragraha(ahargana, REV_MARS, 130.0, 75.0, REV_SUN, 235.0, sunTrue) + ayanamsaOffset + 360.0)
+                        % 360.0);
+        longitudes.put("Mercury",
+                (calculateTaragraha(ahargana, REV_SUN, 220.0, 30.0, REV_MERCURY_SIGHRA, 133.0, sunTrue) + ayanamsaOffset
+                        + 360.0) % 360.0);
+        longitudes.put("Jupiter", (calculateTaragraha(ahargana, REV_JUPITER, 170.0, 33.0, REV_SUN, 70.0, sunTrue)
+                + ayanamsaOffset + 360.0) % 360.0);
+        longitudes.put("Venus", (calculateTaragraha(ahargana, REV_SUN, 80.0, 11.0, REV_VENUS_SIGHRA, 262.0, sunTrue)
+                + ayanamsaOffset + 360.0) % 360.0);
+        longitudes.put("Saturn",
+                (calculateTaragraha(ahargana, REV_SATURN, 240.0, 49.0, REV_SUN, 40.0, sunTrue) + ayanamsaOffset + 360.0)
+                        % 360.0);
+
+        // 5. Nodes (Rahu and Ketu move retrograde in SS)
+        double rahu = (360.0 - calculateMeanLongitude(ahargana, REV_RAHU) + ayanamsaOffset + 360.0) % 360.0;
+        double ketu = (rahu + 180.0) % 360.0;
+        longitudes.put("Rahu", rahu);
+        longitudes.put("Ketu", ketu);
+
+        return longitudes;
     }
 
-    private PlanetaryPosition buildNavamsaPosition(String name, double absoluteLongitude, double speed) {
-        int baseSignNumber = ((int) (absoluteLongitude / 30.0)) % 12 + 1;
-        double degreeInSign = absoluteLongitude % 30.0;
-        int navamsaIndexInSign = (int) (degreeInSign / (30.0 / 9.0));
-        navamsaIndexInSign = Math.min(8, Math.max(0, navamsaIndexInSign));
+    private double calculateMeanLongitude(double ahargana, double totalRevolutions) {
+        double totalRevs = (ahargana * totalRevolutions) / MAHAYUGA_CIVIL_DAYS;
+        double fraction = totalRevs - Math.floor(totalRevs);
+        return (fraction * 360.0 + 360.0) % 360.0;
+    }
 
-        int startSign = switch (baseSignNumber) {
-            case 1, 5, 9 -> 1;
-            case 2, 6, 10 -> 10;
-            case 3, 7, 11 -> 7;
-            default -> 4;
+    private double applyMandaCorrection(double meanLong, double apogeeDeg, double epicycleCircumference) {
+        double anomalyDeg = (meanLong - apogeeDeg + 360.0) % 360.0;
+        double mandaEquationRad = Math.asin((epicycleCircumference / 360.0) * Math.sin(Math.toRadians(anomalyDeg)));
+        return (meanLong - Math.toDegrees(mandaEquationRad) + 360.0) % 360.0;
+    }
+
+    private double calculateTaragraha(double ahargana, double meanRevs, double apogeeDeg, double mandaCirc,
+            double sighraRevs, double sighraCirc, double sunTrue) {
+        double meanLong = calculateMeanLongitude(ahargana, meanRevs);
+        double mandaCorrected = applyMandaCorrection(meanLong, apogeeDeg, mandaCirc);
+
+        double sighraMean = calculateMeanLongitude(ahargana, sighraRevs);
+        double sighraAnomaly = (sighraMean - mandaCorrected + 360.0) % 360.0;
+
+        double sighraEquationRad = Math.atan2(
+                (sighraCirc / 360.0) * Math.sin(Math.toRadians(sighraAnomaly)),
+                1.0 + (sighraCirc / 360.0) * Math.cos(Math.toRadians(sighraAnomaly)));
+
+        return (mandaCorrected + Math.toDegrees(sighraEquationRad) + 360.0) % 360.0;
+    }
+
+    private double calculateSiddhantaLagna(double sunLongitude, double ghatikas, double latitude) {
+        double[] rasimana = { 4.2, 4.8, 5.2, 5.4, 5.3, 5.1, 5.1, 5.3, 5.4, 5.2, 4.8, 4.2 };
+
+        int currentRasiIdx = (int) (sunLongitude / 30.0);
+        double remainingDegInSunRasi = 30.0 - (sunLongitude % 30.0);
+        double ghatikasToClearSunRasi = (remainingDegInSunRasi / 30.0) * rasimana[currentRasiIdx];
+
+        double g = ghatikas;
+        if (g <= ghatikasToClearSunRasi) {
+            return (sunLongitude + (g / rasimana[currentRasiIdx]) * 30.0) % 360.0;
+        }
+
+        g -= ghatikasToClearSunRasi;
+        currentRasiIdx = (currentRasiIdx + 1) % 12;
+
+        while (g > rasimana[currentRasiIdx]) {
+            g -= rasimana[currentRasiIdx];
+            currentRasiIdx = (currentRasiIdx + 1) % 12;
+        }
+
+        double degreeInLagna = (g / rasimana[currentRasiIdx]) * 30.0;
+        return ((currentRasiIdx * 30.0) + degreeInLagna) % 360.0;
+    }
+
+    private double calculateAyanamsaOffset(double julianDayUT, String ayanamsaStr) {
+        if (ayanamsaStr == null || ayanamsaStr.isBlank() || "NONE".equalsIgnoreCase(ayanamsaStr)
+                || "PLAIN".equalsIgnoreCase(ayanamsaStr)) {
+            return 0.0; // Standard Siddhantic Zero Epoch
+        }
+
+        synchronized (swissEph) {
+            AyanamsaType selectedAyanamsa = AyanamsaType.fromString(ayanamsaStr);
+
+            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
+            double lahiriVal = swissEph.swe_get_ayanamsa_ut(julianDayUT);
+
+            selectedAyanamsa.applyTo(swissEph, PanchangamType.SURYA_SIDDHANTA);
+            double targetAyanamsaVal = swissEph.swe_get_ayanamsa_ut(julianDayUT);
+
+            return lahiriVal - targetAyanamsaVal;
+        }
+    }
+
+    private double calculateLocalSunrise(double julianDayUT, double latitude, double longitude) {
+        synchronized (swissEph) {
+            de.thmac.swisseph.DblObj tret = new de.thmac.swisseph.DblObj();
+            StringBuffer serr = new StringBuffer();
+
+            int searchFlags = SweConst.SE_CALC_RISE | SweConst.SE_BIT_DISC_CENTER;
+            int result = swissEph.swe_rise_trans(
+                    julianDayUT, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
+                    searchFlags, new double[] { longitude, latitude, 0.0 }, 0.0, 0.0, tret, serr);
+
+            return (result == SweConst.OK) ? tret.val : (julianDayUT - 0.25);
+        }
+    }
+
+    private double getSuryaSiddhantaSpeed(String planetName) {
+        return switch (planetName) {
+            case "Sun" -> 0.9856;
+            case "Moon" -> 13.1764;
+            case "Mars" -> 0.5240;
+            case "Jupiter" -> 0.0831;
+            case "Saturn" -> 0.0335;
+            case "Rahu", "Ketu" -> -0.0530;
+            default -> 1.0;
         };
+    }
 
-        int d9SignNumber = (navamsaIndexInSign + startSign - 1) % 12 + 1;
-
-        return PlanetaryPosition.builder()
-                .name(name)
-                .absoluteLongitude(absoluteLongitude)
-                .signNumber(d9SignNumber)
-                .signName(ZodiacUtils.getSignName(d9SignNumber))
-                .rashi(ZodiacUtils.getVedicRashi(d9SignNumber))
-                .degreeInSign((absoluteLongitude % (30.0 / 9.0)) * 9.0)
-                .speed(speed)
-                .build();
+    @Override
+    public PanchangamType getType() {
+        return PanchangamType.SURYA_SIDDHANTA;
     }
 }
