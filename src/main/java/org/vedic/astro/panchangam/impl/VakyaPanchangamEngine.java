@@ -77,13 +77,10 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         StringBuffer serr = new StringBuffer();
 
         synchronized (swissEph) {
-            org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(dto.ayanamsa());
-            ayanamsaType.applyTo(swissEph);
-
-            double effectiveDelta = (ayanamsaType == org.vedic.astro.model.AyanamsaType.PUSHYAPAKSHA) ? 0.0 : VAKYA_DELTA_OFFSET;
+            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = (ascmc[SweConst.SE_ASC] + effectiveDelta + 360.0) % 360.0;
+            double lagnaLong = (ascmc[SweConst.SE_ASC] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
 
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
@@ -92,7 +89,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
                 
                 // Apply Vakya Sutra planetary correction offset
-                double vakyaLong = (xx[0] + effectiveDelta + 360.0) % 360.0;
+                double vakyaLong = (xx[0] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
 
                 d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), vakyaLong, xx[3]));
                 d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), vakyaLong, xx[3]));
@@ -126,12 +123,10 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double[] cusps = new double[13];
         double[] ascmc = new double[10];
         synchronized (swissEph) {
-            org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(payload.ayanamsa());
-            ayanamsaType.applyTo(swissEph);
+            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
-            double effectiveDelta = (ayanamsaType == org.vedic.astro.model.AyanamsaType.PUSHYAPAKSHA) ? 0.0 : VAKYA_DELTA_OFFSET;
             for (int i = 1; i <= 12; i++) {
-                cusps[i] = (cusps[i] + effectiveDelta + 360.0) % 360.0;
+                cusps[i] = (cusps[i] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
             }
         }
 
