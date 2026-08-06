@@ -422,7 +422,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         } else if (pType == org.vedic.astro.panchangam.PanchangamType.PARASARA_BHATTAR) {
             deltaOffset = -1.83;
         } else if (pType == org.vedic.astro.panchangam.PanchangamType.SURYA_SIDDHANTA) {
-            sidMode = 21;
+            deltaOffset = -3.40;
+            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph, pType);
         }
 
         double sunLong, moonLong;

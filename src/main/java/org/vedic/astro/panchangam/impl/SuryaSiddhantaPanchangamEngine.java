@@ -35,6 +35,8 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
 
+    private static final double SURYA_SIDDHANTA_PLANET_DELTA = -3.40;
+
     private static final Map<String, Integer> TARGET_GRAHAS = new LinkedHashMap<>();
     static {
         TARGET_GRAHAS.put("Sun", SweConst.SE_SUN);
@@ -77,14 +79,14 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
             org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph, PanchangamType.SURYA_SIDDHANTA);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = ascmc[SweConst.SE_ASC];
+            double lagnaLong = (ascmc[SweConst.SE_ASC] + SURYA_SIDDHANTA_PLANET_DELTA + 360.0) % 360.0;
 
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
 
             for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
-                double absoluteLong = xx[0];
+                double absoluteLong = (xx[0] + SURYA_SIDDHANTA_PLANET_DELTA + 360.0) % 360.0;
 
                 d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), absoluteLong, xx[3]));
                 d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), absoluteLong, xx[3]));
