@@ -338,6 +338,10 @@ function HoroscopePage({ settings }) {
 
   const getAyanamsaLabel = (ayanamsaCode, lang) => {
     const code = (ayanamsaCode || settings.ayanamsa || 'LAHIRI').toUpperCase();
+    const pSys = formPayload?.panchangamSystem || settings.panchangamSystem;
+    if (code === 'PUSHYAPAKSHA' && pSys === 'PARASARA_BHATTAR') {
+      return t('ayanamsaPushyapakshaParasara', lang);
+    }
     const keyMap = {
       LAHIRI: 'ayanamsaLahiri',
       KP: 'ayanamsaKP',
