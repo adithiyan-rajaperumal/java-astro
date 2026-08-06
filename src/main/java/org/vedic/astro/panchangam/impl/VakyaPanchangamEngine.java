@@ -34,6 +34,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
     private final SwissEph swissEph;
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
+    private final org.vedic.astro.service.VakyaTableService vakyaTableService;
 
     // Standard Vakya Sidereal Correction Offset (-1.65 degrees relative to Chitra Paksha Drik)
     private static final double VAKYA_DELTA_OFFSET = -1.65;
@@ -53,6 +54,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
     @Override
     public ChartResult calculate(BirthDetailsDTO dto) {
         LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(), dto.second());
+        LocalDate birthDate = LocalDate.of(dto.year(), dto.month(), dto.day());
 
         String resolvedZoneId = timezoneService.getTimezoneFromCoordinates(dto.latitude(), dto.longitude());
         ZoneId zoneId = ZoneId.of(resolvedZoneId);
@@ -80,7 +82,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = ascmc[SweConst.SE_ASC];
+            double lagnaLong = (ascmc[SweConst.SE_ASC] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
 
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
@@ -91,10 +93,16 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
                 
                 double vakyaLong = xx[0];
 
+                if ("Sun".equals(planet.getKey()) || "Moon".equals(planet.getKey())) {
+                    vakyaLong = (xx[0] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
+                }
+
                 if ("Sun".equals(planet.getKey())) {
                     sunVakyaLong = vakyaLong;
                 } else if ("Mercury".equals(planet.getKey())) {
-                    vakyaLong = calculateVakyaMercuryLongitude(sunVakyaLong, xx[0], xx[0]);
+                    vakyaLong = vakyaTableService.calculateVakyaMercuryLongitude(sunVakyaLong, xx[0], vakyaLong);
+                } else if ("Saturn".equals(planet.getKey())) {
+                    vakyaLong = vakyaTableService.calculateVakyaSaturnLongitude(birthDate, vakyaLong);
                 }
 
                 d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), vakyaLong, xx[3]));
