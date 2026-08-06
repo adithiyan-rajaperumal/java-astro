@@ -74,8 +74,7 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
         StringBuffer serr = new StringBuffer();
 
         synchronized (swissEph) {
-            // Force Surya Siddhanta Ayanamsa Mode 21
-            swissEph.swe_set_sid_mode(21, 0, 0);
+            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph, PanchangamType.SURYA_SIDDHANTA);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
             double lagnaLong = ascmc[SweConst.SE_ASC];
@@ -96,8 +95,6 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
                     d9Map.put("Ketu", buildNavamsaPosition("Ketu", ketuLong, xx[3]));
                 }
             }
-            // Reset back to default Lahiri mode
-            swissEph.swe_set_sid_mode(0, 0, 0);
         }
 
         return ChartResult.builder()
@@ -121,9 +118,8 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
         double[] cusps = new double[13];
         double[] ascmc = new double[10];
         synchronized (swissEph) {
-            swissEph.swe_set_sid_mode(21, 0, 0);
+            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph, PanchangamType.SURYA_SIDDHANTA);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
-            swissEph.swe_set_sid_mode(0, 0, 0);
         }
 
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);
