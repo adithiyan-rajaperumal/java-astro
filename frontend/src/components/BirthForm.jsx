@@ -40,6 +40,17 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
     setDateText(formatted);
   };
 
+  const handlePanchangamChange = (newSystem) => {
+    setPanchangamSystem(newSystem);
+    if (newSystem === 'VAKYA') {
+      setAyanamsa('VAKYA');
+    } else if (newSystem === 'SURYA_SIDDHANTA') {
+      setAyanamsa('SURYA_SIDDHANTA');
+    } else if (newSystem === 'PARASARA_BHATTAR' && ayanamsa !== 'PUSHYAPAKSHA') {
+      setAyanamsa('LAHIRI');
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim() || !dateText || !time || !location) {
@@ -66,6 +77,9 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
     // Parse time (HH:MM)
     const [hour, minute] = time.split(':').map(Number);
 
+    const effectiveAyanamsa = panchangamSystem === 'VAKYA' ? 'VAKYA' : 
+                             panchangamSystem === 'SURYA_SIDDHANTA' ? 'SURYA_SIDDHANTA' : ayanamsa;
+
     onSubmit({
       name,
       year,
@@ -77,7 +91,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       latitude: location.latitude,
       longitude: location.longitude,
       location,
-      ayanamsa,
+      ayanamsa: effectiveAyanamsa,
       panchangamSystem
     });
   };
@@ -130,7 +144,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       <div className="grid-2" style={{ marginBottom: '20px' }}>
         <div>
           <label>{t('panchangamSystem', lang)}</label>
-          <select value={panchangamSystem} onChange={(e) => setPanchangamSystem(e.target.value)}>
+          <select value={panchangamSystem} onChange={(e) => handlePanchangamChange(e.target.value)}>
             <option value="DRIK_TIRUKANITHAM">{t('systemDrik', lang)}</option>
             <option value="VAKYA">{t('systemVakya', lang)}</option>
             <option value="PARASARA_BHATTAR">{t('systemParasaraBhattar', lang)}</option>

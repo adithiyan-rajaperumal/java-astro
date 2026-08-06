@@ -80,7 +80,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = (ascmc[SweConst.SE_ASC] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
+            double lagnaLong = ascmc[SweConst.SE_ASC];
 
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
@@ -89,12 +89,12 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
                 
-                double vakyaLong = (xx[0] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
+                double vakyaLong = xx[0];
 
                 if ("Sun".equals(planet.getKey())) {
                     sunVakyaLong = vakyaLong;
                 } else if ("Mercury".equals(planet.getKey())) {
-                    vakyaLong = calculateVakyaMercuryLongitude(sunVakyaLong, xx[0], vakyaLong);
+                    vakyaLong = calculateVakyaMercuryLongitude(sunVakyaLong, xx[0], xx[0]);
                 }
 
                 d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), vakyaLong, xx[3]));
