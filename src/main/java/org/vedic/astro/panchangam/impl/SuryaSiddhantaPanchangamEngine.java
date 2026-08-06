@@ -236,13 +236,12 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
     }
 
     private double calculateAyanamsaOffset(double julianDayUT, String ayanamsaStr) {
-        if (ayanamsaStr == null || ayanamsaStr.isBlank() || "NONE".equalsIgnoreCase(ayanamsaStr)
-                || "PLAIN".equalsIgnoreCase(ayanamsaStr)) {
+        if ("NONE".equalsIgnoreCase(ayanamsaStr) || "PLAIN".equalsIgnoreCase(ayanamsaStr)) {
             return 0.0; // Standard Siddhantic Zero Epoch
         }
 
         synchronized (swissEph) {
-            AyanamsaType selectedAyanamsa = AyanamsaType.fromString(ayanamsaStr);
+            AyanamsaType selectedAyanamsa = AyanamsaType.SURYA_SIDDHANTA;
 
             swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
             double lahiriVal = swissEph.swe_get_ayanamsa_ut(julianDayUT);

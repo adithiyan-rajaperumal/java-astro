@@ -185,12 +185,15 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
 
     private double calculateAyanamsaOffset(double julianDayUT, String ayanamsaStr) {
         if (ayanamsaStr == null || ayanamsaStr.isBlank() || "NONE".equalsIgnoreCase(ayanamsaStr)
-                || "PLAIN".equalsIgnoreCase(ayanamsaStr)) {
+                || "PLAIN".equalsIgnoreCase(ayanamsaStr) || "PARASARA_BHATTAR".equalsIgnoreCase(ayanamsaStr)) {
             return 0.0; // Plain Parasara Bhattar Mode (Sidereal Epoch Zero)
         }
 
         synchronized (swissEph) {
             AyanamsaType selectedAyanamsa = AyanamsaType.fromString(ayanamsaStr);
+            if (selectedAyanamsa != AyanamsaType.PUSHYAPAKSHA) {
+                selectedAyanamsa = AyanamsaType.PUSHYAPAKSHA;
+            }
 
             // Compute Lahiri baseline
             swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
