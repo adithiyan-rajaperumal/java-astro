@@ -85,22 +85,14 @@ function PanchangamPage({ settings }) {
     return t(`gowriGuide.${subKey}`, lang);
   };
 
-  const [selectedSystem, setSelectedSystem] = useState(settings.panchangamSystem || 'DRIK_TIRUKANITHAM');
-
-  useEffect(() => {
-    if (settings.panchangamSystem) {
-      setSelectedSystem(settings.panchangamSystem);
-    }
-  }, [settings.panchangamSystem]);
-
-  const fetchPanchangam = async (dateStr, activeSys) => {
+  const fetchPanchangam = async (dateStr) => {
     if (!settings.location) return;
     setLoading(true);
     setError(null);
     try {
       const response = await fetch('/api/v1/astrology/panchangam', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept-Language': settings.language
         },
@@ -109,8 +101,8 @@ function PanchangamPage({ settings }) {
           latitude: settings.location.latitude,
           longitude: settings.location.longitude,
           language: settings.language,
-          ayanamsa: settings.ayanamsa,
-          panchangamSystem: activeSys || selectedSystem || 'DRIK_TIRUKANITHAM'
+          ayanamsa: settings.ayanamsa || 'LAHIRI',
+          panchangamSystem: settings.panchangamSystem || 'DRIK_TIRUKANITHAM'
         })
       });
       if (response.ok) {
@@ -127,8 +119,8 @@ function PanchangamPage({ settings }) {
   };
 
   useEffect(() => {
-    fetchPanchangam(currentDate, selectedSystem);
-  }, [currentDate, settings.location, settings.language, settings.ayanamsa, selectedSystem]);
+    fetchPanchangam(currentDate);
+  }, [currentDate, settings.location, settings.language, settings.ayanamsa, settings.panchangamSystem]);
 
   const changeDate = (days) => {
     const d = new Date(currentDate + 'T12:00:00');
