@@ -336,6 +336,19 @@ function HoroscopePage({ settings }) {
     );
   };
 
+  const getAyanamsaLabel = (ayanamsaCode, lang) => {
+    const code = (ayanamsaCode || settings.ayanamsa || 'LAHIRI').toUpperCase();
+    const keyMap = {
+      LAHIRI: 'ayanamsaLahiri',
+      KP: 'ayanamsaKP',
+      RAMAN: 'ayanamsaRaman',
+      SURYA_SIDDHANTA: 'ayanamsaSurya',
+      PUSHYAPAKSHA: 'ayanamsaPushyapaksha',
+      VAKYA: 'ayanamsaFixedVakya'
+    };
+    return t(keyMap[code] || 'ayanamsaLahiri', lang);
+  };
+
   return (
     <div>
       <h2 className="title-gold">{t('horoscope', settings.language)}</h2>
@@ -348,10 +361,12 @@ function HoroscopePage({ settings }) {
             date: `${formPayload.year}-${String(formPayload.month).padStart(2, '0')}-${String(formPayload.day).padStart(2, '0')}`,
             time: `${String(formPayload.hour).padStart(2, '0')}:${String(formPayload.minute).padStart(2, '0')}`,
             location: formPayload.location || settings.location,
-            ayanamsa: formPayload.ayanamsa || settings.ayanamsa
+            ayanamsa: formPayload.ayanamsa || settings.ayanamsa,
+            panchangamSystem: formPayload.panchangamSystem || settings.panchangamSystem
           } : {
             location: settings.location,
-            ayanamsa: settings.ayanamsa
+            ayanamsa: settings.ayanamsa,
+            panchangamSystem: settings.panchangamSystem
           }}
           submitLabel="calculateHoroscope"
           lang={settings.language}
@@ -383,7 +398,7 @@ function HoroscopePage({ settings }) {
                 {t('born', settings.language)}: {report.dateOfBirth} at {report.timeOfBirth} ({t('localMeanTime', settings.language)}: {report.localMeanTime})
               </p>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rashi || report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {t('ayanamsa.' + (report.ayanamsa || settings.ayanamsa).toUpperCase(), settings.language) !== ('ayanamsa.' + (report.ayanamsa || settings.ayanamsa).toUpperCase()) ? t('ayanamsa.' + (report.ayanamsa || settings.ayanamsa).toUpperCase(), settings.language) : (report.ayanamsa || settings.ayanamsa)} | {t('panchangamSystem', settings.language)}: {t('system' + (report.panchangamSystem === 'VAKYA' ? 'Vakya' : report.panchangamSystem === 'PARASARA_BHATTAR' ? 'ParasaraBhattar' : report.panchangamSystem === 'SURYA_SIDDHANTA' ? 'SuryaSiddhanta' : 'Drik'), settings.language)}
+                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rashi || report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {getAyanamsaLabel(report.ayanamsa, settings.language)} | {t('panchangamSystem', settings.language)}: {t('system' + (report.panchangamSystem === 'VAKYA' ? 'Vakya' : report.panchangamSystem === 'PARASARA_BHATTAR' ? 'ParasaraBhattar' : report.panchangamSystem === 'SURYA_SIDDHANTA' ? 'SuryaSiddhanta' : 'Drik'), settings.language)}
               </p>
             </div>
             <div>

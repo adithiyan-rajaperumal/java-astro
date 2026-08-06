@@ -126,6 +126,9 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
             org.vedic.astro.model.AyanamsaType ayanamsaType = org.vedic.astro.model.AyanamsaType.fromString(payload.ayanamsa());
             swissEph.swe_set_sid_mode(ayanamsaType.getMode(), 0, 0);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
+            for (int i = 1; i <= 12; i++) {
+                cusps[i] = (cusps[i] + PARASARA_BHATTAR_DELTA + 360.0) % 360.0;
+            }
         }
 
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);

@@ -344,9 +344,9 @@ function PanchangamPage({ settings }) {
   };
 
   return (
-    <div>
+    <div style={{ width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
       {/* Mobile-First Responsive Date Navigation Top Bar */}
-      <div className="panchangam-top-bar" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+      <div className="panchangam-top-bar">
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <button 
             onClick={() => changeDate(-1)} 

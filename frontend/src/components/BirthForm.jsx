@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LocationSearch from './LocationSearch';
 import { t } from '../i18n/translations';
 
 function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang = 'en' }) {
   const [name, setName] = useState(initialValues.name || '');
-      const [dateText, setDateText] = useState(() => {
+  const [dateText, setDateText] = useState(() => {
     if (initialValues.date && initialValues.date.includes('-')) {
       const [y, m, d] = initialValues.date.split('-');
       return `${d}/${m}/${y}`;
@@ -15,6 +15,18 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
   const [location, setLocation] = useState(initialValues.location || null);
   const [ayanamsa, setAyanamsa] = useState(initialValues.ayanamsa || 'LAHIRI');
   const [panchangamSystem, setPanchangamSystem] = useState(initialValues.panchangamSystem || 'DRIK_TIRUKANITHAM');
+
+  useEffect(() => {
+    if (initialValues.panchangamSystem) {
+      setPanchangamSystem(initialValues.panchangamSystem);
+    }
+    if (initialValues.ayanamsa) {
+      setAyanamsa(initialValues.ayanamsa);
+    }
+    if (initialValues.location) {
+      setLocation(initialValues.location);
+    }
+  }, [initialValues.panchangamSystem, initialValues.ayanamsa, initialValues.location]);
 
   const handleDateChange = (val) => {
     const clean = val.replace(/\D/g, '');
