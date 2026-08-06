@@ -182,7 +182,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         longitudes.put("Lagna", lagnaLong);
 
         // 4. Taragrahas (Mars, Mercury, Jupiter, Venus, Saturn)
-        double mars = (240.0 + (aharganaExact * 0.524033)) % 360.0;
+        double mars = (sunLong * 0.5317 + (aharganaExact * 0.524033)) % 360.0;
         double mercury = (sunLong + Math.sin(Math.toRadians(aharganaExact * 3.151)) * 22.0) % 360.0;
         double jupiter = (180.0 + (aharganaExact * 0.083091)) % 360.0;
         double venus = (sunLong + Math.sin(Math.toRadians(aharganaExact * 0.616)) * 46.0) % 360.0;
