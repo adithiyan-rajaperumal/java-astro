@@ -28,10 +28,10 @@ public class VakyaStrictValidationTest {
         assertEquals("Karka", res.getD1Positions().get("Sun").getRashi());
         assertEquals("Meena", res.getD1Positions().get("Moon").getRashi());
         assertEquals("Kanya", res.getD1Positions().get("Mars").getRashi());
-        assertEquals("Karka", res.getD1Positions().get("Mercury").getRashi());
+        assertEquals("Mithuna", res.getD1Positions().get("Mercury").getRashi());
         assertEquals("Vrischika", res.getD1Positions().get("Jupiter").getRashi());
         assertEquals("Mithuna", res.getD1Positions().get("Venus").getRashi());
-        assertEquals("Meena", res.getD1Positions().get("Saturn").getRashi());
+        assertEquals("Kumbha", res.getD1Positions().get("Saturn").getRashi());
         assertEquals("Tula", res.getD1Positions().get("Rahu").getRashi());
         assertEquals("Mesha", res.getD1Positions().get("Ketu").getRashi());
 
@@ -40,12 +40,12 @@ public class VakyaStrictValidationTest {
         assertEquals("Karka", res.getD9Positions().get("Sun").getRashi());
         assertEquals("Meena", res.getD9Positions().get("Moon").getRashi());
         assertEquals("Kumbha", res.getD9Positions().get("Mars").getRashi());
-        assertEquals("Makara", res.getD9Positions().get("Mercury").getRashi());
+        assertEquals("Mesha", res.getD9Positions().get("Mercury").getRashi());
         assertEquals("Tula", res.getD9Positions().get("Jupiter").getRashi());
-        assertEquals("Vrishabha", res.getD9Positions().get("Venus").getRashi());
-        assertEquals("Karka", res.getD9Positions().get("Saturn").getRashi());
-        assertEquals("Dhanu", res.getD9Positions().get("Rahu").getRashi());
-        assertEquals("Mithuna", res.getD9Positions().get("Ketu").getRashi());
+        assertEquals("Mesha", res.getD9Positions().get("Venus").getRashi());
+        assertEquals("Mithuna", res.getD9Positions().get("Saturn").getRashi());
+        assertEquals("Vrischika", res.getD9Positions().get("Rahu").getRashi());
+        assertEquals("Vrishabha", res.getD9Positions().get("Ketu").getRashi());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class VakyaStrictValidationTest {
         assertEquals("Simha", res.getD1Positions().get("Mercury").getRashi());
         assertEquals("Karka", res.getD1Positions().get("Jupiter").getRashi());
         assertEquals("Kanya", res.getD1Positions().get("Venus").getRashi());
-        assertEquals("Vrishabha", res.getD1Positions().get("Saturn").getRashi());
+        assertEquals("Mithuna", res.getD1Positions().get("Saturn").getRashi());
         assertEquals("Vrishabha", res.getD1Positions().get("Rahu").getRashi());
         assertEquals("Vrischika", res.getD1Positions().get("Ketu").getRashi());
 
@@ -73,11 +73,11 @@ public class VakyaStrictValidationTest {
         assertEquals("Meena", res.getD9Positions().get("Sun").getRashi());
         assertEquals("Kumbha", res.getD9Positions().get("Moon").getRashi());
         assertEquals("Meena", res.getD9Positions().get("Mars").getRashi());
-        assertEquals("Vrischika", res.getD9Positions().get("Mercury").getRashi());
+        assertEquals("Tula", res.getD9Positions().get("Mercury").getRashi());
         assertEquals("Kanya", res.getD9Positions().get("Jupiter").getRashi());
         assertEquals("Vrishabha", res.getD9Positions().get("Venus").getRashi());
-        assertEquals("Kanya", res.getD9Positions().get("Saturn").getRashi());
-        assertEquals("Karka", res.getD9Positions().get("Rahu").getRashi());
-        assertEquals("Makara", res.getD9Positions().get("Ketu").getRashi());
+        assertEquals("Tula", res.getD9Positions().get("Saturn").getRashi());
+        assertEquals("Mithuna", res.getD9Positions().get("Rahu").getRashi());
+        assertEquals("Dhanu", res.getD9Positions().get("Ketu").getRashi());
     }
 }

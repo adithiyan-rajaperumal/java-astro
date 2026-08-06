@@ -34,7 +34,6 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
     private final SwissEph swissEph;
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
-    private final org.vedic.astro.service.VakyaTableService vakyaTableService;
 
     // Standard Vakya Sidereal Correction Offset (-1.65 degrees relative to Chitra Paksha Drik)
     private static final double VAKYA_DELTA_OFFSET = -1.65;
@@ -87,23 +86,10 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
 
-            double sunVakyaLong = 0.0;
             for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
                 
-                double vakyaLong = xx[0];
-
-                if ("Sun".equals(planet.getKey()) || "Moon".equals(planet.getKey())) {
-                    vakyaLong = (xx[0] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
-                }
-
-                if ("Sun".equals(planet.getKey())) {
-                    sunVakyaLong = vakyaLong;
-                } else if ("Mercury".equals(planet.getKey())) {
-                    vakyaLong = vakyaTableService.calculateVakyaMercuryLongitude(sunVakyaLong, xx[0], vakyaLong);
-                } else if ("Saturn".equals(planet.getKey())) {
-                    vakyaLong = vakyaTableService.calculateVakyaSaturnLongitude(birthDate, vakyaLong);
-                }
+                double vakyaLong = (xx[0] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
 
                 d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), vakyaLong, xx[3]));
                 d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), vakyaLong, xx[3]));
