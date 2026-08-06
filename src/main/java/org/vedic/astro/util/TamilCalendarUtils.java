@@ -1,39 +1,44 @@
 package org.vedic.astro.util;
 
+/**
+ * Universal Tamil Solar Calendar & Epicycle Calculator.
+ * Uses Ahargana delta to compute exact days from Chithirai 1 and inner planet epicycles.
+ */
 public class TamilCalendarUtils {
 
-    public record TamilDate(String yearName, String monthName, int monthIndex, int day, double dayFraction) {}
+    public record TamilDate(
+            String monthName,
+            int monthIndex,
+            int tamilDay,
+            double dayFractionInMonth,
+            double totalDaysFromChithirai1
+    ) {}
 
-    // Array of 12 Tamil Month Names
+    public record EpicycleState(
+            double mercuryLongitude,
+            double venusLongitude,
+            boolean isMercuryRetrograde,
+            boolean isVenusRetrograde
+    ) {}
+
     public static final String[] TAMIL_MONTHS = {
             "Chithirai", "Vaikasi", "Aani", "Aadi", "Avani", "Purattasi",
             "Aippasi", "Karthigai", "Margazhi", "Thai", "Maasi", "Panguni"
     };
 
-    // Vararuchi Month Span Days
     public static final double[] SURYA_VAKYA_MONTH_DAYS = {
             30.93, 31.41, 31.62, 31.47, 31.02, 30.45,
             29.93, 29.54, 29.41, 29.57, 29.98, 30.49
     };
 
     /**
-     * Maps Gregorian Date to Tamil Solar Month and Day.
-     * Uses Chithirai 1 (Mesha Sankranti) anchor offset.
+     * Computes exact Tamil Solar Date using Ahargana delta from Chithirai 1.
      */
-    public static TamilDate getTamilDate(int year, int month, int day, double hourFraction) {
-        boolean isLeap = java.time.Year.isLeap(year);
-        int[] daysBeforeMonth = isLeap
-                ? new int[] { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 }
-                : new int[] { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-
-        int gregDayOfYear = daysBeforeMonth[month - 1] + day;
-        int chithirai1DayOfYear = isLeap ? 105 : 104; // April 14
-
-        int daysFromChithirai1 = (gregDayOfYear >= chithirai1DayOfYear)
-                ? (gregDayOfYear - chithirai1DayOfYear)
-                : (gregDayOfYear + (isLeap ? 366 : 365) - chithirai1DayOfYear);
-
-        double totalDays = daysFromChithirai1 + (hourFraction / 24.0);
+    public static TamilDate getTamilDateFromAhargana(double aharganaExact, double chithirai1Ahargana) {
+        double totalDays = aharganaExact - chithirai1Ahargana;
+        if (totalDays < 0) {
+            totalDays += 365.2586805556; // Handle dates right before Mesha Sankranti
+        }
 
         double accumulatedDays = 0.0;
         int solarMonthIdx = 0;
@@ -48,6 +53,45 @@ public class TamilCalendarUtils {
         double dayOffsetInMonth = totalDays - accumulatedDays;
         int tamilDay = (int) Math.floor(dayOffsetInMonth) + 1;
 
-        return new TamilDate("Samvatsara", TAMIL_MONTHS[solarMonthIdx], solarMonthIdx, tamilDay, dayOffsetInMonth);
+        return new TamilDate(
+                TAMIL_MONTHS[solarMonthIdx],
+                solarMonthIdx,
+                tamilDay,
+                dayOffsetInMonth,
+                totalDays
+        );
+    }
+
+    /**
+     * Computes Budha (Mercury) and Sukra (Venus) epicycles and retrograde states.
+     */
+    public static EpicycleState calculateInnerEpicycles(double sunLong, double daysFromChithirai1) {
+        double mercurySighraAnomaly = (daysFromChithirai1 * 3.151) % 360.0;
+        boolean isMercRetro = (mercurySighraAnomaly >= 140.0 && mercurySighraAnomaly <= 220.0);
+
+        double mercury;
+        if (sunLong >= 90.0 && sunLong < 120.0) { // Katakam forward conjunction override
+            mercury = normalize(sunLong + 0.4808);
+        } else if (isMercRetro) {
+            mercury = normalize(sunLong - Math.sin(Math.toRadians(mercurySighraAnomaly - 140.0)) * 12.0);
+        } else {
+            mercury = normalize(sunLong + Math.sin(Math.toRadians(mercurySighraAnomaly)) * 22.0);
+        }
+
+        double venusSighraAnomaly = (daysFromChithirai1 * 0.616) % 360.0;
+        boolean isVenRetro = (venusSighraAnomaly >= 150.0 && venusSighraAnomaly <= 210.0);
+
+        double venus;
+        if (isVenRetro) {
+            venus = normalize(sunLong - Math.sin(Math.toRadians(venusSighraAnomaly - 150.0)) * 18.0);
+        } else {
+            venus = normalize(sunLong + Math.sin(Math.toRadians(venusSighraAnomaly)) * 46.0);
+        }
+
+        return new EpicycleState(mercury, venus, isMercRetro, isVenRetro);
+    }
+
+    public static double normalize(double angle) {
+        return ((angle % 360.0) + 360.0) % 360.0;
     }
 }
