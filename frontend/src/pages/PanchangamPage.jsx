@@ -425,7 +425,7 @@ function PanchangamPage({ settings }) {
       {!loading && !error && data && (
         <div className="panchangam-grid-2col">
           {/* LEFT COLUMN: Core Astronomical & Panchangam Elements */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
             
             {/* Card 1 (TOP): Sunrise, Sunset & Muhurtham / Vasthu Summary */}
             <div className="card" style={{ margin: 0 }}>
@@ -525,7 +525,7 @@ function PanchangamPage({ settings }) {
           </div>
 
           {/* RIGHT COLUMN: Auspicious & Inauspicious Timings & 24 Horai Table */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
             
             {/* Card 3: Auspicious Timings Card */}
             <div className="card" style={{ margin: 0, borderLeft: '4px solid var(--accent-gold)' }}>

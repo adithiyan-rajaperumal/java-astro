@@ -818,6 +818,14 @@ input:focus, select:focus {
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-bottom: 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.panchangam-summary-grid > div {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 600px) {
@@ -833,6 +841,17 @@ input:focus, select:focus {
   text-align: right;
   overflow-wrap: anywhere;
   word-break: break-word;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .slot-time-badge {
+    margin-left: 0;
+    width: 100%;
+    text-align: left;
+    margin-top: 2px;
+    white-space: normal;
+  }
 }
 
 .panchangam-grid-2col {
@@ -840,7 +859,17 @@ input:focus, select:focus {
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
+.panchangam-grid-2col > div {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 @media (max-width: 900px) {
   .panchangam-grid-2col {
     grid-template-columns: 1fr;
@@ -856,6 +885,7 @@ input:focus, select:focus {
   margin-bottom: 16px;
   width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
 }
 
 .time-slot-bar {
@@ -870,6 +900,12 @@ input:focus, select:focus {
   font-size: 13.5px;
   border: 1px solid var(--border);
   background-color: var(--bg-card);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .time-slot-bar.auspicious {
   border-left: 4px solid var(--success);
@@ -888,6 +924,10 @@ input:focus, select:focus {
   margin-bottom: 10px;
   word-break: break-word;
   overflow-wrap: anywhere;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 .element-label {
   font-size: 12.5px;
@@ -900,14 +940,18 @@ input:focus, select:focus {
   color: var(--text-primary);
   font-weight: 500;
   line-height: 1.45;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .horai-table-container {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 8px;
   border: 1px solid var(--border);
+  box-sizing: border-box;
 }
 .horai-table {
   width: 100%;
