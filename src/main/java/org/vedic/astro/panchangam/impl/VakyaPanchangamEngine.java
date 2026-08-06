@@ -103,7 +103,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double aharganaExact = julianDayUT - KALI_EPOCH_JD;
         long aharganaInt = (long) Math.floor(aharganaExact);
 
-        double sunLong = calculateVakyaSunLongitude(aharganaExact, dto.month(), dto.day());
+        double sunLong = calculateVakyaSunLongitude(aharganaExact, dto.year(), dto.month(), dto.day());
         double sunriseLmtHours = calculateVakyaSunriseLocalTime(sunLong, dto.latitude());
 
         double utcHours = utcTime.getHour() + (utcTime.getMinute() / 60.0) + (utcTime.getSecond() / 3600.0);
@@ -116,7 +116,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double ghatikasSinceSunrise = calculateUdayadiGhatikas(birthTimeLmt, sunriseLmtHours);
 
         Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt,
-                ghatikasSinceSunrise, dto.latitude(), dto.month(), dto.day());
+                ghatikasSinceSunrise, dto.latitude(), dto.year(), dto.month(), dto.day());
 
         // 1. Generate D1 Map
         Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(vakyaLongitudes,
@@ -162,12 +162,12 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
     }
 
     private Map<String, Double> calculateAllVakyaLongitudes(double aharganaExact, long aharganaInt, double ghatikas,
-            double latitude, int month, int day) {
+            double latitude, int year, int month, int day) {
         Map<String, Double> longitudes = new LinkedHashMap<>();
 
         // 1. Sun Longitude: Uses 12 Surya Vakyas (Solar Month offsets) + Manda
         // Correction
-        double sunLong = calculateVakyaSunLongitude(aharganaExact, month, day);
+        double sunLong = calculateVakyaSunLongitude(aharganaExact, year, month, day);
         longitudes.put("Sun", sunLong);
 
         // 2. Moon Longitude: Uses 248 Chandra Vakyas Anomaly Index
@@ -203,15 +203,18 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         return longitudes;
     }
 
-    private double calculateVakyaSunLongitude(double aharganaExact, int month, int day) {
-        // Compute day of year starting from April 14 (Chithirai 1 = Day 0)
-        int[] daysBeforeMonth = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+    private double calculateVakyaSunLongitude(double aharganaExact, int year, int month, int day) {
+        boolean isLeap = java.time.Year.isLeap(year);
+        int[] daysBeforeMonth = isLeap
+                ? new int[] { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 }
+                : new int[] { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
         int gregDayOfYear = daysBeforeMonth[month - 1] + day;
-        int chithirai1DayOfYear = 104; // April 14
+        int chithirai1DayOfYear = isLeap ? 105 : 104; // April 14 in leap year is Day 105
 
         int daysFromChithirai1 = (gregDayOfYear >= chithirai1DayOfYear)
                 ? (gregDayOfYear - chithirai1DayOfYear)
-                : (gregDayOfYear + 365 - chithirai1DayOfYear);
+                : (gregDayOfYear + (isLeap ? 366 : 365) - chithirai1DayOfYear);
 
         double accumulatedDays = 0.0;
         int solarMonthIdx = 0;
