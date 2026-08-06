@@ -173,7 +173,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         // 2. Moon Longitude: Uses 248 Chandra Vakyas Anomaly Index
         int vakyaIndex = (int) (Math.abs(aharganaInt) % 248);
         double anomalyOffsetDeg = CHANDRA_VAKYAS_248[vakyaIndex] / 60.0;
-        double meanMoon = (265.0 + (aharganaExact * 13.1763965)) % 360.0;
+        double meanMoon = (257.8 + (aharganaExact * 13.1763965)) % 360.0;
         double moonLong = (meanMoon + anomalyOffsetDeg + 360.0) % 360.0;
         longitudes.put("Moon", moonLong);
 
