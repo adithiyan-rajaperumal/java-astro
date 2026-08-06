@@ -108,8 +108,8 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         if (ghatikasSinceSunrise < 0)
             ghatikasSinceSunrise += 60.0;
 
-        Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt,
-                ghatikasSinceSunrise, dto.latitude(), dto.month(), dto.day());
+        Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(julianDayUT, dto.latitude(),
+                dto.longitude());
 
         // 1. Generate D1 Map
         Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(vakyaLongitudes,
@@ -154,52 +154,47 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         return deepReportData;
     }
 
-    private Map<String, Double> calculateAllVakyaLongitudes(double aharganaExact, long aharganaInt, double ghatikas,
-            double latitude, int month, int day) {
-        Map<String, Double> longitudes = new LinkedHashMap<>();
+    private static final double VAKYA_DELTA_OFFSET = -1.65;
 
-        // 1. Sun Longitude: Uses 12 Surya Vakyas (Solar Month offsets) + Manda
-        // Correction
-        double sunLong = calculateVakyaSunLongitude(aharganaExact);
-        longitudes.put("Sun", sunLong);
-
-        // 2. Moon Longitude: Uses 248 Chandra Vakyas Anomaly Index
-        int vakyaIndex = (int) (Math.abs(aharganaInt) % 248);
-        double anomalyOffsetDeg = CHANDRA_VAKYAS_248[vakyaIndex] / 60.0;
-        double meanMoon = (aharganaExact * 13.1763965) % 360.0;
-        double moonLong = (meanMoon + anomalyOffsetDeg + 360.0) % 360.0;
-        longitudes.put("Moon", moonLong);
-
-        // 3. Lagna: Udayadi Ghatikas + Tamil Rasimana
-        double lagnaLong = calculateVakyaLagna(sunLong, ghatikas, latitude);
-        longitudes.put("Lagna", lagnaLong);
-
-        // 4. Taragrahas (Mars, Mercury, Jupiter, Venus, Saturn)
-        double mars = (sunLong * 0.5317 + (aharganaExact * 0.524033)) % 360.0;
-        double mercury = (sunLong + Math.sin(Math.toRadians(aharganaExact * 3.151)) * 22.0) % 360.0;
-        double jupiter = (aharganaExact * 0.083091) % 360.0;
-        double venus = (sunLong + Math.sin(Math.toRadians(aharganaExact * 0.616)) * 46.0) % 360.0;
-        double saturn = (aharganaExact * 0.033459) % 360.0;
-
-        longitudes.put("Mars", (mars + 360.0) % 360.0);
-        longitudes.put("Mercury", (mercury + 360.0) % 360.0);
-        longitudes.put("Jupiter", (jupiter + 360.0) % 360.0);
-        longitudes.put("Venus", (venus + 360.0) % 360.0);
-        longitudes.put("Saturn", (saturn + 360.0) % 360.0);
-
-        // 5. Nodes (Rahu and Ketu move retrograde)
-        double rahu = (360.0 - (aharganaExact * 0.0529539)) % 360.0;
-        double ketu = (rahu + 180.0) % 360.0;
-        longitudes.put("Rahu", (rahu + 360.0) % 360.0);
-        longitudes.put("Ketu", (ketu + 360.0) % 360.0);
-
-        return longitudes;
+    private static final Map<String, Integer> TARGET_GRAHAS = new LinkedHashMap<>();
+    static {
+        TARGET_GRAHAS.put("Sun", SweConst.SE_SUN);
+        TARGET_GRAHAS.put("Moon", SweConst.SE_MOON);
+        TARGET_GRAHAS.put("Mars", SweConst.SE_MARS);
+        TARGET_GRAHAS.put("Mercury", SweConst.SE_MERCURY);
+        TARGET_GRAHAS.put("Jupiter", SweConst.SE_JUPITER);
+        TARGET_GRAHAS.put("Venus", SweConst.SE_VENUS);
+        TARGET_GRAHAS.put("Saturn", SweConst.SE_SATURN);
+        TARGET_GRAHAS.put("Rahu", SweConst.SE_TRUE_NODE);
     }
 
-    private double calculateVakyaSunLongitude(double aharganaExact) {
-        double meanSun = ((aharganaExact / 365.2586805556) * 360.0) % 360.0;
-        double mandaCorrection = 2.14 * Math.sin(Math.toRadians(meanSun - 78.0));
-        return (meanSun - mandaCorrection + 360.0) % 360.0;
+    private Map<String, Double> calculateAllVakyaLongitudes(double julianDayUT, double latitude, double longitude) {
+        Map<String, Double> longitudes = new LinkedHashMap<>();
+        int calculationFlags = SweConst.SEFLG_SWIEPH | SweConst.SEFLG_SIDEREAL | SweConst.SEFLG_SPEED;
+        double[] cusps = new double[13];
+        double[] ascmc = new double[10];
+        double[] xx = new double[6];
+        StringBuffer serr = new StringBuffer();
+
+        synchronized (swissEph) {
+            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
+
+            swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, latitude, longitude, 'P', cusps, ascmc);
+            double lagnaLong = (ascmc[SweConst.SE_ASC] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
+            longitudes.put("Lagna", lagnaLong);
+
+            for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
+                swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
+                double vakyaLong = (xx[0] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
+                longitudes.put(planet.getKey(), vakyaLong);
+
+                if ("Rahu".equals(planet.getKey())) {
+                    double ketuLong = (vakyaLong + 180.0) % 360.0;
+                    longitudes.put("Ketu", ketuLong);
+                }
+            }
+        }
+        return longitudes;
     }
 
     private double calculateVakyaLagna(double sunLongitude, double ghatikas, double latitude) {
