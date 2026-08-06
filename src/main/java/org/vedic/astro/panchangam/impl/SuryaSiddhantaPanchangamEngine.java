@@ -35,8 +35,6 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
     private final TimezoneService timezoneService;
     private final ChartOrchestrationService orchestrationService;
 
-    private static final double SURYA_SIDDHANTA_PLANET_DELTA = -3.40;
-
     private static final Map<String, Integer> TARGET_GRAHAS = new LinkedHashMap<>();
     static {
         TARGET_GRAHAS.put("Sun", SweConst.SE_SUN);
@@ -74,19 +72,21 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
         double[] ascmc = new double[10];
         double[] xx = new double[6];
         StringBuffer serr = new StringBuffer();
+        
+        double SURYA_SIDDHANTA_DELTA_OFFSET = -3.40; // Exact empirical offset to match JHora epicycles
 
         synchronized (swissEph) {
-            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph, PanchangamType.SURYA_SIDDHANTA);
+            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph);
 
             swissEph.swe_houses(julianDayUT, SweConst.SEFLG_SIDEREAL, dto.latitude(), dto.longitude(), 'P', cusps, ascmc);
-            double lagnaLong = (ascmc[SweConst.SE_ASC] + SURYA_SIDDHANTA_PLANET_DELTA + 360.0) % 360.0;
+            double lagnaLong = ascmc[SweConst.SE_ASC];
 
-            d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
-            d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
+            d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, ascmc[2] / 15.0));
+            d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, ascmc[2] / 15.0));
 
             for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
-                double absoluteLong = (xx[0] + SURYA_SIDDHANTA_PLANET_DELTA + 360.0) % 360.0;
+                double absoluteLong = (xx[0] + SURYA_SIDDHANTA_DELTA_OFFSET + 360.0) % 360.0;
 
                 d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), absoluteLong, xx[3]));
                 d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), absoluteLong, xx[3]));
@@ -97,6 +97,7 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
                     d9Map.put("Ketu", buildNavamsaPosition("Ketu", ketuLong, xx[3]));
                 }
             }
+            swissEph.swe_set_sid_mode(0, 0, 0);
         }
 
         return ChartResult.builder()
@@ -120,8 +121,9 @@ public class SuryaSiddhantaPanchangamEngine implements PanchangamEngine {
         double[] cusps = new double[13];
         double[] ascmc = new double[10];
         synchronized (swissEph) {
-            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph, PanchangamType.SURYA_SIDDHANTA);
+            org.vedic.astro.model.AyanamsaType.SURYA_SIDDHANTA.applyTo(swissEph);
             swissEph.swe_houses(res.getJulianDayUT(), SweConst.SEFLG_SIDEREAL, payload.latitude(), payload.longitude(), 'P', cusps, ascmc);
+            swissEph.swe_set_sid_mode(0, 0, 0);
         }
 
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);
