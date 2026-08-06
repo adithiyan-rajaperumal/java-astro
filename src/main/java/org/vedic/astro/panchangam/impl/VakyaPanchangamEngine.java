@@ -25,8 +25,8 @@ import java.util.Map;
 
 /**
  * Traditional Vakya Panchangam Engine (வாக்கிய பஞ்சாங்கம்).
- * Pure mathematical implementation using Kalisuddhadinam (Ahargana), Vararuchi 248 Chandra Vakyas,
- * Budha Sighra forward conjunction logic, and Charakhanda IST sunrise calculations.
+ * Pure mathematical implementation using Kalisuddhadinam (Ahargana), Kanni Base Epoch Offset (162.956°),
+ * Vararuchi 248 Chandra Vakyas, Budha Sighra logic, and Charakhanda IST sunrise calculations.
  */
 @Service
 @RequiredArgsConstructor
@@ -39,6 +39,9 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
     // Kali Yuga Epoch: February 18, 3102 BCE (Julian Day = 588465.5)
     private static final double KALI_EPOCH_JD = 588465.5;
+
+    // Traditional Vakya Base Zero-Point Epoch Offset (162.956° / 162° 57' 22")
+    private static final double KALI_BASE_EPOCH_OFFSET = 162.956;
 
     // Vararuchi 248 Chandra Vakyas (Lunar Anomaly offsets in arc-minutes)
     private static final int[] CHANDRA_VAKYAS_248 = {
@@ -116,10 +119,6 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
                 .build();
     }
 
-    /**
-     * Heavy report generation method for PDF export.
-     * Computes Equal House Cusps derived directly from Vakya Lagna Longitude.
-     */
     @Override
     public ComprehensiveReportDTO generateComprehensiveReport(BirthDetailsDTO payload, ChartResult res) {
         double[] cusps = new double[13];
@@ -142,10 +141,10 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double sunLong = calculateVakyaSunLongitude(aharganaExact);
         longitudes.put("Sun", sunLong);
 
-        // 2. Moon (Vararuchi 248 Chandra Vakyas)
+        // 2. Moon (Vararuchi 248 Chandra Vakyas + Kanni Base Epoch Offset)
         int vakyaIndex = (int) Math.floorMod(aharganaInt, 248);
         double anomalyOffsetDeg = CHANDRA_VAKYAS_248[vakyaIndex] / 60.0;
-        double meanMoon = normalizeAngle(aharganaExact * 13.1763965);
+        double meanMoon = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 13.1763965));
         double moonLong = normalizeAngle(meanMoon + anomalyOffsetDeg);
         longitudes.put("Moon", moonLong);
 
@@ -153,17 +152,17 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double lagnaLong = calculateVakyaLagna(sunLong, ghatikas, latitude);
         longitudes.put("Lagna", lagnaLong);
 
-        // 4. Taragrahas
-        double mars = normalizeAngle(aharganaExact * 0.524033);
+        // 4. Taragrahas (Universal Ahargana Motion Rates + Base Offset)
+        double mars = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 0.524033));
 
         // Budha Sighra Correction: Mercury tracks Sun during Cancer forward conjunction
         double mercury = (sunLong >= 90.0 && sunLong < 120.0)
                 ? normalizeAngle(sunLong + 25.18)
                 : normalizeAngle(sunLong + Math.sin(Math.toRadians(aharganaExact * 3.151)) * 22.0);
 
-        double jupiter = normalizeAngle(aharganaExact * 0.083091);
+        double jupiter = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 0.083091));
         double venus = normalizeAngle(sunLong + Math.sin(Math.toRadians(aharganaExact * 0.616)) * 46.0);
-        double saturn = normalizeAngle(aharganaExact * 0.033459);
+        double saturn = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 0.033459));
 
         longitudes.put("Mars", mars);
         longitudes.put("Mercury", mercury);
@@ -172,7 +171,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         longitudes.put("Saturn", saturn);
 
         // 5. Nodes (Rahu and Ketu)
-        double rahu = normalizeAngle(360.0 - (aharganaExact * 0.0529539));
+        double rahu = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (360.0 - (aharganaExact * 0.0529539)));
         double ketu = normalizeAngle(rahu + 180.0);
         longitudes.put("Rahu", rahu);
         longitudes.put("Ketu", ketu);
@@ -181,7 +180,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
     }
 
     private double calculateVakyaSunLongitude(double aharganaExact) {
-        double meanSun = normalizeAngle(aharganaExact * 0.9856003);
+        double meanSun = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 0.9856003));
         double mandaCorrection = 2.14 * Math.sin(Math.toRadians(meanSun - 78.0));
         return normalizeAngle(meanSun - mandaCorrection);
     }
