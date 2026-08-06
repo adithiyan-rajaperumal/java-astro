@@ -103,10 +103,15 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double aharganaExact = julianDayUT - KALI_EPOCH_JD;
         long aharganaInt = (long) Math.floor(aharganaExact);
 
-        double sunriseJulDay = calculateLocalSunrise(julianDayUT, dto.latitude(), dto.longitude());
-        double ghatikasSinceSunrise = (julianDayUT - sunriseJulDay) * 24.0 * 2.5;
-        if (ghatikasSinceSunrise < 0)
-            ghatikasSinceSunrise += 60.0;
+        double sunLong = calculateVakyaSunLongitude(aharganaExact, dto.month(), dto.day());
+        double sunriseLmtHours = calculateVakyaSunriseLocalTime(sunLong, dto.latitude());
+
+        double birthLmtHours = (hourFraction + (dto.longitude() * 4.0 / 60.0) % 24.0 + 24.0) % 24.0;
+        double elapsedHours = birthLmtHours - sunriseLmtHours;
+        if (elapsedHours < 0) {
+            elapsedHours += 24.0;
+        }
+        double ghatikasSinceSunrise = elapsedHours * 2.5;
 
         Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt,
                 ghatikasSinceSunrise, dto.latitude(), dto.month(), dto.day());
@@ -236,20 +241,36 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         return ((currentRasiIdx * 30.0) + degreeInLagna) % 360.0;
     }
 
-    private double calculateLocalSunrise(double julianDayUT, double latitude, double longitude) {
-        synchronized (swissEph) {
-            de.thmac.swisseph.DblObj tret = new de.thmac.swisseph.DblObj();
-            StringBuffer serr = new StringBuffer();
+    /**
+     * Computes Traditional Vakya Sunrise without Swiss Ephemeris
+     * using Charakhanda (Ascensional Difference) equations.
+     */
+    private double calculateVakyaSunriseLocalTime(double sunLongitude, double latitude) {
+        // 1. Obliquity of Ecliptic in Classical Sidereal Systems (24.0 degrees)
+        double epsilonRad = Math.toRadians(24.0);
+        double sunLongRad = Math.toRadians(sunLongitude);
+        double latRad = Math.toRadians(latitude);
 
-            double searchStartJd = julianDayUT - 0.5;
+        // 2. Calculate Sun's Declination (Krantya)
+        double sinDeclination = Math.sin(epsilonRad) * Math.sin(sunLongRad);
+        double declinationRad = Math.asin(sinDeclination);
 
-            int searchFlags = SweConst.SE_CALC_RISE | SweConst.SE_BIT_DISC_CENTER;
-            int result = swissEph.swe_rise_trans(
-                    searchStartJd, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
-                    searchFlags, new double[] { longitude, latitude, 0.0 }, 0.0, 0.0, tret, serr);
+        // 3. Compute Chara (Ascensional Difference) in radians
+        double tanLat = Math.tan(latRad);
+        double tanDec = Math.tan(declinationRad);
+        double sinChara = tanLat * tanDec;
 
-            return (result == SweConst.OK) ? tret.val : (julianDayUT - 0.25);
-        }
+        // Clamp sinChara between -1.0 and 1.0 for polar extreme safety
+        sinChara = Math.max(-1.0, Math.min(1.0, sinChara));
+        double charaRad = Math.asin(sinChara);
+
+        // 4. Convert Chara from radians to hours (24 hours = 2*PI radians)
+        double charaHours = Math.toDegrees(charaRad) / 15.0;
+
+        // 5. Traditional Sunrise Baseline: 06:00 LMT minus Chara offset
+        double sunriseLmtHours = 6.0 - charaHours;
+
+        return sunriseLmtHours; // Returns Local Mean Time in hours (e.g., 6.04 = 06:02:24 AM)
     }
 
     private double getVakyaSpeed(String planetName) {
