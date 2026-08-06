@@ -160,7 +160,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
         // 1. Sun Longitude: Uses 12 Surya Vakyas (Solar Month offsets) + Manda
         // Correction
-        double sunLong = calculateVakyaSunLongitude(aharganaExact, month, day);
+        double sunLong = calculateVakyaSunLongitude(aharganaExact);
         longitudes.put("Sun", sunLong);
 
         // 2. Moon Longitude: Uses 248 Chandra Vakyas Anomaly Index
@@ -196,18 +196,8 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         return longitudes;
     }
 
-    private double calculateVakyaSunLongitude(double aharganaExact, int month, int day) {
-        // Estimate Tamil month index starting around April 14 (Chithirai = Month 0)
-        int dayOfYear = (month >= 4) ? ((month - 4) * 30 + day) : ((month + 8) * 30 + day);
-        int solarMonthIdx = Math.min(11, Math.max(0, (dayOfYear / 30)));
-
-        double baseRasiDegree = solarMonthIdx * 30.0;
-        double daysInCurrentMonth = SURYA_VAKYA_MONTH_DAYS[solarMonthIdx];
-        double dayOffsetInMonth = dayOfYear % 30;
-
-        double meanSunInSign = (dayOffsetInMonth / daysInCurrentMonth) * 30.0;
-        double meanSun = baseRasiDegree + meanSunInSign;
-
+    private double calculateVakyaSunLongitude(double aharganaExact) {
+        double meanSun = ((aharganaExact / 365.2586805556) * 360.0) % 360.0;
         double mandaCorrection = 2.14 * Math.sin(Math.toRadians(meanSun - 78.0));
         return (meanSun - mandaCorrection + 360.0) % 360.0;
     }
@@ -241,9 +231,11 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             de.thmac.swisseph.DblObj tret = new de.thmac.swisseph.DblObj();
             StringBuffer serr = new StringBuffer();
 
+            double searchStartJd = julianDayUT - 0.5;
+
             int searchFlags = SweConst.SE_CALC_RISE | SweConst.SE_BIT_DISC_CENTER;
             int result = swissEph.swe_rise_trans(
-                    julianDayUT, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
+                    searchStartJd, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
                     searchFlags, new double[] { longitude, latitude, 0.0 }, 0.0, 0.0, tret, serr);
 
             return (result == SweConst.OK) ? tret.val : (julianDayUT - 0.25);

@@ -184,26 +184,17 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
     }
 
     private double calculateAyanamsaOffset(double julianDayUT, String ayanamsaStr) {
-        if (ayanamsaStr == null || ayanamsaStr.isBlank() || "NONE".equalsIgnoreCase(ayanamsaStr)
-                || "PLAIN".equalsIgnoreCase(ayanamsaStr) || "PARASARA_BHATTAR".equalsIgnoreCase(ayanamsaStr)) {
-            return 0.0; // Plain Parasara Bhattar Mode (Sidereal Epoch Zero)
+        if (ayanamsaStr == null || ayanamsaStr.isBlank() || !"PUSHYAPAKSHA".equalsIgnoreCase(ayanamsaStr.trim())) {
+            return 0.0; // Standard Parasara Bhattar Mode (Plain Sidereal Epoch Zero)
         }
 
         synchronized (swissEph) {
-            AyanamsaType selectedAyanamsa = AyanamsaType.fromString(ayanamsaStr);
-            if (selectedAyanamsa != AyanamsaType.PUSHYAPAKSHA) {
-                selectedAyanamsa = AyanamsaType.PUSHYAPAKSHA;
-            }
-
-            // Compute Lahiri baseline
             swissEph.swe_set_sid_mode(SweConst.SE_SIDM_LAHIRI, 0, 0);
             double lahiriVal = swissEph.swe_get_ayanamsa_ut(julianDayUT);
 
-            // Apply selected Ayanamsa (e.g., Pushya Paksha)
-            selectedAyanamsa.applyTo(swissEph, PanchangamType.PARASARA_BHATTAR);
+            AyanamsaType.PUSHYAPAKSHA.applyTo(swissEph, PanchangamType.PARASARA_BHATTAR);
             double targetAyanamsaVal = swissEph.swe_get_ayanamsa_ut(julianDayUT);
 
-            // Return angular shift relative to baseline
             return lahiriVal - targetAyanamsaVal;
         }
     }
@@ -243,9 +234,11 @@ public class ParasaraBhattarPanchangamEngine implements PanchangamEngine {
             de.thmac.swisseph.DblObj tret = new de.thmac.swisseph.DblObj();
             StringBuffer serr = new StringBuffer();
 
+            double searchStartJd = julianDayUT - 0.5;
+
             int searchFlags = SweConst.SE_CALC_RISE | SweConst.SE_BIT_DISC_CENTER;
             int result = swissEph.swe_rise_trans(
-                    julianDayUT, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
+                    searchStartJd, SweConst.SE_SUN, null, SweConst.SEFLG_SWIEPH,
                     searchFlags, new double[] { longitude, latitude, 0.0 }, 0.0, 0.0, tret, serr);
 
             return (result == SweConst.OK) ? tret.val : (julianDayUT - 0.25);
