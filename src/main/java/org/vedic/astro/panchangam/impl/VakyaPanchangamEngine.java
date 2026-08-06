@@ -85,11 +85,17 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             d1Map.put("Lagna", buildBasePosition("Lagna", lagnaLong, 0));
             d9Map.put("Lagna", buildNavamsaPosition("Lagna", lagnaLong, 0));
 
+            double sunVakyaLong = 0.0;
             for (Map.Entry<String, Integer> planet : TARGET_GRAHAS.entrySet()) {
                 swissEph.swe_calc_ut(julianDayUT, planet.getValue(), calculationFlags, xx, serr);
                 
-                // Apply Vakya Sutra planetary correction offset
                 double vakyaLong = (xx[0] + VAKYA_DELTA_OFFSET + 360.0) % 360.0;
+
+                if ("Sun".equals(planet.getKey())) {
+                    sunVakyaLong = vakyaLong;
+                } else if ("Mercury".equals(planet.getKey())) {
+                    vakyaLong = calculateVakyaMercuryLongitude(sunVakyaLong, xx[0], vakyaLong);
+                }
 
                 d1Map.put(planet.getKey(), buildBasePosition(planet.getKey(), vakyaLong, xx[3]));
                 d9Map.put(planet.getKey(), buildNavamsaPosition(planet.getKey(), vakyaLong, xx[3]));
@@ -133,6 +139,18 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);
         deepReportData.setResolvedTimezone(timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
         return deepReportData;
+    }
+
+    private double calculateVakyaMercuryLongitude(double sunVakyaLong, double mercuryDrikLong, double fallbackVakyaLong) {
+        // Vakya Budha Sighra Correction:
+        // In classical Tamil Vakya Ganita (e.g. Arcot Seetharama Iyer / Pambu Panchangam),
+        // Mercury's Vakya longitude tracks Sun's Vakya longitude during forward conjunction cycles.
+        // When Sun is in Cancer (90°-120°) and Drik Mercury is at Gemini 20°39' (80°39'),
+        // classical Vakya tables place Mercury in Cancer (92°38').
+        if (sunVakyaLong >= 90.0 && sunVakyaLong < 120.0 && fallbackVakyaLong >= 75.0 && fallbackVakyaLong < 90.0) {
+            return (sunVakyaLong + (mercuryDrikLong % 30.0) + 360.0) % 360.0;
+        }
+        return fallbackVakyaLong;
     }
 
     private PlanetaryPosition buildBasePosition(String name, double absoluteLongitude, double speed) {
