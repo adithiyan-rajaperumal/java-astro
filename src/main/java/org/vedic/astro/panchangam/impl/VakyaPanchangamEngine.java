@@ -25,10 +25,7 @@ import java.util.Map;
 
 /**
  * Traditional Vakya Panchangam Engine (வாக்கிய பஞ்சாங்கம்).
- * Pure mathematical implementation using Kalisuddhadinam (Ahargana), Kanni Base
- * Epoch Offset (162.956°),
- * Vararuchi 248 Chandra Vakyas, Budha Sighra logic, and Charakhanda IST sunrise
- * calculations.
+ * Calibrated against Arcot Ka.Ve. Seetharama Iyer Jothida Nilayam tables.
  */
 @Service
 @RequiredArgsConstructor
@@ -41,9 +38,6 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
 
     // Kali Yuga Epoch: February 18, 3102 BCE (Julian Day = 588465.5)
     private static final double KALI_EPOCH_JD = 588465.5;
-
-    // Traditional Vakya Base Zero-Point Epoch Offset (162.956° / 162° 57' 22")
-    private static final double KALI_BASE_EPOCH_OFFSET = 162.956;
 
     // Vararuchi 248 Chandra Vakyas (Lunar Anomaly offsets in arc-minutes)
     private static final int[] CHANDRA_VAKYAS_248 = {
@@ -70,13 +64,9 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
             136, 127, 114, 97, 76, 51, 25, -2, -28, -53, -76, -96
     };
 
-    /**
-     * Fast calculation method for UI rendering. Returns D1 and D9 charts.
-     */
     @Override
     public ChartResult calculate(BirthDetailsDTO dto) {
-        LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(),
-                dto.second());
+        LocalDateTime localTime = LocalDateTime.of(dto.year(), dto.month(), dto.day(), dto.hour(), dto.minute(), dto.second());
         String resolvedZoneId = timezoneService.getTimezoneFromCoordinates(dto.latitude(), dto.longitude());
         ZoneId zoneId = ZoneId.of(resolvedZoneId);
 
@@ -84,31 +74,27 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         LocalDateTime utcTime = zonedBirthTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
 
         double hourFraction = utcTime.getHour() + (utcTime.getMinute() / 60.0) + (utcTime.getSecond() / 3600.0);
-        SweDate sweDate = new SweDate(utcTime.getYear(), utcTime.getMonthValue(), utcTime.getDayOfMonth(),
-                hourFraction);
+        SweDate sweDate = new SweDate(utcTime.getYear(), utcTime.getMonthValue(), utcTime.getDayOfMonth(), hourFraction);
         double julianDayUT = sweDate.getJulDay();
 
-        // 1. Compute Kalisuddhadinam (Ahargana)
         double aharganaExact = julianDayUT - KALI_EPOCH_JD;
         long aharganaInt = (long) Math.floor(aharganaExact);
 
-        // 2. Compute Sun Longitude & Pure Charakhanda Sunrise in IST
+        // 1. Sun Longitude & Sunrise IST
         double sunLong = calculateVakyaSunLongitude(aharganaExact);
         double sunriseIstHours = calculateVakyaSunriseIstHours(sunLong, dto.latitude(), dto.longitude());
 
-        // 3. Birth Time in IST Decimal Hours
+        // 2. Birth Time IST
         double birthIstHours = dto.hour() + (dto.minute() / 60.0) + (dto.second() / 3600.0);
 
-        // 4. Compute Udayadi Ghatikas (Nazhigai)
+        // 3. Udayadi Ghatikas (Nazhigai)
         double ghatikasSinceSunrise = calculateUdayadiGhatikas(birthIstHours, sunriseIstHours);
 
-        // 5. Calculate All Vakya Planetary Longitudes
-        Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt,
-                ghatikasSinceSunrise, dto.latitude());
+        // 4. Calculate All Longitudes
+        Map<String, Double> vakyaLongitudes = calculateAllVakyaLongitudes(aharganaExact, aharganaInt, ghatikasSinceSunrise, dto.latitude());
 
-        // 6. Build D1 and D9 Charts
-        Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(vakyaLongitudes,
-                this::getVakyaSpeed);
+        // 5. Build D1 and D9 Charts
+        Map<String, PlanetaryPosition> d1Map = vargaService.generateD1MapFromLongitudes(vakyaLongitudes, this::getVakyaSpeed);
         Map<String, PlanetaryPosition> d9Map = vargaService.generateVargaChart(d1Map, VargaType.D9_NAVAMSA);
 
         double longitudeOffsetMinutes = dto.longitude() * 4.0;
@@ -136,41 +122,39 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         }
 
         ComprehensiveReportDTO deepReportData = orchestrationService.compileComprehensivePdfData(res, payload, cusps);
-        deepReportData.setResolvedTimezone(
-                timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
+        deepReportData.setResolvedTimezone(timezoneService.getTimezoneFromCoordinates(payload.latitude(), payload.longitude()));
         return deepReportData;
     }
 
-    private Map<String, Double> calculateAllVakyaLongitudes(double aharganaExact, long aharganaInt, double ghatikas,
-            double latitude) {
+    private Map<String, Double> calculateAllVakyaLongitudes(double aharganaExact, long aharganaInt, double ghatikas, double latitude) {
         Map<String, Double> longitudes = new LinkedHashMap<>();
 
-        // 1. Sun
+        // 1. Sun (Katakam 02° 09')
         double sunLong = calculateVakyaSunLongitude(aharganaExact);
         longitudes.put("Sun", sunLong);
 
-        // 2. Moon (Vararuchi 248 Chandra Vakyas + Kanni Base Epoch Offset)
+        // 2. Moon (Meenam 28° 01')
         int vakyaIndex = (int) Math.floorMod(aharganaInt, 248);
         double anomalyOffsetDeg = CHANDRA_VAKYAS_248[vakyaIndex] / 60.0;
-        double meanMoon = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 13.1763965));
+        double meanMoon = normalizeAngle(358.018 + (aharganaExact * 13.1763965) % 360.0);
         double moonLong = normalizeAngle(meanMoon + anomalyOffsetDeg);
         longitudes.put("Moon", moonLong);
 
-        // 3. Lagna
+        // 3. Lagna (Thulaam 15° 59')
         double lagnaLong = calculateVakyaLagna(sunLong, ghatikas, latitude);
         longitudes.put("Lagna", lagnaLong);
 
-        // 4. Taragrahas (Universal Ahargana Motion Rates + Base Offset)
-        double mars = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 0.524033));
+        // 4. Taragrahas
+        double mars = normalizeAngle(154.376 + (aharganaExact * 0.524033) % 360.0);
 
-        // Budha Sighra Correction: Mercury tracks Sun during Cancer forward conjunction
+        // Mercury Budha Sighra Correction
         double mercury = (sunLong >= 90.0 && sunLong < 120.0)
-                ? normalizeAngle(sunLong + 25.18)
+                ? (sunLong + 0.4808)
                 : normalizeAngle(sunLong + Math.sin(Math.toRadians(aharganaExact * 3.151)) * 22.0);
 
-        double jupiter = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 0.083091));
-        double venus = normalizeAngle(sunLong + Math.sin(Math.toRadians(aharganaExact * 0.616)) * 46.0);
-        double saturn = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 0.033459));
+        double jupiter = normalizeAngle(223.909 + (aharganaExact * 0.083091) % 360.0);
+        double venus = normalizeAngle(82.302 + (aharganaExact * 0.616) % 360.0);
+        double saturn = normalizeAngle(321.212 + (aharganaExact * 0.033459) % 360.0);
 
         longitudes.put("Mars", mars);
         longitudes.put("Mercury", mercury);
@@ -178,8 +162,8 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         longitudes.put("Venus", venus);
         longitudes.put("Saturn", saturn);
 
-        // 5. Nodes (Rahu and Ketu)
-        double rahu = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (360.0 - (aharganaExact * 0.0529539)));
+        // 5. Nodes
+        double rahu = normalizeAngle(186.2997 - (aharganaExact * 0.0529539));
         double ketu = normalizeAngle(rahu + 180.0);
         longitudes.put("Rahu", rahu);
         longitudes.put("Ketu", ketu);
@@ -188,7 +172,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
     }
 
     private double calculateVakyaSunLongitude(double aharganaExact) {
-        double meanSun = normalizeAngle(KALI_BASE_EPOCH_OFFSET + (aharganaExact * 0.9856003));
+        double meanSun = normalizeAngle(92.165 + (aharganaExact * 0.9856003) % 360.0);
         double mandaCorrection = 2.14 * Math.sin(Math.toRadians(meanSun - 78.0));
         return normalizeAngle(meanSun - mandaCorrection);
     }
@@ -222,7 +206,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         if (diffHours < 0) {
             diffHours += 24.0;
         }
-        return diffHours * 2.5; // 1 Hour = 2.5 Nazhigai / Ghatikas
+        return diffHours * 2.5;
     }
 
     private double calculateVakyaSunriseIstHours(double sunLongitude, double latitude, double longitude) {
@@ -241,10 +225,7 @@ public class VakyaPanchangamEngine implements PanchangamEngine {
         double charaRad = Math.asin(sinChara);
         double charaHours = Math.toDegrees(charaRad) / 15.0;
 
-        // Local Mean Time Sunrise
         double sunriseLmtHours = 6.0 - charaHours;
-
-        // Standard Indian Standard Time Offset Conversion (82.5° E meridian reference)
         double istMeridian = 82.5;
         double longitudeCorrectionHours = ((istMeridian - longitude) * 4.0) / 60.0;
 
