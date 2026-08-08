@@ -14,19 +14,15 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
   const [time, setTime] = useState(initialValues.time || '');
   const [location, setLocation] = useState(initialValues.location || null);
   const [ayanamsa, setAyanamsa] = useState(initialValues.ayanamsa || 'LAHIRI');
-  const [panchangamSystem, setPanchangamSystem] = useState(initialValues.panchangamSystem || 'DRIK_TIRUKANITHAM');
 
   useEffect(() => {
-    if (initialValues.panchangamSystem) {
-      setPanchangamSystem(initialValues.panchangamSystem);
-    }
     if (initialValues.ayanamsa) {
       setAyanamsa(initialValues.ayanamsa);
     }
     if (initialValues.location) {
       setLocation(initialValues.location);
     }
-  }, [initialValues.panchangamSystem, initialValues.ayanamsa, initialValues.location]);
+  }, [initialValues.ayanamsa, initialValues.location]);
 
   const handleDateChange = (val) => {
     const clean = val.replace(/\D/g, '');
@@ -38,17 +34,6 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       formatted = `${clean.slice(0, 2)}/${clean.slice(2, 4)}/${clean.slice(4, 8)}`;
     }
     setDateText(formatted);
-  };
-
-  const handlePanchangamChange = (newSystem) => {
-    setPanchangamSystem(newSystem);
-    if (newSystem === 'VAKYA') {
-      setAyanamsa('VAKYA');
-    } else if (newSystem === 'SURYA_SIDDHANTA') {
-      setAyanamsa('SURYA_SIDDHANTA');
-    } else if (newSystem === 'PARASARA_BHATTAR' && ayanamsa !== 'PUSHYAPAKSHA') {
-      setAyanamsa('LAHIRI');
-    }
   };
 
   const handleSubmit = (e) => {
@@ -77,9 +62,6 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
     // Parse time (HH:MM)
     const [hour, minute] = time.split(':').map(Number);
 
-    const effectiveAyanamsa = panchangamSystem === 'VAKYA' ? 'VAKYA' : 
-                             panchangamSystem === 'SURYA_SIDDHANTA' ? 'SURYA_SIDDHANTA' : ayanamsa;
-
     onSubmit({
       name,
       year,
@@ -91,8 +73,8 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       latitude: location.latitude,
       longitude: location.longitude,
       location,
-      ayanamsa: effectiveAyanamsa,
-      panchangamSystem
+      ayanamsa,
+      panchangamSystem: 'DRIK_TIRUKANITHAM'
     });
   };
 
@@ -141,41 +123,15 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
         />
       </div>
 
-      <div className="grid-2" style={{ marginBottom: '20px' }}>
-        <div>
-          <label>{t('panchangamSystem', lang)}</label>
-          <select value={panchangamSystem} onChange={(e) => handlePanchangamChange(e.target.value)}>
-            <option value="DRIK_TIRUKANITHAM">{t('systemDrik', lang)}</option>
-            <option value="VAKYA">{t('systemVakya', lang)}</option>
-            <option value="PARASARA_BHATTAR">{t('systemParasaraBhattar', lang)}</option>
-            <option value="SURYA_SIDDHANTA">{t('systemSuryaSiddhanta', lang)}</option>
-          </select>
-        </div>
-        <div>
-          <label>{t('ayanamsa', lang)}</label>
-          {panchangamSystem === 'VAKYA' ? (
-            <select value="VAKYA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
-              <option value="VAKYA">{t('ayanamsaFixedVakya', lang)}</option>
-            </select>
-          ) : panchangamSystem === 'SURYA_SIDDHANTA' ? (
-            <select value="SURYA_SIDDHANTA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
-              <option value="SURYA_SIDDHANTA">{t('ayanamsaFixedSurya', lang)}</option>
-            </select>
-          ) : panchangamSystem === 'PARASARA_BHATTAR' ? (
-            <select value={ayanamsa === 'PUSHYAPAKSHA' ? 'PUSHYAPAKSHA' : 'LAHIRI'} onChange={(e) => setAyanamsa(e.target.value)}>
-              <option value="LAHIRI">{t('ayanamsaFixedParasara', lang)}</option>
-              <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapakshaParasara', lang)}</option>
-            </select>
-          ) : (
-            <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
-              <option value="LAHIRI">{t('ayanamsaLahiri', lang)}</option>
-              <option value="KP">{t('ayanamsaKP', lang)}</option>
-              <option value="RAMAN">{t('ayanamsaRaman', lang)}</option>
-              <option value="SURYA_SIDDHANTA">{t('ayanamsaSurya', lang)}</option>
-              <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', lang)}</option>
-            </select>
-          )}
-        </div>
+      <div style={{ marginBottom: '20px' }}>
+        <label>{t('ayanamsa', lang)}</label>
+        <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
+          <option value="LAHIRI">{t('ayanamsaLahiri', lang)}</option>
+          <option value="KP">{t('ayanamsaKP', lang)}</option>
+          <option value="RAMAN">{t('ayanamsaRaman', lang)}</option>
+          <option value="SURYA_SIDDHANTA">{t('ayanamsaSurya', lang)}</option>
+          <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', lang)}</option>
+        </select>
       </div>
 
       <button type="submit" className="btn-primary" style={{ width: '100%' }}>

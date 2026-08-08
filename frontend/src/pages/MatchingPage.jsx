@@ -16,17 +16,16 @@ function MatchingPage({ settings }) {
   const [matchingSystem, setMatchingSystem] = useState('ASHTA_KOOTA');
   const [strictness, setStrictness] = useState('MODERATE');
   const [ayanamsa, setAyanamsa] = useState(settings.ayanamsa || 'LAHIRI');
-  const [panchangamSystem, setPanchangamSystem] = useState(settings.panchangamSystem || 'DRIK_TIRUKANITHAM');
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (settings.panchangamSystem) {
-      setPanchangamSystem(settings.panchangamSystem);
+    if (settings.ayanamsa) {
+      setAyanamsa(settings.ayanamsa);
     }
-  }, [settings.panchangamSystem]);
+  }, [settings.ayanamsa]);
 
   useEffect(() => {
     setResult(null);
@@ -105,7 +104,7 @@ function MatchingPage({ settings }) {
     };
 
     try {
-      const response = await fetch(`/api/v1/astrology/match/calculate?systemType=${panchangamSystem}`, {
+      const response = await fetch('/api/v1/astrology/match?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -164,7 +163,7 @@ function MatchingPage({ settings }) {
     };
 
     try {
-      const response = await fetch(`/api/v1/astrology/match/download-pdf?systemType=${panchangamSystem}`, {
+      const response = await fetch('/api/v1/astrology/match/download-pdf?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -280,15 +279,6 @@ function MatchingPage({ settings }) {
           {/* Settings block */}
           <div className="card" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
             <div>
-              <label>{t('panchangamSystem', settings.language)}</label>
-              <select value={panchangamSystem} onChange={(e) => setPanchangamSystem(e.target.value)}>
-                <option value="DRIK_TIRUKANITHAM">{t('systemDrik', settings.language)}</option>
-                <option value="VAKYA">{t('systemVakya', settings.language)}</option>
-                <option value="PARASARA_BHATTAR">{t('systemParasaraBhattar', settings.language)}</option>
-                <option value="SURYA_SIDDHANTA">{t('systemSuryaSiddhanta', settings.language)}</option>
-              </select>
-            </div>
-            <div>
               <label>{t('methodology', settings.language)}</label>
               <select value={matchingSystem} onChange={(e) => setMatchingSystem(e.target.value)}>
                 <option value="ASHTA_KOOTA">Ashta Koota (North Indian 36 Points)</option>
@@ -305,28 +295,13 @@ function MatchingPage({ settings }) {
             </div>
             <div>
               <label>{t('ayanamsa', settings.language)}</label>
-              {panchangamSystem === 'VAKYA' ? (
-                <select value="VAKYA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
-                  <option value="VAKYA">{t('ayanamsaFixedVakya', settings.language)}</option>
-                </select>
-              ) : panchangamSystem === 'SURYA_SIDDHANTA' ? (
-                <select value="SURYA_SIDDHANTA" disabled style={{ opacity: 0.85, cursor: 'not-allowed' }}>
-                  <option value="SURYA_SIDDHANTA">{t('ayanamsaFixedSurya', settings.language)}</option>
-                </select>
-              ) : panchangamSystem === 'PARASARA_BHATTAR' ? (
-                <select value={ayanamsa === 'PUSHYAPAKSHA' ? 'PUSHYAPAKSHA' : 'LAHIRI'} onChange={(e) => setAyanamsa(e.target.value)}>
-                  <option value="LAHIRI">{t('ayanamsaFixedParasara', settings.language)}</option>
-                  <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapakshaParasara', settings.language)}</option>
-                </select>
-              ) : (
-                <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
-                  <option value="LAHIRI">{t('ayanamsaLahiri', settings.language)}</option>
-                  <option value="KP">{t('ayanamsaKP', settings.language)}</option>
-                  <option value="RAMAN">{t('ayanamsaRaman', settings.language)}</option>
-                  <option value="SURYA_SIDDHANTA">{t('ayanamsaSurya', settings.language)}</option>
-                  <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', settings.language)}</option>
-                </select>
-              )}
+              <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
+                <option value="LAHIRI">{t('ayanamsaLahiri', settings.language)}</option>
+                <option value="KP">{t('ayanamsaKP', settings.language)}</option>
+                <option value="RAMAN">{t('ayanamsaRaman', settings.language)}</option>
+                <option value="SURYA_SIDDHANTA">{t('ayanamsaSurya', settings.language)}</option>
+                <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', settings.language)}</option>
+              </select>
             </div>
           </div>
 

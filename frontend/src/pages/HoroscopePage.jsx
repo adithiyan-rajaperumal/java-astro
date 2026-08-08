@@ -20,7 +20,7 @@ function HoroscopePage({ settings }) {
     setError(null);
     setFormPayload(payload);
     try {
-      const response = await fetch(`/api/v1/astrology/calculate?systemType=${payload.panchangamSystem || settings.panchangamSystem || 'DRIK_TIRUKANITHAM'}`, {
+      const response = await fetch('/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ function HoroscopePage({ settings }) {
   const handleDownloadPdf = async () => {
     if (!formPayload) return;
     try {
-      const response = await fetch(`/api/v1/astrology/download-pdf?systemType=${formPayload.panchangamSystem || settings.panchangamSystem || 'DRIK_TIRUKANITHAM'}`, {
+      const response = await fetch('/api/v1/astrology/download-pdf?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -402,7 +402,7 @@ function HoroscopePage({ settings }) {
                 {t('born', settings.language)}: {report.dateOfBirth} at {report.timeOfBirth} ({t('localMeanTime', settings.language)}: {report.localMeanTime})
               </p>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rashi || report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {getAyanamsaLabel(report.ayanamsa, settings.language)} | {t('panchangamSystem', settings.language)}: {t('system' + (report.panchangamSystem === 'VAKYA' ? 'Vakya' : report.panchangamSystem === 'PARASARA_BHATTAR' ? 'ParasaraBhattar' : report.panchangamSystem === 'SURYA_SIDDHANTA' ? 'SuryaSiddhanta' : 'Drik'), settings.language)}
+                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rashi || report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {getAyanamsaLabel(report.ayanamsa, settings.language)}
               </p>
             </div>
             <div>
