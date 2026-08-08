@@ -102,7 +102,7 @@ function PanchangamPage({ settings }) {
           longitude: settings.location.longitude,
           language: settings.language,
           ayanamsa: settings.ayanamsa || 'LAHIRI',
-          panchangamSystem: settings.panchangamSystem || 'DRIK_TIRUKANITHAM'
+          panchangamSystem: 'DRIK_TIRUKANITHAM'
         })
       });
       if (response.ok) {
@@ -120,7 +120,7 @@ function PanchangamPage({ settings }) {
 
   useEffect(() => {
     fetchPanchangam(currentDate);
-  }, [currentDate, settings.location, settings.language, settings.ayanamsa, settings.panchangamSystem]);
+  }, [currentDate, settings.location, settings.language, settings.ayanamsa]);
 
   const changeDate = (days) => {
     const d = new Date(currentDate + 'T12:00:00');
