@@ -280,10 +280,10 @@ public class PdfExportService {
                     pastTable.setSpacingAfter(14);
                     pastTable.setWidths(new float[]{16f, 22f, 31f, 31f});
 
-                    pastTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, engBoldB));
-                    pastTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "திசா - புக்தி" : "Dasa - Bhukthi", boldB, engBoldB));
-                    pastTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "முக்கிய நிகழ்வு" : "Milestone Event", boldB, engBoldB));
-                    pastTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "ஜோதிட காரகம்" : "Astrological Factor", boldB, engBoldB));
+                    PdfPCell h1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, Element.ALIGN_CENTER); h1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h1);
+                    PdfPCell h2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "திசா - புக்தி" : "Dasa - Bhukthi", boldB, Element.ALIGN_CENTER); h2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h2);
+                    PdfPCell h3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "முக்கிய நிகழ்வு" : "Milestone Event", boldB, Element.ALIGN_CENTER); h3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h3);
+                    PdfPCell h4 = buildTableCell("ta".equalsIgnoreCase(lang) ? "ஜோதிட காரகம்" : "Astrological Factor", boldB, Element.ALIGN_CENTER); h4.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h4);
 
                     for (var m : data.getAiPredictions().getPastMilestones()) {
                         pastTable.addCell(buildTableCell(m.getYear() + " (Age " + m.getAge() + ")", engBFont, Element.ALIGN_CENTER));
@@ -306,11 +306,11 @@ public class PdfExportService {
                     futTable.setSpacingAfter(14);
                     futTable.setWidths(new float[]{14f, 18f, 23f, 23f, 22f});
 
-                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, engBoldB));
-                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "திசா புக்தி" : "Dasa Period", boldB, engBoldB));
-                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "தொழில் & செல்வம்" : "Career & Finance", boldB, engBoldB));
-                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "உடல்நலம் & குடும்பம்" : "Health & Family", boldB, engBoldB));
-                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "பரிகாரங்கள்" : "Remedies", boldB, engBoldB));
+                    PdfPCell fh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, Element.ALIGN_CENTER); fh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh1);
+                    PdfPCell fh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "திசா புக்தி" : "Dasa Period", boldB, Element.ALIGN_CENTER); fh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh2);
+                    PdfPCell fh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "தொழில் & செல்வம்" : "Career & Finance", boldB, Element.ALIGN_CENTER); fh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh3);
+                    PdfPCell fh4 = buildTableCell("ta".equalsIgnoreCase(lang) ? "உடல்நலம் & குடும்பம்" : "Health & Family", boldB, Element.ALIGN_CENTER); fh4.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh4);
+                    PdfPCell fh5 = buildTableCell("ta".equalsIgnoreCase(lang) ? "பரிகாரங்கள்" : "Remedies", boldB, Element.ALIGN_CENTER); fh5.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh5);
 
                     for (var f : data.getAiPredictions().getFuturePredictions()) {
                         futTable.addCell(buildTableCell(f.getYear() + " (Age " + f.getAge() + ")", engBFont, Element.ALIGN_CENTER));
