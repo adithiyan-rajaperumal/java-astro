@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class GeminiProperties {
     private String apiKey = "";
     private boolean enabled = true;
-    private String model = "gemini-1.5-flash";
+    private String model = "gemini-2.0-flash";
 
     public boolean isFeatureEnabled() {
         return enabled && apiKey != null && !apiKey.trim().isEmpty();
