@@ -111,4 +111,12 @@ public class GeminiPredictionServiceTest {
                 .andExpect(jsonPath("$.pastMilestones").isArray())
                 .andExpect(jsonPath("$.futurePredictions").isArray());
     }
+
+    @Test
+    public void testEncryptedApiKeyResolution() {
+        org.vedic.astro.config.GeminiProperties props = new org.vedic.astro.config.GeminiProperties();
+        props.setApiKey("enc:dGVzdC1rZXktMTIzNDU=");
+        assertEquals("test-key-12345", props.getResolvedApiKey());
+        assertTrue(props.isFeatureEnabled());
+    }
 }

@@ -123,7 +123,7 @@ public class GeminiPredictionService {
 
     private String callGeminiApi(String prompt) throws Exception {
         String url = "https://generativelanguage.googleapis.com/v1beta/models/" 
-                + geminiProperties.getModel() + ":generateContent?key=" + geminiProperties.getApiKey();
+                + geminiProperties.getModel() + ":generateContent?key=" + geminiProperties.getResolvedApiKey();
 
         Map<String, Object> textPart = Map.of("text", prompt);
         Map<String, Object> contentObj = Map.of("parts", List.of(textPart));
