@@ -268,6 +268,56 @@ public class PdfExportService {
                     document.add(summ);
                 }
 
+                // AI Classical Yogas Table
+                if (data.getAiPredictions().getAiYogas() != null && !data.getAiPredictions().getAiYogas().isEmpty()) {
+                    String yogTitleStr = "ta".equalsIgnoreCase(lang) ? "ஜோதிட யோகங்கள் (Classical Vedic Yogas)" : "Classical Vedic Yogas & Astrological Formations";
+                    Paragraph yogH = buildMixedParagraph(yogTitleStr, sFont, engSFont);
+                    yogH.setSpacingAfter(8);
+                    document.add(yogH);
+
+                    PdfPTable yogTable = new PdfPTable(3);
+                    yogTable.setWidthPercentage(100);
+                    yogTable.setSpacingAfter(14);
+                    yogTable.setWidths(new float[]{25f, 25f, 50f});
+
+                    PdfPCell yh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "யோகம்" : "Yoga Name", boldB, Element.ALIGN_CENTER); yh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); yogTable.addCell(yh1);
+                    PdfPCell yh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "காரக கிரகங்கள்" : "Forming Planets", boldB, Element.ALIGN_CENTER); yh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); yogTable.addCell(yh2);
+                    PdfPCell yh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப பலன்கள் & தாக்கம்" : "Astrological Impact", boldB, Element.ALIGN_CENTER); yh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); yogTable.addCell(yh3);
+
+                    for (var y : data.getAiPredictions().getAiYogas()) {
+                        yogTable.addCell(buildTableCell(y.getName() != null ? y.getName() : "", bFont, Element.ALIGN_LEFT));
+                        yogTable.addCell(buildTableCell(y.getFormingPlanets() != null ? y.getFormingPlanets() : "", bFont, Element.ALIGN_LEFT));
+                        yogTable.addCell(buildTableCell(y.getImpact() != null ? y.getImpact() : "", bFont, Element.ALIGN_LEFT));
+                    }
+                    document.add(yogTable);
+                }
+
+                // AI Doshams & Shastric Nullifications Table
+                if (data.getAiPredictions().getAiDoshams() != null && !data.getAiPredictions().getAiDoshams().isEmpty()) {
+                    String doshTitleStr = "ta".equalsIgnoreCase(lang) ? "தோஷங்கள் & சாஸ்திர நிவர்த்திகள் (Doshas & Nullifications)" : "Vedic Doshams, Nullifications & Remedies";
+                    Paragraph doshH = buildMixedParagraph(doshTitleStr, sFont, engSFont);
+                    doshH.setSpacingAfter(8);
+                    document.add(doshH);
+
+                    PdfPTable doshTable = new PdfPTable(4);
+                    doshTable.setWidthPercentage(100);
+                    doshTable.setSpacingAfter(14);
+                    doshTable.setWidths(new float[]{22f, 18f, 32f, 28f});
+
+                    PdfPCell dh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "தோஷம்" : "Dosham", boldB, Element.ALIGN_CENTER); dh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh1);
+                    PdfPCell dh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நிலை" : "Status", boldB, Element.ALIGN_CENTER); dh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh2);
+                    PdfPCell dh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நிவர்த்தி காரணம்" : "Nullification Factor", boldB, Element.ALIGN_CENTER); dh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh3);
+                    PdfPCell dh4 = buildTableCell("ta".equalsIgnoreCase(lang) ? "பரிகாரம்" : "Vedic Remedy", boldB, Element.ALIGN_CENTER); dh4.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh4);
+
+                    for (var d : data.getAiPredictions().getAiDoshams()) {
+                        doshTable.addCell(buildTableCell(d.getName() != null ? d.getName() : "", bFont, Element.ALIGN_LEFT));
+                        doshTable.addCell(buildTableCell(d.getStatus() != null ? d.getStatus() : "", bFont, Element.ALIGN_CENTER));
+                        doshTable.addCell(buildTableCell(d.getNullificationFactor() != null ? d.getNullificationFactor() : "", bFont, Element.ALIGN_LEFT));
+                        doshTable.addCell(buildTableCell(d.getRemedy() != null ? d.getRemedy() : "", bFont, Element.ALIGN_LEFT));
+                    }
+                    document.add(doshTable);
+                }
+
                 // Past Milestones Table
                 if (data.getAiPredictions().getPastMilestones() != null && !data.getAiPredictions().getPastMilestones().isEmpty()) {
                     String pastTitleStr = "ta".equalsIgnoreCase(lang) ? "கடந்த கால சரிபார்ப்பு நிகழ்வுகள் (பிறப்பு முதல் தற்போதைய வயது வரை)" : "Past Life Verification Milestones (Birth to Current Age)";

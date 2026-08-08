@@ -69,6 +69,8 @@ function AiPredictionsView({
     );
   }
 
+  const aiYogas = predictions?.aiYogas || [];
+  const aiDoshams = predictions?.aiDoshams || [];
   const pastMilestones = predictions?.pastMilestones || [];
   const futurePredictions = predictions?.futurePredictions || [];
 
@@ -92,6 +94,100 @@ function AiPredictionsView({
           <p style={{ lineHeight: '1.7', fontSize: '14px', margin: 0, color: 'var(--text-primary)' }}>
             {predictions.overallSummary}
           </p>
+        </div>
+      )}
+
+      {/* AI Classical Yogas */}
+      {aiYogas.length > 0 && (
+        <div className="card">
+          <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '15px' }}>
+            <h3 style={{ margin: '0 0 5px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              ✨ {language === 'ta' ? 'ஜோதிட யோகங்கள் (Classical Vedic Yogas)' : 'Classical Vedic Yogas & Formations'} ({aiYogas.length})
+            </h3>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
+              {language === 'ta' ? 'சுவிஸ் எபிமெரிஸ் கிரக நிலைகள் மற்றும் சாஸ்திர விதிகளின்படி கண்டறியப்பட்ட யோகங்கள்.' : 'Major auspicious planetary combinations and Raja Yogas calculated from chart dignities.'}
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
+            {aiYogas.map((y, idx) => (
+              <div key={idx} style={{ background: 'rgba(255, 215, 0, 0.04)', border: '1px solid rgba(255, 215, 0, 0.25)', borderRadius: '8px', padding: '12px' }}>
+                <h4 style={{ margin: '0 0 6px', fontSize: '14px', color: 'var(--accent-gold)' }}>
+                  👑 {y.name}
+                </h4>
+                {y.formingPlanets && (
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                    🪐 <strong>{language === 'ta' ? 'காரக கிரகங்கள்: ' : 'Forming Planets: '}</strong>{y.formingPlanets}
+                  </div>
+                )}
+                <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-primary)', lineHeight: '1.5' }}>
+                  {y.impact}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI Doshams & Shastric Nullifications */}
+      {aiDoshams.length > 0 && (
+        <div className="card">
+          <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '15px' }}>
+            <h3 style={{ margin: '0 0 5px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              🛡️ {language === 'ta' ? 'தோஷங்கள் & சாஸ்திர நிவர்த்திகள் (Doshas & Nullifications)' : 'Vedic Doshams, Nullification & Shastric Remedies'} ({aiDoshams.length})
+            </h3>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
+              {language === 'ta' ? 'தோஷங்கள், அவற்றின் சாஸ்திர நிவர்த்தி காரணங்கள் மற்றும் எளிய பரிகார வழிகாட்டுதல்.' : 'Planetary afflictions, classical cancellation rules, and authentic Vedic remedies.'}
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
+            {aiDoshams.map((d, idx) => {
+              const isNullified = d.status && (d.status.toLowerCase().includes('nullif') || d.status.includes('நிவர்த்தி'));
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    background: isNullified ? 'rgba(39, 174, 96, 0.05)' : 'rgba(231, 76, 60, 0.05)',
+                    border: `1px solid ${isNullified ? 'rgba(39, 174, 96, 0.4)' : 'rgba(231, 76, 60, 0.4)'}`,
+                    borderRadius: '8px',
+                    padding: '14px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <h4 style={{ margin: 0, fontSize: '14px', color: isNullified ? '#27ae60' : '#e74c3c' }}>
+                      {isNullified ? '✓ ' : '⚠️ '}{d.name}
+                    </h4>
+                    <span
+                      style={{
+                        background: isNullified ? '#27ae60' : '#e74c3c',
+                        color: '#fff',
+                        fontSize: '11px',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {d.status}
+                    </span>
+                  </div>
+
+                  {d.nullificationFactor && (
+                    <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '8px', lineHeight: '1.5' }}>
+                      <strong style={{ color: 'var(--accent-gold)' }}>
+                        {language === 'ta' ? 'நிவர்த்தி காரணம்: ' : 'Nullification Factor: '}
+                      </strong>
+                      {d.nullificationFactor}
+                    </div>
+                  )}
+
+                  {d.remedy && (
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,215,0,0.05)', padding: '6px 8px', borderRadius: '4px', lineHeight: '1.4' }}>
+                      🪔 <strong>{language === 'ta' ? 'பரிகாரம்: ' : 'Remedy: '}</strong>{d.remedy}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

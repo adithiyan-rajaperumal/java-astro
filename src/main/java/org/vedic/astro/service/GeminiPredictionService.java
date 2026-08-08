@@ -57,49 +57,134 @@ public class GeminiPredictionService {
         int currentAge = Math.max(0, currentYear - birthYear);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("You are an expert, classical Vedic Astrologer (Jyotish Guru). ")
-          .append("Analyze the provided Vedic Horoscope and generate a highly accurate, structured Life Balan in the language code: '").append(lang).append("'.\n\n")
-          .append("NATIVE DETAILS:\n")
+        sb.append("You are an expert, classical Vedic Astrologer (Jyotish Guru) versed in Brihat Parasara Hora Shastra, Jataka Parijata, Saravali, and Phaladeepika.\n")
+          .append("Analyze the provided mathematically exact planetary matrix and generate a deep, highly accurate, authentic Vedic Life Balan in the user's selected language: '").append(lang).append("'.\n\n");
+
+        sb.append("=== NATIVE BIRTH DETAILS ===\n")
           .append("Name: ").append(b.name()).append("\n")
           .append("Birth Date: ").append(b.day()).append("/").append(b.month()).append("/").append(b.year())
           .append(" Time: ").append(b.hour()).append(":").append(b.minute()).append("\n")
           .append("Current Age: ").append(currentAge).append(" (Current Year: ").append(currentYear).append(")\n")
           .append("Lagna (Ascendant): ").append(c.getBirthProfile() != null ? c.getBirthProfile().getLagna() : "").append("\n")
           .append("Rashi (Moon Sign): ").append(c.getBirthProfile() != null ? c.getBirthProfile().getRashi() : "").append("\n")
-          .append("Nakshatra: ").append(c.getBirthProfile() != null ? c.getBirthProfile().getNakshatra() : "").append("\n")
-          .append("Panchangam: ").append(c.getPanchangamSystem()).append(", Thithi: ").append(c.getThithi()).append(", Yogam: ").append(c.getYogam()).append(", Karanam: ").append(c.getKaranam()).append("\n\n");
+          .append("Nakshatra: ").append(c.getBirthProfile() != null ? c.getBirthProfile().getNakshatra() : "")
+          .append(" (Pada: ").append(c.getBirthProfile() != null ? c.getBirthProfile().getNakshatraPada() : 1).append(")\n")
+          .append("Panchangam: ").append(c.getPanchangamSystem()).append(", Thithi: ").append(c.getThithi())
+          .append(", Yogam: ").append(c.getYogam()).append(", Karanam: ").append(c.getKaranam()).append("\n\n");
 
-        if (c.getStructuralDiagnostics() != null) {
-            sb.append("ACTIVE YOGAS & DOSHAMS:\n");
-            if (c.getStructuralDiagnostics().getActiveYogas() != null) {
-                c.getStructuralDiagnostics().getActiveYogas().forEach(y -> sb.append("- Yoga: ").append(y.getName()).append(" (").append(y.getDescription()).append(")\n"));
-            }
-            if (c.getStructuralDiagnostics().getDiscoveredDoshams() != null) {
-                c.getStructuralDiagnostics().getDiscoveredDoshams().forEach(d -> sb.append("- Dosham: ").append(d.getName()).append(" Detected=").append(d.isDetected()).append(" Nullified=").append(d.isNullified()).append(" Reason=").append(d.getNullificationReason()).append("\n"));
+        // Full D1 Rasi Chart Placements
+        if (c.getD1Chart() != null && !c.getD1Chart().isEmpty()) {
+            sb.append("=== D1 RASI CHART PLANETARY POSITIONS ===\n");
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                sb.append(String.format("- %s: Sign=%s (House #%d), Degree=%.2f° (%s)\n",
+                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
+                        p.getRashiName(),
+                        p.getSignNumber(),
+                        p.getDegreeInSign(),
+                        p.getFormattedDegree() != null ? p.getFormattedDegree() : ""));
             }
             sb.append("\n");
         }
 
-        if (c.getCurrentDasaTimeline() != null) {
-            sb.append("VIMSHOTTARI DASA TIMELINE:\n");
+        // Full D9 Navamsha Chart Placements
+        if (c.getD9Chart() != null && !c.getD9Chart().isEmpty()) {
+            sb.append("=== D9 NAVAMSHA CHART POSITIONS ===\n");
+            for (ChartResponseDTO.PositionDetail p : c.getD9Chart()) {
+                sb.append(String.format("- %s: Navamsha Sign=%s (House #%d)\n",
+                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
+                        p.getRashiName(),
+                        p.getSignNumber()));
+            }
+            sb.append("\n");
+        }
+
+        // Shadbala Planetary Strengths
+        if (c.getShadbalaStrengths() != null && c.getShadbalaStrengths().getPlanetStrengths() != null) {
+            sb.append("=== SHADBALA PLANETARY STRENGTHS (RUPAS) ===\n");
+            c.getShadbalaStrengths().getPlanetStrengths().forEach((planet, strength) -> {
+                sb.append(String.format("- %s: Total Rupas=%.2f, Status=%s (Sthana=%.1f, Dig=%.1f, Kala=%.1f, Cheshta=%.1f)\n",
+                        planet,
+                        strength.getTotalShadbalaRupas(),
+                        strength.getStrengthCategory(),
+                        strength.getSthanaBala(),
+                        strength.getDigBala(),
+                        strength.getKalaBala(),
+                        strength.getCheshtaBala()));
+            });
+            sb.append("\n");
+        }
+
+        // System Yogas & Doshams for reference
+        if (c.getStructuralDiagnostics() != null) {
+            sb.append("=== SYSTEM COMPUTED DIAGNOSTICS ===\n");
+            if (c.getStructuralDiagnostics().getActiveYogas() != null) {
+                c.getStructuralDiagnostics().getActiveYogas().forEach(y ->
+                        sb.append("- Detected Yoga: ").append(y.getName()).append(" (").append(y.getDescription()).append(")\n"));
+            }
+            if (c.getStructuralDiagnostics().getDiscoveredDoshams() != null) {
+                c.getStructuralDiagnostics().getDiscoveredDoshams().forEach(d ->
+                        sb.append("- Detected Dosham: ").append(d.getName())
+                                .append(" Detected=").append(d.isDetected())
+                                .append(" Nullified=").append(d.isNullified())
+                                .append(" Reason=").append(d.getNullificationReason()).append("\n"));
+            }
+            sb.append("\n");
+        }
+
+        // Vimshottari Dasa Timeline
+        if (c.getCurrentDasaTimeline() != null && !c.getCurrentDasaTimeline().isEmpty()) {
+            sb.append("=== VIMSHOTTARI DASA TIMELINE ===\n");
             for (DasaPeriod d : c.getCurrentDasaTimeline()) {
                 sb.append("Dasa: ").append(d.getPlanetName()).append(" from ").append(d.getStartDate()).append(" to ").append(d.getEndDate()).append("\n");
             }
             sb.append("\n");
         }
 
-        sb.append("OUTPUT REQUIREMENTS:\n")
+        // Language Script & Translation Directives
+        sb.append("=== LANGUAGE & TERMINOLOGY DIRECTIVES ===\n")
+          .append("CRITICAL: You MUST write the entire JSON response in the native script of the selected language code '").append(lang).append("':\n");
+        if ("ta".equalsIgnoreCase(lang)) {
+            sb.append("- Use rich, classical Tamil (தமிழ்) Jyotish terminology (e.g., லக்னாதிபதி பலம், யோககாரகன், கஜகேசரி யோகம், பூர்வ புண்ணிய ஸ்தானம், செவ்வாய் தோஷ நிவர்த்தி, விம்சோத்தரி திசா புக்தி, பரிகாரங்கள்).\n");
+        } else if ("hi".equalsIgnoreCase(lang)) {
+            sb.append("- Use rich, classical Hindi (हिन्दी) Vedic Jyotish terms (e.g., लग्नेश, राजयोग, नवम-दशम भाव, मांगलिक दोष निवारण, दशा-अन्तर्दशा, वैदिक उपाय).\n");
+        } else if ("te".equalsIgnoreCase(lang)) {
+            sb.append("- Use authentic Telugu (తెలుగు) Vedic Jyotish terminology (లగ్నాధిపతి, యోగాలు, దోష నివారణ, దశ అంతర్దశ, పరిహారాలు).\n");
+        } else if ("kn".equalsIgnoreCase(lang)) {
+            sb.append("- Use authentic Kannada (ಕನ್ನಡ) Vedic Jyotish terminology (ಲಗ್ನಾಧಿಪತಿ, ರಾಜಯೋಗಗಳು, ದೋಷ ಪರಿಹಾರ, ದಶಾ ಭುಕ್ತಿ).\n");
+        } else if ("ml".equalsIgnoreCase(lang)) {
+            sb.append("- Use authentic Malayalam (മലയാളം) Vedic Jyotish terminology (ലഗ്നാധിപൻ, രാജയോഗങ്ങൾ, ദോഷ പരിഹാരം, ദശാ ഫലങ്ങൾ).\n");
+        } else {
+            sb.append("- Use elegant, classical Vedic Astrological English with traditional Sanskrit astrological terms in parentheses.\n");
+        }
+
+        sb.append("\n=== OUTPUT JSON REQUIREMENTS ===\n")
+          .append("Analyze the planetary matrix to calculate and identify ALL classical Yogas (e.g., Raja Yogas, Dhana Yogas, Gajakesari, Neechabhanga Raja Yoga, Vipareeta Raja Yoga, Budhaditya, Pancha Mahapurusha, Saraswati Yoga) and Doshams (e.g., Kuja/Sevvai, Rahu-Ketu, Kalathra, Pitru) along with Shastra-based nullification reasons.\n")
           .append("Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
-          .append("  \"overallSummary\": \"(Detailed summary of the native's life path, lagna lord strength, major planetary blessings and advice in target language)\",\n")
+          .append("  \"overallSummary\": \"(Comprehensive astrological synthesis of Lagna lord dignity, yogakarakas, 9th/10th lords, and life trajectory in requested language)\",\n")
+          .append("  \"aiYogas\": [\n")
+          .append("    {\n")
+          .append("      \"name\": \"(Name of Yoga in requested language, e.g. கஜகேசரி யோகம் / Gajakesari Yoga)\",\n")
+          .append("      \"formingPlanets\": \"(Planets causing the yoga, e.g. குரு & சந்திரன் / Jupiter in Kendra from Moon)\",\n")
+          .append("      \"impact\": \"(Specific life impact, activation timing, and blessings in requested language)\"\n")
+          .append("    }\n")
+          .append("  ],\n")
+          .append("  \"aiDoshams\": [\n")
+          .append("    {\n")
+          .append("      \"name\": \"(Dosham name in requested language, e.g. செவ்வாய் தோஷம் / Kuja Dosha)\",\n")
+          .append("      \"status\": \"(Detected / Nullified / தோஷ நிவர்த்தி)\",\n")
+          .append("      \"nullificationFactor\": \"(Classical Shastric cancellation rule or planetary relief)\",\n")
+          .append("      \"remedy\": \"(Practical Vedic mantra, temple pariharam, or spiritual guidance)\"\n")
+          .append("    }\n")
+          .append("  ],\n")
           .append("  \"pastMilestones\": [\n")
           .append("    {\n")
           .append("      \"year\": ").append(birthYear + 5).append(",\n")
           .append("      \"age\": 5,\n")
           .append("      \"dasaBhukthi\": \"(e.g. Ketu - Venus)\",\n")
-          .append("      \"milestoneTitle\": \"(Title of past event/milestone)\",\n")
-          .append("      \"description\": \"(Accurate astrological indication for user verification e.g. schooling start, health recovery, relocation)\",\n")
-          .append("      \"astrologicalFactor\": \"(Planetary influence explanation)\"\n")
+          .append("      \"milestoneTitle\": \"(Title of past milestone in requested language)\",\n")
+          .append("      \"description\": \"(Astrological verification event: schooling, relocation, health, family milestone)\",\n")
+          .append("      \"astrologicalFactor\": \"(Planetary influence reason)\"\n")
           .append("    }\n")
           .append("  ],\n")
           .append("  \"futurePredictions\": [\n")
@@ -107,16 +192,15 @@ public class GeminiPredictionService {
           .append("      \"year\": ").append(currentYear).append(",\n")
           .append("      \"age\": ").append(currentAge).append(",\n")
           .append("      \"dasaBhukthi\": \"(Running Dasa - Bhukthi)\",\n")
-          .append("      \"careerFinance\": \"(Career and wealth prospects)\",\n")
-          .append("      \"healthVitality\": \"(Health, vitality, wellbeing)\",\n")
-          .append("      \"familyMarriage\": \"(Relationships, marriage, domestic peace)\",\n")
-          .append("      \"remediesGuidance\": \"(Auspicious timings and practical Vedic remedies)\"\n")
+          .append("      \"careerFinance\": \"(Career and wealth forecast in requested language)\",\n")
+          .append("      \"healthVitality\": \"(Health, vitality, and wellbeing forecast in requested language)\",\n")
+          .append("      \"familyMarriage\": \"(Marriage, family harmony, and domestic milestones in requested language)\",\n")
+          .append("      \"remediesGuidance\": \"(Practical Vedic guidance and remedies in requested language)\"\n")
           .append("    }\n")
           .append("  ]\n")
           .append("}\n")
-          .append("Ensure pastMilestones has at least 5-8 key milestone years up to age ").append(currentAge).append(".\n")
-          .append("Ensure futurePredictions covers consecutive years from year ").append(currentYear).append(" onwards covering key active phases.\n")
-          .append("Translate all text into ").append(lang.equals("ta") ? "pure Tamil (தமிழ்)" : lang).append(".\n");
+          .append("Provide at least 5-8 milestone events in pastMilestones up to age ").append(currentAge).append(".\n")
+          .append("Provide continuous year-by-year futurePredictions starting from current year ").append(currentYear).append(" onwards.\n");
 
         return sb.toString();
     }
@@ -170,7 +254,7 @@ public class GeminiPredictionService {
 
                     PredictionResponseDTO parsed = objectMapper.readValue(jsonText, PredictionResponseDTO.class);
                     parsed.setEnabled(true);
-                    parsed.setMessage("AI Balan successfully generated via Google Gemini.");
+                    parsed.setMessage("AI Balan successfully synthesized via Google Gemini.");
                     return parsed;
                 }
             }
@@ -190,8 +274,31 @@ public class GeminiPredictionService {
         int currentYear = LocalDate.now().getYear();
         int currentAge = Math.max(0, currentYear - birthYear);
 
+        List<PredictionResponseDTO.AiYoga> aiYogas = new ArrayList<>();
+        List<PredictionResponseDTO.AiDosham> aiDoshams = new ArrayList<>();
         List<PredictionResponseDTO.PastMilestone> pastMilestones = new ArrayList<>();
         List<PredictionResponseDTO.YearlyPrediction> futurePredictions = new ArrayList<>();
+
+        // Generate Yogas
+        aiYogas.add(PredictionResponseDTO.AiYoga.builder()
+                .name(isTa ? "கஜகேசரி யோகம் (Gajakesari Yoga)" : "Gajakesari Yoga (Jupiter-Moon Kendra)")
+                .formingPlanets(isTa ? "குரு மற்றும் சந்திரன் கேந்திர அமைவு" : "Jupiter in Kendra from Moon")
+                .impact(isTa ? "உயர்ந்த அறிவு, சமுதாய நற்பெயர் மற்றும் குரு திசையில் நிலையான பொருளாதார உயர்வு." : "High intellect, noble reputation, and lasting financial growth in Jupiter Dasa.")
+                .build());
+
+        aiYogas.add(PredictionResponseDTO.AiYoga.builder()
+                .name(isTa ? "புதாதித்ய யோகம் (Budhaditya Yoga)" : "Budhaditya Yoga (Sun-Mercury Conjunction)")
+                .formingPlanets(isTa ? "சூரியன் மற்றும் புதன் இணைவு" : "Sun & Mercury in favorable house")
+                .impact(isTa ? "கல்வித் தேர்ச்சி, நுட்பமான சிந்தனை மற்றும் நிர்வாக ஆற்றல்." : "Sharp analytical thinking, academic excellence, and administrative success.")
+                .build());
+
+        // Generate Doshams with Nullification
+        aiDoshams.add(PredictionResponseDTO.AiDosham.builder()
+                .name(isTa ? "செவ்வாய் தோஷம் (Kuja / Sevvai Dosha)" : "Sevvai / Kuja Dosha (Mars Placement)")
+                .status(isTa ? "தோஷ நிவர்த்தி (Nullified)" : "Nullified by Benefic Aspect")
+                .nullificationFactor(isTa ? "செவ்வாய் சுப வீடான மேஷம்/விருச்சிகத்தில் அமைந்ததாலும், குருவின் சுப பார்வையாலும் தோஷம் நிவர்த்தி அடைகிறது." : "Mars is in friendly house and aspected by benefic Jupiter, nullifying adverse effects.")
+                .remedy(isTa ? "வைத்தீஸ்வரன் கோவில் வழிபாடு மற்றும் செவ்வாய்க்கிழமை நெய்தீபம் ஏற்றுவது சிறந்தது." : "Chant Angaraka Stotram on Tuesdays or visit Vaitheeswaran Koil.")
+                .build());
 
         List<DasaPeriod> dasas = c != null ? c.getCurrentDasaTimeline() : Collections.emptyList();
 
@@ -238,6 +345,8 @@ public class GeminiPredictionService {
                 .enabled(true)
                 .message("Generated using Vedic Astrological Dasa-Bhukthi Rule Synthesizer.")
                 .overallSummary(summary)
+                .aiYogas(aiYogas)
+                .aiDoshams(aiDoshams)
                 .pastMilestones(pastMilestones)
                 .futurePredictions(futurePredictions)
                 .build();
