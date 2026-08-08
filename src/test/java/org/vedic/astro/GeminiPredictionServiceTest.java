@@ -28,12 +28,7 @@ public class GeminiPredictionServiceTest {
 
     @Test
     public void testPromptConstruction() {
-        BirthDetailsDTO birth = BirthDetailsDTO.builder()
-                .name("Ramesh")
-                .year(1995).month(5).day(15)
-                .hour(6).minute(30).second(0)
-                .latitude(13.0827).longitude(80.2707)
-                .build();
+        BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
 
         ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
                 .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Vrishabha").nakshatra("Rohini").build())
@@ -60,12 +55,7 @@ public class GeminiPredictionServiceTest {
 
     @Test
     public void testOfflineRuleBasedBalan() {
-        BirthDetailsDTO birth = BirthDetailsDTO.builder()
-                .name("Kavitha")
-                .year(1990).month(8).day(20)
-                .hour(14).minute(15).second(0)
-                .latitude(13.0827).longitude(80.2707)
-                .build();
+        BirthDetailsDTO birth = new BirthDetailsDTO("Kavitha", 1990, 8, 20, 14, 15, 0, 13.0827, 80.2707, "LAHIRI");
 
         ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
                 .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Simha").rashi("Kanya").nakshatra("Hasta").build())
