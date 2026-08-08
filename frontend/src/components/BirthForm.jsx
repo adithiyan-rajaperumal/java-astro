@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LocationSearch from './LocationSearch';
 import { t } from '../i18n/translations';
 
 function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang = 'en' }) {
   const [name, setName] = useState(initialValues.name || '');
-      const [dateText, setDateText] = useState(() => {
+  const [dateText, setDateText] = useState(() => {
     if (initialValues.date && initialValues.date.includes('-')) {
       const [y, m, d] = initialValues.date.split('-');
       return `${d}/${m}/${y}`;
@@ -14,6 +14,15 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
   const [time, setTime] = useState(initialValues.time || '');
   const [location, setLocation] = useState(initialValues.location || null);
   const [ayanamsa, setAyanamsa] = useState(initialValues.ayanamsa || 'LAHIRI');
+
+  useEffect(() => {
+    if (initialValues.ayanamsa) {
+      setAyanamsa(initialValues.ayanamsa);
+    }
+    if (initialValues.location) {
+      setLocation(initialValues.location);
+    }
+  }, [initialValues.ayanamsa, initialValues.location]);
 
   const handleDateChange = (val) => {
     const clean = val.replace(/\D/g, '');
@@ -64,7 +73,8 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       latitude: location.latitude,
       longitude: location.longitude,
       location,
-      ayanamsa
+      ayanamsa,
+      panchangamSystem: 'DRIK_TIRUKANITHAM'
     });
   };
 
@@ -116,11 +126,11 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       <div style={{ marginBottom: '20px' }}>
         <label>{t('ayanamsa', lang)}</label>
         <select value={ayanamsa} onChange={(e) => setAyanamsa(e.target.value)}>
-          <option value="LAHIRI">Lahiri (Chitra Paksha)</option>
-          <option value="KP">KP (Krishnamurti Padhdhati)</option>
-          <option value="RAMAN">B.V. Raman</option>
-          <option value="SURYA_SIDDHANTA">Surya Siddhanta</option>
-          <option value="PUSHYAPAKSHA">Pushyapaksha</option>
+          <option value="LAHIRI">{t('ayanamsaLahiri', lang)}</option>
+          <option value="KP">{t('ayanamsaKP', lang)}</option>
+          <option value="RAMAN">{t('ayanamsaRaman', lang)}</option>
+          <option value="SURYA_SIDDHANTA">{t('ayanamsaSurya', lang)}</option>
+          <option value="PUSHYAPAKSHA">{t('ayanamsaPushyapaksha', lang)}</option>
         </select>
       </div>
 

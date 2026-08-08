@@ -92,7 +92,7 @@ function PanchangamPage({ settings }) {
     try {
       const response = await fetch('/api/v1/astrology/panchangam', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept-Language': settings.language
         },
@@ -101,7 +101,8 @@ function PanchangamPage({ settings }) {
           latitude: settings.location.latitude,
           longitude: settings.location.longitude,
           language: settings.language,
-          ayanamsa: settings.ayanamsa
+          ayanamsa: settings.ayanamsa || 'LAHIRI',
+          panchangamSystem: 'DRIK_TIRUKANITHAM'
         })
       });
       if (response.ok) {
@@ -343,15 +344,15 @@ function PanchangamPage({ settings }) {
   };
 
   return (
-    <div>
+    <div style={{ width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
       {/* Mobile-First Responsive Date Navigation Top Bar */}
-      <div className="panchangam-top-bar" style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+      <div className="panchangam-top-bar">
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <button 
             onClick={() => changeDate(-1)} 
             className="today-btn"
             title="Previous Day"
-            style={{ padding: '6px 14px', fontSize: '13px' }}
+            style={{ padding: '6px 12px', fontSize: '13px' }}
           >
             ◀ Prev
           </button>
@@ -367,7 +368,7 @@ function PanchangamPage({ settings }) {
             onClick={() => changeDate(1)} 
             className="today-btn"
             title="Next Day"
-            style={{ padding: '6px 14px', fontSize: '13px' }}
+            style={{ padding: '6px 12px', fontSize: '13px' }}
           >
             Next ▶
           </button>
@@ -380,6 +381,7 @@ function PanchangamPage({ settings }) {
           onChange={(e) => e.target.value && setCurrentDate(e.target.value)}
           style={{ height: '36px', padding: '4px 10px', fontSize: '14px' }}
         />
+
 
         <button
           onClick={handleShareAsImage}
@@ -396,7 +398,9 @@ function PanchangamPage({ settings }) {
             boxShadow: '0 4px 12px rgba(255, 215, 0, 0.3)',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '6px'
+            justifyContent: 'center',
+            gap: '6px',
+            whiteSpace: 'nowrap'
           }}
         >
           📲 {sharing ? t('generatingImage', settings.language) : t('shareAsImage', settings.language)}
@@ -421,7 +425,7 @@ function PanchangamPage({ settings }) {
       {!loading && !error && data && (
         <div className="panchangam-grid-2col">
           {/* LEFT COLUMN: Core Astronomical & Panchangam Elements */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
             
             {/* Card 1 (TOP): Sunrise, Sunset & Muhurtham / Vasthu Summary */}
             <div className="card" style={{ margin: 0 }}>
@@ -521,7 +525,7 @@ function PanchangamPage({ settings }) {
           </div>
 
           {/* RIGHT COLUMN: Auspicious & Inauspicious Timings & 24 Horai Table */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: 0, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
             
             {/* Card 3: Auspicious Timings Card */}
             <div className="card" style={{ margin: 0, borderLeft: '4px solid var(--accent-gold)' }}>

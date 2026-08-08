@@ -48,8 +48,9 @@ public class MatchingController {
         List<String> warnings = chartAugmentedAnalysis.runComparativeAnalysis(context);
         response.setWarnings(warnings);
 
-        response.setBoyProfile(orchestrationService.convertToUiDashboardResponse(boyChart, request.boy()));
-        response.setGirlProfile(orchestrationService.convertToUiDashboardResponse(girlChart, request.girl()));
+        response.setPanchangamSystem(systemType.name());
+        response.setBoyProfile(orchestrationService.convertToUiDashboardResponse(boyChart, request.boy(), systemType.name()));
+        response.setGirlProfile(orchestrationService.convertToUiDashboardResponse(girlChart, request.girl(), systemType.name()));
 
         return ResponseEntity.ok(response);
     }
@@ -71,9 +72,10 @@ public class MatchingController {
             MatchingResponseDTO response = matchingEngine.calculateCompatibility(context);
             List<String> warnings = chartAugmentedAnalysis.runComparativeAnalysis(context);
             response.setWarnings(warnings);
+            response.setPanchangamSystem(systemType.name());
 
-            response.setBoyProfile(orchestrationService.convertToUiDashboardResponse(boyChart, request.boy()));
-            response.setGirlProfile(orchestrationService.convertToUiDashboardResponse(girlChart, request.girl()));
+            response.setBoyProfile(orchestrationService.convertToUiDashboardResponse(boyChart, request.boy(), systemType.name()));
+            response.setGirlProfile(orchestrationService.convertToUiDashboardResponse(girlChart, request.girl(), systemType.name()));
 
             byte[] pdfBinaryReport = pdfExportService.generateMarriageMatchingReport(response);
             String fileName = "Compatibility_Report.pdf";

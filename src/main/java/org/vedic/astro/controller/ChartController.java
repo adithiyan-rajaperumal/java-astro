@@ -35,7 +35,9 @@ public class ChartController {
         // Factory resolves strategy pattern dynamically
         PanchangamEngine engine = panchangamFactory.getEngine(systemType);
         ChartResult res = engine.calculate(birthDetails);
-        return ResponseEntity.ok(orchestrationService.convertToUiDashboardResponse(res, birthDetails));
+        ChartUiResponseDTO response = orchestrationService.convertToUiDashboardResponse(res, birthDetails);
+        response.setPanchangamSystem(systemType.name());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/download-pdf")
@@ -47,6 +49,7 @@ public class ChartController {
             ChartResult res = engine.calculate(payload);
 
             ComprehensiveReportDTO deepReportData = engine.generateComprehensiveReport(payload, res);
+            deepReportData.setPanchangamSystem(systemType.name());
             byte[] pdfBinaryReport = pdfExportService.generateAstrologyReport(deepReportData);
             String fileName = payload.name().replaceAll("[^a-zA-Z0-9]", "") + "_Premium_Kundali.pdf";
 

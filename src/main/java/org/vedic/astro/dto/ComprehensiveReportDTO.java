@@ -22,6 +22,7 @@ public class ComprehensiveReportDTO {
     private String yogam;
     private String karanam;
     private String ayanamsa;
+    private String panchangamSystem;
 
     private ChartResponseDTO.BirthProfile birthProfile;
     private List<ChartResponseDTO.PositionDetail> birthPlanetaryPositions;
