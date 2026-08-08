@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.vedic.astro.dto.BirthDetailsDTO;
 import org.vedic.astro.dto.DailyPanchangamDTO;
 import org.vedic.astro.dto.PanchangamRequestDTO;
+import org.vedic.astro.model.AyanamsaType;
 import org.vedic.astro.panchangam.PanchangamFactory;
 import org.vedic.astro.panchangam.PanchangamType;
 import org.vedic.astro.service.DailyPanchangamService;
@@ -24,86 +25,70 @@ public class MultiPanchangamEngineTest {
     @Test
     public void testPanchangamTypeResolution() {
         assertEquals(PanchangamType.DRIK_TIRUKANITHAM, PanchangamType.fromString("DRIK_TIRUKANITHAM"));
-        assertEquals(PanchangamType.VAKYA, PanchangamType.fromString("VAKYA"));
-        assertEquals(PanchangamType.VAKYA, PanchangamType.fromString("VAKKIYAM"));
-        assertEquals(PanchangamType.PARASARA_BHATTAR, PanchangamType.fromString("PARASARA_BHATTAR"));
-        assertEquals(PanchangamType.PARASARA_BHATTAR, PanchangamType.fromString("PARASARA_BATTAR"));
-        assertEquals(PanchangamType.SURYA_SIDDHANTA, PanchangamType.fromString("SURYA_SIDDHANTA"));
+        assertEquals(PanchangamType.DRIK_TIRUKANITHAM, PanchangamType.fromString("VAKYA"));
+        assertEquals(PanchangamType.DRIK_TIRUKANITHAM, PanchangamType.fromString(""));
     }
 
     @Test
-    public void testAllEnginesCalculateSuccessfully() {
-        BirthDetailsDTO birth = new BirthDetailsDTO("Test User", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "LAHIRI");
+    public void testThirukanithamCalculatesAcrossAllAyanamsas() {
+        BirthDetailsDTO birthLahiri = new BirthDetailsDTO("Test User", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "LAHIRI");
+        BirthDetailsDTO birthKP = new BirthDetailsDTO("Test User", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "KP");
+        BirthDetailsDTO birthRaman = new BirthDetailsDTO("Test User", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "RAMAN");
+        BirthDetailsDTO birthSurya = new BirthDetailsDTO("Test User", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "SURYA_SIDDHANTA");
+        BirthDetailsDTO birthPushya = new BirthDetailsDTO("Test User", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "PUSHYAPAKSHA");
 
-        var drikChart = panchangamFactory.getEngine(PanchangamType.DRIK_TIRUKANITHAM).calculate(birth);
-        var vakyaChart = panchangamFactory.getEngine(PanchangamType.VAKYA).calculate(birth);
-        var parasaraChart = panchangamFactory.getEngine(PanchangamType.PARASARA_BHATTAR).calculate(birth);
-        var suryaChart = panchangamFactory.getEngine(PanchangamType.SURYA_SIDDHANTA).calculate(birth);
-
-        assertNotNull(drikChart);
-        assertNotNull(vakyaChart);
-        assertNotNull(parasaraChart);
-        assertNotNull(suryaChart);
-
-        // Verify position shifts between Drik, Vakya (-0.78°), Parasara (-1.40°), and Surya Siddhanta
-        double sunDrik = drikChart.getD1Positions().get("Sun").getAbsoluteLongitude();
-        double sunVakya = vakyaChart.getD1Positions().get("Sun").getAbsoluteLongitude();
-        double sunParasara = parasaraChart.getD1Positions().get("Sun").getAbsoluteLongitude();
-
-        assertNotNull(sunVakya);
-        assertNotNull(sunParasara);
-        assertNotEquals(sunDrik, sunParasara, 0.001);
-    }
-
-    @Test
-    public void testParasaraBhattarWithPushyapakshaAyanamsa() {
-        BirthDetailsDTO bhattarLahiri = new BirthDetailsDTO("Bhattar Lahiri", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "LAHIRI");
-        BirthDetailsDTO bhattarPushya = new BirthDetailsDTO("Bhattar Pushya", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "PUSHYAPAKSHA");
-
-        var chartLahiri = panchangamFactory.getEngine(PanchangamType.PARASARA_BHATTAR).calculate(bhattarLahiri);
-        var chartPushya = panchangamFactory.getEngine(PanchangamType.PARASARA_BHATTAR).calculate(bhattarPushya);
+        var engine = panchangamFactory.getEngine(PanchangamType.DRIK_TIRUKANITHAM);
+        var chartLahiri = engine.calculate(birthLahiri);
+        var chartKP = engine.calculate(birthKP);
+        var chartRaman = engine.calculate(birthRaman);
+        var chartSurya = engine.calculate(birthSurya);
+        var chartPushya = engine.calculate(birthPushya);
 
         assertNotNull(chartLahiri);
+        assertNotNull(chartKP);
+        assertNotNull(chartRaman);
+        assertNotNull(chartSurya);
         assertNotNull(chartPushya);
 
         double sunLahiri = chartLahiri.getD1Positions().get("Sun").getAbsoluteLongitude();
+        double sunRaman = chartRaman.getD1Positions().get("Sun").getAbsoluteLongitude();
         double sunPushya = chartPushya.getD1Positions().get("Sun").getAbsoluteLongitude();
+        double sunSurya = chartSurya.getD1Positions().get("Sun").getAbsoluteLongitude();
 
-        // Pushyapaksha Ayanamsa (~22.66°) shifts positions relative to Lahiri (~23.79°) by ~1.13 degrees
+        assertNotEquals(sunLahiri, sunRaman, 0.001);
         assertNotEquals(sunLahiri, sunPushya, 0.001);
+        assertNotEquals(sunLahiri, sunSurya, 0.001);
     }
 
     @Test
-    public void testDailyPanchangamWithMultiPanchangamSystems() {
-        PanchangamRequestDTO requestDrik = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "DRIK_TIRUKANITHAM");
-        PanchangamRequestDTO requestVakya = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "VAKYA");
-        PanchangamRequestDTO requestParasara = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "PARASARA_BHATTAR");
-        PanchangamRequestDTO requestParasaraPushya = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "PUSHYAPAKSHA", "PARASARA_BHATTAR");
-        PanchangamRequestDTO requestSurya = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "SURYA_SIDDHANTA");
+    public void testAyanamsaTypeJHoraValuesPreserved() {
+        assertEquals(AyanamsaType.PUSHYAPAKSHA, AyanamsaType.fromString("PUSHYAPAKSHA"));
+        assertEquals(AyanamsaType.SURYA_SIDDHANTA, AyanamsaType.fromString("SURYA_SIDDHANTA"));
+        assertEquals(AyanamsaType.KP, AyanamsaType.fromString("KP"));
+        assertEquals(AyanamsaType.RAMAN, AyanamsaType.fromString("RAMAN"));
+        assertEquals(AyanamsaType.LAHIRI, AyanamsaType.fromString("LAHIRI"));
+    }
 
-        DailyPanchangamDTO resultDrik = dailyPanchangamService.calculateDailyPanchangam(requestDrik);
-        DailyPanchangamDTO resultVakya = dailyPanchangamService.calculateDailyPanchangam(requestVakya);
-        DailyPanchangamDTO resultParasara = dailyPanchangamService.calculateDailyPanchangam(requestParasara);
-        DailyPanchangamDTO resultParasaraPushya = dailyPanchangamService.calculateDailyPanchangam(requestParasaraPushya);
+    @Test
+    public void testDailyPanchangamWithAyanamsas() {
+        PanchangamRequestDTO requestLahiri = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "LAHIRI", "DRIK_TIRUKANITHAM");
+        PanchangamRequestDTO requestKP = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "KP", "DRIK_TIRUKANITHAM");
+        PanchangamRequestDTO requestRaman = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "RAMAN", "DRIK_TIRUKANITHAM");
+        PanchangamRequestDTO requestPushya = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "PUSHYAPAKSHA", "DRIK_TIRUKANITHAM");
+        PanchangamRequestDTO requestSurya = new PanchangamRequestDTO("2026-08-05", 13.0827, 80.2707, "en", "SURYA_SIDDHANTA", "DRIK_TIRUKANITHAM");
+
+        DailyPanchangamDTO resultLahiri = dailyPanchangamService.calculateDailyPanchangam(requestLahiri);
+        DailyPanchangamDTO resultKP = dailyPanchangamService.calculateDailyPanchangam(requestKP);
+        DailyPanchangamDTO resultRaman = dailyPanchangamService.calculateDailyPanchangam(requestRaman);
+        DailyPanchangamDTO resultPushya = dailyPanchangamService.calculateDailyPanchangam(requestPushya);
         DailyPanchangamDTO resultSurya = dailyPanchangamService.calculateDailyPanchangam(requestSurya);
 
-        assertNotNull(resultDrik);
-        assertNotNull(resultVakya);
-        assertNotNull(resultParasara);
-        assertNotNull(resultParasaraPushya);
+        assertNotNull(resultLahiri);
+        assertNotNull(resultKP);
+        assertNotNull(resultRaman);
+        assertNotNull(resultPushya);
         assertNotNull(resultSurya);
-    }
-
-    @Test
-    public void testCornerCasesSankrantiAndElongationThresholds() {
-        PanchangamRequestDTO sankrantiReq = new PanchangamRequestDTO("2026-01-14", 13.0827, 80.2707, "en", "LAHIRI", "VAKYA");
-        DailyPanchangamDTO sankrantiRes = dailyPanchangamService.calculateDailyPanchangam(sankrantiReq);
-        assertNotNull(sankrantiRes);
-        assertNotNull(sankrantiRes.thithi());
-
-        PanchangamRequestDTO purnimaReq = new PanchangamRequestDTO("2026-02-01", 13.0827, 80.2707, "en", "LAHIRI", "SURYA_SIDDHANTA");
-        DailyPanchangamDTO purnimaRes = dailyPanchangamService.calculateDailyPanchangam(purnimaReq);
-        assertNotNull(purnimaRes);
-        assertNotNull(purnimaRes.nakshatra());
+        assertNotNull(resultLahiri.thithi());
+        assertNotNull(resultLahiri.nakshatra());
     }
 }
