@@ -72,10 +72,10 @@ public class GeminiPredictionService {
         if (c.getStructuralDiagnostics() != null) {
             sb.append("ACTIVE YOGAS & DOSHAMS:\n");
             if (c.getStructuralDiagnostics().getActiveYogas() != null) {
-                c.getStructuralDiagnostics().getActiveYogas().forEach(y -> sb.append("- Yoga: ").append(y.getYogaName()).append(" (").append(y.getDescription()).append(")\n"));
+                c.getStructuralDiagnostics().getActiveYogas().forEach(y -> sb.append("- Yoga: ").append(y.getName()).append(" (").append(y.getDescription()).append(")\n"));
             }
             if (c.getStructuralDiagnostics().getDiscoveredDoshams() != null) {
-                c.getStructuralDiagnostics().getDiscoveredDoshams().forEach(d -> sb.append("- Dosham: ").append(d.getDoshaName()).append(" Detected=").append(d.isDetected()).append(" Nullified=").append(d.isNullified()).append(" Reason=").append(d.getNullificationReason()).append("\n"));
+                c.getStructuralDiagnostics().getDiscoveredDoshams().forEach(d -> sb.append("- Dosham: ").append(d.getName()).append(" Detected=").append(d.isDetected()).append(" Nullified=").append(d.isNullified()).append(" Reason=").append(d.getNullificationReason()).append("\n"));
             }
             sb.append("\n");
         }
