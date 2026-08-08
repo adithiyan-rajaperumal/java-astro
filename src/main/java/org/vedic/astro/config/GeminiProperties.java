@@ -13,7 +13,7 @@ import java.util.Base64;
 public class GeminiProperties {
     private String apiKey = "";
     private boolean enabled = true;
-    private String model = "gemini-2.0-flash";
+    private String model = "gemini-3.5-flash";
 
     public String getResolvedApiKey() {
         if (apiKey == null || apiKey.trim().isEmpty()) {
