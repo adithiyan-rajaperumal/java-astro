@@ -32,4 +32,7 @@ public class ChartUiResponseDTO {
     private String thithi;
     private String yogam;
     private String karanam;
+
+    // AI Prediction Capabilities
+    private boolean aiPredictionsEnabled;
 }

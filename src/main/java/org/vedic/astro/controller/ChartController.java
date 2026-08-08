@@ -26,6 +26,17 @@ public class ChartController {
     private final PanchangamFactory panchangamFactory;
     private final ChartOrchestrationService orchestrationService;
     private final PdfExportService pdfExportService;
+    private final org.vedic.astro.config.GeminiProperties geminiProperties;
+
+    @GetMapping("/config")
+    public ResponseEntity<org.vedic.astro.dto.AppConfigDTO> getAppConfig() {
+        boolean enabled = geminiProperties != null && geminiProperties.isFeatureEnabled();
+        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-1.5-flash";
+        return ResponseEntity.ok(org.vedic.astro.dto.AppConfigDTO.builder()
+                .aiPredictionsEnabled(enabled)
+                .geminiModel(model)
+                .build());
+    }
 
     @PostMapping(path = "/calculate", produces = "application/json;charset=UTF-8")
     public ResponseEntity<ChartUiResponseDTO> calculateNatalCharts(
