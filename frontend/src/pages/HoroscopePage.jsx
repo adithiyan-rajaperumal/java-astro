@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import BirthForm from '../components/BirthForm';
 import IndianChart from '../components/IndianChart';
+import AiPredictionsView from '../components/AiPredictionsView';
 import { t } from '../i18n/translations';
 import { getSavedHoroscopes, saveHoroscope, deleteSavedHoroscope } from '../utils/savedHoroscopes';
 
@@ -13,9 +14,25 @@ function HoroscopePage({ settings }) {
   const [formPayload, setFormPayload] = useState(null);
   const [savedProfiles, setSavedProfiles] = useState(() => getSavedHoroscopes());
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+  const [aiEnabled, setAiEnabled] = useState(true);
+  const [predictions, setPredictions] = useState(null);
+  const [predLoading, setPredLoading] = useState(false);
+  const [predError, setPredError] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/v1/astrology/config')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((cfg) => {
+        if (cfg && typeof cfg.aiPredictionsEnabled === 'boolean') {
+          setAiEnabled(cfg.aiPredictionsEnabled);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setReport(null);
+    setPredictions(null);
   }, [settings.language]);
 
   const handleSaveCurrentProfile = () => {
@@ -69,6 +86,7 @@ function HoroscopePage({ settings }) {
     setLoading(true);
     setError(null);
     setFormPayload(payload);
+    setPredictions(null);
     try {
       const response = await fetch('/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
@@ -81,6 +99,9 @@ function HoroscopePage({ settings }) {
       if (response.ok) {
         const data = await response.json();
         setReport(data);
+        if (typeof data.aiPredictionsEnabled === 'boolean') {
+          setAiEnabled(data.aiPredictionsEnabled);
+        }
       } else {
         throw new Error('Failed to generate horoscope report.');
       }
@@ -88,6 +109,36 @@ function HoroscopePage({ settings }) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGeneratePredictions = async () => {
+    if (!report || !formPayload) return;
+    setPredLoading(true);
+    setPredError(null);
+    try {
+      const response = await fetch('/api/v1/astrology/predictions/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
+        body: JSON.stringify({
+          birthDetails: formPayload,
+          chartData: report,
+          language: settings.language
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPredictions(data);
+      } else {
+        throw new Error('Failed to generate AI predictions.');
+      }
+    } catch (e) {
+      setPredError(e.message);
+    } finally {
+      setPredLoading(false);
     }
   };
 
@@ -540,6 +591,14 @@ function HoroscopePage({ settings }) {
             >
               {t('diagnosticsTab', settings.language)}
             </button>
+            {aiEnabled && (
+              <button 
+                className={`tab-btn ${activeSubTab === 'predictions' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('predictions')}
+              >
+                {t('aiBalanTab', settings.language)}
+              </button>
+            )}
           </div>
 
           {/* Sub Tab contents */}
@@ -547,6 +606,17 @@ function HoroscopePage({ settings }) {
           {activeSubTab === 'dasa' && renderDasaTab()}
           {activeSubTab === 'shadbala' && renderShadbalaTab()}
           {activeSubTab === 'diagnostics' && renderDiagnosticsTab()}
+          {activeSubTab === 'predictions' && (
+            <AiPredictionsView
+              report={report}
+              formPayload={formPayload}
+              language={settings.language}
+              onGenerate={handleGeneratePredictions}
+              predictions={predictions}
+              loading={predLoading}
+              error={predError}
+            />
+          )}
         </div>
       )}
     </div>
