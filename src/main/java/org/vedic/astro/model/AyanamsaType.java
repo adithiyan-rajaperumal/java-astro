@@ -21,24 +21,19 @@ public enum AyanamsaType {
     }
 
     public void applyTo(SwissEph swissEph) {
-        applyTo(swissEph, org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM);
-    }
-
-    public void applyTo(SwissEph swissEph, org.vedic.astro.panchangam.PanchangamType pType) {
         if (this == PUSHYAPAKSHA) {
-            if (pType == org.vedic.astro.panchangam.PanchangamType.PARASARA_BHATTAR) {
-                // Parasara Bhattar Pushyapaksha (astrologer reference value 22°39'34.88" for July 19, 1995)
-                swissEph.swe_set_sid_mode(SweConst.SE_SIDM_USER, 2451545.0, 22.721925);
-            } else {
-                // Standard True Pushyapaksha (JHora match 22°39'36.55" / 22-39-34.95)
-                swissEph.swe_set_sid_mode(SweConst.SE_SIDM_USER, 2451545.0, 22.72238333);
-            }
+            // Standard True Pushyapaksha (JHora match 22°39'36.55" / 22-39-34.95)
+            swissEph.swe_set_sid_mode(SweConst.SE_SIDM_USER, 2451545.0, 22.72238333);
         } else if (this == SURYA_SIDDHANTA) {
             // Surya Siddhanta Ayanamsa (JHora exact match 22°26'37.88")
             swissEph.swe_set_sid_mode(SweConst.SE_SIDM_USER, 2451545.0, 22.50608611);
         } else {
             swissEph.swe_set_sid_mode(this.mode, 0, 0);
         }
+    }
+
+    public void applyTo(SwissEph swissEph, org.vedic.astro.panchangam.PanchangamType pType) {
+        applyTo(swissEph);
     }
 
     public static AyanamsaType fromString(String val) {
