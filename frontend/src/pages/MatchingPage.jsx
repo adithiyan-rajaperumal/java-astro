@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import LocationSearch from '../components/LocationSearch';
 import { t } from '../i18n/translations';
+import { getSavedHoroscopes } from '../utils/savedHoroscopes';
 
 function MatchingPage({ settings }) {
   const [boyName, setBoyName] = useState('');
@@ -20,6 +21,7 @@ function MatchingPage({ settings }) {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [savedProfiles] = useState(() => getSavedHoroscopes());
 
   useEffect(() => {
     if (settings.ayanamsa) {
@@ -30,6 +32,24 @@ function MatchingPage({ settings }) {
   useEffect(() => {
     setResult(null);
   }, [settings.language]);
+
+  const handleSelectBoyProfile = (id) => {
+    const p = savedProfiles.find(x => x.id === id);
+    if (!p) return;
+    setBoyName(p.name);
+    setBoyDate(`${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}`);
+    setBoyTime(`${String(p.hour).padStart(2, '0')}:${String(p.minute).padStart(2, '0')}`);
+    setBoyLocation(p.location);
+  };
+
+  const handleSelectGirlProfile = (id) => {
+    const p = savedProfiles.find(x => x.id === id);
+    if (!p) return;
+    setGirlName(p.name);
+    setGirlDate(`${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}`);
+    setGirlTime(`${String(p.hour).padStart(2, '0')}:${String(p.minute).padStart(2, '0')}`);
+    setGirlLocation(p.location);
+  };
 
   const handleDateChange = (val, setter) => {
     const clean = val.replace(/\D/g, '');
@@ -213,9 +233,23 @@ function MatchingPage({ settings }) {
           <div className="grid-2">
             {/* Boy's card */}
             <div className="card">
-              <h3 className="title-gold" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
-                🙋‍♂️ {t('boyDetails', settings.language)}
-              </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
+                <h3 className="title-gold" style={{ margin: 0 }}>
+                  🙋‍♂️ {t('boyDetails', settings.language)}
+                </h3>
+                {savedProfiles.length > 0 && (
+                  <select
+                    onChange={(e) => handleSelectBoyProfile(e.target.value)}
+                    defaultValue=""
+                    style={{ padding: '4px 8px', fontSize: '12px', maxWidth: '160px' }}
+                  >
+                    <option value="" disabled>📁 {t('loadSaved', settings.language) || 'Load Profile'}</option>
+                    {savedProfiles.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
               <div style={{ marginTop: '15px' }}>
                 <label>{t('name', settings.language)}</label>
                 <input type="text" value={boyName} onChange={(e) => setBoyName(e.target.value)} required />
@@ -245,9 +279,23 @@ function MatchingPage({ settings }) {
 
             {/* Girl's card */}
             <div className="card">
-              <h3 className="title-gold" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
-                🙋‍♀️ {t('girlDetails', settings.language)}
-              </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
+                <h3 className="title-gold" style={{ margin: 0 }}>
+                  🙋‍♀️ {t('girlDetails', settings.language)}
+                </h3>
+                {savedProfiles.length > 0 && (
+                  <select
+                    onChange={(e) => handleSelectGirlProfile(e.target.value)}
+                    defaultValue=""
+                    style={{ padding: '4px 8px', fontSize: '12px', maxWidth: '160px' }}
+                  >
+                    <option value="" disabled>📁 {t('loadSaved', settings.language) || 'Load Profile'}</option>
+                    {savedProfiles.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
               <div style={{ marginTop: '15px' }}>
                 <label>{t('name', settings.language)}</label>
                 <input type="text" value={girlName} onChange={(e) => setGirlName(e.target.value)} required />
