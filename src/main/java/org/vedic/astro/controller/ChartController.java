@@ -27,6 +27,7 @@ public class ChartController {
     private final ChartOrchestrationService orchestrationService;
     private final PdfExportService pdfExportService;
     private final org.vedic.astro.config.GeminiProperties geminiProperties;
+    private final org.vedic.astro.service.GeminiPredictionService geminiPredictionService;
 
     @GetMapping("/config")
     public ResponseEntity<org.vedic.astro.dto.AppConfigDTO> getAppConfig() {
@@ -61,6 +62,19 @@ public class ChartController {
 
             ComprehensiveReportDTO deepReportData = engine.generateComprehensiveReport(payload, res);
             deepReportData.setPanchangamSystem(systemType.name());
+
+            if (geminiProperties != null && geminiProperties.isFeatureEnabled() && geminiPredictionService != null) {
+                try {
+                    ChartUiResponseDTO uiResp = orchestrationService.convertToUiDashboardResponse(res, payload);
+                    org.vedic.astro.dto.PredictionRequestDTO predReq = org.vedic.astro.dto.PredictionRequestDTO.builder()
+                            .birthDetails(payload)
+                            .chartData(uiResp)
+                            .language(org.springframework.context.i18n.LocaleContextHolder.getLocale().getLanguage())
+                            .build();
+                    deepReportData.setAiPredictions(geminiPredictionService.generateLifePredictions(predReq));
+                } catch (Exception ignored) {}
+            }
+
             byte[] pdfBinaryReport = pdfExportService.generateAstrologyReport(deepReportData);
             String fileName = payload.name().replaceAll("[^a-zA-Z0-9]", "") + "_Premium_Kundali.pdf";
 

@@ -250,6 +250,80 @@ public class PdfExportService {
                 }
             }
             document.add(ds);
+
+            // =================================================================
+            // 7. AI LIFE BALAN & YEAR-BY-YEAR PREDICTIONS (IF ENABLED)
+            // =================================================================
+            if (data.getAiPredictions() != null && data.getAiPredictions().isEnabled()) {
+                document.newPage();
+                String aiTitleStr = "ta".equalsIgnoreCase(lang) ? "AI வாழ்நாள் பலன்கள் & வருடாந்திர கணிப்பு" : "AI Life Balan & Yearly Predictions";
+                Paragraph aiTitle = buildMixedParagraph(aiTitleStr, tFont, engTFont);
+                aiTitle.setAlignment(Element.ALIGN_CENTER);
+                aiTitle.setSpacingAfter(12);
+                document.add(aiTitle);
+
+                if (data.getAiPredictions().getOverallSummary() != null && !data.getAiPredictions().getOverallSummary().isBlank()) {
+                    Paragraph summ = buildMixedParagraph(data.getAiPredictions().getOverallSummary(), bFont, engBFont);
+                    summ.setSpacingAfter(14);
+                    document.add(summ);
+                }
+
+                // Past Milestones Table
+                if (data.getAiPredictions().getPastMilestones() != null && !data.getAiPredictions().getPastMilestones().isEmpty()) {
+                    String pastTitleStr = "ta".equalsIgnoreCase(lang) ? "கடந்த கால சரிபார்ப்பு நிகழ்வுகள் (பிறப்பு முதல் தற்போதைய வயது வரை)" : "Past Life Verification Milestones (Birth to Current Age)";
+                    Paragraph pastH = buildMixedParagraph(pastTitleStr, sFont, engSFont);
+                    pastH.setSpacingAfter(8);
+                    document.add(pastH);
+
+                    PdfPTable pastTable = new PdfPTable(4);
+                    pastTable.setWidthPercentage(100);
+                    pastTable.setSpacingAfter(14);
+                    pastTable.setWidths(new float[]{16f, 22f, 31f, 31f});
+
+                    pastTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, engBoldB));
+                    pastTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "திசா - புக்தி" : "Dasa - Bhukthi", boldB, engBoldB));
+                    pastTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "முக்கிய நிகழ்வு" : "Milestone Event", boldB, engBoldB));
+                    pastTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "ஜோதிட காரகம்" : "Astrological Factor", boldB, engBoldB));
+
+                    for (var m : data.getAiPredictions().getPastMilestones()) {
+                        pastTable.addCell(buildTableCell(m.getYear() + " (Age " + m.getAge() + ")", engBFont, Element.ALIGN_CENTER));
+                        pastTable.addCell(buildTableCell(m.getDasaBhukthi() != null ? m.getDasaBhukthi() : "", bFont, Element.ALIGN_LEFT));
+                        pastTable.addCell(buildTableCell(m.getMilestoneTitle() != null ? m.getMilestoneTitle() : "", bFont, Element.ALIGN_LEFT));
+                        pastTable.addCell(buildTableCell(m.getDescription() != null ? m.getDescription() : "", bFont, Element.ALIGN_LEFT));
+                    }
+                    document.add(pastTable);
+                }
+
+                // Future Predictions Table
+                if (data.getAiPredictions().getFuturePredictions() != null && !data.getAiPredictions().getFuturePredictions().isEmpty()) {
+                    String futTitleStr = "ta".equalsIgnoreCase(lang) ? "வருடாந்திர எதிர்கால பலன்கள் & வழிகாட்டுதல்" : "Year-by-Year Future Astrological Forecast";
+                    Paragraph futH = buildMixedParagraph(futTitleStr, sFont, engSFont);
+                    futH.setSpacingAfter(8);
+                    document.add(futH);
+
+                    PdfPTable futTable = new PdfPTable(5);
+                    futTable.setWidthPercentage(100);
+                    futTable.setSpacingAfter(14);
+                    futTable.setWidths(new float[]{14f, 18f, 23f, 23f, 22f});
+
+                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, engBoldB));
+                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "திசா புக்தி" : "Dasa Period", boldB, engBoldB));
+                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "தொழில் & செல்வம்" : "Career & Finance", boldB, engBoldB));
+                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "உடல்நலம் & குடும்பம்" : "Health & Family", boldB, engBoldB));
+                    futTable.addCell(buildHeaderCell("ta".equalsIgnoreCase(lang) ? "பரிகாரங்கள்" : "Remedies", boldB, engBoldB));
+
+                    for (var f : data.getAiPredictions().getFuturePredictions()) {
+                        futTable.addCell(buildTableCell(f.getYear() + " (Age " + f.getAge() + ")", engBFont, Element.ALIGN_CENTER));
+                        futTable.addCell(buildTableCell(f.getDasaBhukthi() != null ? f.getDasaBhukthi() : "", bFont, Element.ALIGN_LEFT));
+                        futTable.addCell(buildTableCell(f.getCareerFinance() != null ? f.getCareerFinance() : "", bFont, Element.ALIGN_LEFT));
+                        String healthFam = (f.getHealthVitality() != null ? f.getHealthVitality() : "") + " | " + (f.getFamilyMarriage() != null ? f.getFamilyMarriage() : "");
+                        futTable.addCell(buildTableCell(healthFam, bFont, Element.ALIGN_LEFT));
+                        futTable.addCell(buildTableCell(f.getRemediesGuidance() != null ? f.getRemediesGuidance() : "", bFont, Element.ALIGN_LEFT));
+                    }
+                    document.add(futTable);
+                }
+            }
+
             document.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
