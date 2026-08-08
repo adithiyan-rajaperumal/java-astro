@@ -12,6 +12,8 @@ spring:
     encoding: UTF-8
     serialization:
       write_dates_as_timestamps: false
+    deserialization:
+      fail_on_unknown_properties: false
 
   # Force Spring MVC to read and write all Web messages using UTF-8
   http:

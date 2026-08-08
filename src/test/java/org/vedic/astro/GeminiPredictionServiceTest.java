@@ -113,6 +113,72 @@ public class GeminiPredictionServiceTest {
     }
 
     @Test
+    public void testPredictionEndpointWithExtraFrontendProperties() throws Exception {
+        String jsonPayload = """
+                {
+                  "birthDetails": {
+                    "name": "Arun Kumar",
+                    "year": 1992,
+                    "month": 4,
+                    "day": 10,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 0,
+                    "latitude": 13.0827,
+                    "longitude": 80.2707,
+                    "location": { "name": "Chennai, Tamil Nadu, India", "lat": 13.0827, "lon": 80.2707 },
+                    "ayanamsa": "LAHIRI",
+                    "panchangamSystem": "DRIK_TIRUKANITHAM",
+                    "date": "1992-04-10",
+                    "time": "10:30"
+                  },
+                  "chartData": {
+                    "name": "Arun Kumar",
+                    "dateOfBirth": "10/04/1992",
+                    "timeOfBirth": "10:30:00",
+                    "localMeanTime": "10:21:05",
+                    "latitude": 13.0827,
+                    "longitude": 80.2707,
+                    "resolvedTimezone": "Asia/Kolkata",
+                    "ayanamsa": "LAHIRI",
+                    "panchangamSystem": "DRIK_TIRUKANITHAM",
+                    "birthProfile": {
+                      "lagna": "Mesha",
+                      "rashi": "Mithuna",
+                      "nakshatra": "Punarvasu",
+                      "nakshatraPada": 2
+                    },
+                    "d1Chart": [
+                      {
+                        "planetKey": "SUN",
+                        "displayName": "Sun",
+                        "signNumber": 12,
+                        "rashiName": "Pisces",
+                        "degreeInSign": 26.54,
+                        "formattedDegree": "26° 32' 24\\""
+                      }
+                    ],
+                    "thithi": "Shukla - Ashtami",
+                    "yogam": "Dhriti",
+                    "karanam": "Vishti",
+                    "aiPredictionsEnabled": true
+                  },
+                  "language": "ta"
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/astrology/predictions/generate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPayload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.enabled").value(true))
+                .andExpect(jsonPath("$.aiYogas").isArray())
+                .andExpect(jsonPath("$.aiDoshams").isArray())
+                .andExpect(jsonPath("$.pastMilestones").isArray())
+                .andExpect(jsonPath("$.futurePredictions").isArray());
+    }
+
+    @Test
     public void testEncryptedApiKeyResolution() {
         org.vedic.astro.config.GeminiProperties props = new org.vedic.astro.config.GeminiProperties();
         props.setApiKey("enc:dGVzdC1rZXktMTIzNDU=");
