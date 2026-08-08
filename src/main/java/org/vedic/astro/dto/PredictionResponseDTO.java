@@ -14,10 +14,24 @@ public class PredictionResponseDTO {
     private boolean enabled;
     private String message;
     private String overallSummary;
+    private TokenUsage tokenUsage;
     private List<AiYoga> aiYogas;
     private List<AiDosham> aiDoshams;
     private List<PastMilestone> pastMilestones;
     private List<YearlyPrediction> futurePredictions;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TokenUsage {
+        private int promptTokens;
+        private int completionTokens;
+        private int totalTokens;
+        private double estimatedCostUsd;
+        private double estimatedCostInr;
+        private String modelUsed;
+    }
 
     @Data
     @Builder

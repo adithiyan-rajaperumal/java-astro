@@ -59,11 +59,31 @@ function AiPredictionsView({
 
   if (error) {
     return (
-      <div className="card" style={{ borderLeft: '4px solid var(--danger)' }}>
-        <h4 style={{ color: 'var(--danger)' }}>Error Generating AI Balan</h4>
-        <p>{error}</p>
-        <button onClick={onGenerate} className="btn-primary" style={{ marginTop: '10px' }}>
-          {t('retry', language)}
+      <div className="card" style={{ borderLeft: '4px solid var(--danger)', background: 'rgba(231, 76, 60, 0.08)' }}>
+        <h4 style={{ color: 'var(--danger)', margin: '0 0 8px' }}>
+          ⚠️ {language === 'ta' ? 'AI கணிப்பு சேவை கிடைக்கவில்லை' : 'AI Prediction Service Unavailable'}
+        </h4>
+        <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>{error}</p>
+        <button onClick={onGenerate} className="btn-primary">
+          🔄 {t('retry', language)}
+        </button>
+      </div>
+    );
+  }
+
+  if (predictions && predictions.enabled === false) {
+    return (
+      <div className="card" style={{ borderLeft: '4px solid #e74c3c', background: 'rgba(231, 76, 60, 0.08)' }}>
+        <h4 style={{ color: '#e74c3c', margin: '0 0 8px' }}>
+          ⚠️ {language === 'ta' ? 'AI கணிப்பு சேவை கிடைக்கவில்லை' : 'AI Prediction Service Unavailable'}
+        </h4>
+        <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>
+          {predictions.message || (language === 'ta' 
+            ? 'AI ஜோதிட கணிப்பு சேவை தற்போது கிடைக்கவில்லை. API அமைப்புகளை சரிபார்க்கவும்.' 
+            : 'AI prediction service is currently unavailable. Please verify API key configuration or network connectivity.')}
+        </p>
+        <button onClick={onGenerate} className="btn-primary" style={{ padding: '8px 20px' }}>
+          🔄 {t('retry', language) || 'Retry'}
         </button>
       </div>
     );
@@ -76,6 +96,37 @@ function AiPredictionsView({
 
   return (
     <div>
+      {/* Token Usage & Cost Analytics Badge */}
+      {predictions?.tokenUsage && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '14px',
+          flexWrap: 'wrap',
+          background: 'rgba(255, 215, 0, 0.06)',
+          border: '1px solid rgba(255, 215, 0, 0.3)',
+          borderRadius: '8px',
+          padding: '10px 16px',
+          marginBottom: '16px',
+          fontSize: '13px',
+          color: 'var(--text-secondary)'
+        }}>
+          <div>
+            ⚡ <strong style={{ color: 'var(--accent-gold)' }}>{predictions.tokenUsage.totalTokens?.toLocaleString()}</strong> {language === 'ta' ? 'டோக்கன்கள்' : 'Tokens'}
+            <span style={{ opacity: 0.75 }}> (Input: {predictions.tokenUsage.promptTokens?.toLocaleString()} | Output: {predictions.tokenUsage.completionTokens?.toLocaleString()})</span>
+          </div>
+          <div>
+            💰 <strong style={{ color: '#2ecc71' }}>${predictions.tokenUsage.estimatedCostUsd?.toFixed(5)} USD</strong>
+            <span style={{ opacity: 0.85 }}> (~₹{predictions.tokenUsage.estimatedCostInr?.toFixed(3)} INR)</span>
+          </div>
+          {predictions.tokenUsage.modelUsed && (
+            <div>
+              🤖 <span style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>{predictions.tokenUsage.modelUsed}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Overall Summary Card */}
       {predictions?.overallSummary && (
         <div className="card" style={{ background: 'linear-gradient(135deg, rgba(255,215,0,0.08), rgba(20,20,30,0.6))', border: '1px solid var(--accent-gold)' }}>

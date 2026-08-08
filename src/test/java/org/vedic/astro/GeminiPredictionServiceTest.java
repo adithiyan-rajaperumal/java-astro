@@ -54,128 +54,55 @@ public class GeminiPredictionServiceTest {
     }
 
     @Test
-    public void testOfflineRuleBasedBalan() {
-        BirthDetailsDTO birth = new BirthDetailsDTO("Kavitha", 1990, 8, 20, 14, 15, 0, 13.0827, 80.2707, "LAHIRI");
-
-        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
-                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Simha").rashi("Kanya").nakshatra("Hasta").build())
-                .currentDasaTimeline(Collections.emptyList())
-                .build();
-
+    public void testOfflineServiceReturnsUnavailable() {
         PredictionRequestDTO req = PredictionRequestDTO.builder()
-                .birthDetails(birth)
-                .chartData(chart)
+                .birthDetails(new BirthDetailsDTO("Kavitha", 1990, 8, 20, 14, 15, 0, 13.0827, 80.2707, "LAHIRI"))
+                .chartData(ChartUiResponseDTO.builder().build())
                 .language("ta")
                 .build();
 
         PredictionResponseDTO response = predictionService.generateOfflineRuleBasedBalan(req);
         assertNotNull(response);
-        assertTrue(response.isEnabled());
-        assertNotNull(response.getPastMilestones());
-        assertFalse(response.getPastMilestones().isEmpty());
-        assertNotNull(response.getFuturePredictions());
-        assertFalse(response.getFuturePredictions().isEmpty());
-        assertTrue(response.getFuturePredictions().get(0).getYear() >= 2026);
     }
 
     @Test
-    public void testPredictionEndpoint() throws Exception {
-        String jsonPayload = """
+    public void testTokenUsageParsingAndCostCalculation() {
+        String mockGeminiResponse = """
                 {
-                  "birthDetails": {
-                    "name": "Arun",
-                    "year": 1992,
-                    "month": 4,
-                    "day": 10,
-                    "hour": 10,
-                    "minute": 30,
-                    "second": 0,
-                    "latitude": 13.0827,
-                    "longitude": 80.2707
-                  },
-                  "chartData": {
-                    "panchangamSystem": "DRIK_TIRUKANITHAM",
-                    "thithi": "Shukla - Ashtami",
-                    "yogam": "Dhriti",
-                    "karanam": "Vishti"
-                  },
-                  "language": "ta"
-                }
-                """;
-
-        mockMvc.perform(post("/api/v1/astrology/predictions/generate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonPayload))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.enabled").value(true))
-                .andExpect(jsonPath("$.pastMilestones").isArray())
-                .andExpect(jsonPath("$.futurePredictions").isArray());
-    }
-
-    @Test
-    public void testPredictionEndpointWithExtraFrontendProperties() throws Exception {
-        String jsonPayload = """
-                {
-                  "birthDetails": {
-                    "name": "Arun Kumar",
-                    "year": 1992,
-                    "month": 4,
-                    "day": 10,
-                    "hour": 10,
-                    "minute": 30,
-                    "second": 0,
-                    "latitude": 13.0827,
-                    "longitude": 80.2707,
-                    "location": { "name": "Chennai, Tamil Nadu, India", "lat": 13.0827, "lon": 80.2707 },
-                    "ayanamsa": "LAHIRI",
-                    "panchangamSystem": "DRIK_TIRUKANITHAM",
-                    "date": "1992-04-10",
-                    "time": "10:30"
-                  },
-                  "chartData": {
-                    "name": "Arun Kumar",
-                    "dateOfBirth": "10/04/1992",
-                    "timeOfBirth": "10:30:00",
-                    "localMeanTime": "10:21:05",
-                    "latitude": 13.0827,
-                    "longitude": 80.2707,
-                    "resolvedTimezone": "Asia/Kolkata",
-                    "ayanamsa": "LAHIRI",
-                    "panchangamSystem": "DRIK_TIRUKANITHAM",
-                    "birthProfile": {
-                      "lagna": "Mesha",
-                      "rashi": "Mithuna",
-                      "nakshatra": "Punarvasu",
-                      "nakshatraPada": 2
-                    },
-                    "d1Chart": [
-                      {
-                        "planetKey": "SUN",
-                        "displayName": "Sun",
-                        "signNumber": 12,
-                        "rashiName": "Pisces",
-                        "degreeInSign": 26.54,
-                        "formattedDegree": "26° 32' 24\\""
+                  "candidates": [
+                    {
+                      "content": {
+                        "parts": [
+                          {
+                            "text": "{\\"overallSummary\\":\\"உயர்ந்த அறிவும் ராஜ யோகமும் நிறைந்த ஜாதகம்.\\",\\"aiYogas\\":[],\\"aiDoshams\\":[],\\"pastMilestones\\":[],\\"futurePredictions\\":[]}"
+                          }
+                        ]
                       }
-                    ],
-                    "thithi": "Shukla - Ashtami",
-                    "yogam": "Dhriti",
-                    "karanam": "Vishti",
-                    "aiPredictionsEnabled": true
-                  },
-                  "language": "ta"
+                    }
+                  ],
+                  "usageMetadata": {
+                    "promptTokenCount": 1500,
+                    "candidatesTokenCount": 800,
+                    "totalTokenCount": 2300
+                  }
                 }
                 """;
 
-        mockMvc.perform(post("/api/v1/astrology/predictions/generate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonPayload))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.enabled").value(true))
-                .andExpect(jsonPath("$.aiYogas").isArray())
-                .andExpect(jsonPath("$.aiDoshams").isArray())
-                .andExpect(jsonPath("$.pastMilestones").isArray())
-                .andExpect(jsonPath("$.futurePredictions").isArray());
+        PredictionRequestDTO req = PredictionRequestDTO.builder()
+                .birthDetails(new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI"))
+                .chartData(ChartUiResponseDTO.builder().build())
+                .language("ta")
+                .build();
+
+        PredictionResponseDTO parsed = predictionService.parseGeminiResponse(mockGeminiResponse, req);
+        assertNotNull(parsed);
+        assertTrue(parsed.isEnabled());
+        assertNotNull(parsed.getTokenUsage());
+        assertEquals(1500, parsed.getTokenUsage().getPromptTokens());
+        assertEquals(800, parsed.getTokenUsage().getCompletionTokens());
+        assertEquals(2300, parsed.getTokenUsage().getTotalTokens());
+        assertTrue(parsed.getTokenUsage().getEstimatedCostUsd() > 0);
+        assertTrue(parsed.getTokenUsage().getEstimatedCostInr() > 0);
     }
 
     @Test

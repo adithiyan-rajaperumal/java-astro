@@ -1,5 +1,16 @@
 const STORAGE_KEY = 'drikvedic_saved_horoscopes';
 
+export function getProfileSignature(p) {
+  if (!p) return '';
+  const name = (p.name || '').trim().toLowerCase();
+  const day = p.day ?? p.year ?? 0;
+  const month = p.month ?? 0;
+  const year = p.year ?? 0;
+  const hour = p.hour ?? 0;
+  const minute = p.minute ?? 0;
+  return `${name}_${day}_${month}_${year}_${hour}_${minute}`;
+}
+
 export function getSavedHoroscopes() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -10,18 +21,30 @@ export function getSavedHoroscopes() {
   }
 }
 
+export function isProfileAlreadySaved(profile) {
+  if (!profile) return false;
+  const existing = getSavedHoroscopes();
+  const sig = getProfileSignature(profile);
+  return existing.some((p) => (profile.id && p.id === profile.id) || getProfileSignature(p) === sig);
+}
+
 export function saveHoroscope(profile) {
   try {
     const existing = getSavedHoroscopes();
-    const id = profile.id || `profile_${Date.now()}`;
+    const sig = getProfileSignature(profile);
+    const existingIndex = existing.findIndex(
+      (p) => (profile.id && p.id === profile.id) || getProfileSignature(p) === sig
+    );
+
+    const id = existingIndex >= 0 ? existing[existingIndex].id : (profile.id || `profile_${Date.now()}`);
     const newProfile = {
       ...profile,
       id,
       savedAt: new Date().toISOString()
     };
-    const index = existing.findIndex((p) => p.id === id);
-    if (index >= 0) {
-      existing[index] = newProfile;
+
+    if (existingIndex >= 0) {
+      existing[existingIndex] = newProfile;
     } else {
       existing.unshift(newProfile);
     }
@@ -44,3 +67,4 @@ export function deleteSavedHoroscope(id) {
     return getSavedHoroscopes();
   }
 }
+

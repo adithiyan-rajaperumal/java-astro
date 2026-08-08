@@ -3,7 +3,7 @@ import BirthForm from '../components/BirthForm';
 import IndianChart from '../components/IndianChart';
 import AiPredictionsView from '../components/AiPredictionsView';
 import { t } from '../i18n/translations';
-import { getSavedHoroscopes, saveHoroscope, deleteSavedHoroscope } from '../utils/savedHoroscopes';
+import { getSavedHoroscopes, saveHoroscope, deleteSavedHoroscope, isProfileAlreadySaved } from '../utils/savedHoroscopes';
 
 function HoroscopePage({ settings }) {
   const [report, setReport] = useState(null);
@@ -553,8 +553,18 @@ function HoroscopePage({ settings }) {
               )}
             </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button onClick={handleSaveCurrentProfile} className="btn-primary" style={{ background: '#27ae60', borderColor: '#27ae60' }}>
-                💾 {t('saveProfile', settings.language) || 'Save Profile'}
+              <button
+                onClick={handleSaveCurrentProfile}
+                className="btn-primary"
+                style={{
+                  background: isProfileAlreadySaved(formPayload) ? 'rgba(39, 174, 96, 0.2)' : '#27ae60',
+                  borderColor: '#27ae60',
+                  color: isProfileAlreadySaved(formPayload) ? '#2ecc71' : '#fff'
+                }}
+              >
+                {isProfileAlreadySaved(formPayload)
+                  ? `✓ ${t('saved', settings.language) || 'Saved'}`
+                  : `💾 ${t('saveProfile', settings.language) || 'Save Profile'}`}
               </button>
               <button onClick={handleDownloadPdf} className="btn-primary">
                 📥 {t('downloadPdf', settings.language)}

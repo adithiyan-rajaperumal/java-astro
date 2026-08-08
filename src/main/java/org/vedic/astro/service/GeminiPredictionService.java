@@ -32,7 +32,10 @@ public class GeminiPredictionService {
         }
 
         if (!geminiProperties.isFeatureEnabled()) {
-            return generateOfflineRuleBasedBalan(req);
+            return PredictionResponseDTO.builder()
+                    .enabled(false)
+                    .message("AI prediction service is currently unavailable. Please verify API key configuration.")
+                    .build();
         }
 
         try {
@@ -41,10 +44,10 @@ public class GeminiPredictionService {
             return parseGeminiResponse(rawJson, req);
         } catch (Exception e) {
             log.error("Failed to generate AI predictions via Gemini: {}", e.getMessage(), e);
-            // Graceful fallback to deterministic astrological balan
-            PredictionResponseDTO fallback = generateOfflineRuleBasedBalan(req);
-            fallback.setMessage("AI Service temporarily unavailable. Generated using deterministic Vedic rules.");
-            return fallback;
+            return PredictionResponseDTO.builder()
+                    .enabled(false)
+                    .message("AI prediction service is currently unavailable. " + (e.getMessage() != null ? e.getMessage() : "Please check connection."))
+                    .build();
         }
     }
 
@@ -157,9 +160,11 @@ public class GeminiPredictionService {
             sb.append("- Use elegant, classical Vedic Astrological English with traditional Sanskrit astrological terms in parentheses.\n");
         }
 
-        sb.append("\n=== OUTPUT JSON REQUIREMENTS ===\n")
-          .append("Analyze the planetary matrix to calculate and identify ALL classical Yogas (e.g., Raja Yogas, Dhana Yogas, Gajakesari, Neechabhanga Raja Yoga, Vipareeta Raja Yoga, Budhaditya, Pancha Mahapurusha, Saraswati Yoga) and Doshams (e.g., Kuja/Sevvai, Rahu-Ketu, Kalathra, Pitru) along with Shastra-based nullification reasons.\n")
-          .append("Return ONLY valid JSON matching this schema:\n")
+        sb.append("\n=== STRICT PERSONALIZATION & ACCURACY DIRECTIVES ===\n")
+          .append("1. CRITICAL: DO NOT GENERATE GENERIC OR BOILERPLATE PREDICTIONS. Every single life event must be strictly deduced from this specific native's Lagna, exact planetary house placements (D1), Navamsha dignity (D9), and actual running Vimshottari Mahadasa-Bhukthi timeline.\n")
+          .append("2. In 'pastMilestones': You MUST generate realistic, personalized past life events matching the native's actual Dasa-Bhukthi lords and the houses they occupy (e.g. 4th lord Dasa brings schooling/property, 9th/10th brings career launch/higher education, 7th brings relationship/marriage, 8th/12th brings relocation/health shifts).\n")
+          .append("3. In 'futurePredictions': Provide continuous year-by-year forecasts starting from current year ").append(currentYear).append(" through upcoming years based on the active Dasa and transits.\n")
+          .append("4. Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
           .append("  \"overallSummary\": \"(Comprehensive astrological synthesis of Lagna lord dignity, yogakarakas, 9th/10th lords, and life trajectory in requested language)\",\n")
           .append("  \"aiYogas\": [\n")
@@ -181,10 +186,10 @@ public class GeminiPredictionService {
           .append("    {\n")
           .append("      \"year\": ").append(birthYear + 5).append(",\n")
           .append("      \"age\": 5,\n")
-          .append("      \"dasaBhukthi\": \"(e.g. Ketu - Venus)\",\n")
+          .append("      \"dasaBhukthi\": \"(Actual Dasa - Bhukthi lord for this year)\",\n")
           .append("      \"milestoneTitle\": \"(Title of past milestone in requested language)\",\n")
-          .append("      \"description\": \"(Astrological verification event: schooling, relocation, health, family milestone)\",\n")
-          .append("      \"astrologicalFactor\": \"(Planetary influence reason)\"\n")
+          .append("      \"description\": \"(Astrological verification event: schooling, relocation, health, family milestone deduced from planetary lord)\",\n")
+          .append("      \"astrologicalFactor\": \"(Planetary influence reason based on house lordship and placement)\"\n")
           .append("    }\n")
           .append("  ],\n")
           .append("  \"futurePredictions\": [\n")
@@ -212,7 +217,7 @@ public class GeminiPredictionService {
         Map<String, Object> textPart = Map.of("text", prompt);
         Map<String, Object> contentObj = Map.of("parts", List.of(textPart));
         Map<String, Object> generationConfig = Map.of(
-                "temperature", 0.3,
+                "temperature", 0.2,
                 "responseMimeType", "application/json"
         );
 
@@ -235,6 +240,32 @@ public class GeminiPredictionService {
     public PredictionResponseDTO parseGeminiResponse(String rawApiResponse, PredictionRequestDTO req) {
         try {
             JsonNode root = objectMapper.readTree(rawApiResponse);
+
+            // Extract usageMetadata
+            JsonNode usageNode = root.path("usageMetadata");
+            PredictionResponseDTO.TokenUsage tokenUsage = null;
+            if (!usageNode.isMissingNode()) {
+                int promptTokens = usageNode.path("promptTokenCount").asInt(0);
+                int completionTokens = usageNode.path("candidatesTokenCount").asInt(0);
+                int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
+
+                String model = geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-2.0-flash";
+                double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
+                double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
+
+                double costUsd = (promptTokens * promptRate) + (completionTokens * completionRate);
+                double costInr = costUsd * 87.0;
+
+                tokenUsage = PredictionResponseDTO.TokenUsage.builder()
+                        .promptTokens(promptTokens)
+                        .completionTokens(completionTokens)
+                        .totalTokens(totalTokens)
+                        .estimatedCostUsd(costUsd)
+                        .estimatedCostInr(costInr)
+                        .modelUsed(model)
+                        .build();
+            }
+
             JsonNode candidates = root.path("candidates");
             if (candidates.isArray() && !candidates.isEmpty()) {
                 JsonNode textNode = candidates.get(0).path("content").path("parts").get(0).path("text");
@@ -254,14 +285,22 @@ public class GeminiPredictionService {
 
                     PredictionResponseDTO parsed = objectMapper.readValue(jsonText, PredictionResponseDTO.class);
                     parsed.setEnabled(true);
+                    parsed.setTokenUsage(tokenUsage);
                     parsed.setMessage("AI Balan successfully synthesized via Google Gemini.");
                     return parsed;
                 }
             }
         } catch (Exception e) {
-            log.warn("Could not parse Gemini JSON response, falling back to rule-based generation: {}", e.getMessage());
+            log.error("Could not parse Gemini JSON response: {}", e.getMessage(), e);
+            return PredictionResponseDTO.builder()
+                    .enabled(false)
+                    .message("AI prediction generation failed to parse. Please try again.")
+                    .build();
         }
-        return generateOfflineRuleBasedBalan(req);
+        return PredictionResponseDTO.builder()
+                .enabled(false)
+                .message("AI prediction response was empty.")
+                .build();
     }
 
     public PredictionResponseDTO generateOfflineRuleBasedBalan(PredictionRequestDTO req) {
