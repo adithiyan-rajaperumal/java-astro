@@ -356,7 +356,7 @@ const translations = {
     ayanamsaFixedParasara: "பராசர பட்டர் (நிலையானது)",
     ayanamsaPushyapaksha: "புஷ்யபக்ஷ அயனாம்சம்",
     ayanamsaPushyapakshaParasara: "புஷ்யபக்ஷ அயனாம்சம் (22°39'34.88\")",
-    ayanamsaLahiri: "லஹிரி (சித்திர பக்கம்)",
+    ayanamsaLahiri: "லஹிரி (சித்திர பக்ஷம்)",
     ayanamsaKP: "கே.பி (கிருஷ்ணமூர்த்தி பத்தாதி)",
     ayanamsaRaman: "பி.வி. ராமன்",
     ayanamsaSurya: "சூரிய சித்தாந்தம்"
