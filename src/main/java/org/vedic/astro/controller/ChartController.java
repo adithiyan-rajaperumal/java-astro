@@ -31,10 +31,15 @@ public class ChartController {
 
     @GetMapping("/config")
     public ResponseEntity<org.vedic.astro.dto.AppConfigDTO> getAppConfig() {
-        boolean enabled = geminiProperties != null && geminiProperties.isFeatureEnabled();
-        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-1.5-flash";
+        boolean lifeEnabled = geminiProperties != null && geminiProperties.isLifePredictionsEnabled();
+        boolean dailyEnabled = geminiProperties != null && geminiProperties.isDailyBalanEnabled();
+        boolean pdfEnabled = geminiProperties != null && geminiProperties.isPdfPredictionsEnabled();
+        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-3.6-flash";
         return ResponseEntity.ok(org.vedic.astro.dto.AppConfigDTO.builder()
-                .aiPredictionsEnabled(enabled)
+                .aiPredictionsEnabled(lifeEnabled)
+                .lifePredictionsEnabled(lifeEnabled)
+                .dailyBalanEnabled(dailyEnabled)
+                .pdfPredictionsEnabled(pdfEnabled)
                 .geminiModel(model)
                 .build());
     }

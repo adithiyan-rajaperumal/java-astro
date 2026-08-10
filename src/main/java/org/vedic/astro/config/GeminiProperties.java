@@ -13,6 +13,9 @@ import java.util.Base64;
 public class GeminiProperties {
     private String apiKey = "";
     private boolean enabled = true;
+    private boolean lifePredictionsEnabled = true;
+    private boolean dailyBalanEnabled = true;
+    private boolean pdfPredictionsEnabled = true;
     private String model = "gemini-3.6-flash";
 
     public String getResolvedApiKey() {
@@ -34,5 +37,17 @@ public class GeminiProperties {
     public boolean isFeatureEnabled() {
         String key = getResolvedApiKey();
         return enabled && !key.isEmpty();
+    }
+
+    public boolean isLifePredictionsEnabled() {
+        return isFeatureEnabled() && lifePredictionsEnabled;
+    }
+
+    public boolean isDailyBalanEnabled() {
+        return isFeatureEnabled() && dailyBalanEnabled;
+    }
+
+    public boolean isPdfPredictionsEnabled() {
+        return isFeatureEnabled() && pdfPredictionsEnabled;
     }
 }
