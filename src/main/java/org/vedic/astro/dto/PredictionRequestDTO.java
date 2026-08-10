@@ -15,4 +15,5 @@ public class PredictionRequestDTO {
     private BirthDetailsDTO birthDetails;
     private ChartUiResponseDTO chartData;
     private String language;
+    private boolean forceRefresh;
 }

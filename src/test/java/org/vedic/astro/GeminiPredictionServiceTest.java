@@ -106,6 +106,27 @@ public class GeminiPredictionServiceTest {
     }
 
     @Test
+    public void testDailyBalanPromptConstruction() {
+        BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
+        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
+                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Vrishabha").nakshatra("Rohini").build())
+                .build();
+
+        DailyBalanRequestDTO req = DailyBalanRequestDTO.builder()
+                .birthDetails(birth)
+                .chartData(chart)
+                .targetDate("2026-08-10")
+                .language("ta")
+                .build();
+
+        DailyBalanDTO offlineDaily = predictionService.generateOfflineRuleBasedDailyBalan(req, null, java.time.LocalDate.of(2026, 8, 10));
+        assertNotNull(offlineDaily);
+        assertTrue(offlineDaily.isEnabled());
+        assertNotNull(offlineDaily.getGeneralOutlook());
+        assertNotNull(offlineDaily.getLuckyColor());
+    }
+
+    @Test
     public void testEncryptedApiKeyResolution() {
         org.vedic.astro.config.GeminiProperties props = new org.vedic.astro.config.GeminiProperties();
         props.setApiKey("enc:dGVzdC1rZXktMTIzNDU=");
