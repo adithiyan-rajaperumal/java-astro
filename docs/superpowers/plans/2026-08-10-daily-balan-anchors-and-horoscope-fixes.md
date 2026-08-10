@@ -2,12 +2,15 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Provide 100% deterministic, accurate daily astrological anchors (direction, color, number, time window), lock Daily Balan to today, display token & monetary cost badges, standardize clean text subtabs, and fix Ayanamsa/Panchangam display in the horoscope results header.
+**Goal:** Prompt Gemini to calculate all Yogas/Doshams fresh from raw planetary matrices without passing pre-calculated diagnostics; eliminate offline synthetic fallbacks and return localized unavailable messages on failure; provide deterministic daily astrological anchors (direction, color, number, time window); lock Daily Balan to today; display token & monetary cost badges; standardize clean text subtabs; and fix Ayanamsa/Panchangam display in the horoscope results header.
 
 **Architecture:** 
-1. `GeminiPredictionService.java`: Compute deterministic Vara Lord, Lucky Color, Lucky Number, Favorable Direction, and Auspicious Gowri Window from date & natal Moon sign; calculate USD/INR token costs in Daily Balan parser.
+1. `GeminiPredictionService.java`: 
+   - Exclude pre-calculated diagnostics from prompt; instruct Gemini to calculate all classical Yogas and Doshams fresh.
+   - Eliminate synthetic rule-based offline fallbacks; return `enabled: false` with localized unavailable messages on failure or when disabled.
+   - Compute deterministic Vara Lord, Lucky Color, Lucky Number, Favorable Direction, and Auspicious Gowri Window from date & natal Moon sign; calculate USD/INR token costs in Daily Balan parser.
 2. `DailyBalanView.jsx`: Remove date picker, lock forecast to today, and render Token Usage & Cost badge (`tokens, USD, INR, model`).
-3. `AiPredictionsView.jsx`: Render Token Usage & Cost badge (`tokens, USD, INR, model`).
+3. `AiPredictionsView.jsx`: Render Token Usage & Cost badge, and render distinct yearly categories without duplicate string concatenation.
 4. `HoroscopePage.jsx`: Normalize Ayanamsa/Panchangam system lookup mappings, display both in header results, and use clean text labels without emoji prefixes on subtabs.
 5. `translations.js`: Update subtab labels for clean text presentation.
 
@@ -15,20 +18,20 @@
 
 ---
 
-### Task 1: Backend Deterministic Gochara Engine & Cost Calculation
+### Task 1: Backend Fresh Astrological Synthesis, No Offline Fallback & Deterministic Gochara Anchors
 
 **Files:**
 - Modify: `src/main/java/org/vedic/astro/service/GeminiPredictionService.java`
 - Modify: `src/test/java/org/vedic/astro/GeminiPredictionServiceTest.java`
 
-- [ ] **Step 1: Write the unit test for deterministic daily Gochara attributes & token cost**
-- [ ] **Step 2: Implement deterministic Vara Lord, Direction, Color, Number, and Auspicious Window calculation and token cost in `GeminiPredictionService.java`**
+- [ ] **Step 1: Write unit tests in `GeminiPredictionServiceTest.java` verifying prompt does not contain precalculated diagnostics, unavailable error message on disabled/failure, deterministic daily Gochara attributes, and token cost computation**
+- [ ] **Step 2: Implement prompt modifications (fresh Yogas/Doshams), localized unavailable response (no offline fallback), deterministic Gochara anchors, and daily token cost in `GeminiPredictionService.java`**
 - [ ] **Step 3: Run `mvn test -Dtest=GeminiPredictionServiceTest` to verify PASS**
 - [ ] **Step 4: Commit changes**
 
 ---
 
-### Task 2: Frontend Token Cost Badges & Today-Only Daily Balan
+### Task 2: Frontend Token Cost Badges, Category Deduplication & Today-Only Daily Balan
 
 **Files:**
 - Modify: `frontend/src/components/DailyBalanView.jsx`
@@ -36,7 +39,8 @@
 
 - [ ] **Step 1: In `DailyBalanView.jsx`, remove date picker and lock target date to today**
 - [ ] **Step 2: In `DailyBalanView.jsx` and `AiPredictionsView.jsx`, render the full Token Usage & Monetary Cost badge (`tokens, USD, INR, model`)**
-- [ ] **Step 3: Commit changes**
+- [ ] **Step 3: In `AiPredictionsView.jsx`, ensure yearly cards render clean, distinct category blocks without duplicate text concatenation**
+- [ ] **Step 4: Commit changes**
 
 ---
 
