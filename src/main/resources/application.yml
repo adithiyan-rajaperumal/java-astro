@@ -26,6 +26,6 @@ spring:
     encoding: UTF-8
 
 gemini:
-  api-key: ${GEMINI_API_KEY:enc:QVEuQWI4Uk42SXZvc2QwSktCUF90UTZma0ZDOEhvSHk2anY5Y2JuMGdtTDRVc21JNW9acUE=}
+  api-key: ${GEMINI_API_KEY:enc:QVEuQWI4Uk42SnB2Q3pJcU1QWjh5SXhGVExXZmhWeUlONk9xb3I5RFFGNFVxSGcyTjFQRXc}
   enabled: ${GEMINI_ENABLED:true}
   model: ${GEMINI_MODEL:gemini-3.6-flash}
