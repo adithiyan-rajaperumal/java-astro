@@ -31,11 +31,20 @@ public class ChartController {
 
     @GetMapping("/config")
     public ResponseEntity<org.vedic.astro.dto.AppConfigDTO> getAppConfig() {
-        boolean enabled = geminiProperties != null && geminiProperties.isFeatureEnabled();
-        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-1.5-flash";
+        boolean lifeEnabled = geminiProperties != null && geminiProperties.isLifePredictionsEnabled();
+        boolean dailyEnabled = geminiProperties != null && geminiProperties.isDailyBalanEnabled();
+        boolean pdfEnabled = geminiProperties != null && geminiProperties.isPdfPredictionsEnabled();
+        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-3.6-flash";
+        double temperature = geminiProperties != null ? geminiProperties.getTemperature() : 0.4;
+        int thinkingBudget = geminiProperties != null ? geminiProperties.getThinkingBudget() : 1024;
         return ResponseEntity.ok(org.vedic.astro.dto.AppConfigDTO.builder()
-                .aiPredictionsEnabled(enabled)
+                .aiPredictionsEnabled(lifeEnabled)
+                .lifePredictionsEnabled(lifeEnabled)
+                .dailyBalanEnabled(dailyEnabled)
+                .pdfPredictionsEnabled(pdfEnabled)
                 .geminiModel(model)
+                .temperature(temperature)
+                .thinkingBudget(thinkingBudget)
                 .build());
     }
 
@@ -53,9 +62,20 @@ public class ChartController {
     }
 
     @PostMapping("/download-pdf")
-    public ResponseEntity<byte[]> downloadComprehensiveAstrologyReport(@RequestBody BirthDetailsDTO payload, @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType) {
+    public ResponseEntity<byte[]> downloadComprehensiveAstrologyReport(
+            @RequestBody BirthDetailsDTO payload,
+            @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType,
+            @RequestParam(required = false) String language,
+            @RequestHeader(value = "Accept-Language", defaultValue = "ta") String acceptLanguage) {
         try {
             org.vedic.astro.util.IndicPreShaper.setPdfMode(true);
+            String rawLang = (language != null && !language.isBlank()) ? language : acceptLanguage;
+            String effectiveLang = (rawLang != null && rawLang.contains(",")) ? rawLang.split(",")[0].trim() : (rawLang != null ? rawLang : "ta");
+            if (effectiveLang.contains("-")) effectiveLang = effectiveLang.split("-")[0].trim();
+            if (effectiveLang.contains("_")) effectiveLang = effectiveLang.split("_")[0].trim();
+            effectiveLang = effectiveLang.toLowerCase();
+            org.springframework.context.i18n.LocaleContextHolder.setLocale(java.util.Locale.forLanguageTag(effectiveLang));
+
             // Factory resolves strategy pattern dynamically
             PanchangamEngine engine = panchangamFactory.getEngine(systemType);
             ChartResult res = engine.calculate(payload);
@@ -63,13 +83,14 @@ public class ChartController {
             ComprehensiveReportDTO deepReportData = engine.generateComprehensiveReport(payload, res);
             deepReportData.setPanchangamSystem(systemType.name());
 
-            if (geminiProperties != null && geminiProperties.isFeatureEnabled() && geminiPredictionService != null) {
+            if (geminiProperties != null && geminiProperties.isPdfPredictionsEnabled() && geminiPredictionService != null) {
                 try {
                     ChartUiResponseDTO uiResp = orchestrationService.convertToUiDashboardResponse(res, payload);
                     org.vedic.astro.dto.PredictionRequestDTO predReq = org.vedic.astro.dto.PredictionRequestDTO.builder()
                             .birthDetails(payload)
                             .chartData(uiResp)
-                            .language(org.springframework.context.i18n.LocaleContextHolder.getLocale().getLanguage())
+                            .language(effectiveLang)
+                            .forceRefresh(false)
                             .build();
                     deepReportData.setAiPredictions(geminiPredictionService.generateLifePredictions(predReq));
                 } catch (Exception ignored) {}

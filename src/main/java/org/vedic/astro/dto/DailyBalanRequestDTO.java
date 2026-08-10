@@ -1,6 +1,5 @@
 package org.vedic.astro.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class PredictionRequestDTO {
+public class DailyBalanRequestDTO {
     private BirthDetailsDTO birthDetails;
     private ChartUiResponseDTO chartData;
+    private String targetDate;
     private String language;
     private boolean forceRefresh;
 }

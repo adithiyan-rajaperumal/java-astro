@@ -11,5 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AppConfigDTO {
     private boolean aiPredictionsEnabled;
+    private boolean lifePredictionsEnabled;
+    private boolean dailyBalanEnabled;
+    private boolean pdfPredictionsEnabled;
     private String geminiModel;
+    private double temperature;
+    private int thinkingBudget;
 }

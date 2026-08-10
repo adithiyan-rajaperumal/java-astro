@@ -106,10 +106,14 @@ public class PdfExportService {
             String sysKey = "system." + (data.getPanchangamSystem() != null ? data.getPanchangamSystem().toUpperCase() : "DRIK_TIRUKANITHAM");
             info.addCell(buildTableCell(ts.getLabel(sysKey), bFont, Element.ALIGN_LEFT));
 
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.lat"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(String.valueOf(data.getLatitude()), engBFont, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(ts.getLabel("pdf.info.long"), boldB, Element.ALIGN_LEFT));
-            info.addCell(buildTableCell(String.valueOf(data.getLongitude()), engBFont, Element.ALIGN_LEFT));
+            String pobLabel = "ta".equalsIgnoreCase(lang) ? "பிறந்த இடம்" : "Place of Birth";
+            info.addCell(buildTableCell(pobLabel, boldB, Element.ALIGN_LEFT));
+            String pobVal = data.getPlaceOfBirth() != null && !data.getPlaceOfBirth().isBlank()
+                    ? data.getPlaceOfBirth()
+                    : String.format("%.4f, %.4f", data.getLatitude(), data.getLongitude());
+            PdfPCell pobCell = buildTableCell(pobVal, engBFont, Element.ALIGN_LEFT);
+            pobCell.setColspan(3);
+            info.addCell(pobCell);
             document.add(info);
 
             // UPGRADED PANCHANGAM BAR: 2-Column layout expands width, stopping label fragmentation
@@ -268,6 +272,38 @@ public class PdfExportService {
                     document.add(summ);
                 }
 
+                // Native Personality Section
+                if (data.getAiPredictions().getNativePersonality() != null) {
+                    var np = data.getAiPredictions().getNativePersonality();
+                    if (np.getCoreTemperament() != null && !np.getCoreTemperament().isBlank()) {
+                        String pTitleStr = "ta".equalsIgnoreCase(lang) ? "ஜாதகரின் சுபாவம் & ஆளுமைத் திறன்" : "Native Personality & Core Temperament";
+                        Paragraph pH = buildMixedParagraph(pTitleStr, sFont, engSFont);
+                        pH.setSpacingAfter(4);
+                        document.add(pH);
+
+                        Paragraph pDesc = buildMixedParagraph(np.getCoreTemperament(), bFont, engBFont);
+                        pDesc.setSpacingAfter(10);
+                        document.add(pDesc);
+                    }
+                }
+
+                // Health & Vitality Diagnostics Section
+                if (data.getAiPredictions().getHealthAnalysis() != null) {
+                    var ha = data.getAiPredictions().getHealthAnalysis();
+                    String hTitleStr = "ta".equalsIgnoreCase(lang) ? "ஆரோக்கியம் & ஆயுள் பலம் (Health & Vitality Diagnostics)" : "Ayurvedic Constitution & Health Diagnostics";
+                    Paragraph hH = buildMixedParagraph(hTitleStr, sFont, engSFont);
+                    hH.setSpacingAfter(4);
+                    document.add(hH);
+
+                    String hDescText = (ha.getAyurvedicConstitution() != null ? ha.getAyurvedicConstitution() + " " : "")
+                            + (ha.getLongevityVitalitySummary() != null ? ha.getLongevityVitalitySummary() : "");
+                    if (!hDescText.isBlank()) {
+                        Paragraph hDesc = buildMixedParagraph(hDescText, bFont, engBFont);
+                        hDesc.setSpacingAfter(10);
+                        document.add(hDesc);
+                    }
+                }
+
                 // AI Classical Yogas Table
                 if (data.getAiPredictions().getAiYogas() != null && !data.getAiPredictions().getAiYogas().isEmpty()) {
                     String yogTitleStr = "ta".equalsIgnoreCase(lang) ? "ஜோதிட யோகங்கள் (Classical Vedic Yogas)" : "Classical Vedic Yogas & Astrological Formations";
@@ -345,30 +381,40 @@ public class PdfExportService {
                 }
 
                 // Future Predictions Table
-                if (data.getAiPredictions().getFuturePredictions() != null && !data.getAiPredictions().getFuturePredictions().isEmpty()) {
-                    String futTitleStr = "ta".equalsIgnoreCase(lang) ? "வருடாந்திர எதிர்கால பலன்கள் & வழிகாட்டுதல்" : "Year-by-Year Future Astrological Forecast";
+                var futureList = data.getAiPredictions().getLifetimePredictions() != null && !data.getAiPredictions().getLifetimePredictions().isEmpty()
+                        ? data.getAiPredictions().getLifetimePredictions()
+                        : data.getAiPredictions().getFuturePredictions();
+
+                if (futureList != null && !futureList.isEmpty()) {
+                    String futTitleStr = "ta".equalsIgnoreCase(lang) ? "வருடாந்திர வாழ்நாள் பலன்கள் & வழிகாட்டுதல்" : "Year-by-Year Lifetime Astrological Forecast";
                     Paragraph futH = buildMixedParagraph(futTitleStr, sFont, engSFont);
                     futH.setSpacingAfter(8);
                     document.add(futH);
 
-                    PdfPTable futTable = new PdfPTable(5);
+                    PdfPTable futTable = new PdfPTable(4);
                     futTable.setWidthPercentage(100);
                     futTable.setSpacingAfter(14);
-                    futTable.setWidths(new float[]{14f, 18f, 23f, 23f, 22f});
+                    futTable.setWidths(new float[]{14f, 22f, 44f, 20f});
 
                     PdfPCell fh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, Element.ALIGN_CENTER); fh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh1);
-                    PdfPCell fh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "திசா புக்தி" : "Dasa Period", boldB, Element.ALIGN_CENTER); fh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh2);
-                    PdfPCell fh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "தொழில் & செல்வம்" : "Career & Finance", boldB, Element.ALIGN_CENTER); fh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh3);
-                    PdfPCell fh4 = buildTableCell("ta".equalsIgnoreCase(lang) ? "உடல்நலம் & குடும்பம்" : "Health & Family", boldB, Element.ALIGN_CENTER); fh4.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh4);
-                    PdfPCell fh5 = buildTableCell("ta".equalsIgnoreCase(lang) ? "பரிகாரங்கள்" : "Remedies", boldB, Element.ALIGN_CENTER); fh5.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh5);
+                    PdfPCell fh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "திசா & ஜோதிட அடிப்படை" : "Dasa & Planetary Basis", boldB, Element.ALIGN_CENTER); fh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh2);
+                    PdfPCell fh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "ஆண்டு பலன் & விரிவான விபரம்" : "Yearly Forecast & Details", boldB, Element.ALIGN_CENTER); fh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh3);
+                    PdfPCell fh4 = buildTableCell("ta".equalsIgnoreCase(lang) ? "எச்சரிக்கைகள் & பரிகாரங்கள்" : "Cautions & Remedies", boldB, Element.ALIGN_CENTER); fh4.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh4);
 
-                    for (var f : data.getAiPredictions().getFuturePredictions()) {
+                    for (var f : futureList) {
                         futTable.addCell(buildTableCell(f.getYear() + " (Age " + f.getAge() + ")", engBFont, Element.ALIGN_CENTER));
-                        futTable.addCell(buildTableCell(f.getDasaBhukthi() != null ? f.getDasaBhukthi() : "", bFont, Element.ALIGN_LEFT));
-                        futTable.addCell(buildTableCell(f.getCareerFinance() != null ? f.getCareerFinance() : "", bFont, Element.ALIGN_LEFT));
-                        String healthFam = (f.getHealthVitality() != null ? f.getHealthVitality() : "") + " | " + (f.getFamilyMarriage() != null ? f.getFamilyMarriage() : "");
-                        futTable.addCell(buildTableCell(healthFam, bFont, Element.ALIGN_LEFT));
-                        futTable.addCell(buildTableCell(f.getRemediesGuidance() != null ? f.getRemediesGuidance() : "", bFont, Element.ALIGN_LEFT));
+                        String dasaBasis = (f.getDasaBhukthi() != null ? f.getDasaBhukthi() : "") +
+                                (f.getAstrologicalBasis() != null && !f.getAstrologicalBasis().isBlank() ? "\n[" + f.getAstrologicalBasis() + "]" : "");
+                        futTable.addCell(buildTableCell(dasaBasis, bFont, Element.ALIGN_LEFT));
+
+                        String narrative = (f.getYearlyTheme() != null && !f.getYearlyTheme().isBlank() ? "🎯 " + f.getYearlyTheme() + "\n\n" : "") +
+                                (f.getDetailedPrediction() != null && !f.getDetailedPrediction().isBlank() ? f.getDetailedPrediction() : ((f.getCareerAndFinance() != null ? f.getCareerAndFinance() : "") + " " + (f.getHealthAndFamily() != null ? f.getHealthAndFamily() : "")).trim());
+                        futTable.addCell(buildTableCell(narrative, bFont, Element.ALIGN_LEFT));
+
+                        String cautionsRemedies = f.getCautionsAndRemedies() != null && !f.getCautionsAndRemedies().isBlank()
+                                ? f.getCautionsAndRemedies()
+                                : (f.getRemediesGuidance() != null ? f.getRemediesGuidance() : "");
+                        futTable.addCell(buildTableCell(cautionsRemedies, bFont, Element.ALIGN_LEFT));
                     }
                     document.add(futTable);
                 }
@@ -575,6 +621,80 @@ public class PdfExportService {
             }
 
             document.add(kTable);
+
+            if (data.getAiMatchingPrediction() != null && data.getAiMatchingPrediction().isEnabled()) {
+                var ai = data.getAiMatchingPrediction();
+                document.newPage();
+                document.add(buildMixedParagraph(ts.getLabel("aiMatchingTitle"), sFont, engSFont));
+                document.add(new Paragraph(" ", bFont));
+
+                PdfPTable aiBanner = new PdfPTable(2);
+                aiBanner.setWidthPercentage(100);
+                aiBanner.setSpacingAfter(12);
+                aiBanner.setWidths(new float[]{50f, 50f});
+                aiBanner.addCell(buildTableCell(ts.getLabel("overallCompatibility") + ": " + String.format("%.1f%%", ai.getCompatibilityPercentage()), boldB, Element.ALIGN_LEFT));
+                aiBanner.addCell(buildTableCell(ts.getLabel("overallVerdict") + ": " + ai.getOverallVerdict(), boldB, Element.ALIGN_LEFT));
+                document.add(aiBanner);
+
+                if (ai.getExecutiveSummary() != null && !ai.getExecutiveSummary().isBlank()) {
+                    Paragraph p = buildMixedParagraph(ai.getExecutiveSummary(), bFont, engBFont);
+                    p.setSpacingAfter(10);
+                    document.add(p);
+                }
+
+                var domains = java.util.Arrays.asList(
+                        ai.getEmotionalMentalHarmony(),
+                        ai.getHealthLongevityNadi(),
+                        ai.getCareerFinancialSynergy(),
+                        ai.getProgenyFamilyLineage(),
+                        ai.getDoshaPapasamyaParity()
+                );
+
+                for (var d : domains) {
+                    if (d != null && d.getAnalysis() != null) {
+                        String titleText = (d.getTitle() != null ? d.getTitle() : "Domain Analysis") + 
+                                (d.getScoreOrStatus() != null ? " (" + d.getScoreOrStatus() + ")" : "");
+                        document.add(buildMixedParagraph("✦ " + titleText, boldB, engBFont));
+                        Paragraph ap = buildMixedParagraph(d.getAnalysis(), bFont, engBFont);
+                        ap.setSpacingAfter(6);
+                        document.add(ap);
+                        if (d.getAstrologicalBasis() != null && !d.getAstrologicalBasis().isBlank()) {
+                            Paragraph bp = buildMixedParagraph("• " + ts.getLabel("astrologicalBasis") + ": " + d.getAstrologicalBasis(), bFont, engBFont);
+                            bp.setSpacingAfter(8);
+                            document.add(bp);
+                        }
+                    }
+                }
+
+                if (ai.getKeyStrengths() != null && !ai.getKeyStrengths().isEmpty()) {
+                    document.add(buildMixedParagraph("✦ " + ts.getLabel("keyStrengthsTitle"), boldB, engBFont));
+                    for (String str : ai.getKeyStrengths()) {
+                        Paragraph sp = buildMixedParagraph("✔ " + str, bFont, engBFont);
+                        sp.setSpacingAfter(4);
+                        document.add(sp);
+                    }
+                    document.add(new Paragraph(" ", bFont));
+                }
+
+                if (ai.getGrowthAreasAndCautions() != null && !ai.getGrowthAreasAndCautions().isEmpty()) {
+                    document.add(buildMixedParagraph("✦ " + ts.getLabel("cautionsTitle"), boldB, engBFont));
+                    for (String c : ai.getGrowthAreasAndCautions()) {
+                        Paragraph cp = buildMixedParagraph("⚠ " + c, bFont, engBFont);
+                        cp.setSpacingAfter(4);
+                        document.add(cp);
+                    }
+                    document.add(new Paragraph(" ", bFont));
+                }
+
+                if (ai.getAuthenticVedicRemedies() != null && !ai.getAuthenticVedicRemedies().isEmpty()) {
+                    document.add(buildMixedParagraph("✦ " + ts.getLabel("remediesTitle"), boldB, engBFont));
+                    for (String r : ai.getAuthenticVedicRemedies()) {
+                        Paragraph rp = buildMixedParagraph("☸ " + r, bFont, engBFont);
+                        rp.setSpacingAfter(4);
+                        document.add(rp);
+                    }
+                }
+            }
 
             document.close();
         } catch (Exception e) {

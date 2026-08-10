@@ -22,6 +22,11 @@ public class AppConfigControllerTest {
         mockMvc.perform(get("/api/v1/astrology/config"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.geminiModel").exists())
-                .andExpect(jsonPath("$.aiPredictionsEnabled").isBoolean());
+                .andExpect(jsonPath("$.aiPredictionsEnabled").isBoolean())
+                .andExpect(jsonPath("$.lifePredictionsEnabled").isBoolean())
+                .andExpect(jsonPath("$.dailyBalanEnabled").isBoolean())
+                .andExpect(jsonPath("$.pdfPredictionsEnabled").isBoolean())
+                .andExpect(jsonPath("$.temperature").isNumber())
+                .andExpect(jsonPath("$.thinkingBudget").isNumber());
     }
 }

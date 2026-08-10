@@ -748,6 +748,29 @@ input:focus, select:focus {
 .verdict-badge.average { background: rgba(255, 152, 0, 0.2); color: #ff9800; border: 1px solid #ff9800; }
 .verdict-badge.not_recommended { background: rgba(244, 67, 54, 0.2); color: #f44336; border: 1px solid #f44336; }
 
+@media (max-width: 600px) {
+  .matching-header {
+    margin-bottom: 15px;
+    padding: 15px 10px !important;
+  }
+  .score-circle {
+    width: 90px;
+    height: 90px;
+    border-width: 4px;
+    margin-bottom: 10px;
+  }
+  .score-circle .number {
+    font-size: 24px;
+  }
+  .score-circle .label {
+    font-size: 11px;
+  }
+  .verdict-badge {
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+}
+
 /* Language settings */
 .lang-selector-grid {
   display: grid;
