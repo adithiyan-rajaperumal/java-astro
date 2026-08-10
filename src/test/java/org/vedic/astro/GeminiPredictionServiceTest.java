@@ -56,6 +56,11 @@ public class GeminiPredictionServiceTest {
         // Pre-calculated structural diagnostics should NOT be passed to Gemini
         assertFalse(prompt.contains("Diagnostics:"));
         assertTrue(prompt.contains("detailedPrediction"));
+        assertTrue(prompt.contains("Ayurdaya Determination") || prompt.contains("ஆயுள் நிர்ணயம்"));
+        assertTrue(prompt.contains("Career, Business & Wealth"));
+        assertTrue(prompt.contains("Health & Vitality Realities"));
+        assertTrue(prompt.contains("Family, Marriage & Progeny"));
+        assertTrue(prompt.contains("Parents, Elders & Mindset"));
     }
 
     @Test
