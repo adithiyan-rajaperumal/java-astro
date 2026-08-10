@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import BirthForm from '../components/BirthForm';
 import IndianChart from '../components/IndianChart';
 import AiPredictionsView from '../components/AiPredictionsView';
+import DailyBalanView from '../components/DailyBalanView';
 import { t } from '../i18n/translations';
 import { getSavedHoroscopes, saveHoroscope, deleteSavedHoroscope, isProfileAlreadySaved } from '../utils/savedHoroscopes';
 
@@ -14,17 +15,34 @@ function HoroscopePage({ settings }) {
   const [formPayload, setFormPayload] = useState(null);
   const [savedProfiles, setSavedProfiles] = useState(() => getSavedHoroscopes());
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
-  const [aiEnabled, setAiEnabled] = useState(true);
+
+  // Granular Feature Flags from Backend
+  const [lifeEnabled, setLifeEnabled] = useState(true);
+  const [dailyEnabled, setDailyEnabled] = useState(true);
+
+  // Lifetime Predictions state
   const [predictions, setPredictions] = useState(null);
   const [predLoading, setPredLoading] = useState(false);
   const [predError, setPredError] = useState(null);
+
+  // Daily Balan state
+  const [dailyBalan, setDailyBalan] = useState(null);
+  const [dailyLoading, setDailyLoading] = useState(false);
+  const [dailyError, setDailyError] = useState(null);
 
   useEffect(() => {
     fetch('/api/v1/astrology/config')
       .then((res) => (res.ok ? res.json() : null))
       .then((cfg) => {
-        if (cfg && typeof cfg.aiPredictionsEnabled === 'boolean') {
-          setAiEnabled(cfg.aiPredictionsEnabled);
+        if (cfg) {
+          if (typeof cfg.lifePredictionsEnabled === 'boolean') {
+            setLifeEnabled(cfg.lifePredictionsEnabled);
+          } else if (typeof cfg.aiPredictionsEnabled === 'boolean') {
+            setLifeEnabled(cfg.aiPredictionsEnabled);
+          }
+          if (typeof cfg.dailyBalanEnabled === 'boolean') {
+            setDailyEnabled(cfg.dailyBalanEnabled);
+          }
         }
       })
       .catch(() => {});
@@ -33,7 +51,16 @@ function HoroscopePage({ settings }) {
   useEffect(() => {
     setReport(null);
     setPredictions(null);
+    setDailyBalan(null);
+    setActiveSubTab('charts'); // Reset subtab on language change
   }, [settings.language]);
+
+  const handleResetToNewChart = () => {
+    setReport(null);
+    setPredictions(null);
+    setDailyBalan(null);
+    setActiveSubTab('charts'); // Clean reset so tabs never stick
+  };
 
   const handleSaveCurrentProfile = () => {
     if (!formPayload) return;
@@ -79,6 +106,7 @@ function HoroscopePage({ settings }) {
       panchangamSystem: 'DRIK_TIRUKANITHAM'
     };
     setFormPayload(payload);
+    setActiveSubTab('charts'); // Always start on charts for loaded profile
     handleFormSubmit(payload);
   };
 
@@ -87,6 +115,8 @@ function HoroscopePage({ settings }) {
     setError(null);
     setFormPayload(payload);
     setPredictions(null);
+    setDailyBalan(null);
+    setActiveSubTab('charts'); // Always default to charts on calculate
     try {
       const response = await fetch('/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
@@ -99,9 +129,6 @@ function HoroscopePage({ settings }) {
       if (response.ok) {
         const data = await response.json();
         setReport(data);
-        if (typeof data.aiPredictionsEnabled === 'boolean') {
-          setAiEnabled(data.aiPredictionsEnabled);
-        }
       } else {
         throw new Error('Failed to generate horoscope report.');
       }
@@ -112,8 +139,35 @@ function HoroscopePage({ settings }) {
     }
   };
 
-  const handleGeneratePredictions = async () => {
+  const getLifeStorageKey = (payload, lang) => {
+    if (!payload) return null;
+    return `drik_life_${payload.name}_${payload.year}_${payload.month}_${payload.day}_${payload.latitude}_${payload.longitude}_${lang}`;
+  };
+
+  const getDailyStorageKey = (payload, date, lang) => {
+    if (!payload) return null;
+    return `drik_daily_${payload.name}_${payload.year}_${payload.month}_${payload.day}_${date}_${lang}`;
+  };
+
+  const handleGeneratePredictions = async (forceRefresh = false) => {
     if (!report || !formPayload) return;
+    const cacheKey = getLifeStorageKey(formPayload, settings.language);
+
+    if (!forceRefresh && cacheKey) {
+      try {
+        const localCached = localStorage.getItem(cacheKey);
+        if (localCached) {
+          const parsed = JSON.parse(localCached);
+          if (parsed && parsed.expiry && Date.now() < parsed.expiry) {
+            setPredictions(parsed.data);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('localStorage read error:', e);
+      }
+    }
+
     setPredLoading(true);
     setPredError(null);
     try {
@@ -126,12 +180,24 @@ function HoroscopePage({ settings }) {
         body: JSON.stringify({
           birthDetails: formPayload,
           chartData: report,
-          language: settings.language
+          language: settings.language,
+          forceRefresh
         })
       });
       if (response.ok) {
         const data = await response.json();
         setPredictions(data);
+        if (cacheKey && data.enabled) {
+          try {
+            const cacheObj = {
+              expiry: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
+              data
+            };
+            localStorage.setItem(cacheKey, JSON.stringify(cacheObj));
+          } catch (e) {
+            console.warn('localStorage write error:', e);
+          }
+        }
       } else {
         throw new Error('Failed to generate AI predictions.');
       }
@@ -139,6 +205,68 @@ function HoroscopePage({ settings }) {
       setPredError(e.message);
     } finally {
       setPredLoading(false);
+    }
+  };
+
+  const handleGenerateDailyBalan = async (targetDate, forceRefresh = false) => {
+    if (!report || !formPayload) return;
+    const dateStr = targetDate || new Date().toISOString().split('T')[0];
+    const cacheKey = getDailyStorageKey(formPayload, dateStr, settings.language);
+
+    if (!forceRefresh && cacheKey) {
+      try {
+        const localCached = localStorage.getItem(cacheKey);
+        if (localCached) {
+          const parsed = JSON.parse(localCached);
+          if (parsed && parsed.expiry && Date.now() < parsed.expiry) {
+            setDailyBalan(parsed.data);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('localStorage read error:', e);
+      }
+    }
+
+    setDailyLoading(true);
+    setDailyError(null);
+    try {
+      const response = await fetch('/api/v1/astrology/predictions/daily', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
+        body: JSON.stringify({
+          birthDetails: formPayload,
+          chartData: report,
+          targetDate: dateStr,
+          language: settings.language,
+          forceRefresh
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setDailyBalan(data);
+        if (cacheKey && data.enabled) {
+          try {
+            const endOfDay = new Date(dateStr + 'T23:59:59').getTime();
+            const cacheObj = {
+              expiry: endOfDay,
+              data
+            };
+            localStorage.setItem(cacheKey, JSON.stringify(cacheObj));
+          } catch (e) {
+            console.warn('localStorage write error:', e);
+          }
+        }
+      } else {
+        throw new Error('Failed to generate Daily Balan.');
+      }
+    } catch (e) {
+      setDailyError(e.message);
+    } finally {
+      setDailyLoading(false);
     }
   };
 
@@ -249,59 +377,80 @@ function HoroscopePage({ settings }) {
       );
     }
 
-    const today = new Date().toISOString().split('T')[0];
-
     return (
       <div className="card">
         <h3 className="title-gold">{t('dasaTab', settings.language)}</h3>
-        <div className="dasa-accordion">
-          {timeline.map((dasa, idx) => {
-            const startStr = formatDate(dasa.startDate);
-            const endStr = formatDate(dasa.endDate);
-            const isCurrent = today >= startStr && today <= endStr;
-            const isExpanded = expandedDasa === idx || (expandedDasa === null && (isCurrent || idx === 0));
+        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '15px' }}>
+          {language === 'ta' ? 'விம்சோத்தரி மகாதிசா மற்றும் அந்தர்திசா (புக்தி) கால அட்டவணை' : 'Vimshottari Mahadasa and Bhukthi Timeline'}
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {timeline.map((dasa, dIdx) => {
+            const isExpanded = expandedDasa === dIdx;
+            const planetKey = (dasa.planetKey || dasa.planetName || '').toLowerCase();
+            const localizedPlanet = t('planet.' + planetKey, settings.language) !== ('planet.' + planetKey)
+              ? t('planet.' + planetKey, settings.language)
+              : (dasa.planetName || dasa.planetKey);
 
             return (
-              <div key={idx} className="dasa-item" style={isCurrent ? { borderLeft: '4px solid var(--accent-gold)' } : {}}>
+              <div 
+                key={dIdx} 
+                style={{ 
+                  border: '1px solid var(--border)', 
+                  borderRadius: '8px', 
+                  overflow: 'hidden',
+                  background: isExpanded ? 'rgba(255, 215, 0, 0.03)' : 'var(--bg-card)'
+                }}
+              >
                 <div 
-                  className={`dasa-header ${isExpanded ? 'active' : ''}`}
-                  onClick={() => setExpandedDasa(isExpanded ? -1 : idx)}
+                  onClick={() => setExpandedDasa(isExpanded ? null : dIdx)}
+                  style={{ 
+                    padding: '12px 16px', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    userSelect: 'none'
+                  }}
                 >
-                  <span style={{ fontWeight: 'bold', color: isCurrent ? 'var(--accent-warm)' : 'var(--accent-gold)' }}>
-                    ☀️ {t('planet.' + (dasa.planetName || '').toLowerCase(), settings.language)} {t('mahaDasa', settings.language)} {isCurrent ? `(${t('active', settings.language)})` : ''}
-                  </span>
-                  <span>
-                    {startStr} to {endStr}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '16px' }}>{isExpanded ? '▼' : '▶'}</span>
+                    <strong style={{ fontSize: '15px', color: 'var(--accent-gold)' }}>
+                      {localizedPlanet} {t('mahaDasa', settings.language)}
+                    </strong>
+                  </div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                    {formatDate(dasa.startDate)} ➔ {formatDate(dasa.endDate)}
+                  </div>
                 </div>
+
                 {isExpanded && dasa.bhukthis && dasa.bhukthis.length > 0 && (
-                  <div className="dasa-body" style={{ padding: '15px 0' }}>
-                    <div className="bhukthi-grid">
-                      {dasa.bhukthis.map((bhukthi, bidx) => {
-                        const bStartStr = formatDate(bhukthi.startDate);
-                        const bEndStr = formatDate(bhukthi.endDate);
-                        const isBhukthiCurrent = today >= bStartStr && today <= bEndStr;
-                        return (
-                          <div 
-                            key={bidx} 
-                            className="bhukthi-card" 
-                            style={{
-                              padding: '10px 12px',
-                              borderRadius: '8px',
-                              border: isBhukthiCurrent ? '2px solid var(--accent-gold)' : '1px solid var(--border)',
-                              backgroundColor: isBhukthiCurrent ? 'var(--bg-card-hover)' : 'var(--bg-card)'
-                            }}
-                          >
-                            <div style={{ fontWeight: 'bold', color: isBhukthiCurrent ? 'var(--accent-gold)' : 'var(--accent-warm)' }}>
-                              {t('planet.' + (bhukthi.planetName || '').toLowerCase(), settings.language)} {t('bhukthi', settings.language)} {isBhukthiCurrent ? `(${t('active', settings.language)})` : ''}
-                            </div>
-                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                              {bStartStr} to {bEndStr}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                  <div style={{ padding: '0 16px 12px 16px', borderTop: '1px solid var(--border)' }}>
+                    <table className="horai-table" style={{ marginTop: '8px', fontSize: '13px' }}>
+                      <thead>
+                        <tr>
+                          <th>{t('bhukthi', settings.language)}</th>
+                          <th>{t('from', settings.language) || 'From'}</th>
+                          <th>{t('until', settings.language) || 'To'}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dasa.bhukthis.map((bhukthi, bIdx) => {
+                          const bPlanetKey = (bhukthi.planetKey || bhukthi.planetName || '').toLowerCase();
+                          const bLocalizedPlanet = t('planet.' + bPlanetKey, settings.language) !== ('planet.' + bPlanetKey)
+                            ? t('planet.' + bPlanetKey, settings.language)
+                            : (bhukthi.planetName || bhukthi.planetKey);
+
+                          return (
+                            <tr key={bIdx}>
+                              <td style={{ fontWeight: 'bold' }}>{bLocalizedPlanet}</td>
+                              <td>{formatDate(bhukthi.startDate)}</td>
+                              <td>{formatDate(bhukthi.endDate)}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </div>
@@ -313,10 +462,25 @@ function HoroscopePage({ settings }) {
   };
 
   const renderShadbalaTab = () => {
-    if (!report || !report.shadbalaStrengths?.planetStrengths) return null;
+    const shadbala = report?.shadbalaStrengths;
+    if (!report || !shadbala || !shadbala.planetStrengths) {
+      return (
+        <div className="card">
+          <h3 className="title-gold">{t('shadbalaTab', settings.language)}</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>No Shadbala strength data available.</p>
+        </div>
+      );
+    }
+
+    const planets = Object.keys(shadbala.planetStrengths);
+
     return (
       <div className="card">
         <h3 className="title-gold">{t('shadbalaTab', settings.language)}</h3>
+        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '15px' }}>
+          {language === 'ta' ? '6 விதமான கிரக பலங்களின் (ஸ்தான, திக், கால, சேஷ்டா, திருக், நைசர்கிக) மதிப்பீடு' : 'Six-fold Planetary Strength Assessment (in Rupas)'}
+        </p>
+
         <div className="horai-table-container">
           <table className="horai-table">
             <thead>
@@ -331,24 +495,30 @@ function HoroscopePage({ settings }) {
               </tr>
             </thead>
             <tbody>
-              {Object.entries(report.shadbalaStrengths.planetStrengths).map(([planet, strength], idx) => {
-                const isStrong = strength.strengthCategory?.toLowerCase().includes('strong');
-                const isWeak = strength.strengthCategory?.toLowerCase().includes('weak');
+              {planets.map((planetKey, idx) => {
+                const strength = shadbala.planetStrengths[planetKey];
+                const localizedPlanet = t('planet.' + planetKey.toLowerCase(), settings.language) !== ('planet.' + planetKey.toLowerCase())
+                  ? t('planet.' + planetKey.toLowerCase(), settings.language)
+                  : planetKey;
+
                 return (
                   <tr key={idx}>
-                    <td style={{ fontWeight: 'bold' }}>{t('planet.' + planet.toLowerCase(), settings.language)}</td>
-                    <td>{strength.sthanaBala.toFixed(2)}</td>
-                    <td>{strength.digBala.toFixed(2)}</td>
-                    <td>{strength.kalaBala.toFixed(2)}</td>
-                    <td>{strength.cheshtaBala.toFixed(2)}</td>
+                    <td style={{ fontWeight: 'bold' }}>{localizedPlanet}</td>
+                    <td>{strength.sthanaBala?.toFixed(1)}</td>
+                    <td>{strength.digBala?.toFixed(1)}</td>
+                    <td>{strength.kalaBala?.toFixed(1)}</td>
+                    <td>{strength.cheshtaBala?.toFixed(1)}</td>
                     <td style={{ fontWeight: 'bold', color: 'var(--accent-gold)' }}>
-                      {strength.totalShadbalaRupas.toFixed(2)}
+                      {strength.totalShadbalaRupas?.toFixed(2)} R
                     </td>
-                    <td style={{
-                      color: isStrong ? 'var(--success)' : isWeak ? 'var(--danger)' : 'var(--accent-gold)',
-                      fontWeight: 'bold'
-                    }}>
-                      {strength.strengthCategory?.toLowerCase().includes('strong') ? t('veryStrong', settings.language) : strength.strengthCategory?.toLowerCase().includes('weak') ? t('weak', settings.language) : t('optimum', settings.language)}
+                    <td>
+                      <span style={{ 
+                        color: strength.strengthCategory === 'STRONG' || strength.strengthCategory === 'VERY_STRONG' ? '#27ae60' : '#e67e22',
+                        fontWeight: 'bold',
+                        fontSize: '12px'
+                      }}>
+                        {strength.strengthCategory}
+                      </span>
                     </td>
                   </tr>
                 );
@@ -361,137 +531,126 @@ function HoroscopePage({ settings }) {
   };
 
   const renderDiagnosticsTab = () => {
-    if (!report || !report.structuralDiagnostics) return null;
-    const diag = report.structuralDiagnostics;
+    const diag = report?.structuralDiagnostics;
+    if (!report || !diag) {
+      return (
+        <div className="card">
+          <h3 className="title-gold">{t('diagnosticsTab', settings.language)}</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>No structural diagnostics available.</p>
+        </div>
+      );
+    }
+
+    const yogas = diag.activeYogas || [];
+    const doshams = diag.discoveredDoshams || [];
+
     return (
       <div>
+        {/* Yogas */}
         <div className="card">
-          <h3 className="title-gold">{t('yogasDetected', settings.language)}</h3>
-          <div className="grid-2">
-            {diag.activeYogas?.map((yoga, idx) => (
-              <div key={idx} className="card" style={{ borderLeft: '4px solid var(--accent-gold)', margin: 0 }}>
-                <h4 style={{ margin: '0 0 5px', color: 'var(--accent-gold)' }}>{yoga.name}</h4>
-                <p style={{ fontSize: '14px' }}>{yoga.description}</p>
-                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                  {t('impact', settings.language)}: {yoga.impactLevel}
-                </p>
-              </div>
-            ))}
-            {(!diag.activeYogas || diag.activeYogas.length === 0) && (
-              <p>{t('noYogasDetected', settings.language)}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="card">
-          <h3 className="title-gold">{t('doshamsEvaluated', settings.language)}</h3>
-          <div className="dosha-grid">
-            {diag.discoveredDoshams?.map((dosha, idx) => {
-              const active = dosha.active;
-              const nullified = dosha.nullified;
-              let badgeClass = 'none';
-              let badgeText = dosha.severity || 'None';
-              if (active) {
-                badgeClass = 'active';
-              } else if (nullified) {
-                badgeClass = 'cancelled';
-              }
-
-              return (
-                <div key={idx} className="dosha-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                    <h4 style={{ margin: 0, color: 'var(--text-primary)', flex: '1 1 180px', fontSize: '15px', lineHeight: '1.45' }}>{dosha.name}</h4>
-                    <span className={`dosha-badge ${badgeClass}`}>{badgeText}</span>
-                  </div>
-                  
-                  {nullified && (
-                    <p style={{ fontSize: '13px', color: 'var(--success)', marginTop: '5px' }}>
-                      <strong>{t('cancelled', settings.language)}:</strong> {dosha.nullificationReason}
-                    </p>
-                  )}
-                  {active && (
-                    <p style={{ fontSize: '13px', color: 'var(--accent-warm)', marginTop: '5px' }}>
-                      <strong>{t('remedy', settings.language)}:</strong> {dosha.remedySuggestion}
-                    </p>
-                  )}
-                  {!active && !nullified && (
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{t('noDoshasDetected', settings.language)}</p>
-                  )}
+          <h3 className="title-gold">{t('yogasDetected', settings.language)} ({yogas.length})</h3>
+          {yogas.length === 0 ? (
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>{t('noYogasDetected', settings.language)}</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
+              {yogas.map((y, idx) => (
+                <div key={idx} style={{ background: 'rgba(255, 215, 0, 0.04)', border: '1px solid rgba(255, 215, 0, 0.25)', borderRadius: '8px', padding: '12px' }}>
+                  <h4 style={{ margin: '0 0 6px', fontSize: '14px', color: 'var(--accent-gold)' }}>
+                    👑 {y.name}
+                  </h4>
+                  <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                    {y.description}
+                  </p>
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {diag.horoscopicSpecialities && diag.horoscopicSpecialities.length > 0 && (
-          <div className="card">
-            <h3 className="title-gold">{t('specialFeatures', settings.language)}</h3>
-            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', color: 'var(--text-primary)' }}>
-              {diag.horoscopicSpecialities.map((s, idx) => (
-                <li key={idx} style={{ marginBottom: '6px' }}>{s}</li>
+        {/* Doshams */}
+        <div className="card">
+          <h3 className="title-gold">{t('doshamsEvaluated', settings.language)} ({doshams.length})</h3>
+          {doshams.length === 0 ? (
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>{t('noDoshasDetected', settings.language)}</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
+              {doshams.map((d, idx) => (
+                <div 
+                  key={idx} 
+                  style={{ 
+                    background: d.nullified ? 'rgba(39, 174, 96, 0.05)' : 'rgba(231, 76, 60, 0.05)',
+                    border: `1px solid ${d.nullified ? 'rgba(39, 174, 96, 0.4)' : 'rgba(231, 76, 60, 0.4)'}`,
+                    borderRadius: '8px', 
+                    padding: '14px' 
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <h4 style={{ margin: 0, fontSize: '14px', color: d.nullified ? '#27ae60' : '#e74c3c' }}>
+                      {d.nullified ? '✓ ' : '⚠️ '}{d.name}
+                    </h4>
+                    <span style={{ 
+                      background: d.nullified ? '#27ae60' : '#e74c3c', 
+                      color: '#fff', 
+                      fontSize: '11px', 
+                      padding: '2px 8px', 
+                      borderRadius: '12px',
+                      fontWeight: 'bold'
+                    }}>
+                      {d.nullified ? t('cancelled', settings.language) : t('active', settings.language)}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                    {d.reason || d.nullificationReason || d.description}
+                  </p>
+                </div>
               ))}
-            </ul>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     );
   };
 
-  const getAyanamsaLabel = (ayanamsaCode, lang) => {
-    const code = (ayanamsaCode || settings.ayanamsa || 'LAHIRI').toUpperCase();
-    const pSys = formPayload?.panchangamSystem || settings.panchangamSystem;
-    if (code === 'PUSHYAPAKSHA' && pSys === 'PARASARA_BHATTAR') {
-      return t('ayanamsaPushyapakshaParasara', lang);
-    }
-    const keyMap = {
-      LAHIRI: 'ayanamsaLahiri',
-      KP: 'ayanamsaKP',
-      RAMAN: 'ayanamsaRaman',
-      SURYA_SIDDHANTA: 'ayanamsaSurya',
-      PUSHYAPAKSHA: 'ayanamsaPushyapaksha',
-      VAKYA: 'ayanamsaFixedVakya'
-    };
-    return t(keyMap[code] || 'ayanamsaLahiri', lang);
+  const getAyanamsaLabel = (key, lang) => {
+    return t('ayanamsa' + (key || 'Lahiri'), lang) || key || 'Lahiri';
   };
+
+  const language = settings.language;
 
   return (
     <div>
-      <h2 className="title-gold">{t('horoscope', settings.language)}</h2>
-
       {!report && !loading && (
         <>
+          {/* Saved Profiles Section */}
           {savedProfiles.length > 0 && (
-            <div className="card" style={{ marginBottom: '15px', background: 'rgba(255, 215, 0, 0.05)', border: '1px dashed var(--accent-gold)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--accent-gold)' }}>
-                  📁 {t('savedProfiles', settings.language) || 'Saved Horoscope Profiles'} ({savedProfiles.length})
-                </span>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {savedProfiles.map((p) => (
+            <div className="card" style={{ marginBottom: '20px' }}>
+              <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: 'var(--accent-gold)' }}>
+                📁 {t('savedProfiles', settings.language) || 'Saved Horoscope Profiles'} ({savedProfiles.length})
+              </h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {savedProfiles.map((prof) => (
                   <div
-                    key={p.id}
-                    onClick={() => handleLoadSavedProfile(p)}
+                    key={prof.id}
+                    onClick={() => handleLoadSavedProfile(prof)}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      background: 'var(--bg-card)',
+                      background: 'rgba(255, 215, 0, 0.06)',
                       border: '1px solid var(--border)',
                       borderRadius: '6px',
-                      padding: '6px 12px',
+                      padding: '8px 12px',
                       cursor: 'pointer',
                       fontSize: '13px'
                     }}
-                    title={`${p.name} - ${p.day}/${p.month}/${p.year}`}
                   >
-                    <span>📜 <strong>{p.name}</strong> ({p.day}/{p.month}/{p.year})</span>
+                    <span>👤 <strong>{prof.name}</strong> ({prof.day}/{prof.month}/{prof.year})</span>
                     <button
-                      onClick={(e) => handleDeleteProfile(e, p.id)}
-                      style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '0 2px', fontSize: '14px' }}
-                      title="Delete profile"
+                      onClick={(e) => handleDeleteProfile(e, prof.id)}
+                      style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: '12px', padding: 0 }}
+                      title="Delete"
                     >
-                      ×
+                      ✕
                     </button>
                   </div>
                 ))}
@@ -530,7 +689,7 @@ function HoroscopePage({ settings }) {
         <div className="card" style={{ borderLeft: '4px solid var(--danger)' }}>
           <p style={{ color: 'var(--danger)', fontWeight: 'bold' }}>{t('errorLoadingPanchangam', settings.language)}</p>
           <p>{error}</p>
-          <button onClick={() => setReport(null)} className="btn-primary" style={{ marginTop: '10px' }}>{t('retry', settings.language)}</button>
+          <button onClick={handleResetToNewChart} className="btn-primary" style={{ marginTop: '10px' }}>{t('retry', settings.language)}</button>
         </div>
       )}
 
@@ -569,7 +728,7 @@ function HoroscopePage({ settings }) {
               <button onClick={handleDownloadPdf} className="btn-primary">
                 📥 {t('downloadPdf', settings.language)}
               </button>
-              <button onClick={() => setReport(null)} className="btn-primary" style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+              <button onClick={handleResetToNewChart} className="btn-primary" style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 {t('newChart', settings.language)}
               </button>
             </div>
@@ -601,12 +760,20 @@ function HoroscopePage({ settings }) {
             >
               {t('diagnosticsTab', settings.language)}
             </button>
-            {aiEnabled && (
+            {lifeEnabled && (
               <button 
                 className={`tab-btn ${activeSubTab === 'predictions' ? 'active' : ''}`}
                 onClick={() => setActiveSubTab('predictions')}
               >
                 {t('aiBalanTab', settings.language)}
+              </button>
+            )}
+            {dailyEnabled && (
+              <button 
+                className={`tab-btn ${activeSubTab === 'daily' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('daily')}
+              >
+                {t('dailyBalanTab', settings.language)}
               </button>
             )}
           </div>
@@ -625,6 +792,17 @@ function HoroscopePage({ settings }) {
               predictions={predictions}
               loading={predLoading}
               error={predError}
+            />
+          )}
+          {activeSubTab === 'daily' && (
+            <DailyBalanView
+              report={report}
+              formPayload={formPayload}
+              language={settings.language}
+              onGenerateDaily={handleGenerateDailyBalan}
+              dailyBalan={dailyBalan}
+              loading={dailyLoading}
+              error={dailyError}
             />
           )}
         </div>
