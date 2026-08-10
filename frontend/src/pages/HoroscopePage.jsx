@@ -394,6 +394,43 @@ function HoroscopePage({ settings }) {
     return String(val);
   };
 
+  const parseDateToComparable = (val) => {
+    if (!val) return null;
+    const str = formatDate(val);
+    return str ? new Date(str + 'T00:00:00') : null;
+  };
+
+  const isPeriodActive = (startDateVal, endDateVal) => {
+    const s = parseDateToComparable(startDateVal);
+    const e = parseDateToComparable(endDateVal);
+    if (!s || !e) return false;
+    const now = new Date();
+    // End date should include the full end day till 23:59:59
+    const eEnd = new Date(e.getTime() + 86400000);
+    return now >= s && now <= eEnd;
+  };
+
+  // Auto-expand active Mahadasa when report loads
+  useEffect(() => {
+    const timeline = report?.currentDasaTimeline || report?.vimshottariTimeline;
+    if (timeline && timeline.length > 0) {
+      const activeIdx = timeline.findIndex(d => isPeriodActive(d.startDate, d.endDate));
+      if (activeIdx !== -1) {
+        setExpandedDasa(activeIdx);
+      }
+    }
+  }, [report]);
+
+  const REQUIRED_SHADBALA_RUPAS = {
+    SUN: 6.5,
+    MOON: 6.0,
+    MARS: 5.0,
+    MERCURY: 7.0,
+    JUPITER: 6.5,
+    VENUS: 5.5,
+    SATURN: 5.0
+  };
+
   const renderDasaTab = () => {
     const timeline = report?.currentDasaTimeline || report?.vimshottariTimeline;
     if (!report || !timeline || timeline.length === 0) {
@@ -415,6 +452,7 @@ function HoroscopePage({ settings }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {timeline.map((dasa, dIdx) => {
             const isExpanded = expandedDasa === dIdx;
+            const isActiveDasa = isPeriodActive(dasa.startDate, dasa.endDate);
             const planetKey = (dasa.planetKey || dasa.planetName || '').toLowerCase();
             const localizedPlanet = t('planet.' + planetKey, settings.language) !== ('planet.' + planetKey)
               ? t('planet.' + planetKey, settings.language)
@@ -424,10 +462,13 @@ function HoroscopePage({ settings }) {
               <div 
                 key={dIdx} 
                 style={{ 
-                  border: '1px solid var(--border)', 
+                  border: isActiveDasa ? '2px solid var(--accent-gold)' : '1px solid var(--border)', 
                   borderRadius: '8px', 
                   overflow: 'hidden',
-                  background: isExpanded ? 'rgba(255, 215, 0, 0.03)' : 'var(--bg-card)'
+                  background: isActiveDasa 
+                    ? 'rgba(255, 215, 0, 0.08)' 
+                    : (isExpanded ? 'rgba(255, 215, 0, 0.03)' : 'var(--bg-card)'),
+                  boxShadow: isActiveDasa ? '0 0 10px rgba(255, 215, 0, 0.15)' : 'none'
                 }}
               >
                 <div 
@@ -438,7 +479,9 @@ function HoroscopePage({ settings }) {
                     justifyContent: 'space-between', 
                     alignItems: 'center',
                     cursor: 'pointer',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    flexWrap: 'wrap',
+                    gap: '8px'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -446,8 +489,23 @@ function HoroscopePage({ settings }) {
                     <strong style={{ fontSize: '15px', color: 'var(--accent-gold)' }}>
                       {localizedPlanet} {t('mahaDasa', settings.language)}
                     </strong>
+                    {isActiveDasa && (
+                      <span style={{ 
+                        fontSize: '11px', 
+                        background: 'var(--accent-gold)', 
+                        color: '#000', 
+                        padding: '2px 8px', 
+                        borderRadius: '12px', 
+                        fontWeight: 'bold',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        ✨ {t('currentActiveDasa', settings.language) || 'Current Dasa'}
+                      </span>
+                    )}
                   </div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  <div style={{ fontSize: '13px', color: isActiveDasa ? 'var(--accent-gold)' : 'var(--text-secondary)', fontWeight: isActiveDasa ? 'bold' : 'normal' }}>
                     {formatDate(dasa.startDate)} ➔ {formatDate(dasa.endDate)}
                   </div>
                 </div>
@@ -464,14 +522,29 @@ function HoroscopePage({ settings }) {
                       </thead>
                       <tbody>
                         {dasa.bhukthis.map((bhukthi, bIdx) => {
+                          const isActiveBhukthi = isPeriodActive(bhukthi.startDate, bhukthi.endDate);
                           const bPlanetKey = (bhukthi.planetKey || bhukthi.planetName || '').toLowerCase();
                           const bLocalizedPlanet = t('planet.' + bPlanetKey, settings.language) !== ('planet.' + bPlanetKey)
                             ? t('planet.' + bPlanetKey, settings.language)
                             : (bhukthi.planetName || bhukthi.planetKey);
 
                           return (
-                            <tr key={bIdx}>
-                              <td style={{ fontWeight: 'bold' }}>{bLocalizedPlanet}</td>
+                            <tr 
+                              key={bIdx}
+                              style={{
+                                background: isActiveBhukthi ? 'rgba(255, 215, 0, 0.18)' : 'transparent',
+                                fontWeight: isActiveBhukthi ? 'bold' : 'normal',
+                                color: isActiveBhukthi ? 'var(--accent-gold)' : 'inherit'
+                              }}
+                            >
+                              <td>
+                                {isActiveBhukthi ? '⭐ ' : ''}{bLocalizedPlanet}
+                                {isActiveBhukthi && (
+                                  <span style={{ fontSize: '10px', marginLeft: '6px', background: 'rgba(255, 215, 0, 0.25)', padding: '1px 6px', borderRadius: '4px' }}>
+                                    {t('currentActiveDasa', settings.language) || 'Current'}
+                                  </span>
+                                )}
+                              </td>
                               <td>{formatDate(bhukthi.startDate)}</td>
                               <td>{formatDate(bhukthi.endDate)}</td>
                             </tr>
@@ -528,6 +601,10 @@ function HoroscopePage({ settings }) {
                 const localizedPlanet = t('planet.' + planetKey.toLowerCase(), settings.language) !== ('planet.' + planetKey.toLowerCase())
                   ? t('planet.' + planetKey.toLowerCase(), settings.language)
                   : planetKey;
+                const reqRupas = REQUIRED_SHADBALA_RUPAS[planetKey.toUpperCase()] || 6.0;
+                const totalRupas = strength.totalShadbalaRupas || 0;
+                const pct = Math.round((totalRupas / reqRupas) * 100);
+                const isStrong = totalRupas >= reqRupas;
 
                 return (
                   <tr key={idx}>
@@ -536,16 +613,19 @@ function HoroscopePage({ settings }) {
                     <td>{strength.digBala?.toFixed(1)}</td>
                     <td>{strength.kalaBala?.toFixed(1)}</td>
                     <td>{strength.cheshtaBala?.toFixed(1)}</td>
-                    <td style={{ fontWeight: 'bold', color: 'var(--accent-gold)' }}>
-                      {strength.totalShadbalaRupas?.toFixed(2)} R
+                    <td style={{ fontWeight: 'bold', color: isStrong ? '#2ecc71' : '#e67e22' }}>
+                      {totalRupas.toFixed(2)} R ({pct}%)
                     </td>
                     <td>
                       <span style={{ 
-                        color: strength.strengthCategory === 'STRONG' || strength.strengthCategory === 'VERY_STRONG' ? '#27ae60' : '#e67e22',
+                        color: isStrong ? '#27ae60' : '#e67e22',
+                        background: isStrong ? 'rgba(39, 174, 96, 0.1)' : 'rgba(230, 126, 34, 0.1)',
+                        padding: '2px 8px',
+                        borderRadius: '10px',
                         fontWeight: 'bold',
                         fontSize: '12px'
                       }}>
-                        {strength.strengthCategory}
+                        {strength.strengthCategory || (isStrong ? 'STRONG' : 'MODERATE')}
                       </span>
                     </td>
                   </tr>
@@ -602,45 +682,66 @@ function HoroscopePage({ settings }) {
             <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>{t('noDoshasDetected', settings.language)}</p>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
-              {doshams.map((d, idx) => (
-                <div 
-                  key={idx} 
-                  style={{ 
-                    background: d.nullified ? 'rgba(39, 174, 96, 0.05)' : 'rgba(231, 76, 60, 0.05)',
-                    border: `1px solid ${d.nullified ? 'rgba(39, 174, 96, 0.4)' : 'rgba(231, 76, 60, 0.4)'}`,
-                    borderRadius: '8px', 
-                    padding: '14px' 
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <h4 style={{ margin: 0, fontSize: '14px', color: d.nullified ? '#27ae60' : '#e74c3c' }}>
-                      {d.nullified ? '✓ ' : '⚠️ '}{d.name}
-                    </h4>
-                    <span style={{ 
-                      background: d.nullified ? '#27ae60' : '#e74c3c', 
-                      color: '#fff', 
-                      fontSize: '11px', 
-                      padding: '2px 8px', 
-                      borderRadius: '12px',
-                      fontWeight: 'bold'
-                    }}>
-                      {d.nullified ? t('cancelled', settings.language) : t('active', settings.language)}
-                    </span>
+              {doshams.map((d, idx) => {
+                const isNotDetected = !d.detected;
+                const isNullified = d.detected && d.nullified;
+                const isActive = d.detected && !d.nullified;
+
+                const borderColor = isNotDetected 
+                  ? 'rgba(39, 174, 96, 0.25)' 
+                  : (isNullified ? 'rgba(39, 174, 96, 0.5)' : 'rgba(231, 76, 60, 0.5)');
+                const bgColor = isNotDetected 
+                  ? 'rgba(39, 174, 96, 0.02)' 
+                  : (isNullified ? 'rgba(39, 174, 96, 0.06)' : 'rgba(231, 76, 60, 0.06)');
+                const titleColor = isNotDetected 
+                  ? '#27ae60' 
+                  : (isNullified ? '#2ecc71' : '#e74c3c');
+                const badgeText = isNotDetected 
+                  ? `✓ ${t('noDosham', settings.language) || 'No Affliction'}` 
+                  : (isNullified ? `🛡️ ${t('cancelled', settings.language) || 'Cancelled'}` : `⚠️ ${t('active', settings.language) || 'Active'}`);
+                const badgeBg = isNotDetected 
+                  ? 'rgba(39, 174, 96, 0.15)' 
+                  : (isNullified ? '#27ae60' : '#e74c3c');
+                const badgeColor = isNotDetected ? '#2ecc71' : '#fff';
+
+                return (
+                  <div 
+                    key={idx} 
+                    style={{ 
+                      background: bgColor,
+                      border: `1px solid ${borderColor}`,
+                      borderRadius: '8px', 
+                      padding: '14px' 
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <h4 style={{ margin: 0, fontSize: '14px', color: titleColor }}>
+                        {isNotDetected ? '✓ ' : (isNullified ? '🛡️ ' : '⚠️ ')}{d.name}
+                      </h4>
+                      <span style={{ 
+                        background: badgeBg, 
+                        color: badgeColor, 
+                        fontSize: '11px', 
+                        padding: '2px 8px', 
+                        borderRadius: '12px',
+                        fontWeight: 'bold'
+                      }}>
+                        {badgeText}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                      {isNullified 
+                        ? (d.nullificationReason || d.reason || t('noDoshasDetected', settings.language))
+                        : (isActive ? (d.remedySuggestion || d.reason || d.description) : (d.description || t('noDoshasDetected', settings.language)))}
+                    </p>
                   </div>
-                  <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                    {d.reason || d.nullificationReason || d.description}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
       </div>
     );
-  };
-
-  const getAyanamsaLabel = (key, lang) => {
-    return t('ayanamsa' + (key || 'Lahiri'), lang) || key || 'Lahiri';
   };
 
   const language = settings.language;
