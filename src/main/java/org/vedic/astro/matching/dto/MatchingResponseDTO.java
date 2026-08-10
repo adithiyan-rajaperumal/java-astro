@@ -22,4 +22,5 @@ public class MatchingResponseDTO {
     private String panchangamSystem;
     private ChartUiResponseDTO boyProfile;
     private ChartUiResponseDTO girlProfile;
+    private MatchingAiPredictionDTO aiMatchingPrediction;
 }

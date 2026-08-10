@@ -30,6 +30,7 @@ gemini:
   enabled: ${GEMINI_ENABLED:true}
   life-predictions-enabled: ${GEMINI_LIFE_PREDICTIONS_ENABLED:true}
   daily-balan-enabled: ${GEMINI_DAILY_BALAN_ENABLED:true}
+  matching-enabled: ${GEMINI_MATCHING_ENABLED:true}
   pdf-predictions-enabled: ${GEMINI_PDF_PREDICTIONS_ENABLED:true}
   model: ${GEMINI_MODEL:gemini-3.6-flash}
   temperature: ${GEMINI_TEMPERATURE:0.4}

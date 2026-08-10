@@ -622,6 +622,80 @@ public class PdfExportService {
 
             document.add(kTable);
 
+            if (data.getAiMatchingPrediction() != null && data.getAiMatchingPrediction().isEnabled()) {
+                var ai = data.getAiMatchingPrediction();
+                document.newPage();
+                document.add(buildMixedParagraph(ts.getLabel("aiMatchingTitle"), sFont, engSFont));
+                document.add(new Paragraph(" ", bFont));
+
+                PdfPTable aiBanner = new PdfPTable(2);
+                aiBanner.setWidthPercentage(100);
+                aiBanner.setSpacingAfter(12);
+                aiBanner.setWidths(new float[]{50f, 50f});
+                aiBanner.addCell(buildTableCell(ts.getLabel("overallCompatibility") + ": " + String.format("%.1f%%", ai.getCompatibilityPercentage()), boldB, Element.ALIGN_LEFT));
+                aiBanner.addCell(buildTableCell(ts.getLabel("overallVerdict") + ": " + ai.getOverallVerdict(), boldB, Element.ALIGN_LEFT));
+                document.add(aiBanner);
+
+                if (ai.getExecutiveSummary() != null && !ai.getExecutiveSummary().isBlank()) {
+                    Paragraph p = buildMixedParagraph(ai.getExecutiveSummary(), bFont, engBFont);
+                    p.setSpacingAfter(10);
+                    document.add(p);
+                }
+
+                var domains = java.util.Arrays.asList(
+                        ai.getEmotionalMentalHarmony(),
+                        ai.getHealthLongevityNadi(),
+                        ai.getCareerFinancialSynergy(),
+                        ai.getProgenyFamilyLineage(),
+                        ai.getDoshaPapasamyaParity()
+                );
+
+                for (var d : domains) {
+                    if (d != null && d.getAnalysis() != null) {
+                        String titleText = (d.getTitle() != null ? d.getTitle() : "Domain Analysis") + 
+                                (d.getScoreOrStatus() != null ? " (" + d.getScoreOrStatus() + ")" : "");
+                        document.add(buildMixedParagraph("✦ " + titleText, boldB, engBFont));
+                        Paragraph ap = buildMixedParagraph(d.getAnalysis(), bFont, engBFont);
+                        ap.setSpacingAfter(6);
+                        document.add(ap);
+                        if (d.getAstrologicalBasis() != null && !d.getAstrologicalBasis().isBlank()) {
+                            Paragraph bp = buildMixedParagraph("• " + ts.getLabel("astrologicalBasis") + ": " + d.getAstrologicalBasis(), bFont, engBFont);
+                            bp.setSpacingAfter(8);
+                            document.add(bp);
+                        }
+                    }
+                }
+
+                if (ai.getKeyStrengths() != null && !ai.getKeyStrengths().isEmpty()) {
+                    document.add(buildMixedParagraph("✦ " + ts.getLabel("keyStrengthsTitle"), boldB, engBFont));
+                    for (String str : ai.getKeyStrengths()) {
+                        Paragraph sp = buildMixedParagraph("✔ " + str, bFont, engBFont);
+                        sp.setSpacingAfter(4);
+                        document.add(sp);
+                    }
+                    document.add(new Paragraph(" ", bFont));
+                }
+
+                if (ai.getGrowthAreasAndCautions() != null && !ai.getGrowthAreasAndCautions().isEmpty()) {
+                    document.add(buildMixedParagraph("✦ " + ts.getLabel("cautionsTitle"), boldB, engBFont));
+                    for (String c : ai.getGrowthAreasAndCautions()) {
+                        Paragraph cp = buildMixedParagraph("⚠ " + c, bFont, engBFont);
+                        cp.setSpacingAfter(4);
+                        document.add(cp);
+                    }
+                    document.add(new Paragraph(" ", bFont));
+                }
+
+                if (ai.getAuthenticVedicRemedies() != null && !ai.getAuthenticVedicRemedies().isEmpty()) {
+                    document.add(buildMixedParagraph("✦ " + ts.getLabel("remediesTitle"), boldB, engBFont));
+                    for (String r : ai.getAuthenticVedicRemedies()) {
+                        Paragraph rp = buildMixedParagraph("☸ " + r, bFont, engBFont);
+                        rp.setSpacingAfter(4);
+                        document.add(rp);
+                    }
+                }
+            }
+
             document.close();
         } catch (Exception e) {
             throw new RuntimeException(e);

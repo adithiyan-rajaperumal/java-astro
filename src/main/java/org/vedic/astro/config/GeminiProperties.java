@@ -15,6 +15,7 @@ public class GeminiProperties {
     private boolean enabled = true;
     private boolean lifePredictionsEnabled = true;
     private boolean dailyBalanEnabled = true;
+    private boolean matchingEnabled = true;
     private boolean pdfPredictionsEnabled = true;
     private String model = "gemini-3.6-flash";
     private double temperature = 0.4;
@@ -47,6 +48,10 @@ public class GeminiProperties {
 
     public boolean isDailyBalanEnabled() {
         return isFeatureEnabled() && dailyBalanEnabled;
+    }
+
+    public boolean isMatchingEnabled() {
+        return isFeatureEnabled() && matchingEnabled;
     }
 
     public boolean isPdfPredictionsEnabled() {

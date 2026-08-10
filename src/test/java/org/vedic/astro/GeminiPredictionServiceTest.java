@@ -191,4 +191,43 @@ public class GeminiPredictionServiceTest {
         assertEquals(2048, props.getThinkingBudget());
         assertEquals(0.5, props.getTemperature(), 0.001);
     }
+
+    @Test
+    public void testMatchingPromptConstructionAndDirectives() {
+        BirthDetailsDTO boy = new BirthDetailsDTO("Karthik", 1992, 4, 18, 9, 30, 0, 13.0827, 80.2707, "LAHIRI");
+        BirthDetailsDTO girl = new BirthDetailsDTO("Priya", 1995, 8, 22, 14, 15, 0, 13.0827, 80.2707, "LAHIRI");
+
+        org.vedic.astro.matching.dto.MatchingRequestDTO req = new org.vedic.astro.matching.dto.MatchingRequestDTO(
+                boy, girl, org.vedic.astro.matching.MatchingType.ASHTA_KOOTA, org.vedic.astro.matching.StrictnessLevel.MODERATE
+        );
+
+        org.vedic.astro.matching.dto.MatchingResponseDTO classical = org.vedic.astro.matching.dto.MatchingResponseDTO.builder()
+                .totalScore(28.0)
+                .maxScore(36.0)
+                .percentage(77.8)
+                .verdict("Good")
+                .boyProfile(ChartUiResponseDTO.builder()
+                        .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Thula").nakshatra("Swati").nakshatraPada(2).build())
+                        .build())
+                .girlProfile(ChartUiResponseDTO.builder()
+                        .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Karka").rashi("Mithuna").nakshatra("Ardra").nakshatraPada(3).build())
+                        .build())
+                .build();
+
+        String prompt = predictionService.constructMatchingPrompt(req, classical);
+        assertNotNull(prompt);
+        assertTrue(prompt.contains("Karthik"));
+        assertTrue(prompt.contains("Priya"));
+        assertTrue(prompt.contains("ASHTA_KOOTA"));
+        assertTrue(prompt.contains("emotionalMentalHarmony"));
+        assertTrue(prompt.contains("healthLongevityNadi"));
+        assertTrue(prompt.contains("careerFinancialSynergy"));
+        assertTrue(prompt.contains("progenyFamilyLineage"));
+        assertTrue(prompt.contains("doshaPapasamyaParity"));
+
+        org.vedic.astro.matching.dto.MatchingAiPredictionDTO unavail = predictionService.createUnavailableMatchingResponse("ta");
+        assertNotNull(unavail);
+        assertFalse(unavail.isEnabled());
+        assertTrue(unavail.getMessage().contains("கிடைக்கவில்லை"));
+    }
 }

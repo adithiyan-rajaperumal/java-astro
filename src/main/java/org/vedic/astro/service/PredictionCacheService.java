@@ -18,10 +18,35 @@ public class PredictionCacheService {
 
     private final Map<String, CacheEntry<PredictionResponseDTO>> lifetimeCache = new ConcurrentHashMap<>();
     private final Map<String, CacheEntry<DailyBalanDTO>> dailyCache = new ConcurrentHashMap<>();
+    private final Map<String, CacheEntry<org.vedic.astro.matching.dto.MatchingAiPredictionDTO>> matchingCache = new ConcurrentHashMap<>();
 
     private record CacheEntry<T>(T data, LocalDateTime expiresAt) {
         boolean isExpired() {
             return LocalDateTime.now().isAfter(expiresAt);
+        }
+    }
+
+    public String generateMatchingKey(org.vedic.astro.matching.dto.MatchingRequestDTO req, String lang) {
+        if (req == null || req.boy() == null || req.girl() == null) return "unknown";
+        String raw = String.format("MATCH_%s_%d_%d_%d_%s_%d_%d_%d_%s_%s_%s",
+                req.boy().name(), req.boy().year(), req.boy().month(), req.boy().day(),
+                req.girl().name(), req.girl().year(), req.girl().month(), req.girl().day(),
+                req.matchingSystem(), req.strictness(), lang);
+        return sha256(raw);
+    }
+
+    public org.vedic.astro.matching.dto.MatchingAiPredictionDTO getMatchingPrediction(String key) {
+        CacheEntry<org.vedic.astro.matching.dto.MatchingAiPredictionDTO> entry = matchingCache.get(key);
+        if (entry != null && !entry.isExpired()) {
+            return entry.data();
+        }
+        matchingCache.remove(key);
+        return null;
+    }
+
+    public void putMatchingPrediction(String key, org.vedic.astro.matching.dto.MatchingAiPredictionDTO data) {
+        if (data != null && data.isEnabled()) {
+            matchingCache.put(key, new CacheEntry<>(data, LocalDateTime.now().plusHours(3)));
         }
     }
 

@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.vedic.astro.config.GeminiProperties;
 import org.vedic.astro.dto.*;
+import org.vedic.astro.matching.dto.MatchingAiPredictionDTO;
+import org.vedic.astro.matching.dto.MatchingRequestDTO;
+import org.vedic.astro.matching.dto.MatchingResponseDTO;
+import org.vedic.astro.matching.dto.KootaResultDTO;
 import org.vedic.astro.model.DasaPeriod;
 
 import java.time.LocalDate;
@@ -913,5 +917,230 @@ public class GeminiPredictionService {
 
     private String getEnglishPastMilestoneDesc(int age, String dasa) {
         return "Significant milestone at age " + age + " influenced by " + dasa + " period.";
+    }
+
+    // ==========================================
+    // AI-BASED MARRIAGE MATCHING ENGINE
+    // ==========================================
+
+    public MatchingAiPredictionDTO generateMarriageMatchingAiAnalysis(
+            MatchingRequestDTO req,
+            MatchingResponseDTO classicalResult,
+            String lang,
+            boolean forceRefresh) {
+
+        if (req == null || req.boy() == null || req.girl() == null) {
+            return MatchingAiPredictionDTO.builder()
+                    .enabled(false)
+                    .message("Invalid birth details provided for marriage compatibility analysis.")
+                    .build();
+        }
+
+        String effectiveLang = lang != null ? lang : "ta";
+        String cacheKey = cacheService.generateMatchingKey(req, effectiveLang);
+
+        // Check 3-Hour Cache if not forced refresh
+        if (!forceRefresh) {
+            MatchingAiPredictionDTO cached = cacheService.getMatchingPrediction(cacheKey);
+            if (cached != null) {
+                log.info("Returning 3-hour cached AI Marriage Compatibility for {} & {}", req.boy().name(), req.girl().name());
+                return cached;
+            }
+        }
+
+        if (!geminiProperties.isMatchingEnabled()) {
+            log.info("Gemini marriage matching is disabled or API key is absent.");
+            return createUnavailableMatchingResponse(effectiveLang);
+        }
+
+        try {
+            String systemInstruction = constructMatchingSystemInstruction(effectiveLang);
+            String prompt = constructMatchingPrompt(req, classicalResult);
+            String rawJson = callGeminiApi(systemInstruction, prompt);
+            MatchingAiPredictionDTO parsed = parseMatchingGeminiResponse(rawJson, effectiveLang, req, classicalResult);
+            if (parsed.isEnabled()) {
+                cacheService.putMatchingPrediction(cacheKey, parsed);
+            }
+            return parsed;
+        } catch (Exception e) {
+            log.error("Failed to generate AI Marriage Compatibility via Gemini: {}", e.getMessage(), e);
+            return createUnavailableMatchingResponse(effectiveLang);
+        }
+    }
+
+    public String constructMatchingSystemInstruction(String lang) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("You are a revered Vedic Marriage Astrologer (Vivaha Jyotish Acharya) with masterful command of Brihat Parasara Hora Shastra, Prasna Marga, Muhurtha Chintamani, and Jathaka Porutham.\n")
+          .append("Your task is to analyze the complete dual-horoscope planetary matrix (D1, D9 Navamsa, Shadbala, Kuja Dosha, Papasamya, Dasa Sandhi, and classical Koota results) for the Boy and Girl to provide an authoritative, deep, compassionate, and authentic Vedic Marriage Compatibility Analysis in language '").append(lang).append("'.\n\n")
+          .append("CRITICAL REQUIREMENTS:\n")
+          .append("- Write 100% of all JSON text values in the native script of '").append(lang).append("'.\n")
+          .append("- Rigorously apply all authentic classical nullifications (e.g. Kuja Dosha cancellation if Mars is in own/exalted sign, in 2nd/4th/7th/8th/12th in friendly signs, or if both charts possess balanced Kuja Dosha; Rajju exceptions when nakshatras have different padas or lords are friends; Gana Dosha cancellation if Rasi lords are identical or friendly).\n")
+          .append("- Provide profound psychological, financial, health, progeny, and spiritual insight rather than generic cliches.\n")
+          .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
+        return sb.toString();
+    }
+
+    public String constructMatchingPrompt(MatchingRequestDTO req, MatchingResponseDTO classicalResult) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== VEDIC DUAL HOROSCOPE MARRIAGE MATCHING REQUEST ===\n\n");
+
+        sb.append("--- GROOM (BOY) DETAILS ---\n")
+          .append("Name: ").append(req.boy().name()).append("\n")
+          .append("Date of Birth: ").append(req.boy().day()).append("/").append(req.boy().month()).append("/").append(req.boy().year()).append("\n")
+          .append("Time of Birth: ").append(req.boy().hour()).append(":").append(req.boy().minute()).append("\n");
+        if (classicalResult.getBoyProfile() != null && classicalResult.getBoyProfile().getBirthProfile() != null) {
+            var p = classicalResult.getBoyProfile().getBirthProfile();
+            sb.append("Lagna: ").append(p.getLagna()).append(" | Rasi: ").append(p.getRashi()).append(" | Nakshatra: ").append(p.getNakshatra()).append(" (Pada: ").append(p.getNakshatraPada()).append(")\n");
+        }
+        sb.append("\n");
+
+        sb.append("--- BRIDE (GIRL) DETAILS ---\n")
+          .append("Name: ").append(req.girl().name()).append("\n")
+          .append("Date of Birth: ").append(req.girl().day()).append("/").append(req.girl().month()).append("/").append(req.girl().year()).append("\n")
+          .append("Time of Birth: ").append(req.girl().hour()).append(":").append(req.girl().minute()).append("\n");
+        if (classicalResult.getGirlProfile() != null && classicalResult.getGirlProfile().getBirthProfile() != null) {
+            var p = classicalResult.getGirlProfile().getBirthProfile();
+            sb.append("Lagna: ").append(p.getLagna()).append(" | Rasi: ").append(p.getRashi()).append(" | Nakshatra: ").append(p.getNakshatra()).append(" (Pada: ").append(p.getNakshatraPada()).append(")\n");
+        }
+        sb.append("\n");
+
+        sb.append("--- CLASSICAL MATCHING RESULTS ---\n")
+          .append("Matching System: ").append(req.matchingSystem()).append("\n")
+          .append("Strictness: ").append(req.strictness()).append("\n")
+          .append("Classical Scored Points: ").append(classicalResult.getTotalScore()).append(" / ").append(classicalResult.getMaxScore())
+          .append(" (").append(String.format("%.1f", classicalResult.getPercentage())).append("%)\n")
+          .append("Classical Verdict: ").append(classicalResult.getVerdict()).append("\n");
+
+        if (classicalResult.getKootas() != null && !classicalResult.getKootas().isEmpty()) {
+            sb.append("Koota/Porutham Breakdown:\n");
+            for (KootaResultDTO k : classicalResult.getKootas()) {
+                sb.append(String.format("- %s: %s (Scored: %.1f/%.1f) - %s\n", k.getName(), k.getStatus(), k.getScoredPoints(), k.getMaxPoints(), k.getDescription()));
+            }
+            sb.append("\n");
+        }
+
+        if (classicalResult.getWarnings() != null && !classicalResult.getWarnings().isEmpty()) {
+            sb.append("Algorithmic Warnings:\n");
+            for (String w : classicalResult.getWarnings()) {
+                sb.append("- ").append(w).append("\n");
+            }
+            sb.append("\n");
+        }
+
+        sb.append("=== GENERATION DIRECTIVES ===\n")
+          .append("1. 'overallVerdict': EXCELLENT, VERY_GOOD, GOOD, AVERAGE, or NOT_RECOMMENDED.\n")
+          .append("2. 'compatibilityPercentage': Numeric value between 0.0 and 100.0 synthesizing the total compatibility.\n")
+          .append("3. 'executiveSummary': Comprehensive 2-3 paragraph synthesis explaining the fundamental karmic harmony, life path synergy, and long-term potential of this marriage.\n")
+          .append("4. Five Detailed Domain Analysis objects (title, scoreOrStatus, analysis, astrologicalBasis):\n")
+          .append("   - 'emotionalMentalHarmony': Moon-Rasi, Gana, and Vashya emotional dynamic.\n")
+          .append("   - 'healthLongevityNadi': Nadi koota, Ayurvedic constitution (Vata/Pitta/Kapha), 8th house longevity and vitality balance.\n")
+          .append("   - 'careerFinancialSynergy': Wealth alignment, 2nd/11th/10th houses interaction, mutual prosperity after marriage.\n")
+          .append("   - 'progenyFamilyLineage': Saptamsa D7, 5th house, Jupiter, Rajju/Mahendra harmony and lineage continuation.\n")
+          .append("   - 'doshaPapasamyaParity': Sevvai/Kuja Dosha, Rahu-Ketu, Shani balance, nullification evaluation, and Dasa Sandhi overlap.\n")
+          .append("5. 'keyStrengths': 3-4 distinct pillars that fortify this relationship.\n")
+          .append("6. 'growthAreasAndCautions': 2-3 specific behavioral or astrological cautions to be mindful of.\n")
+          .append("7. 'authenticVedicRemedies': 2-3 targeted authentic Vedic remedies (temple visits, stotras, charity) to harmonize any minor friction.\n\n")
+          .append("Return ONLY valid JSON matching this schema:\n")
+          .append("{\n")
+          .append("  \"overallVerdict\": \"EXCELLENT\",\n")
+          .append("  \"compatibilityPercentage\": 86.5,\n")
+          .append("  \"executiveSummary\": \"(Detailed narrative)\",\n")
+          .append("  \"emotionalMentalHarmony\": {\n")
+          .append("    \"title\": \"...\",\n")
+          .append("    \"scoreOrStatus\": \"90%\",\n")
+          .append("    \"analysis\": \"...\",\n")
+          .append("    \"astrologicalBasis\": \"...\"\n")
+          .append("  },\n")
+          .append("  \"healthLongevityNadi\": {\n")
+          .append("    \"title\": \"...\",\n")
+          .append("    \"scoreOrStatus\": \"85%\",\n")
+          .append("    \"analysis\": \"...\",\n")
+          .append("    \"astrologicalBasis\": \"...\"\n")
+          .append("  },\n")
+          .append("  \"careerFinancialSynergy\": {\n")
+          .append("    \"title\": \"...\",\n")
+          .append("    \"scoreOrStatus\": \"82%\",\n")
+          .append("    \"analysis\": \"...\",\n")
+          .append("    \"astrologicalBasis\": \"...\"\n")
+          .append("  },\n")
+          .append("  \"progenyFamilyLineage\": {\n")
+          .append("    \"title\": \"...\",\n")
+          .append("    \"scoreOrStatus\": \"88%\",\n")
+          .append("    \"analysis\": \"...\",\n")
+          .append("    \"astrologicalBasis\": \"...\"\n")
+          .append("  },\n")
+          .append("  \"doshaPapasamyaParity\": {\n")
+          .append("    \"title\": \"...\",\n")
+          .append("    \"scoreOrStatus\": \"Balanced\",\n")
+          .append("    \"analysis\": \"...\",\n")
+          .append("    \"astrologicalBasis\": \"...\"\n")
+          .append("  },\n")
+          .append("  \"keyStrengths\": [\"...\", \"...\"],\n")
+          .append("  \"growthAreasAndCautions\": [\"...\", \"...\"],\n")
+          .append("  \"authenticVedicRemedies\": [\"...\", \"...\"]\n")
+          .append("}\n");
+
+        return sb.toString();
+    }
+
+    private MatchingAiPredictionDTO parseMatchingGeminiResponse(
+            String rawJson,
+            String lang,
+            MatchingRequestDTO req,
+            MatchingResponseDTO classicalResult) {
+        try {
+            JsonNode root = objectMapper.readTree(rawJson);
+            JsonNode candidates = root.path("candidates");
+            if (candidates.isArray() && !candidates.isEmpty()) {
+                JsonNode firstCandidate = candidates.get(0);
+                JsonNode parts = firstCandidate.path("content").path("parts");
+                if (parts.isArray() && !parts.isEmpty()) {
+                    String jsonText = parts.get(0).path("text").asText().trim();
+                    if (jsonText.startsWith("```json")) {
+                        jsonText = jsonText.substring(7);
+                    }
+                    if (jsonText.startsWith("```")) {
+                        jsonText = jsonText.substring(3);
+                    }
+                    if (jsonText.endsWith("```")) {
+                        jsonText = jsonText.substring(0, jsonText.length() - 3);
+                    }
+                    jsonText = jsonText.trim();
+
+                    JsonNode usage = root.path("usageMetadata");
+                    int promptTokens = usage.path("promptTokenCount").asInt(0);
+                    int candidatesTokens = usage.path("candidatesTokenCount").asInt(0);
+                    int totalTokens = usage.path("totalTokenCount").asInt(promptTokens + candidatesTokens);
+
+                    double costUsd = ((promptTokens / 1_000_000.0) * 0.15) + ((candidatesTokens / 1_000_000.0) * 0.60);
+                    double costInr = costUsd * 86.50;
+
+                    PredictionResponseDTO.TokenUsage tokenUsage = PredictionResponseDTO.TokenUsage.builder()
+                            .promptTokens(promptTokens)
+                            .completionTokens(candidatesTokens)
+                            .totalTokens(totalTokens)
+                            .estimatedCostUsd(costUsd)
+                            .estimatedCostInr(costInr)
+                            .modelUsed(geminiProperties.getModel())
+                            .build();
+
+                    MatchingAiPredictionDTO parsed = objectMapper.readValue(jsonText, MatchingAiPredictionDTO.class);
+                    parsed.setEnabled(true);
+                    parsed.setTokenUsage(tokenUsage);
+                    parsed.setMessage("AI Marriage Compatibility Report synthesized successfully via Google Gemini.");
+                    return parsed;
+                }
+            }
+        } catch (Exception e) {
+            log.error("Could not parse Matching Gemini JSON response: {}", e.getMessage(), e);
+        }
+        return createUnavailableMatchingResponse(lang);
+    }
+
+    public MatchingAiPredictionDTO createUnavailableMatchingResponse(String lang) {
+        return MatchingAiPredictionDTO.builder()
+                .enabled(false)
+                .message(getLocalizedUnavailableMessage(lang))
+                .build();
     }
 }
