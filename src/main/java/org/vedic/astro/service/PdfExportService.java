@@ -268,6 +268,38 @@ public class PdfExportService {
                     document.add(summ);
                 }
 
+                // Native Personality Section
+                if (data.getAiPredictions().getNativePersonality() != null) {
+                    var np = data.getAiPredictions().getNativePersonality();
+                    if (np.getCoreTemperament() != null && !np.getCoreTemperament().isBlank()) {
+                        String pTitleStr = "ta".equalsIgnoreCase(lang) ? "ஜாதகரின் சுபாவம் & ஆளுமைத் திறன்" : "Native Personality & Core Temperament";
+                        Paragraph pH = buildMixedParagraph(pTitleStr, sFont, engSFont);
+                        pH.setSpacingAfter(4);
+                        document.add(pH);
+
+                        Paragraph pDesc = buildMixedParagraph(np.getCoreTemperament(), bFont, engBFont);
+                        pDesc.setSpacingAfter(10);
+                        document.add(pDesc);
+                    }
+                }
+
+                // Health & Vitality Diagnostics Section
+                if (data.getAiPredictions().getHealthAnalysis() != null) {
+                    var ha = data.getAiPredictions().getHealthAnalysis();
+                    String hTitleStr = "ta".equalsIgnoreCase(lang) ? "ஆரோக்கியம் & ஆயுள் பலம் (Health & Vitality Diagnostics)" : "Ayurvedic Constitution & Health Diagnostics";
+                    Paragraph hH = buildMixedParagraph(hTitleStr, sFont, engSFont);
+                    hH.setSpacingAfter(4);
+                    document.add(hH);
+
+                    String hDescText = (ha.getAyurvedicConstitution() != null ? ha.getAyurvedicConstitution() + " " : "")
+                            + (ha.getLongevityVitalitySummary() != null ? ha.getLongevityVitalitySummary() : "");
+                    if (!hDescText.isBlank()) {
+                        Paragraph hDesc = buildMixedParagraph(hDescText, bFont, engBFont);
+                        hDesc.setSpacingAfter(10);
+                        document.add(hDesc);
+                    }
+                }
+
                 // AI Classical Yogas Table
                 if (data.getAiPredictions().getAiYogas() != null && !data.getAiPredictions().getAiYogas().isEmpty()) {
                     String yogTitleStr = "ta".equalsIgnoreCase(lang) ? "ஜோதிட யோகங்கள் (Classical Vedic Yogas)" : "Classical Vedic Yogas & Astrological Formations";

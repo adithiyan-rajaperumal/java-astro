@@ -68,13 +68,14 @@ public class ChartController {
             ComprehensiveReportDTO deepReportData = engine.generateComprehensiveReport(payload, res);
             deepReportData.setPanchangamSystem(systemType.name());
 
-            if (geminiProperties != null && geminiProperties.isFeatureEnabled() && geminiPredictionService != null) {
+            if (geminiProperties != null && geminiProperties.isPdfPredictionsEnabled() && geminiPredictionService != null) {
                 try {
                     ChartUiResponseDTO uiResp = orchestrationService.convertToUiDashboardResponse(res, payload);
                     org.vedic.astro.dto.PredictionRequestDTO predReq = org.vedic.astro.dto.PredictionRequestDTO.builder()
                             .birthDetails(payload)
                             .chartData(uiResp)
                             .language(org.springframework.context.i18n.LocaleContextHolder.getLocale().getLanguage())
+                            .forceRefresh(false)
                             .build();
                     deepReportData.setAiPredictions(geminiPredictionService.generateLifePredictions(predReq));
                 } catch (Exception ignored) {}
