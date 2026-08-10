@@ -4,17 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.vedic.astro.dto.*;
 import org.vedic.astro.service.GeminiPredictionService;
 
+import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -27,7 +24,7 @@ public class GeminiPredictionServiceTest {
     private GeminiPredictionService predictionService;
 
     @Test
-    public void testPromptConstruction() {
+    public void testPromptConstructionWithoutPrecalculatedDiagnostics() {
         BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
 
         ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
@@ -36,7 +33,12 @@ public class GeminiPredictionServiceTest {
                 .thithi("Shukla - Dvitiya")
                 .yogam("Siddha")
                 .karanam("Bava")
+                .d1Chart(Collections.emptyList())
                 .currentDasaTimeline(Collections.emptyList())
+                .structuralDiagnostics(DiagnosticsDTO.builder()
+                        .activeYogas(Collections.emptyList())
+                        .discoveredDoshams(Collections.emptyList())
+                        .build())
                 .build();
 
         PredictionRequestDTO req = PredictionRequestDTO.builder()
@@ -51,27 +53,36 @@ public class GeminiPredictionServiceTest {
         assertTrue(prompt.contains("Mesha"));
         assertTrue(prompt.contains("Rohini"));
         assertTrue(prompt.contains("tamil") || prompt.contains("ta") || prompt.contains("தமிழ்"));
+        // Pre-calculated structural diagnostics should NOT be passed to Gemini
+        assertFalse(prompt.contains("Diagnostics:"));
+        assertTrue(prompt.contains("detailedPrediction"));
     }
 
     @Test
-    public void testOfflineServiceReturnsUnavailable() {
-        PredictionRequestDTO req = PredictionRequestDTO.builder()
-                .birthDetails(new BirthDetailsDTO("Kavitha", 1990, 8, 20, 14, 15, 0, 13.0827, 80.2707, "LAHIRI"))
-                .chartData(ChartUiResponseDTO.builder().build())
-                .language("ta")
-                .build();
+    public void testUnavailableResponseWhenDisabledOrFails() {
+        PredictionResponseDTO lifeResp = predictionService.createUnavailableLifeResponse("ta");
+        assertNotNull(lifeResp);
+        assertFalse(lifeResp.isEnabled());
+        assertTrue(lifeResp.getMessage().contains("கிடைக்கவில்லை"));
 
-        PredictionResponseDTO response = predictionService.generateOfflineRuleBasedBalan(req);
-        assertNotNull(response);
-        assertNotNull(response.getPastKeyPhases());
-        assertTrue(response.getPastKeyPhases().size() >= 2);
-        assertNotNull(response.getLifetimePredictions());
-        assertFalse(response.getLifetimePredictions().isEmpty());
-        assertNotNull(response.getLifetimePredictions().get(0).getYearlyTheme());
-        assertNotNull(response.getLifetimePredictions().get(0).getAstrologicalBasis());
-        assertNotNull(response.getLifetimePredictions().get(0).getCareerAndFinance());
-        assertNotNull(response.getLifetimePredictions().get(0).getHealthAndFamily());
-        assertNotNull(response.getLifetimePredictions().get(0).getCautionsAndRemedies());
+        DailyBalanDTO dailyResp = predictionService.createUnavailableDailyResponse("en", "2026-08-10");
+        assertNotNull(dailyResp);
+        assertFalse(dailyResp.isEnabled());
+        assertEquals("2026-08-10", dailyResp.getTargetDate());
+        assertTrue(dailyResp.getMessage().contains("currently unavailable"));
+    }
+
+    @Test
+    public void testDeterministicDailyAnchors() {
+        LocalDate date = LocalDate.of(2026, 8, 10); // Monday
+        GeminiPredictionService.DeterministicDailyAnchors anchors = GeminiPredictionService.calculateDeterministicAnchors(date, "ta");
+
+        assertNotNull(anchors);
+        assertTrue(anchors.getVaraLord().contains("சந்திரன்"));
+        assertTrue(anchors.getLuckyColor().contains("வெள்ளை"));
+        assertEquals("2 & 7", anchors.getLuckyNumber());
+        assertTrue(anchors.getFavorableDirection().contains("வடமேற்கு"));
+        assertTrue(anchors.getAuspiciousTimeWindow().contains("06:00"));
     }
 
     @Test
@@ -83,7 +94,7 @@ public class GeminiPredictionServiceTest {
                       "content": {
                         "parts": [
                           {
-                            "text": "{\\"overallSummary\\":\\"உயர்ந்த அறிவும் ராஜ யோகமும் நிறைந்த ஜாதகம்.\\",\\"aiYogas\\":[],\\"aiDoshams\\":[],\\"pastMilestones\\":[],\\"futurePredictions\\":[]}"
+                            "text": "{\\"overallSummary\\":\\"உயர்ந்த அறிவும் ராஜ யோகமும் நிறைந்த ஜாதகம்.\\",\\"aiYogas\\":[],\\"aiDoshams\\":[],\\"pastKeyPhases\\":[],\\"lifetimePredictions\\":[]}"
                           }
                         ]
                       }
@@ -115,7 +126,7 @@ public class GeminiPredictionServiceTest {
     }
 
     @Test
-    public void testDailyBalanPromptConstruction() {
+    public void testDailyBalanPromptConstructionAndCost() {
         BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
         ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
                 .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Vrishabha").nakshatra("Rohini").build())
@@ -128,11 +139,42 @@ public class GeminiPredictionServiceTest {
                 .language("ta")
                 .build();
 
-        DailyBalanDTO offlineDaily = predictionService.generateOfflineRuleBasedDailyBalan(req, null, java.time.LocalDate.of(2026, 8, 10));
-        assertNotNull(offlineDaily);
-        assertTrue(offlineDaily.isEnabled());
-        assertNotNull(offlineDaily.getGeneralOutlook());
-        assertNotNull(offlineDaily.getLuckyColor());
+        String dailyPrompt = predictionService.constructDailyAstrologicalPrompt(req, null, LocalDate.of(2026, 8, 10));
+        assertNotNull(dailyPrompt);
+        assertTrue(dailyPrompt.contains("Fixed Astrological Anchors"));
+        assertTrue(dailyPrompt.contains("Vara Lord"));
+
+        String mockDailyJson = """
+                {
+                  "candidates": [
+                    {
+                      "content": {
+                        "parts": [
+                          {
+                            "text": "{\\"generalOutlook\\":\\"இன்று நல்ல நாள்.\\",\\"careerWork\\":\\"பணியில் முன்னேற்றம்.\\",\\"financeWealth\\":\\"தனவரவு உண்டு.\\",\\"healthVitality\\":\\"உடல் நலம் நன்று.\\",\\"relationshipFamily\\":\\"குடும்ப மகிழ்ச்சி.\\",\\"dailyRemedy\\":\\"விநாயகர் வழிபாடு.\\"}"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "usageMetadata": {
+                    "promptTokenCount": 600,
+                    "candidatesTokenCount": 200,
+                    "totalTokenCount": 800
+                  }
+                }
+                """;
+
+        DailyBalanDTO parsedDaily = predictionService.parseDailyGeminiResponse(mockDailyJson, req, null, "2026-08-10");
+        assertNotNull(parsedDaily);
+        assertTrue(parsedDaily.isEnabled());
+        assertEquals("2026-08-10", parsedDaily.getTargetDate());
+        assertNotNull(parsedDaily.getTokenUsage());
+        assertEquals(800, parsedDaily.getTokenUsage().getTotalTokens());
+        assertTrue(parsedDaily.getTokenUsage().getEstimatedCostUsd() > 0);
+        assertTrue(parsedDaily.getTokenUsage().getEstimatedCostInr() > 0);
+        assertTrue(parsedDaily.getLuckyColor().contains("வெள்ளை"));
+        assertEquals("2 & 7", parsedDaily.getLuckyNumber());
     }
 
     @Test

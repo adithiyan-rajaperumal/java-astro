@@ -49,10 +49,8 @@ public class GeminiPredictionService {
         }
 
         if (!geminiProperties.isLifePredictionsEnabled()) {
-            log.info("Gemini life predictions disabled or API key absent. Generating rule-based synthesis.");
-            PredictionResponseDTO offline = generateOfflineRuleBasedBalan(req);
-            cacheService.putLifetimePrediction(cacheKey, offline);
-            return offline;
+            log.info("Gemini life predictions disabled or API key absent.");
+            return createUnavailableLifeResponse(lang);
         }
 
         try {
@@ -66,9 +64,7 @@ public class GeminiPredictionService {
             return parsed;
         } catch (Exception e) {
             log.error("Failed to generate AI predictions via Gemini: {}", e.getMessage(), e);
-            PredictionResponseDTO fallback = generateOfflineRuleBasedBalan(req);
-            fallback.setMessage("Generated via Vedic Rule Synthesizer (AI Service temporarily offline).");
-            return fallback;
+            return createUnavailableLifeResponse(lang);
         }
     }
 
@@ -113,9 +109,7 @@ public class GeminiPredictionService {
         }
 
         if (!geminiProperties.isDailyBalanEnabled()) {
-            DailyBalanDTO offline = generateOfflineRuleBasedDailyBalan(req, panchangam, targetDate);
-            cacheService.putDailyBalan(cacheKey, offline, targetDate);
-            return offline;
+            return createUnavailableDailyResponse(lang, targetDateStr);
         }
 
         try {
@@ -129,9 +123,7 @@ public class GeminiPredictionService {
             return parsed;
         } catch (Exception e) {
             log.error("Failed to generate Daily Balan via Gemini: {}", e.getMessage(), e);
-            DailyBalanDTO fallback = generateOfflineRuleBasedDailyBalan(req, panchangam, targetDate);
-            fallback.setMessage("Generated via Vedic Gochara Synthesizer (AI Service temporarily offline).");
-            return fallback;
+            return createUnavailableDailyResponse(lang, targetDateStr);
         }
     }
 
@@ -246,18 +238,6 @@ public class GeminiPredictionService {
             sb.append("\n\n");
         }
 
-        // Diagnostics Yogas & Doshas
-        if (c.getStructuralDiagnostics() != null) {
-            sb.append("Diagnostics: ");
-            if (c.getStructuralDiagnostics().getActiveYogas() != null) {
-                c.getStructuralDiagnostics().getActiveYogas().forEach(y -> sb.append("Yoga[").append(y.getName()).append("] "));
-            }
-            if (c.getStructuralDiagnostics().getDiscoveredDoshams() != null) {
-                c.getStructuralDiagnostics().getDiscoveredDoshams().forEach(d -> sb.append("Dosha[").append(d.getName()).append(":").append(d.isNullified() ? "Nullified" : "Active").append("] "));
-            }
-            sb.append("\n\n");
-        }
-
         // Dasa Timeline
         if (c.getCurrentDasaTimeline() != null && !c.getCurrentDasaTimeline().isEmpty()) {
             sb.append("Vimshottari Dasa Timeline:\n");
@@ -270,8 +250,11 @@ public class GeminiPredictionService {
         sb.append("=== GENERATION DIRECTIVES ===\n")
           .append("1. 'nativePersonality': Deep core psychological temperament, 3-4 key strengths, and 2-3 vulnerabilities/karmic patterns.\n")
           .append("2. 'healthAnalysis': Ayurvedic constitution (Vata/Pitta/Kapha balance), 2-4 organ vulnerabilities deduced from 6th/8th/12th houses & D30, vitality summary, and diet/lifestyle advice.\n")
-          .append("3. 'pastKeyPhases': 2-3 pivotal life-defining turning points/phases from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n")
-          .append("4. 'lifetimePredictions': Distinct year-by-year forecasts starting from current year ").append(currentYear).append(" for at least 15-20 upcoming key years (year, age, dasaBhukthi, yearlyTheme, astrologicalBasis, careerAndFinance [jobs, promotions, losses], healthAndFamily [vitality, surgeries, parents' health from D12/D30, marriage], cautionsAndRemedies [warnings and targeted remedy]).\n\n")
+          .append("3. 'aiYogas': Analyze the complete planetary positions (D1, D9, D10, kendras/trikonas/parivarthanas) to independently identify ALL classical Vedic Yogas present in this horoscope (e.g. Gajakesari, Raja Yoga, Dhana Yoga, Vipareeta Raja Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha Yogas, Parivarthana) with name, forming planets, and lifelong impact.\n")
+          .append("4. 'aiDoshams': Independently evaluate all major doshams (Sevvai/Kuja Dosha, Kala Sarpa Dosha, Pitru Dosha, Papakarthari, Rahu-Ketu afflictions), determining whether they are active or nullified, the exact astrological nullification factors, and authentic Vedic remedies.\n")
+          .append("5. 'pastKeyPhases': 2-3 pivotal life-defining turning points/phases from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n")
+          .append("6. 'lifetimePredictions': Distinct year-by-year forecasts starting from current year ").append(currentYear).append(" for at least 15-20 upcoming key years.\n")
+          .append("   - For EACH year, provide 'yearlyTheme', 'detailedPrediction' (a rich, cohesive, highly articulated paragraph synthesizing that specific year's real-life events: career moves/job disruptions/promotions, financial shifts, health/vitality/surgeries, family/domestic events, bereavement if indicated, and psychological mindset with natural continuity across the lifespan — avoid generic subcategory repetition), 'astrologicalBasis' (explicit planetary combination from D1/D10/D12/D30 & running Dasa), and 'cautionsAndRemedies'.\n\n")
           .append("Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
           .append("  \"overallSummary\": \"(Comprehensive synthesis)\",\n")
@@ -303,10 +286,9 @@ public class GeminiPredictionService {
           .append("      \"age\": ").append(currentAge).append(",\n")
           .append("      \"dasaBhukthi\": \"(Dasa-Bhukthi)\",\n")
           .append("      \"yearlyTheme\": \"(Sharp 1-sentence headline for the year)\",\n")
-          .append("      \"astrologicalBasis\": \"(Explicit planetary reason from D1/D10/D30)\",\n")
-          .append("      \"careerAndFinance\": \"(Direct forecast: promotion, job loss, business, wealth)\",\n")
-          .append("      \"healthAndFamily\": \"(Direct forecast: health, surgeries, parents' health, domestic milestones)\",\n")
-          .append("      \"cautionsAndRemedies\": \"(Direct warning and targeted remedy)\"\n")
+          .append("      \"detailedPrediction\": \"(Rich, comprehensive narrative paragraph synthesizing the year's events in career, finance, health, domestic life, and mindset with lifespan continuity)\",\n")
+          .append("      \"astrologicalBasis\": \"(Explicit planetary reason from D1/D10/D12/D30 and active Dasa lords)\",\n")
+          .append("      \"cautionsAndRemedies\": \"(Direct warning and authentic targeted Vedic remedy)\"\n")
           .append("    }\n")
           .append("  ]\n")
           .append("}\n");
@@ -326,6 +308,7 @@ public class GeminiPredictionService {
     public String constructDailyAstrologicalPrompt(DailyBalanRequestDTO req, DailyPanchangamDTO panchangam, LocalDate targetDate) {
         BirthDetailsDTO b = req.getBirthDetails();
         ChartUiResponseDTO c = req.getChartData();
+        String lang = req.getLanguage() != null ? req.getLanguage() : "ta";
         String rasi = c.getBirthProfile() != null ? c.getBirthProfile().getRashi() : "Mesha";
         String nakshatra = c.getBirthProfile() != null ? c.getBirthProfile().getNakshatra() : "Ashwini";
         String runningDasa = findDasaForYear(c.getCurrentDasaTimeline(), targetDate.getYear());
@@ -338,14 +321,21 @@ public class GeminiPredictionService {
         boolean chandrashtama = panchangam != null && panchangam.chandrastamamNakshatras() != null
                 && panchangam.chandrastamamNakshatras().contains(nakshatra);
 
+        DeterministicDailyAnchors anchors = calculateDeterministicAnchors(targetDate, lang);
+
         StringBuilder sb = new StringBuilder();
         sb.append("=== DAILY GOCHARA & TRANSIT MATRIX ===\n")
-          .append("Date: ").append(targetDate).append("\n")
+          .append("Date: ").append(targetDate).append(" (Weekday: ").append(targetDate.getDayOfWeek()).append(")\n")
           .append("Native: ").append(b.name()).append(" | Janma Rasi: ").append(rasi).append(" | Janma Nakshatra: ").append(nakshatra).append("\n")
           .append("Running Dasa-Bhukthi: ").append(runningDasa).append("\n")
           .append("Today Transit Moon Sign: ").append(todayMoonRasi).append(" | Transit Nakshatra: ").append(todayNakshatra).append("\n")
           .append("Today Tithi: ").append(todayTithi).append(" | Yoga: ").append(todayYoga).append("\n")
-          .append("Chandrashtama Active: ").append(chandrashtama).append("\n\n")
+          .append("Chandrashtama Active: ").append(chandrashtama).append("\n")
+          .append("Fixed Astrological Anchors: Vara Lord=").append(anchors.varaLord)
+          .append(", Lucky Color=").append(anchors.luckyColor)
+          .append(", Lucky Number=").append(anchors.luckyNumber)
+          .append(", Favorable Direction=").append(anchors.favorableDirection)
+          .append(", Best Time Window=").append(anchors.auspiciousTimeWindow).append("\n\n")
           .append("Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
           .append("  \"generalOutlook\": \"(1-2 sentence overall energy & mood for the day)\",\n")
@@ -353,10 +343,10 @@ public class GeminiPredictionService {
           .append("  \"financeWealth\": \"(Financial transactions, expenses, gains)\",\n")
           .append("  \"healthVitality\": \"(Physical stamina and mental wellbeing)\",\n")
           .append("  \"relationshipFamily\": \"(Family and relationship harmony)\",\n")
-          .append("  \"luckyColor\": \"(e.g. Yellow / மஞ்சள்)\",\n")
-          .append("  \"luckyNumber\": \"(e.g. 3)\",\n")
-          .append("  \"favorableDirection\": \"(e.g. North-East / வடகிழக்கு)\",\n")
-          .append("  \"bestTimeWindow\": \"(e.g. 10:30 AM - 12:00 PM)\",\n")
+          .append("  \"luckyColor\": \"").append(anchors.luckyColor).append("\",\n")
+          .append("  \"luckyNumber\": \"").append(anchors.luckyNumber).append("\",\n")
+          .append("  \"favorableDirection\": \"").append(anchors.favorableDirection).append("\",\n")
+          .append("  \"bestTimeWindow\": \"").append(anchors.auspiciousTimeWindow).append("\",\n")
           .append("  \"dailyRemedy\": \"(Simple actionable mantra or prayer for the day)\"\n")
           .append("}\n");
 
@@ -458,10 +448,14 @@ public class GeminiPredictionService {
         } catch (Exception e) {
             log.error("Could not parse Gemini JSON response: {}", e.getMessage(), e);
         }
-        return generateOfflineRuleBasedBalan(req);
+        return createUnavailableLifeResponse(req.getLanguage() != null ? req.getLanguage() : "ta");
     }
 
     public DailyBalanDTO parseDailyGeminiResponse(String rawApiResponse, DailyBalanRequestDTO req, DailyPanchangamDTO panchangam, String targetDateStr) {
+        String lang = req.getLanguage() != null ? req.getLanguage() : "ta";
+        LocalDate targetDate = LocalDate.parse(targetDateStr);
+        DeterministicDailyAnchors anchors = calculateDeterministicAnchors(targetDate, lang);
+
         try {
             JsonNode root = objectMapper.readTree(rawApiResponse);
             JsonNode usageNode = root.path("usageMetadata");
@@ -472,10 +466,18 @@ public class GeminiPredictionService {
                 int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
 
                 String model = geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.6-flash";
+                double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
+                double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
+
+                double costUsd = (promptTokens * promptRate) + (completionTokens * completionRate);
+                double costInr = costUsd * 87.0;
+
                 tokenUsage = PredictionResponseDTO.TokenUsage.builder()
                         .promptTokens(promptTokens)
                         .completionTokens(completionTokens)
                         .totalTokens(totalTokens)
+                        .estimatedCostUsd(costUsd)
+                        .estimatedCostInr(costInr)
                         .modelUsed(model)
                         .build();
             }
@@ -495,10 +497,14 @@ public class GeminiPredictionService {
                     parsed.setTargetDate(targetDateStr);
                     parsed.setRasi(req.getChartData().getBirthProfile() != null ? req.getChartData().getBirthProfile().getRashi() : "");
                     parsed.setNakshatra(req.getChartData().getBirthProfile() != null ? req.getChartData().getBirthProfile().getNakshatra() : "");
-                    parsed.setRunningDasaBhukthi(findDasaForYear(req.getChartData().getCurrentDasaTimeline(), LocalDate.parse(targetDateStr).getYear()));
+                    parsed.setRunningDasaBhukthi(findDasaForYear(req.getChartData().getCurrentDasaTimeline(), targetDate.getYear()));
                     parsed.setChandrashtama(panchangam != null && panchangam.chandrastamamNakshatras() != null
                             && panchangam.chandrastamamNakshatras().contains(parsed.getNakshatra()));
                     parsed.setTokenUsage(tokenUsage);
+                    parsed.setLuckyColor(anchors.luckyColor);
+                    parsed.setLuckyNumber(anchors.luckyNumber);
+                    parsed.setFavorableDirection(anchors.favorableDirection);
+                    parsed.setBestTimeWindow(anchors.auspiciousTimeWindow);
                     parsed.setMessage("Daily Balan synthesized successfully via Google Gemini.");
                     return parsed;
                 }
@@ -506,7 +512,110 @@ public class GeminiPredictionService {
         } catch (Exception e) {
             log.error("Could not parse Daily Gemini JSON response: {}", e.getMessage(), e);
         }
-        return generateOfflineRuleBasedDailyBalan(req, panchangam, LocalDate.parse(targetDateStr));
+        return createUnavailableDailyResponse(lang, targetDateStr);
+    }
+
+    public PredictionResponseDTO createUnavailableLifeResponse(String lang) {
+        return PredictionResponseDTO.builder()
+                .enabled(false)
+                .message(getLocalizedUnavailableMessage(lang))
+                .build();
+    }
+
+    public DailyBalanDTO createUnavailableDailyResponse(String lang, String targetDateStr) {
+        return DailyBalanDTO.builder()
+                .enabled(false)
+                .targetDate(targetDateStr)
+                .message(getLocalizedUnavailableMessage(lang))
+                .build();
+    }
+
+    public static String getLocalizedUnavailableMessage(String lang) {
+        if ("ta".equalsIgnoreCase(lang)) {
+            return "AI கணிப்பு சேவை தற்போது கிடைக்கவில்லை. சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.";
+        } else if ("hi".equalsIgnoreCase(lang)) {
+            return "एआई भविष्यफल सेवा वर्तमान में उपलब्ध नहीं है। कृपया कुछ समय बाद पुनः प्रयास करें।";
+        } else if ("te".equalsIgnoreCase(lang)) {
+            return "AI జ్యోతిష్య సేవ ప్రస్తుతం అందుబాటులో లేదు. దయచేసి కాసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.";
+        } else if ("kn".equalsIgnoreCase(lang)) {
+            return "AI ಭವಿಷ್ಯ ಸೇವೆ ಪ್ರಸ್ತುತ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+        } else if ("ml".equalsIgnoreCase(lang)) {
+            return "AI പ്രവചന സേവനം ഇപ്പോൾ ലഭ്യമല്ല. ദയവായി അല്പം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.";
+        }
+        return "AI prediction service is currently unavailable. Please try again later.";
+    }
+
+    @lombok.Data
+    @lombok.Builder
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class DeterministicDailyAnchors {
+        private String varaLord;
+        private String luckyColor;
+        private String luckyNumber;
+        private String favorableDirection;
+        private String auspiciousTimeWindow;
+    }
+
+    public static DeterministicDailyAnchors calculateDeterministicAnchors(LocalDate targetDate, String lang) {
+        java.time.DayOfWeek day = targetDate.getDayOfWeek();
+        boolean isTa = "ta".equalsIgnoreCase(lang);
+        boolean isHi = "hi".equalsIgnoreCase(lang);
+        boolean isTe = "te".equalsIgnoreCase(lang);
+        boolean isKn = "kn".equalsIgnoreCase(lang);
+        boolean isMl = "ml".equalsIgnoreCase(lang);
+
+        return switch (day) {
+            case SUNDAY -> DeterministicDailyAnchors.builder()
+                    .varaLord(isTa ? "சூரியன் (Sun)" : "Sun")
+                    .luckyColor(isTa ? "தாமரை சிவப்பு / ஆரஞ்சு (Ruby Red)" : (isHi ? "माणिक्य लाल / नारंगी" : (isTe ? "కెంపు ఎరుపు / నారింజ" : (isKn ? "ಮಾಣಿಕ್ಯ ಕೆಂಪು" : (isMl ? "മാണിക്യ ചുവപ്പ്" : "Ruby Red / Deep Orange")))))
+                    .luckyNumber("1 & 4")
+                    .favorableDirection(isTa ? "கிழக்கு (East)" : (isHi ? "पूर्व (East)" : (isTe ? "తూర్పు (East)" : (isKn ? "ಪೂರ್ವ (East)" : (isMl ? "കിഴക്ക് (East)" : "East")))))
+                    .auspiciousTimeWindow(isTa ? "காலை 07:30 - 09:00 (உத்தம நேரம்)" : "07:30 AM - 09:00 AM")
+                    .build();
+            case MONDAY -> DeterministicDailyAnchors.builder()
+                    .varaLord(isTa ? "சந்திரன் (Moon)" : "Moon")
+                    .luckyColor(isTa ? "முத்து வெள்ளை / வெள்ளி (Pearl White)" : (isHi ? "मोती सफेद / चांदी" : (isTe ? "ముత్యపు తెలుపు / వెండి" : (isKn ? "ಮುತ್ತಿನ ಬಿಳಿ" : (isMl ? "മുത്ത് വെളുപ്പ്" : "Pearl White / Silver")))))
+                    .luckyNumber("2 & 7")
+                    .favorableDirection(isTa ? "வடமேற்கு (North-West)" : (isHi ? "उत्तर-पश्चिम (North-West)" : (isTe ? "వాయవ్య (North-West)" : (isKn ? "ವಾಯುವ್ಯ (North-West)" : (isMl ? "വടക്കുപടിഞ്ഞാറ് (North-West)" : "North-West")))))
+                    .auspiciousTimeWindow(isTa ? "காலை 06:00 - 07:30 (உத்தம நேரம்)" : "06:00 AM - 07:30 AM")
+                    .build();
+            case TUESDAY -> DeterministicDailyAnchors.builder()
+                    .varaLord(isTa ? "செவ்வாய் (Mars)" : "Mars")
+                    .luckyColor(isTa ? "பவள சிவப்பு / அடர் சிவப்பு (Coral Red)" : (isHi ? "मूंगा लाल / सिंदूरी" : (isTe ? "పగడపు ఎరుపు" : (isKn ? "ಹವಳದ ಕೆಂಪು" : (isMl ? "പവിഴ ചുവപ്പ്" : "Coral Red / Crimson")))))
+                    .luckyNumber("9 & 1")
+                    .favorableDirection(isTa ? "தெற்கு (South)" : (isHi ? "दक्षिण (South)" : (isTe ? "దక్షిణం (South)" : (isKn ? "ದಕ್ಷಿಣ (South)" : (isMl ? "തെക്ക് (South)" : "South")))))
+                    .auspiciousTimeWindow(isTa ? "காலை 10:30 - 12:00 (உத்தம நேரம்)" : "10:30 AM - 12:00 PM")
+                    .build();
+            case WEDNESDAY -> DeterministicDailyAnchors.builder()
+                    .varaLord(isTa ? "புதன் (Mercury)" : "Mercury")
+                    .luckyColor(isTa ? "மரகத பச்சை / புல் பச்சை (Emerald Green)" : (isHi ? "पन्ना हरा / तोतिया" : (isTe ? "మరకత పచ్చ" : (isKn ? "ಪಚ್ಚೆ ಹಸಿರು" : (isMl ? "മരതക പച്ച" : "Emerald Green / Light Green")))))
+                    .luckyNumber("5 & 6")
+                    .favorableDirection(isTa ? "வடக்கு (North)" : (isHi ? "उत्तर (North)" : (isTe ? "ఉత్తరం (North)" : (isKn ? "ಉತ್ತರ (North)" : (isMl ? "വടക്ക് (North)" : "North")))))
+                    .auspiciousTimeWindow(isTa ? "காலை 09:00 - 10:30 (உத்தம நேரம்)" : "09:00 AM - 10:30 AM")
+                    .build();
+            case THURSDAY -> DeterministicDailyAnchors.builder()
+                    .varaLord(isTa ? "குரு (Jupiter)" : "Jupiter")
+                    .luckyColor(isTa ? "பொன் மஞ்சள் / தங்கம் (Golden Yellow)" : (isHi ? "पुखराज पीला / स्वर्णिम" : (isTe ? "బంగారు పసుపు" : (isKn ? "ಚಿನ್ನದ ಹಳದಿ" : (isMl ? "സ്വർണ്ണ മഞ്ഞ" : "Golden Yellow / Amber")))))
+                    .luckyNumber("3 & 9")
+                    .favorableDirection(isTa ? "வடகிழக்கு (North-East)" : (isHi ? "ईशान / उत्तर-पूर्व (North-East)" : (isTe ? "ఈశాన్యం (North-East)" : (isKn ? "ಈಶಾನ್ಯ (North-East)" : (isMl ? "വടക്കുകിഴക്ക് (North-East)" : "North-East")))))
+                    .auspiciousTimeWindow(isTa ? "காலை 09:15 - 10:45 (உத்தம நேரம்)" : "09:15 AM - 10:45 AM")
+                    .build();
+            case FRIDAY -> DeterministicDailyAnchors.builder()
+                    .varaLord(isTa ? "சுக்கிரன் (Venus)" : "Venus")
+                    .luckyColor(isTa ? "பட்டு வெள்ளை / கிரீம் (Silk White)" : (isHi ? "चमकीला सफेद / क्रीम" : (isTe ? "పట్టు తెలుపు / క్రీమ్" : (isKn ? "ರೇಷ್ಮೆ ಬಿಳಿ" : (isMl ? "പട്ട് വെളുപ്പ്" : "Silk White / Cream")))))
+                    .luckyNumber("6 & 5")
+                    .favorableDirection(isTa ? "தென்கிழக்கு (South-East)" : (isHi ? "आग्नेय / दक्षिण-पूर्व (South-East)" : (isTe ? "ఆగ్నేయం (South-East)" : (isKn ? "ಆಗ್ನೇಯ (South-East)" : (isMl ? "തെക്കുകിഴക്ക് (South-East)" : "South-East")))))
+                    .auspiciousTimeWindow(isTa ? "காலை 06:30 - 08:00 (உத்தம நேரம்)" : "06:30 AM - 08:00 AM")
+                    .build();
+            case SATURDAY -> DeterministicDailyAnchors.builder()
+                    .varaLord(isTa ? "சனி (Saturn)" : "Saturn")
+                    .luckyColor(isTa ? "நீலம் / கருநீலம் (Navy Blue)" : (isHi ? "नीलम नीला / गहरा नीला" : (isTe ? "నీలం / ముదురు నీలం" : (isKn ? "ನೀಲಿ / ಕಡು ನೀಲಿ" : (isMl ? "നീല / കടും നീല" : "Navy Blue / Dark Blue")))))
+                    .luckyNumber("8 & 4")
+                    .favorableDirection(isTa ? "மேற்கு (West)" : (isHi ? "पश्चिम (West)" : (isTe ? "పడమర (West)" : (isKn ? "ಪಶ್ಚಿಮ (West)" : (isMl ? "പടിഞ്ഞാറ് (West)" : "West")))))
+                    .auspiciousTimeWindow(isTa ? "காலை 07:30 - 09:00 (உத்தம நேரம்)" : "07:30 AM - 09:00 AM")
+                    .build();
+        };
     }
 
     public PredictionResponseDTO generateOfflineRuleBasedBalan(PredictionRequestDTO req) {

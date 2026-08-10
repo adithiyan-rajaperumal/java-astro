@@ -125,9 +125,8 @@ public class PredictionResponseDTO {
         private int age;
         private String dasaBhukthi;
         private String yearlyTheme;
+        private String detailedPrediction;
         private String astrologicalBasis;
-        private String careerAndFinance;
-        private String healthAndFamily;
         private String cautionsAndRemedies;
         private String personalMindset;
         private String careerProfession;
