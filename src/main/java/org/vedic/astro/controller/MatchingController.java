@@ -99,10 +99,13 @@ public class MatchingController {
     public ResponseEntity<byte[]> downloadCompatibilityReport(
             @RequestBody MatchingRequestDTO request,
             @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType,
-            @RequestHeader(value = "Accept-Language", defaultValue = "ta") String language) {
+            @RequestParam(required = false) String language,
+            @RequestHeader(value = "Accept-Language", defaultValue = "ta") String acceptLanguage) {
         try {
             org.vedic.astro.util.IndicPreShaper.setPdfMode(true);
-            String effectiveLang = normalizeLanguage(language);
+            String rawLang = (language != null && !language.isBlank()) ? language : acceptLanguage;
+            String effectiveLang = normalizeLanguage(rawLang);
+            org.springframework.context.i18n.LocaleContextHolder.setLocale(java.util.Locale.forLanguageTag(effectiveLang));
             
             PanchangamEngine panchangamEngine = panchangamFactory.getEngine(systemType);
             ChartResult boyChart = panchangamEngine.calculate(request.boy());

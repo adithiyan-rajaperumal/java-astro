@@ -62,9 +62,20 @@ public class ChartController {
     }
 
     @PostMapping("/download-pdf")
-    public ResponseEntity<byte[]> downloadComprehensiveAstrologyReport(@RequestBody BirthDetailsDTO payload, @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType) {
+    public ResponseEntity<byte[]> downloadComprehensiveAstrologyReport(
+            @RequestBody BirthDetailsDTO payload,
+            @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType,
+            @RequestParam(required = false) String language,
+            @RequestHeader(value = "Accept-Language", defaultValue = "ta") String acceptLanguage) {
         try {
             org.vedic.astro.util.IndicPreShaper.setPdfMode(true);
+            String rawLang = (language != null && !language.isBlank()) ? language : acceptLanguage;
+            String effectiveLang = (rawLang != null && rawLang.contains(",")) ? rawLang.split(",")[0].trim() : (rawLang != null ? rawLang : "ta");
+            if (effectiveLang.contains("-")) effectiveLang = effectiveLang.split("-")[0].trim();
+            if (effectiveLang.contains("_")) effectiveLang = effectiveLang.split("_")[0].trim();
+            effectiveLang = effectiveLang.toLowerCase();
+            org.springframework.context.i18n.LocaleContextHolder.setLocale(java.util.Locale.forLanguageTag(effectiveLang));
+
             // Factory resolves strategy pattern dynamically
             PanchangamEngine engine = panchangamFactory.getEngine(systemType);
             ChartResult res = engine.calculate(payload);
@@ -78,7 +89,7 @@ public class ChartController {
                     org.vedic.astro.dto.PredictionRequestDTO predReq = org.vedic.astro.dto.PredictionRequestDTO.builder()
                             .birthDetails(payload)
                             .chartData(uiResp)
-                            .language(org.springframework.context.i18n.LocaleContextHolder.getLocale().getLanguage())
+                            .language(effectiveLang)
                             .forceRefresh(false)
                             .build();
                     deepReportData.setAiPredictions(geminiPredictionService.generateLifePredictions(predReq));

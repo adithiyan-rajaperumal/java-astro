@@ -303,7 +303,7 @@ function HoroscopePage({ settings }) {
     if (!formPayload || pdfLoading) return;
     setPdfLoading(true);
     try {
-      const response = await fetch('/api/v1/astrology/download-pdf?systemType=DRIK_TIRUKANITHAM', {
+      const response = await fetch(`/api/v1/astrology/download-pdf?systemType=DRIK_TIRUKANITHAM&language=${settings.language}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

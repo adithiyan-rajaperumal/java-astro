@@ -251,7 +251,7 @@ function MatchingPage({ settings }) {
 
     setPdfLoading(true);
     try {
-      const response = await fetch('/api/v1/astrology/match/download-pdf?systemType=DRIK_TIRUKANITHAM', {
+      const response = await fetch(`/api/v1/astrology/match/download-pdf?systemType=DRIK_TIRUKANITHAM&language=${settings.language}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
