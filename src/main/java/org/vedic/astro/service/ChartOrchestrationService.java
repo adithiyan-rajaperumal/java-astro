@@ -26,6 +26,7 @@ public class ChartOrchestrationService {
     private final ShadbalaService shadbalaService;
     private final AstrologyDiagnosticsService diagnosticsService;
     private final TimezoneService timezoneService;
+    private final org.vedic.astro.config.GeminiProperties geminiProperties;
 
     public ChartUiResponseDTO convertToUiDashboardResponse(ChartResult res, BirthDetailsDTO pay) {
         PlanetaryPosition moon = res.getD1Positions().get("Moon");
@@ -82,6 +83,7 @@ public class ChartOrchestrationService {
                 .thithi(computedThithi)
                 .yogam(computedYogam)
                 .karanam(computedKaranam)
+                .aiPredictionsEnabled(geminiProperties != null && geminiProperties.isFeatureEnabled())
                 .localMeanTime(res.getLocalMeanTime()).birthProfile(buildProfileHeader(res.getD1Positions()))
                 .d1Chart(compileVargaList(1, res.getD1Positions(), null))
                 .d9Chart(compileVargaList(9, res.getD1Positions(), null))

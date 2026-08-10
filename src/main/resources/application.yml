@@ -12,7 +12,8 @@ spring:
     encoding: UTF-8
     serialization:
       write_dates_as_timestamps: false
-
+    deserialization:
+      fail_on_unknown_properties: false
 
   # Force Spring MVC to read and write all Web messages using UTF-8
   http:
@@ -23,3 +24,8 @@ spring:
   # Backup rule enforcing system message settings
   messages:
     encoding: UTF-8
+
+gemini:
+  api-key: ${GEMINI_API_KEY:enc:QVEuQWI4Uk42SXZvc2QwSktCUF90UTZma0ZDOEhvSHk2anY5Y2JuMGdtTDRVc21JNW9acUE=}
+  enabled: ${GEMINI_ENABLED:true}
+  model: ${GEMINI_MODEL:gemini-3.6-flash}

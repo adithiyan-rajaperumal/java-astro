@@ -1,12 +1,18 @@
 package org.vedic.astro.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChartResponseDTO {
     private String name;
     private String dateOfBirth;
@@ -18,6 +24,9 @@ public class ChartResponseDTO {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class BirthProfile {
         private String lagna;
         private String rashi;
@@ -27,6 +36,9 @@ public class ChartResponseDTO {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PositionDetail {
         private String planetKey;
         private String displayName;

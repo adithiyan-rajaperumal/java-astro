@@ -30,4 +30,5 @@ public class ComprehensiveReportDTO {
     private List<DasaPeriod> vimshottariTimeline;
     private ShadbalaDTO shadbalaStrengths;
     private DiagnosticsDTO structuralDiagnostics;
+    private PredictionResponseDTO aiPredictions;
 }

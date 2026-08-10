@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import BirthForm from '../components/BirthForm';
 import IndianChart from '../components/IndianChart';
+import AiPredictionsView from '../components/AiPredictionsView';
 import { t } from '../i18n/translations';
+import { getSavedHoroscopes, saveHoroscope, deleteSavedHoroscope, isProfileAlreadySaved } from '../utils/savedHoroscopes';
 
 function HoroscopePage({ settings }) {
   const [report, setReport] = useState(null);
@@ -10,15 +12,81 @@ function HoroscopePage({ settings }) {
   const [activeSubTab, setActiveSubTab] = useState('charts');
   const [expandedDasa, setExpandedDasa] = useState(null);
   const [formPayload, setFormPayload] = useState(null);
+  const [savedProfiles, setSavedProfiles] = useState(() => getSavedHoroscopes());
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+  const [aiEnabled, setAiEnabled] = useState(true);
+  const [predictions, setPredictions] = useState(null);
+  const [predLoading, setPredLoading] = useState(false);
+  const [predError, setPredError] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/v1/astrology/config')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((cfg) => {
+        if (cfg && typeof cfg.aiPredictionsEnabled === 'boolean') {
+          setAiEnabled(cfg.aiPredictionsEnabled);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setReport(null);
+    setPredictions(null);
   }, [settings.language]);
+
+  const handleSaveCurrentProfile = () => {
+    if (!formPayload) return;
+    const profileToSave = {
+      name: formPayload.name,
+      year: formPayload.year,
+      month: formPayload.month,
+      day: formPayload.day,
+      hour: formPayload.hour,
+      minute: formPayload.minute,
+      second: 0,
+      latitude: formPayload.latitude,
+      longitude: formPayload.longitude,
+      location: formPayload.location,
+      ayanamsa: formPayload.ayanamsa || settings.ayanamsa || 'LAHIRI',
+      panchangamSystem: 'DRIK_TIRUKANITHAM'
+    };
+    const updated = saveHoroscope(profileToSave);
+    setSavedProfiles(updated);
+    setSaveSuccessMsg(t('profileSaved', settings.language) || 'Profile Saved!');
+    setTimeout(() => setSaveSuccessMsg(''), 3000);
+  };
+
+  const handleDeleteProfile = (e, id) => {
+    e.stopPropagation();
+    const updated = deleteSavedHoroscope(id);
+    setSavedProfiles(updated);
+  };
+
+  const handleLoadSavedProfile = (prof) => {
+    const payload = {
+      name: prof.name,
+      year: prof.year,
+      month: prof.month,
+      day: prof.day,
+      hour: prof.hour,
+      minute: prof.minute,
+      second: prof.second || 0,
+      latitude: prof.latitude,
+      longitude: prof.longitude,
+      location: prof.location,
+      ayanamsa: prof.ayanamsa || settings.ayanamsa || 'LAHIRI',
+      panchangamSystem: 'DRIK_TIRUKANITHAM'
+    };
+    setFormPayload(payload);
+    handleFormSubmit(payload);
+  };
 
   const handleFormSubmit = async (payload) => {
     setLoading(true);
     setError(null);
     setFormPayload(payload);
+    setPredictions(null);
     try {
       const response = await fetch('/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
@@ -31,6 +99,9 @@ function HoroscopePage({ settings }) {
       if (response.ok) {
         const data = await response.json();
         setReport(data);
+        if (typeof data.aiPredictionsEnabled === 'boolean') {
+          setAiEnabled(data.aiPredictionsEnabled);
+        }
       } else {
         throw new Error('Failed to generate horoscope report.');
       }
@@ -38,6 +109,36 @@ function HoroscopePage({ settings }) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGeneratePredictions = async () => {
+    if (!report || !formPayload) return;
+    setPredLoading(true);
+    setPredError(null);
+    try {
+      const response = await fetch('/api/v1/astrology/predictions/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
+        body: JSON.stringify({
+          birthDetails: formPayload,
+          chartData: report,
+          language: settings.language
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPredictions(data);
+      } else {
+        throw new Error('Failed to generate AI predictions.');
+      }
+    } catch (e) {
+      setPredError(e.message);
+    } finally {
+      setPredLoading(false);
     }
   };
 
@@ -356,25 +457,66 @@ function HoroscopePage({ settings }) {
   return (
     <div>
       <h2 className="title-gold">{t('horoscope', settings.language)}</h2>
-      
+
       {!report && !loading && (
-        <BirthForm
-          onSubmit={handleFormSubmit}
-          initialValues={formPayload ? {
-            name: formPayload.name,
-            date: `${formPayload.year}-${String(formPayload.month).padStart(2, '0')}-${String(formPayload.day).padStart(2, '0')}`,
-            time: `${String(formPayload.hour).padStart(2, '0')}:${String(formPayload.minute).padStart(2, '0')}`,
-            location: formPayload.location || settings.location,
-            ayanamsa: formPayload.ayanamsa || settings.ayanamsa,
-            panchangamSystem: formPayload.panchangamSystem || settings.panchangamSystem
-          } : {
-            location: settings.location,
-            ayanamsa: settings.ayanamsa,
-            panchangamSystem: settings.panchangamSystem
-          }}
-          submitLabel="calculateHoroscope"
-          lang={settings.language}
-        />
+        <>
+          {savedProfiles.length > 0 && (
+            <div className="card" style={{ marginBottom: '15px', background: 'rgba(255, 215, 0, 0.05)', border: '1px dashed var(--accent-gold)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontWeight: 'bold', fontSize: '14px', color: 'var(--accent-gold)' }}>
+                  📁 {t('savedProfiles', settings.language) || 'Saved Horoscope Profiles'} ({savedProfiles.length})
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {savedProfiles.map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => handleLoadSavedProfile(p)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      cursor: 'pointer',
+                      fontSize: '13px'
+                    }}
+                    title={`${p.name} - ${p.day}/${p.month}/${p.year}`}
+                  >
+                    <span>📜 <strong>{p.name}</strong> ({p.day}/{p.month}/{p.year})</span>
+                    <button
+                      onClick={(e) => handleDeleteProfile(e, p.id)}
+                      style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '0 2px', fontSize: '14px' }}
+                      title="Delete profile"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <BirthForm
+            onSubmit={handleFormSubmit}
+            initialValues={formPayload ? {
+              name: formPayload.name,
+              date: `${formPayload.year}-${String(formPayload.month).padStart(2, '0')}-${String(formPayload.day).padStart(2, '0')}`,
+              time: `${String(formPayload.hour).padStart(2, '0')}:${String(formPayload.minute).padStart(2, '0')}`,
+              location: formPayload.location || settings.location,
+              ayanamsa: formPayload.ayanamsa || settings.ayanamsa,
+              panchangamSystem: formPayload.panchangamSystem || settings.panchangamSystem
+            } : {
+              location: settings.location,
+              ayanamsa: settings.ayanamsa,
+              panchangamSystem: settings.panchangamSystem
+            }}
+            submitLabel="calculateHoroscope"
+            lang={settings.language}
+          />
+        </>
       )}
 
       {loading && (
@@ -404,12 +546,30 @@ function HoroscopePage({ settings }) {
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                 {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rashi || report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {getAyanamsaLabel(report.ayanamsa, settings.language)}
               </p>
+              {saveSuccessMsg && (
+                <p style={{ fontSize: '12px', color: '#27ae60', fontWeight: 'bold', margin: '4px 0 0 0' }}>
+                  ✓ {saveSuccessMsg}
+                </p>
+              )}
             </div>
-            <div>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                onClick={handleSaveCurrentProfile}
+                className="btn-primary"
+                style={{
+                  background: isProfileAlreadySaved(formPayload) ? 'rgba(39, 174, 96, 0.2)' : '#27ae60',
+                  borderColor: '#27ae60',
+                  color: isProfileAlreadySaved(formPayload) ? '#2ecc71' : '#fff'
+                }}
+              >
+                {isProfileAlreadySaved(formPayload)
+                  ? `✓ ${t('saved', settings.language) || 'Saved'}`
+                  : `💾 ${t('saveProfile', settings.language) || 'Save Profile'}`}
+              </button>
               <button onClick={handleDownloadPdf} className="btn-primary">
                 📥 {t('downloadPdf', settings.language)}
               </button>
-              <button onClick={() => setReport(null)} className="btn-primary" style={{ marginLeft: '10px', background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+              <button onClick={() => setReport(null)} className="btn-primary" style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 {t('newChart', settings.language)}
               </button>
             </div>
@@ -441,6 +601,14 @@ function HoroscopePage({ settings }) {
             >
               {t('diagnosticsTab', settings.language)}
             </button>
+            {aiEnabled && (
+              <button 
+                className={`tab-btn ${activeSubTab === 'predictions' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('predictions')}
+              >
+                {t('aiBalanTab', settings.language)}
+              </button>
+            )}
           </div>
 
           {/* Sub Tab contents */}
@@ -448,6 +616,17 @@ function HoroscopePage({ settings }) {
           {activeSubTab === 'dasa' && renderDasaTab()}
           {activeSubTab === 'shadbala' && renderShadbalaTab()}
           {activeSubTab === 'diagnostics' && renderDiagnosticsTab()}
+          {activeSubTab === 'predictions' && (
+            <AiPredictionsView
+              report={report}
+              formPayload={formPayload}
+              language={settings.language}
+              onGenerate={handleGeneratePredictions}
+              predictions={predictions}
+              loading={predLoading}
+              error={predError}
+            />
+          )}
         </div>
       )}
     </div>
