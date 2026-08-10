@@ -397,11 +397,11 @@ function AiPredictionsView({
                   }}
                 >
                   {/* Year Card Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
                     <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--accent-gold)' }}>
                       🌟 {fp.year} ({t('yearAge', language)}: {fp.age})
                     </span>
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,215,0,0.1)', padding: '2px 8px', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,215,0,0.1)', padding: '2px 8px', borderRadius: '4px', fontWeight: '500' }}>
                       {fp.dasaBhukthi}
                     </span>
                   </div>
@@ -412,6 +412,19 @@ function AiPredictionsView({
                       🎯 {fp.yearlyTheme}
                     </div>
                   )}
+
+                  {/* Quick Domain Indicator Pill Tags */}
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', fontSize: '11px' }}>
+                    <span style={{ background: 'rgba(52, 152, 219, 0.12)', color: '#3498db', padding: '2px 7px', borderRadius: '4px', border: '1px solid rgba(52, 152, 219, 0.25)' }}>
+                      💼 {t('filterCareer', language) || 'Career & Wealth'}
+                    </span>
+                    <span style={{ background: 'rgba(46, 204, 113, 0.12)', color: '#2ecc71', padding: '2px 7px', borderRadius: '4px', border: '1px solid rgba(46, 204, 113, 0.25)' }}>
+                      🌿 {t('filterHealth', language) || 'Health & Vitality'}
+                    </span>
+                    <span style={{ background: 'rgba(155, 89, 182, 0.12)', color: '#9b59b6', padding: '2px 7px', borderRadius: '4px', border: '1px solid rgba(155, 89, 182, 0.25)' }}>
+                      👨‍👩‍👦 {t('filterFamily', language) || 'Family & Marriage'}
+                    </span>
+                  </div>
 
                   {/* Detailed Unified Narrative Paragraph */}
                   {narrativeText && (
