@@ -20,6 +20,7 @@ function MatchingPage({ settings }) {
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState(null);
   const [savedProfiles] = useState(() => getSavedHoroscopes());
 
@@ -147,7 +148,7 @@ function MatchingPage({ settings }) {
   };
 
   const handleDownloadPdf = async () => {
-    if (!boyLocation || !girlLocation || !result) return;
+    if (!boyLocation || !girlLocation || !result || pdfLoading) return;
     const bDateParsed = parseDateText(boyDate);
     const gDateParsed = parseDateText(girlDate);
     const [bHour, bMinute] = boyTime.split(':').map(Number);
@@ -182,6 +183,7 @@ function MatchingPage({ settings }) {
       strictness
     };
 
+    setPdfLoading(true);
     try {
       const response = await fetch('/api/v1/astrology/match/download-pdf?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
@@ -207,6 +209,8 @@ function MatchingPage({ settings }) {
     } catch (err) {
       console.error(err);
       alert('Error occurred while downloading PDF matching report.');
+    } finally {
+      setPdfLoading(false);
     }
   };
 
@@ -395,8 +399,13 @@ function MatchingPage({ settings }) {
             </div>
             
             <div style={{ marginTop: '20px', display: 'flex', gap: '15px' }}>
-              <button onClick={handleDownloadPdf} className="btn-primary">
-                📥 {t('downloadPdf', settings.language)}
+              <button 
+                onClick={handleDownloadPdf} 
+                disabled={pdfLoading}
+                className="btn-primary"
+                style={{ opacity: pdfLoading ? 0.75 : 1, cursor: pdfLoading ? 'wait' : 'pointer' }}
+              >
+                {pdfLoading ? `⏳ ${t('generatingPdf', settings.language)}` : `📥 ${t('downloadPdf', settings.language)}`}
               </button>
               <button onClick={() => setResult(null)} className="btn-primary" style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 {t('newMatch', settings.language)}

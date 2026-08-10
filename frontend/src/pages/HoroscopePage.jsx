@@ -47,6 +47,7 @@ function HoroscopePage({ settings }) {
   // Granular Feature Flags from Backend
   const [lifeEnabled, setLifeEnabled] = useState(true);
   const [dailyEnabled, setDailyEnabled] = useState(true);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   // Lifetime Predictions state
   const [predictions, setPredictions] = useState(null);
@@ -299,7 +300,8 @@ function HoroscopePage({ settings }) {
   };
 
   const handleDownloadPdf = async () => {
-    if (!formPayload) return;
+    if (!formPayload || pdfLoading) return;
+    setPdfLoading(true);
     try {
       const response = await fetch('/api/v1/astrology/download-pdf?systemType=DRIK_TIRUKANITHAM', {
         method: 'POST',
@@ -325,6 +327,8 @@ function HoroscopePage({ settings }) {
     } catch (err) {
       console.error(err);
       alert('Error occurred while downloading PDF report.');
+    } finally {
+      setPdfLoading(false);
     }
   };
 
@@ -511,47 +515,48 @@ function HoroscopePage({ settings }) {
                 </div>
 
                 {isExpanded && dasa.bhukthis && dasa.bhukthis.length > 0 && (
-                  <div style={{ padding: '0 16px 12px 16px', borderTop: '1px solid var(--border)' }}>
-                    <table className="horai-table" style={{ marginTop: '8px', fontSize: '13px' }}>
-                      <thead>
-                        <tr>
-                          <th>{t('bhukthi', settings.language)}</th>
-                          <th>{t('from', settings.language) || 'From'}</th>
-                          <th>{t('until', settings.language) || 'To'}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {dasa.bhukthis.map((bhukthi, bIdx) => {
-                          const isActiveBhukthi = isPeriodActive(bhukthi.startDate, bhukthi.endDate);
-                          const bPlanetKey = (bhukthi.planetKey || bhukthi.planetName || '').toLowerCase();
-                          const bLocalizedPlanet = t('planet.' + bPlanetKey, settings.language) !== ('planet.' + bPlanetKey)
-                            ? t('planet.' + bPlanetKey, settings.language)
-                            : (bhukthi.planetName || bhukthi.planetKey);
+                  <div style={{ padding: '8px 14px 14px 14px', borderTop: '1px solid var(--border)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '8px', marginTop: '8px' }}>
+                      {dasa.bhukthis.map((bhukthi, bIdx) => {
+                        const isActiveBhukthi = isPeriodActive(bhukthi.startDate, bhukthi.endDate);
+                        const bPlanetKey = (bhukthi.planetKey || bhukthi.planetName || '').toLowerCase();
+                        const bLocalizedPlanet = t('planet.' + bPlanetKey, settings.language) !== ('planet.' + bPlanetKey)
+                          ? t('planet.' + bPlanetKey, settings.language)
+                          : (bhukthi.planetName || bhukthi.planetKey);
 
-                          return (
-                            <tr 
-                              key={bIdx}
-                              style={{
-                                background: isActiveBhukthi ? 'rgba(255, 215, 0, 0.18)' : 'transparent',
-                                fontWeight: isActiveBhukthi ? 'bold' : 'normal',
-                                color: isActiveBhukthi ? 'var(--accent-gold)' : 'inherit'
-                              }}
-                            >
-                              <td>
+                        return (
+                          <div 
+                            key={bIdx}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: '8px 12px',
+                              borderRadius: '6px',
+                              border: isActiveBhukthi ? '1px solid var(--accent-gold)' : '1px solid var(--border)',
+                              background: isActiveBhukthi ? 'rgba(255, 215, 0, 0.14)' : 'rgba(255, 255, 255, 0.02)',
+                              fontSize: '13px',
+                              flexWrap: 'wrap',
+                              gap: '6px'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontWeight: 'bold', color: isActiveBhukthi ? 'var(--accent-gold)' : 'var(--text-primary)' }}>
                                 {isActiveBhukthi ? '⭐ ' : ''}{bLocalizedPlanet}
-                                {isActiveBhukthi && (
-                                  <span style={{ fontSize: '10px', marginLeft: '6px', background: 'rgba(255, 215, 0, 0.25)', padding: '1px 6px', borderRadius: '4px' }}>
-                                    {t('currentActiveDasa', settings.language) || 'Current'}
-                                  </span>
-                                )}
-                              </td>
-                              <td>{formatDate(bhukthi.startDate)}</td>
-                              <td>{formatDate(bhukthi.endDate)}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                              </span>
+                              {isActiveBhukthi && (
+                                <span style={{ fontSize: '10px', background: 'var(--accent-gold)', color: '#000', padding: '1px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                                  {t('currentActiveDasa', settings.language) || 'Current'}
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: '12px', color: isActiveBhukthi ? 'var(--accent-gold)' : 'var(--text-secondary)', fontFamily: 'monospace' }}>
+                              {formatDate(bhukthi.startDate)} ➔ {formatDate(bhukthi.endDate)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -854,8 +859,13 @@ function HoroscopePage({ settings }) {
                   ? `✓ ${t('saved', settings.language) || 'Saved'}`
                   : `💾 ${t('saveProfile', settings.language) || 'Save Profile'}`}
               </button>
-              <button onClick={handleDownloadPdf} className="btn-primary">
-                📥 {t('downloadPdf', settings.language)}
+              <button 
+                onClick={handleDownloadPdf} 
+                disabled={pdfLoading}
+                className="btn-primary"
+                style={{ opacity: pdfLoading ? 0.75 : 1, cursor: pdfLoading ? 'wait' : 'pointer' }}
+              >
+                {pdfLoading ? `⏳ ${t('generatingPdf', settings.language)}` : `📥 ${t('downloadPdf', settings.language)}`}
               </button>
               <button onClick={handleResetToNewChart} className="btn-primary" style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
                 {t('newChart', settings.language)}
@@ -863,14 +873,34 @@ function HoroscopePage({ settings }) {
             </div>
           </div>
 
-          {/* Sub Navigation */}
-          <div className="tabs-header">
+          {/* Sub Navigation with smooth mobile horizontal scroll */}
+          <div 
+            className="tabs-header" 
+            style={{ 
+              display: 'flex', 
+              overflowX: 'auto', 
+              whiteSpace: 'nowrap', 
+              scrollSnapType: 'x mandatory', 
+              WebkitOverflowScrolling: 'touch', 
+              gap: '8px', 
+              paddingBottom: '6px',
+              scrollbarWidth: 'thin'
+            }}
+          >
             <button 
               className={`tab-btn ${activeSubTab === 'charts' ? 'active' : ''}`}
               onClick={() => setActiveSubTab('charts')}
             >
               {t('chartsTab', settings.language)}
             </button>
+            {dailyEnabled && (
+              <button 
+                className={`tab-btn ${activeSubTab === 'daily' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('daily')}
+              >
+                {t('dailyBalanTab', settings.language)}
+              </button>
+            )}
             <button 
               className={`tab-btn ${activeSubTab === 'dasa' ? 'active' : ''}`}
               onClick={() => setActiveSubTab('dasa')}
@@ -895,14 +925,6 @@ function HoroscopePage({ settings }) {
                 onClick={() => setActiveSubTab('predictions')}
               >
                 {t('aiBalanTab', settings.language)}
-              </button>
-            )}
-            {dailyEnabled && (
-              <button 
-                className={`tab-btn ${activeSubTab === 'daily' ? 'active' : ''}`}
-                onClick={() => setActiveSubTab('daily')}
-              >
-                {t('dailyBalanTab', settings.language)}
               </button>
             )}
           </div>
