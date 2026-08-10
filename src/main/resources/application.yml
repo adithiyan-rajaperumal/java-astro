@@ -26,7 +26,7 @@ spring:
     encoding: UTF-8
 
 gemini:
-  api-key: ${GEMINI_API_KEY:enc:QVEuQWI4Uk42SXZvc2QwSktCUF90UTZma0ZDOEhvSHk2anY5Y2JuMGdtTDRVc21JNW9acUE=}
+  api-key: ${GEMINI_API_KEY:enc:QVEuQWI4Uk42SnB2Q3pJcU1QWjh5SXhGVExXZmhWeUlONk9xb3I5RFFGNFVxSGcyTjFQRXc}
   enabled: ${GEMINI_ENABLED:true}
   life-predictions-enabled: ${GEMINI_LIFE_PREDICTIONS_ENABLED:true}
   daily-balan-enabled: ${GEMINI_DAILY_BALAN_ENABLED:true}
