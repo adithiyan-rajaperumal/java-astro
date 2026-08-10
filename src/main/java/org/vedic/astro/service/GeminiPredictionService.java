@@ -154,7 +154,8 @@ public class GeminiPredictionService {
         } else {
             sb.append("  * Language: English with classical Sanskrit astrological terms in parentheses.\n");
         }
-        sb.append("- Output dense, punchy, actionable astrological readings. Avoid generic filler statements.\n")
+        sb.append("- Output dense, punchy, actionable astrological readings. FORBID repetitive boilerplate or generic optimistic filler across years.\n")
+          .append("- TRUTHFULLY AND ACCURATELY predict potential difficulties (job loss, career disruption, acute/chronic illness, surgeries, parental health decline/bereavement, debts) when Maraka/Dusthana/Badhaka/afflicted lords are active.\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
         return sb.toString();
     }
@@ -217,6 +218,15 @@ public class GeminiPredictionService {
             }
             sb.append("\n");
 
+            sb.append("D12[Dwadasamsa-Parents/Heritage]: ");
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                int d12Sign = vargaEngineService != null
+                        ? vargaEngineService.calculateVargaSign(12, p.getSignNumber(), p.getDegreeInSign(), p.getSignNumber() * 30.0 + p.getDegreeInSign())
+                        : ((p.getSignNumber() - 1 + (int)(p.getDegreeInSign() / 2.5)) % 12 + 1);
+                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":S").append(d12Sign).append(" ");
+            }
+            sb.append("\n");
+
             sb.append("D30[Trimsamsa-Health/Affliction]: ");
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
                 int d30Sign = vargaEngineService != null
@@ -258,10 +268,10 @@ public class GeminiPredictionService {
         }
 
         sb.append("=== GENERATION DIRECTIVES ===\n")
-          .append("1. 'nativePersonality': Deep core psychological temperament, 3-4 key strengths, and 2-3 vulnerabilities/karmic lessons.\n")
+          .append("1. 'nativePersonality': Deep core psychological temperament, 3-4 key strengths, and 2-3 vulnerabilities/karmic patterns.\n")
           .append("2. 'healthAnalysis': Ayurvedic constitution (Vata/Pitta/Kapha balance), 2-4 organ vulnerabilities deduced from 6th/8th/12th houses & D30, vitality summary, and diet/lifestyle advice.\n")
-          .append("3. 'pastMilestones': 5-8 verified past milestone events up to age ").append(currentAge).append(" (year, age, dasaBhukthi, milestoneTitle, nature ['POSITIVE'|'CHALLENGING'|'NEUTRAL'], description, astrologicalFactor).\n")
-          .append("4. 'lifetimePredictions': Continuous year-by-year forecasts starting from current year ").append(currentYear).append(" for at least 15-20 upcoming key years (year, age, dasaBhukthi, personalMindset, careerProfession, wealthFinance [using D2], healthVitality [using D30], marriageFamily, parentsKids, favorableVsCaution, remediesGuidance).\n\n")
+          .append("3. 'pastKeyPhases': 2-3 pivotal life-defining turning points/phases from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n")
+          .append("4. 'lifetimePredictions': Distinct year-by-year forecasts starting from current year ").append(currentYear).append(" for at least 15-20 upcoming key years (year, age, dasaBhukthi, yearlyTheme, astrologicalBasis, careerAndFinance [jobs, promotions, losses], healthAndFamily [vitality, surgeries, parents' health from D12/D30, marriage], cautionsAndRemedies [warnings and targeted remedy]).\n\n")
           .append("Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
           .append("  \"overallSummary\": \"(Comprehensive synthesis)\",\n")
@@ -278,15 +288,13 @@ public class GeminiPredictionService {
           .append("  },\n")
           .append("  \"aiYogas\": [{ \"name\": \"...\", \"formingPlanets\": \"...\", \"impact\": \"...\" }],\n")
           .append("  \"aiDoshams\": [{ \"name\": \"...\", \"status\": \"...\", \"nullificationFactor\": \"...\", \"remedy\": \"...\" }],\n")
-          .append("  \"pastMilestones\": [\n")
+          .append("  \"pastKeyPhases\": [\n")
           .append("    {\n")
-          .append("      \"year\": ").append(birthYear + 5).append(",\n")
-          .append("      \"age\": 5,\n")
-          .append("      \"dasaBhukthi\": \"(Dasa-Bhukthi)\",\n")
-          .append("      \"milestoneTitle\": \"...\",\n")
-          .append("      \"nature\": \"POSITIVE\",\n")
-          .append("      \"description\": \"...\",\n")
-          .append("      \"astrologicalFactor\": \"...\"\n")
+          .append("      \"periodOrAge\": \"(e.g. Age 16 - 22 / 2012 - 2018)\",\n")
+          .append("      \"dasaBhukthi\": \"(Running Dasa)\",\n")
+          .append("      \"phaseTitle\": \"(Phase Milestone Title)\",\n")
+          .append("      \"livedExperience\": \"(Turning point, lived struggles and achievements)\",\n")
+          .append("      \"astrologicalBasis\": \"(Planetary basis in D1/D9)\"\n")
           .append("    }\n")
           .append("  ],\n")
           .append("  \"lifetimePredictions\": [\n")
@@ -294,14 +302,11 @@ public class GeminiPredictionService {
           .append("      \"year\": ").append(currentYear).append(",\n")
           .append("      \"age\": ").append(currentAge).append(",\n")
           .append("      \"dasaBhukthi\": \"(Dasa-Bhukthi)\",\n")
-          .append("      \"personalMindset\": \"...\",\n")
-          .append("      \"careerProfession\": \"...\",\n")
-          .append("      \"wealthFinance\": \"...\",\n")
-          .append("      \"healthVitality\": \"...\",\n")
-          .append("      \"marriageFamily\": \"...\",\n")
-          .append("      \"parentsKids\": \"...\",\n")
-          .append("      \"favorableVsCaution\": \"...\",\n")
-          .append("      \"remediesGuidance\": \"...\"\n")
+          .append("      \"yearlyTheme\": \"(Sharp 1-sentence headline for the year)\",\n")
+          .append("      \"astrologicalBasis\": \"(Explicit planetary reason from D1/D10/D30)\",\n")
+          .append("      \"careerAndFinance\": \"(Direct forecast: promotion, job loss, business, wealth)\",\n")
+          .append("      \"healthAndFamily\": \"(Direct forecast: health, surgeries, parents' health, domestic milestones)\",\n")
+          .append("      \"cautionsAndRemedies\": \"(Direct warning and targeted remedy)\"\n")
           .append("    }\n")
           .append("  ]\n")
           .append("}\n");
@@ -556,46 +561,48 @@ public class GeminiPredictionService {
 
         List<DasaPeriod> dasas = c != null ? c.getCurrentDasaTimeline() : Collections.emptyList();
 
-        List<PredictionResponseDTO.PastMilestone> pastMilestones = new ArrayList<>();
-        int[] samplePastAges = {5, 10, 16, 21, 25, 28, 32, 35, 40};
-        for (int age : samplePastAges) {
-            if (age <= currentAge) {
-                int yr = birthYear + age;
-                String runningDasa = findDasaForYear(dasas, yr);
-                pastMilestones.add(PredictionResponseDTO.PastMilestone.builder()
-                        .year(yr)
-                        .age(age)
-                        .dasaBhukthi(runningDasa)
-                        .milestoneTitle(isTa ? getTamilPastMilestoneTitle(age) : getEnglishPastMilestoneTitle(age))
-                        .nature(age % 2 == 0 ? "POSITIVE" : "NEUTRAL")
-                        .description(isTa ? getTamilPastMilestoneDesc(age, runningDasa) : getEnglishPastMilestoneDesc(age, runningDasa))
-                        .astrologicalFactor(isTa ? "கோச்சார & திசா நாதனின் சாதகமான பார்வை." : "Active transit influence and Dasa lord dignity.")
-                        .verified(false)
-                        .build());
-            }
+        List<PredictionResponseDTO.PastKeyPhase> pastKeyPhases = new ArrayList<>();
+        pastKeyPhases.add(PredictionResponseDTO.PastKeyPhase.builder()
+                .periodOrAge(isTa ? "வயது 5 முதல் 15 வரை (ஆரம்ப கல்வி & குடும்ப அடித்தளம்)" : "Age 5 to 15 (Early Foundation & Schooling)")
+                .dasaBhukthi(dasas != null && !dasas.isEmpty() ? dasas.get(0).getPlanetName() + (isTa ? " திசா" : " Dasa") : (isTa ? "ஆரம்ப திசா" : "Initial Dasa"))
+                .phaseTitle(isTa ? "அடிப்படை கல்வி & குடும்ப சூழல்" : "Foundational Learning & Family Environment")
+                .livedExperience(isTa
+                        ? "குடும்ப சூழல் மற்றும் தொடக்கக் கல்வி சார்ந்த அனுபவங்கள் உங்கள் அடிப்படை குணாதிசயங்களையும் ஒழுக்கத்தையும் வடிவமைத்தன."
+                        : "Family environment and schooling shaped your core perseverance and analytical aptitude.")
+                .astrologicalBasis(isTa ? "2-ஆம் வீடு (குடும்பம்/வாக்கு) மற்றும் தொடக்க திசா நாதனின் பலம்." : "2nd house of family and foundational Dasa lord placement.")
+                .build());
+
+        if (currentAge >= 18) {
+            pastKeyPhases.add(PredictionResponseDTO.PastKeyPhase.builder()
+                    .periodOrAge(isTa ? "வயது 16 முதல் 24 வரை (உயர் கல்வி & வாழ்க்கை திருப்புமுனை)" : "Age 16 to 24 (Higher Studies & Turning Point)")
+                    .dasaBhukthi(dasas != null && dasas.size() > 1 ? dasas.get(1).getPlanetName() + (isTa ? " திசா" : " Dasa") : (isTa ? "திசா மாற்றம்" : "Transition Dasa"))
+                    .phaseTitle(isTa ? "கல்வி மாற்றங்களும் சுயமாக முடிவெடுக்கும் ஆற்றலும்" : "Academic Transition & Independent Decision Making")
+                    .livedExperience(isTa
+                            ? "உயர் கல்வி மற்றும் தொழில் திசை தேர்வில் சவால்கள்; சுய உழைப்பால் தடைகளை கடந்து முன்னேறும் மனப்பக்குவம் உருவானது."
+                            : "Navigating transitions in higher education and initial career choices, fostering resilience and independence.")
+                    .astrologicalBasis(isTa ? "5-ஆம் வீடு (புத்தி/கல்வி) மற்றும் 9-ஆம் அதிபதியின் சுப பார்வை." : "5th house of intellect and 9th lord aspect.")
+                    .build());
+        }
+
+        if (currentAge >= 28) {
+            pastKeyPhases.add(PredictionResponseDTO.PastKeyPhase.builder()
+                    .periodOrAge(isTa ? "வயது 25 முதல் " + currentAge + " வரை (தொழில் ஸ்திரத்தன்மை & அனுபவ முதிர்ச்சி)" : "Age 25 to " + currentAge + " (Career Settlement & Maturity)")
+                    .dasaBhukthi(findDasaForYear(dasas, Math.max(birthYear + 25, currentYear - 2)))
+                    .phaseTitle(isTa ? "பணியிட மாற்றங்களும் குடும்பப் பொறுப்புகளும்" : "Workplace Consolidation & Domestic Responsibilities")
+                    .livedExperience(isTa
+                            ? "பணியிடத்தில் புதிய பொறுப்புகள், நிதி நிர்வாகத்தில் அனுபவப் பாடம் மற்றும் குடும்பப் பொறுப்புகளை ஏற்கும் முதிர்ச்சி ஏற்பட்டது."
+                            : "Career consolidation, practical financial lessons, and rising family responsibilities.")
+                    .astrologicalBasis(isTa ? "10-ஆம் வீடு (கர்ம ஸ்தானம்) மற்றும் D10 தசாம்ச பலன்." : "10th house of career and D10 Dasamsa activation.")
+                    .build());
         }
 
         List<PredictionResponseDTO.YearlyPrediction> predictions = new ArrayList<>();
-        int maxForecastYears = Math.min(100 - currentAge, 35);
+        int maxForecastYears = Math.min(100 - currentAge, 30);
         for (int i = 0; i <= maxForecastYears; i++) {
             int yr = currentYear + i;
             int age = currentAge + i;
             String runningDasa = findDasaForYear(dasas, yr);
-            predictions.add(PredictionResponseDTO.YearlyPrediction.builder()
-                    .year(yr)
-                    .age(age)
-                    .dasaBhukthi(runningDasa)
-                    .personalMindset(isTa ? "மன அமைதியும் ஆக்கப்பூர்வமான புதிய சிந்தனைகளும் மேலோங்கும்." : "Mental clarity, renewed optimism, and personal growth.")
-                    .careerProfession(isTa ? "தொழில் மற்றும் பணியிடத்தில் புதிய பொறுப்புகளும் அங்கீகாரமும் கிட்டும்." : "Career advancements, supportive colleagues, and steady recognition.")
-                    .careerFinance(isTa ? "தொழில் & நிதி உயர்வும் நன்மையும் உண்டாகும்." : "Career & financial progression.")
-                    .wealthFinance(isTa ? "D2 ஹோரா பலத்தால் நிலையான சேமிப்பும் பூமி/நகை சேர்க்கையும் உண்டாகும்." : "D2 Hora indicates solid asset accumulation and growing savings.")
-                    .healthVitality(isTa ? "உடல் நலம் சீராக இருக்கும். உணவு முறையில் கவனம் தேவை." : "Vitality remains high. Maintain balanced sleep and hydration.")
-                    .marriageFamily(isTa ? "குடும்பத்தில் மகிழ்ச்சியும் நற்காரிய சுப நிகழ்வுகளும் கூடிவரும்." : "Domestic peace, supportive family bonds, and harmonious milestones.")
-                    .familyMarriage(isTa ? "குடும்ப சுப காரியங்கள் கூடிவரும்." : "Family harmony and auspicious domestic events.")
-                    .parentsKids(isTa ? "பெற்றோர் ஆசியும் குழந்தைகளின் கல்வி/வளர்ச்சியில் மகிழ்ச்சியும் அமையும்." : "Parental blessings and proud moments regarding children's progress.")
-                    .favorableVsCaution(isTa ? "முதல் 6 மாதங்கள் மிகச் சிறந்த சுப காலம். பெரிய முதலீடுகளில் கவனம் தேவை." : "H1 is highly auspicious. Exercise caution during major legal paperwork.")
-                    .remediesGuidance(isTa ? "வியாழக்கிழமை குரு வழிபாடு மற்றும் நெய்தீபம் ஏற்றுவது நற்பலனைத் தரும்." : "Chant Gayatri Mantra daily and offer prayers to Ishta Devata on Thursdays.")
-                    .build());
+            predictions.add(generateDynamicYearlyPrediction(yr, age, runningDasa, isTa, i));
         }
 
         String summary = isTa ?
@@ -610,9 +617,95 @@ public class GeminiPredictionService {
                 .healthAnalysis(health)
                 .aiYogas(aiYogas)
                 .aiDoshams(aiDoshams)
-                .pastMilestones(pastMilestones)
+                .pastKeyPhases(pastKeyPhases)
                 .futurePredictions(predictions)
                 .lifetimePredictions(predictions)
+                .build();
+    }
+
+    private PredictionResponseDTO.YearlyPrediction generateDynamicYearlyPrediction(int yr, int age, String runningDasa, boolean isTa, int idx) {
+        String dasa = runningDasa != null ? runningDasa.toLowerCase() : "";
+        String theme;
+        String astroBasis;
+        String careerFin;
+        String healthFam;
+        String cautionsRem;
+
+        if (dasa.contains("saturn") || dasa.contains("சனி") || dasa.contains("shani")) {
+            theme = isTa ? "கடின உழைப்பு, புதிய பொறுப்புகள் மற்றும் நிதி மறுசீரமைப்பு ஆண்டு." : "High perseverance, structured workload, and financial consolidation.";
+            astroBasis = isTa ? "சனி திசா/புக்தியின் கர்ம வினைகள் மற்றும் உழைப்புக்குரிய பலன்." : "Saturn's karmic discipline and structural realignment.";
+            careerFin = isTa ? "பணியிடத்தில் கூடுதல் பொறுப்புகள். அவசர முடிவுகளையோ தேவையற்ற விவாதங்களையோ தவிர்க்கவும்; புதிய கடன் வாங்குவதை தவிர்க்கவும்." : "Heavy workplace deliverables; avoid friction with seniors. Guard against unbudgeted debts.";
+            healthFam = isTa ? "மூட்டு வலி, நரம்பு அல்லது தூக்கமின்மை சோர்வு. மூத்த குடும்பத்தினர்/பெற்றோர் உடல்நலத்தில் மிகுந்த கவனம் தேவை." : "Joint/nervous fatigue; manage posture and sleep. Special attention needed for elderly parents' health.";
+            cautionsRem = isTa ? "எச்சரிக்கை: அவசர வணிக முடிவுகள் வேண்டாம். பரிகாரம்: சனிக்கிழமை நல்லெண்ணெய் தீபம் ஏற்றி அனுமனை வழிபடவும்." : "Caution: Avoid hasty speculative investments. Remedy: Chant Hanuman Chalisa on Saturdays.";
+        } else if (dasa.contains("rahu") || dasa.contains("ராகு")) {
+            theme = isTa ? "திடீர் மாற்றங்கள், எதிர்பாராத பயணம் அல்லது தொழில் இடப்பெயர்ச்சி ஆண்டு." : "Unconventional expansion, sudden relocations, and digital/foreign prospects.";
+            astroBasis = isTa ? "ராகுவின் மாயா சக்தியால் புதிய வாய்ப்புகளும் திடீர் ஏற்ற இறக்கங்களும்." : "Rahu triggering rapid paradigm shifts and unconventional growth.";
+            careerFin = isTa ? "தொழில்நுட்பம் அல்லது புதிய துறையில் முன்னேற்றம்; ஆனால் வேலை மாற்றம் அல்லது பணி அமைப்பில் திடீர் மாற்றம் ஏற்படலாம். நிதி பரிவர்த்தனைகளில் ஏமாற்றங்களை தவிர்க்கவும்." : "Breakthrough in modern/tech avenues, but beware of sudden job disruption or deceptive financial contracts.";
+            healthFam = isTa ? "அதிக சிந்தனையால் மன உளைச்சல் மற்றும் ஒவ்வாமை. குடும்பத்தில் வெளிப்படையான பேச்சை கடைபிடிக்கவும்." : "Restlessness, sleep disruption, and digestive allergies. Cultivate open communication at home.";
+            cautionsRem = isTa ? "எச்சரிக்கை: புதிய முதலீடுகளில் ஆவணங்களை முழுமையாக சரிபார்க்கவும். பரிகாரம்: துர்க்கை அம்மன் வழிபாடு மற்றும் ராகுகால எலுமிச்சை தீபம்." : "Caution: Verify all legal documents before signing. Remedy: Offer prayers to Goddess Durga on Tuesdays.";
+        } else if (dasa.contains("jupiter") || dasa.contains("குரு") || dasa.contains("guru")) {
+            theme = isTa ? "பொருளாதார வளர்ச்சி, சுப காரியங்கள் மற்றும் நற்பெயர் உயரும் பொற்காலம்." : "Auspicious expansion, financial elevation, and family milestones.";
+            astroBasis = isTa ? "சுப கிரகமான குருவின் தர்ம பார்வை மற்றும் கேந்திர யோகம்." : "Benefic Jupiter's expansive aspect and dharma trikona activation.";
+            careerFin = isTa ? "பதவி உயர்வு, தொழில் விரிவாக்கம் மற்றும் D2 ஹோரா பலத்தால் நிலையான சொத்து/சேமிப்பு உயர்வு." : "Executive recognition, profitable venture expansion, and strong asset acquisition.";
+            healthFam = isTa ? "குடும்பத்தில் திருமணம், புத்திர பாக்கியம் போன்ற மங்கல நிகழ்வுகள். உடல் ஆரோக்கியமும் மன அமைதியும் மேலோங்கும்." : "Domestic bliss, celebratory family milestones, and vibrant physical vitality.";
+            cautionsRem = isTa ? "எச்சரிக்கை: அதிகப்படியான நம்பிக்கையால் மற்றவர்களுக்கு ஜாமீன் கொடுப்பதை தவிர்க்கவும். பரிகாரம்: வியாழக்கிழமை தட்சிணாமூர்த்தி வழிபாடு." : "Caution: Avoid standing guarantee for third-party loans. Remedy: Offer yellow flowers to Dakshinamurthy.";
+        } else if (dasa.contains("mars") || dasa.contains("செவ்வாய்") || dasa.contains("kuja")) {
+            theme = isTa ? "தைரியம், பூமி/சொத்து சேர்க்கை மற்றும் வேகமான முன்னேற்ற ஆண்டு." : "Bold enterprise, property acquisitions, and dynamic initiative.";
+            astroBasis = isTa ? "செவ்வாயின் காரகத்துவமான பூமி பலம் மற்றும் உக்கிர சக்தி." : "Mars activating real estate prospects and assertive vitality.";
+            careerFin = isTa ? "ரியல் எஸ்டேட், பொறியியல் துறைகளில் வெற்றி. அதிக ரிஸ்க் உள்ள ஊக வணிகங்களில் நஷ்ட அபாயம் உள்ளதால் நிதானம் தேவை." : "Advancement in property/engineering; exercise restraint in high-risk speculative trading.";
+            healthFam = isTa ? "இரத்த அழுத்தம், உஷ்ணம் அல்லது சிறிய காயங்கள்/அறுவைசிகிச்சை கவனம் தேவை. உடன்பிறந்தோருடன் நல்லிணக்கம் காக்கவும்." : "Heat-related fatigue, blood pressure, or minor injury caution. Maintain cordial ties with siblings.";
+            cautionsRem = isTa ? "எச்சரிக்கை: வாகன இயக்கத்திலும் முன்கோபத்திலும் கூடுதல் கவனம். பரிகாரம்: செவ்வாய்க்கிழமை முருகப்பெருமான் வழிபாடு." : "Caution: Drive defensively and manage impulsive anger. Remedy: Chant Kanda Sashti Kavasam on Tuesdays.";
+        } else if (dasa.contains("venus") || dasa.contains("சுக்கிரன்") || dasa.contains("sukra")) {
+            theme = isTa ? "கலை, ஆடம்பர பொருட்கள், புதிய வாகனம் மற்றும் தாம்பத்திய மகிழ்ச்சி ஆண்டு." : "Comforts, vehicle acquisition, creative achievements, and relationship joy.";
+            astroBasis = isTa ? "சுக்கிரனின் சுப பார்வை மற்றும் களத்திர ஸ்தான அனுகூலம்." : "Venusian grace enhancing domestic harmony and lifestyle comforts.";
+            careerFin = isTa ? "வணிகம், கலை, டிசைனிங் துறைகளில் நற்பலன்; புதிய வருமான வழிகளும் நகை/ஆபரண சேர்க்கையும் உண்டாகும்." : "Prosperity in design/creative commerce; new revenue streams and luxury acquisitions.";
+            healthFam = isTa ? "குடும்பத்தில் சுப காரியங்கள் கூடிவரும். இனிப்பு மற்றும் உணவு உட்கொள்ளலில் கட்டுப்பாடு தேவை." : "Domestic celebrations and joyous milestones. Balance sugar and diet.";
+            cautionsRem = isTa ? "எச்சரிக்கை: ஆடம்பர செலவுகளை திட்டமிட்டு கையாளவும். பரிகாரம்: வெள்ளிக்கிழமை மகாலட்சுமி வழிபாடு." : "Caution: Keep discretionary lifestyle spending budgeted. Remedy: Offer white flowers to Goddess Lakshmi.";
+        } else if (dasa.contains("mercury") || dasa.contains("புதன்") || dasa.contains("budha")) {
+            theme = isTa ? "புதிய அறிவு, தகவல் தொடர்பு, வியாபார லாபம் மற்றும் ஒப்பந்தங்கள் கூடிவரும் ஆண்டு." : "Intellectual excellence, commercial trade expansion, and profitable agreements.";
+            astroBasis = isTa ? "புதனின் வித்யா காரகத்துவம் மற்றும் வியாபார ஸ்தான அனுகூலம்." : "Mercury activating commercial intellect and communication channels.";
+            careerFin = isTa ? "புதிய தொழில் ஒப்பந்தங்கள், கணக்கியல்/ஐடி துறையில் அபார வளர்ச்சி மற்றும் வர்த்தக லாபம்." : "Signing profitable commercial agreements, IT/analytical success, and business growth.";
+            healthFam = isTa ? "நரம்பு மண்டலம் மற்றும் கண் பார்வையில் அக்கறை தேவை. குடும்பத்தில் சுமுகமான பேச்சுவார்த்தை வெற்றி தரும்." : "Eye and nervous care; maintain balanced screen time. Intellectual harmony in family discussions.";
+            cautionsRem = isTa ? "எச்சரிக்கை: வாய்மொழி ஒப்பந்தங்களை தவிர்த்து எழுத்துப்பூர்வ ஆவணங்களை பயன்படுத்தவும். பரிகாரம்: புதன்கிழமை பெருமாள் வழிபாடு." : "Caution: Rely on written contracts rather than verbal assurances. Remedy: Visit Lord Vishnu temple on Wednesdays.";
+        } else if (dasa.contains("sun") || dasa.contains("சூரியன்") || dasa.contains("surya")) {
+            theme = isTa ? "அரசு அனுகூலம், சமூக அங்கீகாரம், தலைமைப் பதவி மற்றும் அதிகார உயர்வு." : "Authoritative recognition, governmental support, and leadership elevation.";
+            astroBasis = isTa ? "ஆத்மகாரகனான சூரியனின் பலம் மற்றும் 1-ஆம்/10-ஆம் அதிபதியின் பார்வை." : "Solar vitality activating executive authority and public recognition.";
+            careerFin = isTa ? "நிர்வாகப் பொறுப்புகள், அரசு வழி காரிய அனுகூலம் மற்றும் கௌரவப் பதவி கிட்டும்." : "Promotions into senior managerial roles, official approvals, and career prestige.";
+            healthFam = isTa ? "உடல் வலிமை கூடும்; கண் பார்வை மற்றும் தந்தையாரின் உடல்நலத்தில் கூடுதல் கவனம் செலுத்தவும்." : "High vitality and stamina; ensure regular health checkups for father/elders.";
+            cautionsRem = isTa ? "எச்சரிக்கை: அதிகார மட்டத்தில் ஈகோ மோதல்களை தவிர்க்கவும். பரிகாரம்: தினமும் காலையில் ஆதித்ய ஹிருதய ஸ்தோத்திரம் பாராயணம்." : "Caution: Avoid ego clashes with higher authorities. Remedy: Chant Aditya Hridaya Stotram at sunrise.";
+        } else if (dasa.contains("moon") || dasa.contains("சந்திரன்") || dasa.contains("chandra")) {
+            theme = isTa ? "மன அமைதி, புதிய பயணங்கள், மக்கள் தொடர்பு மற்றும் தாய்வழி அனுகூலம்." : "Mental serenity, fruitful travels, public goodwill, and maternal harmony.";
+            astroBasis = isTa ? "மனோகாரகனான சந்திரனின் சுப கதி மற்றும் 4-ஆம் வீட்டு பலம்." : "Lunar tranquility activating 4th house comforts and intuitive clarity.";
+            careerFin = isTa ? "மக்கள் தொடர்பு, உணவு/மருந்து, வெளிநாட்டு வர்த்தகத்தில் நல்ல லாபம் மற்றும் புதிய தொடர்புகள்." : "Gains in public-facing, healthcare, or foreign trade ventures.";
+            healthFam = isTa ? "மனத்தெளிவு உண்டாகும்; சளி, நீர் சம்பந்தமான தொந்தரவுகளில் எச்சரிக்கை. தாயாரின் ஆசி நலம் சேர்க்கும்." : "Emotional well-being; guard against respiratory congestion. Maternal support brings peace.";
+            cautionsRem = isTa ? "எச்சரிக்கை: உணர்ச்சிவசப்பட்டு முக்கிய முடிவுகள் எடுப்பதை தவிர்க்கவும். பரிகாரம்: திங்கட்கிழமை சிவபெருமான் வழிபாடு." : "Caution: Avoid making major financial commitments purely on impulse. Remedy: Offer milk abhishekam to Lord Shiva.";
+        } else { // Ketu or default
+            theme = isTa ? "ஆராய்ச்சி, ஆன்மீக விழிப்புணர்வு, யோகா/தியான ஈடுபாடு மற்றும் தத்துவ சிந்தனைகள்." : "Spiritual depth, analytical research, and detachment from stressful materialism.";
+            astroBasis = isTa ? "ஞானகாரகனான கேதுவின் 12-ஆம் வீட்டு தொடர்பு மற்றும் ஆத்ம சிந்தனை." : "Ketu's introspective energy granting research clarity and inner peace.";
+            careerFin = isTa ? "ஆராய்ச்சி, மருத்துவம், ஆன்மீகம், ஆலோசனை துறைகளில் நல்ல முன்னேற்றம். மறைமுக எதிர்ப்புகள் விலகும்." : "Progress in research, consultancy, or specialized diagnostics; hidden obstacles dissolve.";
+            healthFam = isTa ? "தோல், ஒவ்வாமை மற்றும் மன அமைதிக்கான தியானம் அவசியம். குடும்ப விவகாரங்களில் பக்குவமான அணுகுமுறை தேவை." : "Skin and allergy care; daily meditation enhances peace. Maintain balanced domestic relationships.";
+            cautionsRem = isTa ? "எச்சரிக்கை: அவநம்பிக்கை மற்றும் தனிமை உணர்வை தவிர்த்து சுறுசுறுப்பாக இருக்கவும். பரிகாரம்: விநாயகர் வழிபாடு மற்றும் சங்கடஹர சதுர்த்தி விரதம்." : "Caution: Avoid excessive self-isolation. Remedy: Worship Lord Ganesha with Arugampul on Sankatahara Chaturthi.";
+        }
+
+        return PredictionResponseDTO.YearlyPrediction.builder()
+                .year(yr)
+                .age(age)
+                .dasaBhukthi(runningDasa)
+                .yearlyTheme(theme)
+                .astrologicalBasis(astroBasis)
+                .careerAndFinance(careerFin)
+                .healthAndFamily(healthFam)
+                .cautionsAndRemedies(cautionsRem)
+                .personalMindset(theme)
+                .careerProfession(careerFin)
+                .careerFinance(careerFin)
+                .wealthFinance(careerFin)
+                .healthVitality(healthFam)
+                .marriageFamily(healthFam)
+                .familyMarriage(healthFam)
+                .parentsKids(healthFam)
+                .favorableVsCaution(cautionsRem)
+                .remediesGuidance(cautionsRem)
                 .build();
     }
 

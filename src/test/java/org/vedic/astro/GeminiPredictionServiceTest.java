@@ -63,6 +63,15 @@ public class GeminiPredictionServiceTest {
 
         PredictionResponseDTO response = predictionService.generateOfflineRuleBasedBalan(req);
         assertNotNull(response);
+        assertNotNull(response.getPastKeyPhases());
+        assertTrue(response.getPastKeyPhases().size() >= 2);
+        assertNotNull(response.getLifetimePredictions());
+        assertFalse(response.getLifetimePredictions().isEmpty());
+        assertNotNull(response.getLifetimePredictions().get(0).getYearlyTheme());
+        assertNotNull(response.getLifetimePredictions().get(0).getAstrologicalBasis());
+        assertNotNull(response.getLifetimePredictions().get(0).getCareerAndFinance());
+        assertNotNull(response.getLifetimePredictions().get(0).getHealthAndFamily());
+        assertNotNull(response.getLifetimePredictions().get(0).getCautionsAndRemedies());
     }
 
     @Test
