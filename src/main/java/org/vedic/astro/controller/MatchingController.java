@@ -33,6 +33,15 @@ public class MatchingController {
     private final PdfExportService pdfExportService;
     private final org.vedic.astro.service.GeminiPredictionService geminiPredictionService;
     private final org.vedic.astro.service.PredictionCacheService cacheService;
+    private final org.vedic.astro.config.GeminiProperties geminiProperties;
+
+    private String normalizeLanguage(String lang) {
+        if (lang == null || lang.isBlank()) return "ta";
+        String l = lang.contains(",") ? lang.split(",")[0].trim() : lang.trim();
+        if (l.contains("-")) l = l.split("-")[0].trim();
+        if (l.contains("_")) l = l.split("_")[0].trim();
+        return l.toLowerCase();
+    }
 
     @PostMapping(path = "/match", produces = "application/json;charset=UTF-8")
     public ResponseEntity<MatchingResponseDTO> calculateCompatibility(
@@ -64,6 +73,8 @@ public class MatchingController {
             @RequestParam(defaultValue = "ta") String language,
             @RequestParam(defaultValue = "false") boolean forceRefresh) {
 
+        String effectiveLang = normalizeLanguage(language);
+
         PanchangamEngine panchangamEngine = panchangamFactory.getEngine(systemType);
         ChartResult boyChart = panchangamEngine.calculate(request.boy());
         ChartResult girlChart = panchangamEngine.calculate(request.girl());
@@ -79,7 +90,7 @@ public class MatchingController {
         classicalResponse.setGirlProfile(orchestrationService.convertToUiDashboardResponse(girlChart, request.girl(), systemType.name()));
 
         org.vedic.astro.matching.dto.MatchingAiPredictionDTO aiResponse = geminiPredictionService.generateMarriageMatchingAiAnalysis(
-                request, classicalResponse, language, forceRefresh);
+                request, classicalResponse, effectiveLang, forceRefresh);
 
         return ResponseEntity.ok(aiResponse);
     }
@@ -91,6 +102,7 @@ public class MatchingController {
             @RequestHeader(value = "Accept-Language", defaultValue = "ta") String language) {
         try {
             org.vedic.astro.util.IndicPreShaper.setPdfMode(true);
+            String effectiveLang = normalizeLanguage(language);
             
             PanchangamEngine panchangamEngine = panchangamFactory.getEngine(systemType);
             ChartResult boyChart = panchangamEngine.calculate(request.boy());
@@ -107,11 +119,20 @@ public class MatchingController {
             response.setBoyProfile(orchestrationService.convertToUiDashboardResponse(boyChart, request.boy(), systemType.name()));
             response.setGirlProfile(orchestrationService.convertToUiDashboardResponse(girlChart, request.girl(), systemType.name()));
 
-            // Check if AI Prediction is in 3-hour cache
-            String cacheKey = cacheService.generateMatchingKey(request, language);
-            var cachedAi = cacheService.getMatchingPrediction(cacheKey);
-            if (cachedAi != null && cachedAi.isEnabled()) {
-                response.setAiMatchingPrediction(cachedAi);
+            // Attach AI Marriage Compatibility if enabled in configuration
+            if (geminiProperties != null && geminiProperties.isPdfPredictionsEnabled() && geminiProperties.isMatchingEnabled() && geminiPredictionService != null) {
+                try {
+                    var aiPred = geminiPredictionService.generateMarriageMatchingAiAnalysis(request, response, effectiveLang, false);
+                    if (aiPred != null && aiPred.isEnabled()) {
+                        response.setAiMatchingPrediction(aiPred);
+                    }
+                } catch (Exception ignored) {}
+            } else {
+                String cacheKey = cacheService.generateMatchingKey(request, effectiveLang);
+                var cachedAi = cacheService.getMatchingPrediction(cacheKey);
+                if (cachedAi != null && cachedAi.isEnabled()) {
+                    response.setAiMatchingPrediction(cachedAi);
+                }
             }
 
             byte[] pdfBinaryReport = pdfExportService.generateMarriageMatchingReport(response);
