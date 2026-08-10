@@ -9,8 +9,8 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
         <h4 style={{ color: 'var(--accent-saffron)', margin: '0 0 10px 0' }}>
           {t('analyzingCompatibility', language)}
         </h4>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', maxWidth: '500px', margin: '0 auto' }}>
-          Evaluating planetary alignments, D9 Navamsa harmony, Kuja Dosha nullifications, Nadi/Gana balance, and long-term marital synergy...
+        <p style={{ color: 'var(--text-secondary)', fontSize: '13.5px', maxWidth: '500px', margin: '0 auto', lineHeight: '1.5' }}>
+          {t('aiMatchingLoadingDesc', language)}
         </p>
       </div>
     );
@@ -23,8 +23,8 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
         <h3 className="title-gold" style={{ marginTop: 0 }}>
           {t('aiMatchingTitle', language)}
         </h3>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', maxWidth: '600px', margin: '0 auto 20px auto' }}>
-          Unlock a comprehensive, AI-powered Vedic compatibility analysis synthesizing dual-horoscope planetary configurations, Navamsa (D9) harmony, Dosha nullifications, and authentic remedies.
+        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', maxWidth: '600px', margin: '0 auto 20px auto', lineHeight: '1.5' }}>
+          {t('aiMatchingBannerDesc', language)}
         </p>
         {aiData?.message && (
           <p style={{ color: 'var(--warning)', fontSize: '13px', marginBottom: '15px' }}>
@@ -70,14 +70,14 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
           {aiData.overallVerdict || 'EVALUATED'}
         </div>
         <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-          ✨ {t('aiMatchingTitle', language)} • 3-Hour Cached Analysis
+          ✨ {t('aiMatchingTitle', language)} • {t('cached3HourNotice', language)}
         </div>
         <button
           onClick={onGenerate}
           className="btn-primary"
           style={{ marginTop: '15px', background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '6px 14px', fontSize: '12px' }}
         >
-          🔄 Refresh AI Analysis
+          🔄 {t('refreshAiAnalysis', language)}
         </button>
       </div>
 
@@ -87,34 +87,34 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
           <h4 style={{ margin: '0 0 10px 0', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>📜</span> {t('executiveSummary', language)}
           </h4>
-          <p style={{ margin: 0, fontSize: '15px', lineHeight: '1.7', whiteSpace: 'pre-line', color: 'var(--text-primary)' }}>
+          <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-line', color: 'var(--text-primary)' }}>
             {aiData.executiveSummary}
           </p>
         </div>
       )}
 
       {/* 5 Domain Deep Dive Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', marginBottom: '20px' }}>
         {domainList.map(({ key, data, icon, label }) => {
           if (!data) return null;
           return (
-            <div key={key} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div key={key} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
-                <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span>{icon}</span> {label || data.title}
                 </h4>
                 {data.scoreOrStatus && (
-                  <span style={{ fontSize: '12px', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(232, 93, 4, 0.1)', color: 'var(--accent-warm)' }}>
+                  <span style={{ fontSize: '11.5px', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(232, 93, 4, 0.1)', color: 'var(--accent-warm)' }}>
                     {data.scoreOrStatus}
                   </span>
                 )}
               </div>
-              <p style={{ margin: '0 0 10px 0', fontSize: '14px', lineHeight: '1.6', flexGrow: 1, color: 'var(--text-primary)' }}>
+              <p style={{ margin: '0 0 10px 0', fontSize: '13px', lineHeight: '1.55', flexGrow: 1, color: 'var(--text-primary)' }}>
                 {data.analysis}
               </p>
               {data.astrologicalBasis && (
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', backgroundColor: 'var(--bg-primary)', padding: '8px', borderRadius: '6px', border: '1px dashed var(--border)' }}>
-                  <strong>Astrological Basis:</strong> {data.astrologicalBasis}
+                <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', backgroundColor: 'var(--bg-primary)', padding: '8px', borderRadius: '6px', border: '1px dashed var(--border)' }}>
+                  <strong>{t('astrologicalBasisLabel', language)}:</strong> {data.astrologicalBasis}
                 </div>
               )}
             </div>

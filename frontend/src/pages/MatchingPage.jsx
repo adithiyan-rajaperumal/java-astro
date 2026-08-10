@@ -399,16 +399,16 @@ function MatchingPage({ settings }) {
             <div>
               <label>{t('methodology', settings.language)}</label>
               <select value={matchingSystem} onChange={(e) => setMatchingSystem(e.target.value)}>
-                <option value="ASHTA_KOOTA">Ashta Koota (North Indian 36 Points)</option>
-                <option value="DASA_PORUTHAM">Dasa Porutham (South Indian 10 matches)</option>
+                <option value="ASHTA_KOOTA">{t('ashtaKoota', settings.language)}</option>
+                <option value="DASA_PORUTHAM">{t('dasaPorutham', settings.language)}</option>
               </select>
             </div>
             <div>
               <label>{t('strictness', settings.language)}</label>
               <select value={strictness} onChange={(e) => setStrictness(e.target.value)}>
-                <option value="LENIENT">Lenient</option>
-                <option value="MODERATE">Moderate</option>
-                <option value="STRICT">Strict</option>
+                <option value="LENIENT">{t('strictnessLenient', settings.language)}</option>
+                <option value="MODERATE">{t('strictnessModerate', settings.language)}</option>
+                <option value="STRICT">{t('strictnessStrict', settings.language)}</option>
               </select>
             </div>
             <div>
@@ -432,15 +432,15 @@ function MatchingPage({ settings }) {
       {loading && (
         <div className="spinner-container">
           <div className="spinner"></div>
-          <p>Analyzing compatibility parameters and dosha configurations...</p>
+          <p>{t('analyzingMatchNotice', settings.language)}</p>
         </div>
       )}
 
       {error && (
         <div className="card" style={{ borderLeft: '4px solid var(--danger)' }}>
-          <p style={{ color: 'var(--danger)', fontWeight: 'bold' }}>Matching Engine Error</p>
+          <p style={{ color: 'var(--danger)', fontWeight: 'bold' }}>{t('matchingEngineError', settings.language)}</p>
           <p>{error}</p>
-          <button onClick={() => setResult(null)} className="btn-primary" style={{ marginTop: '10px' }}>Try Again</button>
+          <button onClick={() => setResult(null)} className="btn-primary" style={{ marginTop: '10px' }}>{t('tryAgain', settings.language)}</button>
         </div>
       )}
 
@@ -554,7 +554,7 @@ function MatchingPage({ settings }) {
                             {k.description}
                             {k.nullificationReason && (
                               <div style={{ color: 'var(--success)', marginTop: '4px', fontStyle: 'italic' }}>
-                                Exception: {k.nullificationReason}
+                                {t('exceptionLabel', settings.language)}: {k.nullificationReason}
                               </div>
                             )}
                           </td>
