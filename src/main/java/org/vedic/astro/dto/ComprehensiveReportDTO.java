@@ -15,6 +15,7 @@ public class ComprehensiveReportDTO {
     private String localMeanTime;
     private double latitude;
     private double longitude;
+    private String placeOfBirth;
     private String resolvedTimezone;
 
     // Core Panchangam Element Block

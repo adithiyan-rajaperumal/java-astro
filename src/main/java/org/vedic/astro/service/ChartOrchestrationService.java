@@ -155,6 +155,11 @@ public class ChartOrchestrationService {
         suiteMap.put("d30", compileVargaList(30, d1, cusps));
         suiteMap.put("d60", compileVargaList(60, d1, cusps));
 
+        String place = pay.resolvePlaceName();
+        if (place == null || place.isBlank()) {
+            place = String.format("%.4f° N/S, %.4f° E/W", pay.latitude(), pay.longitude());
+        }
+
         return ComprehensiveReportDTO.builder()
                 .name(pay.name())
                 .dateOfBirth(dob.toString())
@@ -162,6 +167,7 @@ public class ChartOrchestrationService {
                 .localMeanTime(res.getLocalMeanTime())
                 .latitude(pay.latitude())
                 .longitude(pay.longitude())
+                .placeOfBirth(place)
                 .thithi(computedThithi)
                 .yogam(computedYogam)
                 .karanam(computedKaranam)

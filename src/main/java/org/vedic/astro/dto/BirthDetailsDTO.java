@@ -54,5 +54,17 @@ public class BirthDetailsDTO {
     public String panchangamSystem() { return panchangamSystem; }
     public String date() { return date; }
     public String time() { return time; }
+    public String resolvePlaceName() {
+        if (location instanceof String s && !s.isBlank()) return s;
+        if (location instanceof java.util.Map<?, ?> m) {
+            Object name = m.get("name");
+            Object city = m.get("city");
+            Object country = m.get("country");
+            if (name != null && !String.valueOf(name).isBlank()) return String.valueOf(name);
+            if (city != null && !String.valueOf(city).isBlank()) return String.valueOf(city);
+            if (country != null && !String.valueOf(country).isBlank()) return String.valueOf(country);
+        }
+        return null;
+    }
 }
 
