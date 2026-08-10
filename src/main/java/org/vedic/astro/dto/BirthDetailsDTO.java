@@ -50,5 +50,9 @@ public class BirthDetailsDTO {
     public double latitude() { return latitude; }
     public double longitude() { return longitude; }
     public String ayanamsa() { return ayanamsa; }
+    public Object location() { return location; }
+    public String panchangamSystem() { return panchangamSystem; }
+    public String date() { return date; }
+    public String time() { return time; }
 }
 

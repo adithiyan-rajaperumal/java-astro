@@ -101,10 +101,10 @@ public class GeminiPredictionService {
         try {
             PanchangamRequestDTO pReq = new PanchangamRequestDTO(
                     targetDateStr,
-                    req.getBirthDetails().latitude(),
-                    req.getBirthDetails().longitude(),
-                    req.getBirthDetails().location() != null ? req.getBirthDetails().location().toString() : "Chennai",
-                    req.getBirthDetails().ayanamsa() != null ? req.getBirthDetails().ayanamsa() : "LAHIRI",
+                    req.getBirthDetails().getLatitude(),
+                    req.getBirthDetails().getLongitude(),
+                    req.getBirthDetails().getLocation() != null ? req.getBirthDetails().getLocation().toString() : "Chennai",
+                    req.getBirthDetails().getAyanamsa() != null ? req.getBirthDetails().getAyanamsa() : "LAHIRI",
                     lang
             );
             panchangam = dailyPanchangamService.calculateDailyPanchangam(pReq);
