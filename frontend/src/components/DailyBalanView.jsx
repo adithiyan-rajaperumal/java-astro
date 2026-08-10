@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { t } from '../i18n/translations';
 
 function DailyBalanView({
@@ -10,44 +9,22 @@ function DailyBalanView({
   loading,
   error
 }) {
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const todayStr = new Date().toISOString().split('T')[0];
 
   if (!dailyBalan && !loading) {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '40px 20px' }}>
-        <div style={{ fontSize: '48px', marginBottom: '15px' }}>📅</div>
         <h3 style={{ color: 'var(--accent-gold)', marginBottom: '10px' }}>
           {t('dailyBalanTitle', language)}
         </h3>
-        <p style={{ maxWidth: '650px', margin: '0 auto 20px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+        <p style={{ maxWidth: '650px', margin: '0 auto 25px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
           {language === 'ta'
             ? 'இன்றைய கோச்சார கிரக நிலைகள், ராசி, நட்சத்திரம் மற்றும் விம்சோத்தரி திசா புக்தி அடிப்படையில் உங்களுக்கான தனிப்பயனாக்கப்பட்ட இன்றைய பலன்கள்.'
             : 'Personalized daily astrological forecast synthesized from today’s planetary transits (Gochara), Janma Rasi, Nakshatra, and active Vimshottari Dasa.'}
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
-          <label style={{ fontSize: '14px', color: 'var(--text-primary)' }}>
-            📅 {t('birthDate', language)}:
-          </label>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            style={{
-              padding: '8px 12px',
-              borderRadius: '6px',
-              border: '1px solid var(--border)',
-              background: 'var(--bg-card)',
-              color: 'var(--text-primary)'
-            }}
-          />
-        </div>
-
         <button
-          onClick={() => onGenerateDaily(selectedDate, false)}
+          onClick={() => onGenerateDaily(todayStr, false)}
           className="btn-primary"
           style={{ padding: '12px 28px', fontSize: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
         >
@@ -76,7 +53,23 @@ function DailyBalanView({
           ⚠️ {t('calculationFaulted', language)}
         </h4>
         <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>{error}</p>
-        <button onClick={() => onGenerateDaily(selectedDate, true)} className="btn-primary">
+        <button onClick={() => onGenerateDaily(todayStr, true)} className="btn-primary">
+          🔄 {t('retry', language)}
+        </button>
+      </div>
+    );
+  }
+
+  if (dailyBalan && dailyBalan.enabled === false) {
+    return (
+      <div className="card" style={{ borderLeft: '4px solid #e74c3c', background: 'rgba(231, 76, 60, 0.08)' }}>
+        <h4 style={{ color: '#e74c3c', margin: '0 0 8px' }}>
+          ⚠️ {t('calculationFaulted', language)}
+        </h4>
+        <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>
+          {dailyBalan.message || t('aiPredictionUnavailable', language)}
+        </p>
+        <button onClick={() => onGenerateDaily(todayStr, true)} className="btn-primary" style={{ padding: '8px 20px' }}>
           🔄 {t('retry', language)}
         </button>
       </div>
@@ -100,7 +93,7 @@ function DailyBalanView({
         color: 'var(--text-secondary)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-          <span>📅 <strong style={{ color: 'var(--accent-gold)' }}>{dailyBalan.targetDate || selectedDate}</strong></span>
+          <span>📅 <strong style={{ color: 'var(--accent-gold)' }}>{dailyBalan.targetDate || todayStr}</strong></span>
           <span>💾 <strong style={{ color: '#2ecc71' }}>{t('cachedNoticeDaily', language)}</strong></span>
           {dailyBalan.rasi && (
             <span>🌙 {t('rashi', language)}: <strong style={{ color: 'var(--text-primary)' }}>{dailyBalan.rasi}</strong></span>
@@ -108,9 +101,18 @@ function DailyBalanView({
           {dailyBalan.runningDasaBhukthi && (
             <span>🪐 {t('dasaPeriod', language)}: <strong style={{ color: 'var(--text-primary)' }}>{dailyBalan.runningDasaBhukthi}</strong></span>
           )}
+          {dailyBalan.tokenUsage && (
+            <>
+              <span>⚡ <strong>{dailyBalan.tokenUsage.totalTokens?.toLocaleString()}</strong> {t('tokensCount', language) || 'tokens'}</span>
+              {(dailyBalan.tokenUsage.estimatedCostUsd > 0 || dailyBalan.tokenUsage.estimatedCostInr > 0) && (
+                <span>💵 <strong>${dailyBalan.tokenUsage.estimatedCostUsd?.toFixed(4)} / ₹{dailyBalan.tokenUsage.estimatedCostInr?.toFixed(2)}</strong></span>
+              )}
+              <span>🤖 <code style={{ color: 'var(--text-primary)' }}>{dailyBalan.tokenUsage.modelUsed}</code></span>
+            </>
+          )}
         </div>
         <button
-          onClick={() => onGenerateDaily(selectedDate, true)}
+          onClick={() => onGenerateDaily(todayStr, true)}
           className="btn-primary"
           style={{
             padding: '5px 12px',

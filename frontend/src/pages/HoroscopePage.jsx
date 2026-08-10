@@ -6,6 +6,34 @@ import DailyBalanView from '../components/DailyBalanView';
 import { t } from '../i18n/translations';
 import { getSavedHoroscopes, saveHoroscope, deleteSavedHoroscope, isProfileAlreadySaved } from '../utils/savedHoroscopes';
 
+const AYANAMSA_I18N_MAP = {
+  LAHIRI: 'ayanamsaLahiri',
+  KP: 'ayanamsaKP',
+  RAMAN: 'ayanamsaRaman',
+  SURYA_SIDDHANTA: 'ayanamsaSurya',
+  PUSHYAPAKSHA: 'ayanamsaPushyapaksha'
+};
+
+const PANCHANGAM_I18N_MAP = {
+  DRIK_TIRUKANITHAM: 'panchangamThirukanitham',
+  VAKYAM: 'panchangamVakyam',
+  SURYA_SIDDHANTA: 'panchangamSurya'
+};
+
+export const getAyanamsaLabel = (val, lang = 'en') => {
+  if (!val) return '';
+  const key = AYANAMSA_I18N_MAP[val.toUpperCase()] || `ayanamsa${val}`;
+  const translated = t(key, lang);
+  return translated !== key ? translated : val;
+};
+
+export const getPanchangamSystemLabel = (val, lang = 'en') => {
+  if (!val) return '';
+  const key = PANCHANGAM_I18N_MAP[val.toUpperCase()] || `panchangam${val}`;
+  const translated = t(key, lang);
+  return translated !== key ? translated : val;
+};
+
 function HoroscopePage({ settings }) {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -703,7 +731,7 @@ function HoroscopePage({ settings }) {
                 {t('born', settings.language)}: {report.dateOfBirth} at {report.timeOfBirth} ({t('localMeanTime', settings.language)}: {report.localMeanTime})
               </p>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rashi || report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {getAyanamsaLabel(report.ayanamsa, settings.language)}
+                {t('lagna', settings.language)}: {report.birthProfile?.lagna} | {t('rashi', settings.language)}: {report.birthProfile?.rashi || report.birthProfile?.rasi} | {t('star', settings.language)}: {report.birthProfile?.nakshatra} ({t('pada', settings.language)}: {report.birthProfile?.nakshatraPada}) | {t('ayanamsa', settings.language)}: {getAyanamsaLabel(report.ayanamsa || formPayload?.ayanamsa, settings.language)} | {t('panchangamSystem', settings.language)}: {getPanchangamSystemLabel(report.panchangamSystem || formPayload?.panchangamSystem, settings.language)}
               </p>
               {saveSuccessMsg && (
                 <p style={{ fontSize: '12px', color: '#27ae60', fontWeight: 'bold', margin: '4px 0 0 0' }}>
