@@ -21,9 +21,23 @@ public class PredictionResponseDTO {
     private HealthAnalysis healthAnalysis;
     private List<AiYoga> aiYogas;
     private List<AiDosham> aiDoshams;
+    private List<PastKeyPhase> pastKeyPhases;
     private List<PastMilestone> pastMilestones;
     private List<YearlyPrediction> futurePredictions;
     private List<YearlyPrediction> lifetimePredictions;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class PastKeyPhase {
+        private String periodOrAge;
+        private String dasaBhukthi;
+        private String phaseTitle;
+        private String livedExperience;
+        private String astrologicalBasis;
+    }
 
     @Data
     @Builder
@@ -110,6 +124,11 @@ public class PredictionResponseDTO {
         private int year;
         private int age;
         private String dasaBhukthi;
+        private String yearlyTheme;
+        private String astrologicalBasis;
+        private String careerAndFinance;
+        private String healthAndFamily;
+        private String cautionsAndRemedies;
         private String personalMindset;
         private String careerProfession;
         private String careerFinance; // Backwards compatibility
