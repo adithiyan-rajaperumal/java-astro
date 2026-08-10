@@ -22,7 +22,11 @@ public class PredictionCacheServiceTest {
 
     @Test
     void testLifetimeCacheStorageAndRetrieval() {
-        BirthDetailsDTO b = new BirthDetailsDTO("Adithiyan", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "Chennai", "LAHIRI");
+        BirthDetailsDTO b = BirthDetailsDTO.builder()
+                .name("Adithiyan")
+                .year(1995).month(8).day(15).hour(10).minute(30).second(0)
+                .latitude(13.0827).longitude(80.2707).ayanamsa("LAHIRI")
+                .build();
         String key = cacheService.generateLifetimeKey(b, "ta");
 
         assertNull(cacheService.getLifetimePrediction(key));
@@ -37,7 +41,11 @@ public class PredictionCacheServiceTest {
 
     @Test
     void testDailyCacheEndOfDayStorage() {
-        BirthDetailsDTO b = new BirthDetailsDTO("Adithiyan", 1995, 8, 15, 10, 30, 0, 13.0827, 80.2707, "Chennai", "LAHIRI");
+        BirthDetailsDTO b = BirthDetailsDTO.builder()
+                .name("Adithiyan")
+                .year(1995).month(8).day(15).hour(10).minute(30).second(0)
+                .latitude(13.0827).longitude(80.2707).ayanamsa("LAHIRI")
+                .build();
         String key = cacheService.generateDailyKey(b, "2026-08-10", "ta");
 
         DailyBalanDTO daily = DailyBalanDTO.builder().enabled(true).generalOutlook("Great Day").build();
