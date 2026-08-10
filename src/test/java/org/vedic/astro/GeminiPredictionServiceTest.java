@@ -132,5 +132,12 @@ public class GeminiPredictionServiceTest {
         props.setApiKey("enc:dGVzdC1rZXktMTIzNDU=");
         assertEquals("test-key-12345", props.getResolvedApiKey());
         assertTrue(props.isFeatureEnabled());
+        assertEquals(0.4, props.getTemperature(), 0.001);
+        assertEquals(1024, props.getThinkingBudget());
+
+        props.setThinkingBudget(2048);
+        props.setTemperature(0.5);
+        assertEquals(2048, props.getThinkingBudget());
+        assertEquals(0.5, props.getTemperature(), 0.001);
     }
 }

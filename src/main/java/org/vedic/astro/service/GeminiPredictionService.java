@@ -367,10 +367,14 @@ public class GeminiPredictionService {
 
         Map<String, Object> textPart = Map.of("text", prompt);
         Map<String, Object> contentObj = Map.of("parts", List.of(textPart));
-        Map<String, Object> generationConfig = Map.of(
-                "temperature", 0.2,
-                "responseMimeType", "application/json"
-        );
+
+        Map<String, Object> generationConfig = new HashMap<>();
+        generationConfig.put("temperature", geminiProperties.getTemperature());
+        generationConfig.put("responseMimeType", "application/json");
+
+        if (geminiProperties.getThinkingBudget() > 0) {
+            generationConfig.put("thinkingConfig", Map.of("thinkingBudget", geminiProperties.getThinkingBudget()));
+        }
 
         Map<String, Object> requestBody = Map.of(
                 "system_instruction", systemInstructionObj,
