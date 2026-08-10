@@ -2,9 +2,12 @@
 
 ## 1. Problem Statement & User Directives
 
-1. **Independent Yogas & Doshams Calculation**: Do NOT feed our pre-calculated structural diagnostics (yogas/doshas) into Gemini. Gemini must calculate and discover all classical Vedic Yogas and evaluate all Doshams fresh from raw planetary matrices (D1, D2, D9, D10, D12, D30, Shadbala, Dasa) to independently verify accuracy and identify additional astrological combinations.
-2. **No Offline Synthetic Fallback**: Eliminate synthetic rule-based offline fallbacks. If Gemini API is disabled, unconfigured, fails, or throws errors, return a clear, localized message: "AI prediction service is currently unavailable. Please try again later." in the chosen language (`en`, `ta`, `hi`, `te`, `kn`, `ml`).
-3. **Distinct Category Mapping in Yearly Cards**: Fix field mappings in yearly cards so `yearlyTheme`, `astrologicalBasis`, `careerAndFinance`, `healthAndFamily`, and `cautionsAndRemedies` are strictly distinct, highly articulated, and contain no duplicated text across categories.
+1. **Unified Articulated Yearly Narrative (No Fragmented Subcategory Boxes)**:
+   - Rigid subcategory boxes (`Career`, `Health`, `Parents & Kids`, etc.) force repetitive filler text and cause logical anomalies (e.g. mentioning parents' health every year after age 38 even if parents have already passed away).
+   - Replace fragmented subcategory boxes with a **single, rich, well-articulated yearly narrative paragraph (`detailedPrediction`)** alongside the **yearly theme**, **astrological basis**, and **cautions/remedies**.
+   - As life events occur (e.g., career change, marriage, parental loss), subsequent years naturally progress in their narrative context without repetitive boilerplate.
+2. **Independent Yogas & Doshams Calculation**: Do NOT feed our pre-calculated structural diagnostics (yogas/doshas) into Gemini. Gemini must calculate and discover all classical Vedic Yogas and evaluate all Doshams fresh from raw planetary matrices (D1, D2, D9, D10, D12, D30, Shadbala, Dasa) to independently verify accuracy and identify additional astrological combinations.
+3. **No Offline Synthetic Fallback**: Eliminate synthetic rule-based offline fallbacks. If Gemini API is disabled, unconfigured, fails, or throws errors, return a clear, localized message: "AI prediction service is currently unavailable. Please try again later." in the chosen language (`en`, `ta`, `hi`, `te`, `kn`, `ml`).
 4. **Horoscope Results Header**: Fix Ayanamsa and Panchangam system display in `HoroscopePage.jsx` results header using proper i18n lookup maps.
 5. **Clean Text Sub Tabs**: Remove emoji prefixes (`🔮`, `📅`) from subtab buttons for consistent text tabs.
 6. **Token & Cost Metrics**: Display total tokens, estimated cost in USD ($) and INR (₹), and model name on both AI Life Balan and Daily Balan cards.
@@ -15,7 +18,24 @@
 
 ## 2. Technical Architecture & Component Changes
 
-### A. Fresh Gemini Astrological Synthesis & No Offline Fallback (`GeminiPredictionService.java`)
+### A. Unified Yearly Narrative & Clean Card Schema (`PredictionResponseDTO.java`, `GeminiPredictionService.java`, `AiPredictionsView.jsx`)
+- **Yearly Card Structure**:
+  - `year`: Target forecast year (int)
+  - `age`: Native's age in that year (int)
+  - `dasaBhukthi`: Active Vimshottari Dasa & Bhukthi during that year (String)
+  - `yearlyTheme`: Sharp, 1-sentence headline capturing the central life theme for the year.
+  - `detailedPrediction`: A comprehensive, highly articulated narrative paragraph synthesizing the year's real-life events (career moves/job loss, financial shifts, health/surgeries, family/domestic events, bereavement if indicated, psychological mindset) with continuity across the lifespan.
+  - `astrologicalBasis`: Specific planetary placements and house activations from D1/D10/D12/D30.
+  - `cautionsAndRemedies`: Targeted period warnings and authentic Vedic remedial guidance.
+- **Frontend Card UI (`AiPredictionsView.jsx`)**:
+  - Render an elegant, premium card with:
+    - Header: Year, Age, Running Dasa
+    - 🎯 **Yearly Theme Headline**
+    - 📖 **Articulated Prediction Narrative**
+    - 🪐 **Astrological Basis** (subtle badge / callout)
+    - ⚠️ **Cautions & Remedies** (actionable alert box)
+
+### B. Fresh Gemini Astrological Synthesis & No Offline Fallback (`GeminiPredictionService.java`)
 - **Exclude Pre-calculated Diagnostics**:
   - Remove `c.getStructuralDiagnostics()` from `constructAstrologicalPrompt`.
   - Pass all vargas (D1, D2, D9, D10, D12, D30), Shadbala, and Dasa timeline.
@@ -29,15 +49,6 @@
     - `te`: "AI జ్యోతిష్య సేవ ప్రస్తుతం అందుబాటులో లేదు. దయచేసి కాసేపటి తర్వాత మళ్లీ ప్రయత్నించండి."
     - `kn`: "AI ಭವಿಷ್ಯ ಸೇವೆ ಪ್ರಸ್ತುತ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
     - `ml`: "AI പ്രവചന സേവനം ഇപ്പോൾ ലഭ്യമല്ല. ദയവായി അല്പം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക."
-
-### B. Distinct Year-Wise Prediction Categories (`GeminiPredictionService.java`, `AiPredictionsView.jsx`)
-- Prompt schema and backend DTO strictly enforce distinct fields:
-  - `yearlyTheme`: Sharp, 1-sentence headline capturing the central life theme.
-  - `astrologicalBasis`: Specific planetary reason (D1/D10/D12/D30 lords and Dasa-Bhukthi).
-  - `careerAndFinance`: Strictly job, promotions, business, investments, and financial gains/losses.
-  - `healthAndFamily`: Strictly physical vitality, surgeries, parents' health (from D12/D30), spouse, and children.
-  - `cautionsAndRemedies`: Strictly period warnings and authentic targeted Vedic remedies.
-- `AiPredictionsView.jsx` renders each category distinctly without string concatenation duplication.
 
 ### C. Frontend Header Display & I18n Key Normalization (`HoroscopePage.jsx`)
 - Add explicit mapping dictionaries for Ayanamsa and Panchangam systems:
@@ -85,4 +96,4 @@
    - `npm run build` validating Vite compilation.
    - Check horoscope header rendering for Ayanamsa and Panchangam systems across languages.
    - Verify token and cost badges in both AI Life Balan and Daily Balan views.
-   - Verify distinct categories in yearly prediction cards without duplicate text.
+   - Verify unified narrative paragraphs in yearly prediction cards.
