@@ -17,6 +17,8 @@ public class GeminiProperties {
     private boolean dailyBalanEnabled = true;
     private boolean pdfPredictionsEnabled = true;
     private String model = "gemini-3.6-flash";
+    private double temperature = 0.4;
+    private int thinkingBudget = 1024;
 
     public String getResolvedApiKey() {
         if (apiKey == null || apiKey.trim().isEmpty()) {

@@ -32,3 +32,5 @@ gemini:
   daily-balan-enabled: ${GEMINI_DAILY_BALAN_ENABLED:true}
   pdf-predictions-enabled: ${GEMINI_PDF_PREDICTIONS_ENABLED:true}
   model: ${GEMINI_MODEL:gemini-3.6-flash}
+  temperature: ${GEMINI_TEMPERATURE:0.4}
+  thinking-budget: ${GEMINI_THINKING_BUDGET:1024}

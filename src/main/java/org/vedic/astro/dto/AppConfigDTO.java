@@ -15,4 +15,6 @@ public class AppConfigDTO {
     private boolean dailyBalanEnabled;
     private boolean pdfPredictionsEnabled;
     private String geminiModel;
+    private double temperature;
+    private int thinkingBudget;
 }

@@ -35,12 +35,16 @@ public class ChartController {
         boolean dailyEnabled = geminiProperties != null && geminiProperties.isDailyBalanEnabled();
         boolean pdfEnabled = geminiProperties != null && geminiProperties.isPdfPredictionsEnabled();
         String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-3.6-flash";
+        double temperature = geminiProperties != null ? geminiProperties.getTemperature() : 0.4;
+        int thinkingBudget = geminiProperties != null ? geminiProperties.getThinkingBudget() : 1024;
         return ResponseEntity.ok(org.vedic.astro.dto.AppConfigDTO.builder()
                 .aiPredictionsEnabled(lifeEnabled)
                 .lifePredictionsEnabled(lifeEnabled)
                 .dailyBalanEnabled(dailyEnabled)
                 .pdfPredictionsEnabled(pdfEnabled)
                 .geminiModel(model)
+                .temperature(temperature)
+                .thinkingBudget(thinkingBudget)
                 .build());
     }
 
