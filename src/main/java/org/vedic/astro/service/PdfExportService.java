@@ -259,8 +259,12 @@ public class PdfExportService {
             // 7. AI LIFE BALAN & YEAR-BY-YEAR PREDICTIONS (IF ENABLED)
             // =================================================================
             if (data.getAiPredictions() != null && data.getAiPredictions().isEnabled()) {
-                document.newPage();
-                String aiTitleStr = "ta".equalsIgnoreCase(lang) ? "AI வாழ்நாள் பலன்கள் & வருடாந்திர கணிப்பு" : "AI Life Balan & Yearly Predictions";
+                boolean is10YearScope = "NEXT_10_YEARS".equalsIgnoreCase(data.getAiPredictions().getForecastMode())
+                        || (data.getAiPredictions().getLifetimePredictions() != null && data.getAiPredictions().getLifetimePredictions().size() <= 15)
+                        || (data.getAiPredictions().getFuturePredictions() != null && data.getAiPredictions().getFuturePredictions().size() <= 15);
+                String aiTitleStr = is10YearScope
+                        ? ("ta".equalsIgnoreCase(lang) ? "AI 10 ஆண்டு பலன்கள் & கணிப்பு (10-Year Forecast)" : "AI 10-Year Astrological Forecast")
+                        : ("ta".equalsIgnoreCase(lang) ? "AI வாழ்நாள் பலன்கள் & வருடாந்திர கணிப்பு" : "AI Life Balan & Yearly Predictions");
                 Paragraph aiTitle = buildMixedParagraph(aiTitleStr, tFont, engTFont);
                 aiTitle.setAlignment(Element.ALIGN_CENTER);
                 aiTitle.setSpacingAfter(12);
@@ -429,7 +433,25 @@ public class PdfExportService {
                         : data.getAiPredictions().getFuturePredictions();
 
                 if (futureList != null && !futureList.isEmpty()) {
-                    String futTitleStr = "ta".equalsIgnoreCase(lang) ? "வருடாந்திர வாழ்நாள் பலன்கள் & வழிகாட்டுதல்" : "Year-by-Year Lifetime Astrological Forecast";
+                    boolean is10Year = "NEXT_10_YEARS".equalsIgnoreCase(data.getAiPredictions().getForecastMode())
+                            || futureList.size() <= 15;
+                    int sYr = data.getAiPredictions().getStartYear() > 0
+                            ? data.getAiPredictions().getStartYear()
+                            : futureList.get(0).getYear();
+                    int eYr = data.getAiPredictions().getEndYear() > 0
+                            ? data.getAiPredictions().getEndYear()
+                            : futureList.get(futureList.size() - 1).getYear();
+
+                    String futTitleStr;
+                    if (is10Year) {
+                        futTitleStr = "ta".equalsIgnoreCase(lang)
+                                ? "அடுத்த 10 ஆண்டுகளுக்கான பலன்கள் & வழிகாட்டுதல் (" + sYr + " – " + eYr + ")"
+                                : "10-Year Astrological Forecast & Guidance (" + sYr + " – " + eYr + ")";
+                    } else {
+                        futTitleStr = "ta".equalsIgnoreCase(lang)
+                                ? "வருடாந்திர வாழ்நாள் பலன்கள் & வழிகாட்டுதல் (" + sYr + " – " + eYr + ")"
+                                : "Year-by-Year Lifetime Astrological Forecast (" + sYr + " – " + eYr + ")";
+                    }
                     Paragraph futH = buildMixedParagraph(futTitleStr, sFont, engSFont);
                     futH.setSpacingAfter(8);
                     document.add(futH);
