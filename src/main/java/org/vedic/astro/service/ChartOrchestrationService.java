@@ -13,6 +13,7 @@ import org.vedic.astro.util.ZodiacUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -153,7 +154,7 @@ public class ChartOrchestrationService {
         String computedKaranam = ts.getLabel("karanam." + resolveKaranamId(karanamIdx));
 
         String resolvedTz = timezoneService.getTimezoneFromCoordinates(pay.latitude(), pay.longitude());
-        String place = pay.place() != null ? pay.place() : "Chennai, India";
+        String place = pay.resolvePlaceName() != null ? pay.resolvePlaceName() : "Chennai, India";
 
         Map<String, List<ChartResponseDTO.PositionDetail>> suiteMap = new LinkedHashMap<>();
         int[] vargas = { 1, 2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60 };
