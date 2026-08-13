@@ -719,4 +719,21 @@ public class GeminiPredictionServiceTest {
         assertEquals("Saturn", result2[0]);
         assertEquals("Mercury", result2[1]);
     }
+
+    @Test
+    public void testAuspiciousAnchorsGeneration() {
+        // Aries Lagna (1) -> Mars ruled
+        PredictionResponseDTO.AuspiciousAnchors ariesAnchors = GeminiPredictionService.calculateAuspiciousAnchors(1, 2, "ta");
+        assertNotNull(ariesAnchors);
+        assertTrue(ariesAnchors.getLifeGemstone().contains("பவளம்") || ariesAnchors.getLifeGemstone().contains("Coral"));
+        assertTrue(ariesAnchors.getFavorableColors().contains("சிவப்பு") || ariesAnchors.getFavorableColors().contains("Red"));
+        assertEquals("9, 1, 3", ariesAnchors.getLuckyNumbers());
+        assertTrue(ariesAnchors.getIshtaDevata().contains("முருகப்பெருமான்") || ariesAnchors.getIshtaDevata().contains("Muruga"));
+
+        // Leo Lagna (5) -> Sun ruled
+        PredictionResponseDTO.AuspiciousAnchors leoAnchors = GeminiPredictionService.calculateAuspiciousAnchors(5, 5, "en");
+        assertNotNull(leoAnchors);
+        assertTrue(leoAnchors.getLifeGemstone().contains("Ruby"));
+        assertEquals("1, 4, 9", leoAnchors.getLuckyNumbers());
+    }
 }

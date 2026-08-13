@@ -75,6 +75,7 @@ function AiPredictionsView({
 
   const personality = predictions?.nativePersonality;
   const health = predictions?.healthAnalysis;
+  const anchors = predictions?.auspiciousAnchors;
   const aiYogas = predictions?.aiYogas || [];
   const aiDoshams = predictions?.aiDoshams || [];
   const pastPhases = predictions?.pastKeyPhases || [];
@@ -135,6 +136,88 @@ function AiPredictionsView({
           <p style={{ lineHeight: '1.7', fontSize: '14px', margin: 0, color: 'var(--text-primary)' }}>
             {predictions.overallSummary}
           </p>
+        </div>
+      )}
+
+      {/* Auspicious Life Anchors Card */}
+      {anchors && (
+        <div className="card" style={{
+          background: 'linear-gradient(135deg, rgba(255,215,0,0.06), rgba(30,30,45,0.6))',
+          border: '1px solid rgba(255,215,0,0.3)',
+          borderRadius: '10px',
+          padding: '18px'
+        }}>
+          <h3 style={{ margin: '0 0 14px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            💎 {t('auspiciousAnchorsTitle', language)}
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+            {anchors.lifeGemstone && (
+              <div style={{ background: 'rgba(255,215,0,0.04)', border: '1px solid rgba(255,215,0,0.2)', borderRadius: '8px', padding: '12px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  💍 {t('lifeGemstone', language)}
+                </span>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--accent-gold)', marginTop: '4px' }}>
+                  {anchors.lifeGemstone}
+                </div>
+              </div>
+            )}
+
+            {anchors.favorableColors && (
+              <div style={{ background: 'rgba(46,204,113,0.04)', border: '1px solid rgba(46,204,113,0.2)', borderRadius: '8px', padding: '12px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  🎨 {t('favorableColors', language)}
+                </span>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#2ecc71', marginTop: '4px' }}>
+                  {anchors.favorableColors}
+                </div>
+              </div>
+            )}
+
+            {anchors.luckyNumbers && (
+              <div style={{ background: 'rgba(52,152,219,0.04)', border: '1px solid rgba(52,152,219,0.2)', borderRadius: '8px', padding: '12px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  🔢 {t('luckyNumbers', language)}
+                </span>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#3498db', marginTop: '4px' }}>
+                  {anchors.luckyNumbers}
+                </div>
+              </div>
+            )}
+
+            {anchors.favorableDays && (
+              <div style={{ background: 'rgba(155,89,182,0.04)', border: '1px solid rgba(155,89,182,0.2)', borderRadius: '8px', padding: '12px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  📅 {t('favorableDays', language)}
+                </span>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#9b59b6', marginTop: '4px' }}>
+                  {anchors.favorableDays}
+                </div>
+              </div>
+            )}
+
+            {anchors.ishtaDevata && (
+              <div style={{ background: 'rgba(230,126,34,0.04)', border: '1px solid rgba(230,126,34,0.2)', borderRadius: '8px', padding: '12px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  🪔 {t('ishtaDevata', language)}
+                </span>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#e67e22', marginTop: '4px' }}>
+                  {anchors.ishtaDevata}
+                </div>
+              </div>
+            )}
+
+            {anchors.favorableDirections && (
+              <div style={{ background: 'rgba(26,188,156,0.04)', border: '1px solid rgba(26,188,156,0.2)', borderRadius: '8px', padding: '12px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  🧭 {t('favorableDirections', language)}
+                </span>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#1abc9c', marginTop: '4px' }}>
+                  {anchors.favorableDirections}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

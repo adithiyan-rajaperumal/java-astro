@@ -19,6 +19,7 @@ public class PredictionResponseDTO {
     private TokenUsage tokenUsage;
     private NativePersonality nativePersonality;
     private HealthAnalysis healthAnalysis;
+    private AuspiciousAnchors auspiciousAnchors;
     private List<AiYoga> aiYogas;
     private List<AiDosham> aiDoshams;
     private List<PastKeyPhase> pastKeyPhases;
@@ -140,5 +141,19 @@ public class PredictionResponseDTO {
         private String parentsKids;
         private String favorableVsCaution;
         private String remediesGuidance;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AuspiciousAnchors {
+        private String lifeGemstone;
+        private String favorableColors;
+        private String luckyNumbers;
+        private String favorableDays;
+        private String ishtaDevata;
+        private String favorableDirections;
     }
 }
