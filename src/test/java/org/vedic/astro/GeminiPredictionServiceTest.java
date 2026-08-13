@@ -91,25 +91,23 @@ public class GeminiPredictionServiceTest {
         String prompt = predictionService.constructAstrologicalPrompt(req);
         assertNotNull(prompt);
 
-        // Verify D1 Rasi formatting uses Rasi, NOT H
-        assertTrue(prompt.contains("D1[Rasi-ZodiacSigns]:"));
-        assertTrue(prompt.contains("Sun:Simha(Rasi5@4.2°)"));
-        assertTrue(prompt.contains("Moon:Mesha(Rasi1@18.0°)"));
-        assertFalse(prompt.contains("Sun:Simha(H5"));
+        // Verify JSON input contains structured houseLordshipTable and planetaryPositionsD1
+        assertTrue(prompt.contains("houseLordshipTable"));
+        assertTrue(prompt.contains("planetaryPositionsD1"));
 
-        // Verify Bhava (House) from Taurus (Sign 2) Lagna:
-        // Lagna in Sign 2 -> House 1
-        // Sun in Sign 5 -> House 4 ((5 - 2 + 12) % 12 + 1 = 4)
-        // Moon in Sign 1 -> House 12 ((1 - 2 + 12) % 12 + 1 = 12)
-        assertTrue(prompt.contains("Bhava[Houses-From-Lagna]:"));
-        assertTrue(prompt.contains("Lagna:House1(Vrishabha)"));
-        assertTrue(prompt.contains("Sun:House4(Simha)"));
-        assertTrue(prompt.contains("Moon:House12(Mesha)"));
+        // Verify Sun in Leo (Sign 5) -> House 4 from Taurus (Sign 2) Lagna
+        assertTrue(prompt.contains("\"planet\" : \"Sun\""));
+        assertTrue(prompt.contains("\"rashi\" : \"Simha\""));
+        assertTrue(prompt.contains("\"houseFromLagna\" : 4"));
 
-        // Verify system instructions contain Rasi vs Bhava disambiguation rules
+        // Verify Moon in Aries (Sign 1) -> House 12 from Taurus (Sign 2) Lagna
+        assertTrue(prompt.contains("\"planet\" : \"Moon\""));
+        assertTrue(prompt.contains("\"rashi\" : \"Mesha\""));
+        assertTrue(prompt.contains("\"houseFromLagna\" : 12"));
+
+        // Verify system instructions contain Rasi vs Bhava disambiguation and lordship rules
         String systemInstruction = predictionService.constructSystemInstruction("ta");
-        assertTrue(systemInstruction.contains("CRITICAL ASTROLOGICAL INTERPRETATION RULES"));
-        assertTrue(systemInstruction.contains("Rasi"));
+        assertTrue(systemInstruction.contains("CRITICAL ASTROLOGICAL INTERPRETATION & LORDSHIP RULES"));
         assertTrue(systemInstruction.contains("Bhava"));
     }
 
@@ -196,8 +194,8 @@ public class GeminiPredictionServiceTest {
 
         String dailyPrompt = predictionService.constructDailyAstrologicalPrompt(req, null, LocalDate.of(2026, 8, 10));
         assertNotNull(dailyPrompt);
-        assertTrue(dailyPrompt.contains("Fixed Astrological Anchors"));
-        assertTrue(dailyPrompt.contains("Vara Lord"));
+        assertTrue(dailyPrompt.contains("fixedDailyAnchors"));
+        assertTrue(dailyPrompt.contains("varaLord"));
 
         String mockDailyJson = """
                 {
@@ -314,10 +312,11 @@ public class GeminiPredictionServiceTest {
 
         String prompt = predictionService.constructAstrologicalPrompt(req);
         assertNotNull(prompt);
-        assertTrue(prompt.contains("D1[Rasi-ZodiacSigns]:"));
-        assertTrue(prompt.contains("Sun:Mesha(Rasi1@10.0°)[Exalted]"));
-        assertTrue(prompt.contains("Saturn:Mesha(Rasi1@12.0°)[Debilitated][Combust]"));
-        assertTrue(prompt.contains("Mars:Mesha(Rasi1@25.0°)[Own]"));
+        assertTrue(prompt.contains("planetaryPositionsD1"));
+        assertTrue(prompt.contains("\"dignity\" : \"EXALTED\""));
+        assertTrue(prompt.contains("\"dignity\" : \"DEBILITATED\""));
+        assertTrue(prompt.contains("\"dignity\" : \"OWN_SIGN\""));
+        assertTrue(prompt.contains("\"isCombust\" : true"));
     }
 
     @Test
@@ -336,16 +335,10 @@ public class GeminiPredictionServiceTest {
                 .bhukthis(java.util.List.of(bhukthi1, bhukthi2))
                 .build();
 
-        DiagnosticsDTO diag = DiagnosticsDTO.builder()
-                .activeYogas(java.util.List.of(DiagnosticsDTO.YogaDetail.builder().name("Gajakesari Yoga").description("Jupiter-Moon Kendra").build()))
-                .discoveredDoshams(java.util.List.of(DiagnosticsDTO.DoshaDetail.builder().name("Sevvai Dosha").detected(true).nullified(true).nullificationReason("Jupiter Aspect").build()))
-                .build();
-
         ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
                 .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Mesha").nakshatra("Ashwini").build())
                 .panchangamSystem("DRIK_TIRUKANITHAM")
                 .currentDasaTimeline(java.util.List.of(dasa))
-                .structuralDiagnostics(diag)
                 .build();
 
         PredictionRequestDTO req = PredictionRequestDTO.builder()
@@ -356,14 +349,11 @@ public class GeminiPredictionServiceTest {
 
         String prompt = predictionService.constructAstrologicalPrompt(req);
         assertNotNull(prompt);
-        assertTrue(prompt.contains("Vimshottari Dasa & Bhukthi Sub-Periods:"));
-        assertTrue(prompt.contains("Jupiter Mahadasa"));
-        assertTrue(prompt.contains("Jupiter-Venus Bhukthi"));
-        assertTrue(prompt.contains("Jupiter-Sun Bhukthi"));
-        assertTrue(prompt.contains("Pre-Calculated Yogas:"));
-        assertTrue(prompt.contains("Gajakesari Yoga"));
-        assertTrue(prompt.contains("Evaluated Doshams:"));
-        assertTrue(prompt.contains("Sevvai Dosha [Nullified: Jupiter Aspect]"));
+        assertTrue(prompt.contains("vimshottariTimeline"));
+        assertTrue(prompt.contains("\"dasa\" : \"Jupiter\""));
+        assertTrue(prompt.contains("\"bhukthi\" : \"Venus\""));
+        assertTrue(prompt.contains("\"bhukthi\" : \"Sun\""));
+        assertTrue(prompt.contains("houseLordshipTable"));
     }
 
     @Test
@@ -380,9 +370,6 @@ public class GeminiPredictionServiceTest {
                 .language("ta")
                 .build();
 
-        // Transit Moon in Kanya (Virgo / Sign 6) with Hasta Nakshatra (Star 13)
-        // From Ashwini (Star 1) to Hasta (Star 13): (13 - 1 + 27) % 9 + 1 = 12 % 9 + 1 = 4 (Kshema Tara)
-        // From Mesha (Sign 1) to Kanya (Sign 6): (6 - 1 + 12) % 12 + 1 = 6 (6th House)
         DailyPanchangamDTO panchangam = new DailyPanchangamDTO(
                 "2026-08-10", "06:00", "18:00", "07:00", "19:00",
                 null,
@@ -396,9 +383,10 @@ public class GeminiPredictionServiceTest {
 
         String prompt = predictionService.constructDailyAstrologicalPrompt(req, panchangam, LocalDate.of(2026, 8, 10));
         assertNotNull(prompt);
-        assertTrue(prompt.contains("Tarabalam:"));
-        assertTrue(prompt.contains("க்ஷேம தாரை (4/9"));
-        assertTrue(prompt.contains("Gochara Moon from Janma Rasi: House 6"));
+        assertTrue(prompt.contains("todayGocharaAndPanchangam"));
+        assertTrue(prompt.contains("tarabalam"));
+        assertTrue(prompt.contains("transitMoonHouseFromJanmaRasi"));
+        assertTrue(prompt.contains("\"transitMoonHouseFromJanmaRasi\" : 6"));
     }
 
     @Test
@@ -432,9 +420,136 @@ public class GeminiPredictionServiceTest {
 
         String prompt = predictionService.constructMatchingPrompt(req, classical);
         assertNotNull(prompt);
-        assertTrue(prompt.contains("Boy-D9[Navamsa]:"));
-        assertTrue(prompt.contains("Sun:Simha"));
-        assertTrue(prompt.contains("Girl-D9[Navamsa]:"));
-        assertTrue(prompt.contains("Moon:Vrishabha"));
+        assertTrue(prompt.contains("groomBoy"));
+        assertTrue(prompt.contains("brideGirl"));
+        assertTrue(prompt.contains("d9Navamsa"));
+        assertTrue(prompt.contains("\"Sun\" : \"Simha\""));
+        assertTrue(prompt.contains("\"Moon\" : \"Vrishabha\""));
+    }
+
+    @Test
+    public void testSmokeTestPromptAccuracySagittariusLagnaWithMercuryJupiterCancer() throws Exception {
+        // Native with Sagittarius (Sign 9 / Dhanus) Lagna
+        BirthDetailsDTO birth = new BirthDetailsDTO("Adithiyan", 1996, 7, 25, 17, 45, 0, 13.0827, 80.2707, "LAHIRI");
+
+        ChartResponseDTO.PositionDetail lagna = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("LAGNA").displayName("Lagna").signNumber(9).rashiName("Dhanus").degreeInSign(14.2).build();
+        ChartResponseDTO.PositionDetail mercury = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("MERCURY").displayName("Mercury").signNumber(4).rashiName("Kataka").degreeInSign(8.5).build();
+        ChartResponseDTO.PositionDetail jupiter = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("JUPITER").displayName("Jupiter").signNumber(4).rashiName("Kataka").degreeInSign(15.0).build();
+        ChartResponseDTO.PositionDetail venus = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("VENUS").displayName("Venus").signNumber(2).rashiName("Vrishabha").degreeInSign(12.0).build();
+        ChartResponseDTO.PositionDetail sun = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SUN").displayName("Sun").signNumber(1).rashiName("Mesha").degreeInSign(10.0).build();
+        ChartResponseDTO.PositionDetail saturn = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SATURN").displayName("Saturn").signNumber(10).rashiName("Makara").degreeInSign(20.0).build();
+
+        org.vedic.astro.model.DasaPeriod.BhukthiPeriod bhukthi = org.vedic.astro.model.DasaPeriod.BhukthiPeriod.builder()
+                .planetName("Venus").startDate(LocalDate.of(2024, 1, 1)).endDate(LocalDate.of(2026, 12, 31)).build();
+        org.vedic.astro.model.DasaPeriod dasa = org.vedic.astro.model.DasaPeriod.builder()
+                .planetName("Jupiter").startDate(LocalDate.of(2020, 1, 1)).endDate(LocalDate.of(2036, 1, 1))
+                .bhukthis(java.util.List.of(bhukthi)).build();
+
+        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
+                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Dhanus").rashi("Vrishabha").nakshatra("Rohini").nakshatraPada(2).build())
+                .panchangamSystem("DRIK_TIRUKANITHAM")
+                .thithi("Shukla - Dashami")
+                .yogam("Shubha")
+                .karanam("Taitila")
+                .d1Chart(java.util.List.of(lagna, mercury, jupiter, venus, sun, saturn))
+                .currentDasaTimeline(java.util.List.of(dasa))
+                .build();
+
+        PredictionRequestDTO req = PredictionRequestDTO.builder()
+                .birthDetails(birth)
+                .chartData(chart)
+                .language("ta")
+                .build();
+
+        // 1. Generate Lifetime Prompt
+        String prompt = predictionService.constructAstrologicalPrompt(req);
+        assertNotNull(prompt);
+
+        // Extract JSON substring from prompt
+        int jsonStart = prompt.indexOf("{");
+        int jsonEnd = prompt.lastIndexOf("}") + 1;
+        assertTrue(jsonStart > 0 && jsonEnd > jsonStart);
+        String extractedJson = prompt.substring(jsonStart, prompt.indexOf("=== GENERATION DIRECTIVES ===")).trim();
+
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(extractedJson);
+        assertNotNull(root);
+
+        // Verify Native Info
+        assertEquals("Adithiyan", root.get("native").get("name").asText());
+        assertEquals("Dhanus", root.get("native").get("janmaLagna").asText());
+        assertEquals("Vrishabha", root.get("native").get("janmaRasi").asText());
+
+        // Verify House Lordship Table for Sagittarius (Dhanus / Sign 9) Lagna
+        com.fasterxml.jackson.databind.JsonNode houseLords = root.get("houseLordshipTable");
+        assertNotNull(houseLords);
+        assertEquals(12, houseLords.size());
+
+        // House 1: Dhanus -> Jupiter
+        assertEquals(1, houseLords.get(0).get("houseNumber").asInt());
+        assertEquals("Dhanus", houseLords.get(0).get("signName").asText());
+        assertEquals("Jupiter", houseLords.get(0).get("lord").asText());
+
+        // House 6: Vrishabha -> Venus (Roga / Shatru lord)
+        assertEquals(6, houseLords.get(5).get("houseNumber").asInt());
+        assertEquals("Vrishabha", houseLords.get(5).get("signName").asText());
+        assertEquals("Venus", houseLords.get(5).get("lord").asText());
+
+        // House 10: Kanya -> Mercury (Karma / Rajya lord - NOT Venus!)
+        assertEquals(10, houseLords.get(9).get("houseNumber").asInt());
+        assertEquals("Kanya", houseLords.get(9).get("signName").asText());
+        assertEquals("Mercury", houseLords.get(9).get("lord").asText());
+
+        // House 11: Thula -> Venus (Labha lord)
+        assertEquals(11, houseLords.get(10).get("houseNumber").asInt());
+        assertEquals("Tula", houseLords.get(10).get("signName").asText());
+        assertEquals("Venus", houseLords.get(10).get("lord").asText());
+
+        // Verify Planetary Positions & Dignities
+        com.fasterxml.jackson.databind.JsonNode planets = root.get("planetaryPositionsD1");
+        assertNotNull(planets);
+
+        // Mercury in Cancer -> House 8, Dignity: NEUTRAL (NOT own sign!)
+        com.fasterxml.jackson.databind.JsonNode mercNode = null;
+        com.fasterxml.jackson.databind.JsonNode jupNode = null;
+        com.fasterxml.jackson.databind.JsonNode venNode = null;
+        com.fasterxml.jackson.databind.JsonNode sunNode = null;
+
+        for (com.fasterxml.jackson.databind.JsonNode p : planets) {
+            String pName = p.get("planet").asText();
+            if ("Mercury".equalsIgnoreCase(pName)) mercNode = p;
+            if ("Jupiter".equalsIgnoreCase(pName)) jupNode = p;
+            if ("Venus".equalsIgnoreCase(pName)) venNode = p;
+            if ("Sun".equalsIgnoreCase(pName)) sunNode = p;
+        }
+
+        assertNotNull(mercNode);
+        assertEquals("Kataka", mercNode.get("rashi").asText());
+        assertEquals(8, mercNode.get("houseFromLagna").asInt());
+        assertEquals("NEUTRAL", mercNode.get("dignity").asText());
+
+        // Jupiter in Cancer -> House 8, Dignity: EXALTED (NOT own sign!)
+        assertNotNull(jupNode);
+        assertEquals("Kataka", jupNode.get("rashi").asText());
+        assertEquals(8, jupNode.get("houseFromLagna").asInt());
+        assertEquals("EXALTED", jupNode.get("dignity").asText());
+
+        // Venus in Taurus -> House 6, Dignity: OWN_SIGN
+        assertNotNull(venNode);
+        assertEquals("Vrishabha", venNode.get("rashi").asText());
+        assertEquals(6, venNode.get("houseFromLagna").asInt());
+        assertEquals("OWN_SIGN", venNode.get("dignity").asText());
+
+        // Sun in Aries -> House 5, Dignity: EXALTED
+        assertNotNull(sunNode);
+        assertEquals("Mesha", sunNode.get("rashi").asText());
+        assertEquals(5, sunNode.get("houseFromLagna").asInt());
+        assertEquals("EXALTED", sunNode.get("dignity").asText());
     }
 }

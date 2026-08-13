@@ -135,7 +135,7 @@ public class GeminiPredictionService {
     public String constructSystemInstruction(String lang) {
         StringBuilder sb = new StringBuilder();
         sb.append("You are an elite, classical Vedic Astrologer (Jyotish Guru) versed in Brihat Parasara Hora Shastra, Jataka Parijata, Saravali, and Phaladeepika.\n")
-          .append("Your task is to analyze the provided mathematically exact 12-Varga planetary matrix and generate a deep, 100% personalized, authentic Vedic Life Balan in the user's selected language: '").append(lang).append("'.\n\n")
+          .append("Your task is to analyze the provided mathematically exact structured JSON astrological matrix and generate a deep, 100% personalized, authentic Vedic Life Balan in the user's selected language: '").append(lang).append("'.\n\n")
           .append("CRITICAL LANGUAGE & SCRIPT DIRECTIVES:\n")
           .append("- You MUST write 100% of all JSON text fields in the native script of language code '").append(lang).append("':\n");
         if ("ta".equalsIgnoreCase(lang)) {
@@ -153,11 +153,12 @@ public class GeminiPredictionService {
         }
         sb.append("- Output dense, punchy, actionable astrological readings. FORBID repetitive boilerplate or generic optimistic filler across years.\n")
           .append("- TRUTHFULLY AND ACCURATELY predict potential difficulties (job loss, career disruption, acute/chronic illness, surgeries, parental health decline/bereavement, debts) when Maraka/Dusthana/Badhaka/afflicted lords are active.\n")
-          .append("- CRITICAL ASTROLOGICAL INTERPRETATION RULES:\n")
-          .append("  * 'Rasi' (Rasi 1-12) refers to the fixed ZODIAC SIGN (1=Mesha/Aries, 2=Vrishabha/Taurus, ..., 12=Meena/Pisces).\n")
+          .append("- CRITICAL ASTROLOGICAL INTERPRETATION & LORDSHIP RULES:\n")
+          .append("  * The input is provided in clean, structured JSON containing the native's details, exact house lordships (House 1-12 signs & lords), D1 planetary positions with exact house numbers and dignities (EXALTED, DEBILITATED, OWN_SIGN, NEUTRAL), 12-varga divisional charts (D2, D9, D10, D12, D30), Shadbala, and Dasa-Bhukthi timelines.\n")
+          .append("  * You MUST strictly respect the pre-calculated house lordships and dignities in the input JSON (e.g. if House 10 is Kanya with lord Mercury, Mercury is the 10th lord; never assign house lords incorrectly).\n")
           .append("  * 'Bhava' (House 1-12) refers to the HOUSE reckoned relative to Lagna (Ascendant = House 1).\n")
-          .append("  * STRICTLY use Bhava (House) positions for all house-based lordships and functional analysis (e.g. 6th house for health/illness, 7th house for marriage, 10th house for career/status, 2nd/7th for maraka, 8th for ayurdaya longevity).\n")
-          .append("  * NEVER confuse Rasi index with House number unless Lagna is Mesha (Aries).\n")
+          .append("  * Calculate and evaluate classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana, Vipareeta Raja Yoga) by evaluating the planetary houses and dignities from the JSON matrix according to authentic Parasari rules (e.g. Pancha Mahapurusha requires Kendra 1,4,7,10 in own/exalted sign; Gajakesari requires Moon-Jupiter Kendra 1,4,7,10; Budhaditya requires Sun-Mercury conjunction in the same sign).\n")
+          .append("  * Evaluate all major Doshams (Sevvai/Kuja Dosha in 1,2,4,7,8,12, Kala Sarpa, Pitru, Papakarthari) and authentically apply classical nullification factors based on own/exalted status, friendly signs, or benefic aspects.\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
         return sb.toString();
     }
@@ -169,164 +170,172 @@ public class GeminiPredictionService {
         int currentYear = LocalDate.now().getYear();
         int currentAge = Math.max(0, currentYear - birthYear);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== COMPRESSED VEDIC ASTROLOGICAL MATRIX ===\n")
-          .append("Native: ").append(b.name()).append(" | DOB: ").append(b.day()).append("/").append(b.month()).append("/").append(b.year())
-          .append(" ").append(b.hour()).append(":").append(b.minute())
-          .append(" | Age: ").append(currentAge).append(" (Current: ").append(currentYear).append(")\n")
-          .append("Lagna: ").append(c.getBirthProfile() != null ? c.getBirthProfile().getLagna() : "").append("\n")
-          .append("Rasi: ").append(c.getBirthProfile() != null ? c.getBirthProfile().getRashi() : "")
-          .append(" | Star: ").append(c.getBirthProfile() != null ? c.getBirthProfile().getNakshatra() : "")
-          .append(" (Pada ").append(c.getBirthProfile() != null ? c.getBirthProfile().getNakshatraPada() : 1).append(")\n")
-          .append("Panchangam: ").append(c.getPanchangamSystem()).append(" | Tithi: ").append(c.getThithi())
-          .append(" | Yoga: ").append(c.getYogam()).append(" | Karana: ").append(c.getKaranam()).append("\n\n");
+        Map<String, Object> inputData = new LinkedHashMap<>();
 
-        // D1 Rasi Positions & Bhava (House from Lagna) with Dignity Tags
-        if (c.getD1Chart() != null && !c.getD1Chart().isEmpty()) {
-            int lagnaSign = 1;
-            double sunAbsLong = 0.0;
+        // 1. Native Identity & Panchangam
+        Map<String, Object> nativeInfo = new LinkedHashMap<>();
+        nativeInfo.put("name", b.name());
+        nativeInfo.put("dob", String.format("%04d-%02d-%02d", b.year(), b.month(), b.day()));
+        nativeInfo.put("tob", String.format("%02d:%02d", b.hour(), b.minute()));
+        nativeInfo.put("currentAge", currentAge);
+        nativeInfo.put("currentYear", currentYear);
+        nativeInfo.put("janmaLagna", c.getBirthProfile() != null ? c.getBirthProfile().getLagna() : "");
+        nativeInfo.put("janmaRasi", c.getBirthProfile() != null ? c.getBirthProfile().getRashi() : "");
+        nativeInfo.put("janmaNakshatra", c.getBirthProfile() != null ? c.getBirthProfile().getNakshatra() : "");
+        nativeInfo.put("nakshatraPada", c.getBirthProfile() != null ? c.getBirthProfile().getNakshatraPada() : 1);
+        nativeInfo.put("panchangamSystem", c.getPanchangamSystem());
+        nativeInfo.put("tithi", c.getThithi());
+        nativeInfo.put("yoga", c.getYogam());
+        nativeInfo.put("karana", c.getKaranam());
+        inputData.put("native", nativeInfo);
+
+        // 2. Pre-calculated 12 House Lordships reckoned from Lagna
+        int lagnaSign = 1;
+        if (c.getD1Chart() != null) {
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
                 if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) {
                     lagnaSign = p.getSignNumber();
-                }
-                if ("SUN".equalsIgnoreCase(p.getPlanetKey()) || "SURYA".equalsIgnoreCase(p.getPlanetKey())) {
-                    sunAbsLong = (p.getSignNumber() - 1) * 30.0 + p.getDegreeInSign();
+                    break;
                 }
             }
+        }
+        List<Map<String, Object>> houseLordships = new ArrayList<>();
+        for (int h = 1; h <= 12; h++) {
+            int signNumber = ((lagnaSign - 1 + (h - 1)) % 12) + 1;
+            String rasiName = RASHIS[signNumber - 1];
+            String lord = PlanetDignityUtils.getSignLord(signNumber);
+            Map<String, Object> hObj = new LinkedHashMap<>();
+            hObj.put("houseNumber", h);
+            hObj.put("signName", rasiName);
+            hObj.put("signNumber", signNumber);
+            hObj.put("lord", lord);
+            hObj.put("significance", getHouseSignificance(h));
+            houseLordships.add(hObj);
+        }
+        inputData.put("houseLordshipTable", houseLordships);
 
-            sb.append("D1[Rasi-ZodiacSigns]: ");
+        // 3. D1 Planetary Positions with exact House & Dignity
+        double sunAbsLong = 0.0;
+        if (c.getD1Chart() != null) {
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                if ("SUN".equalsIgnoreCase(p.getPlanetKey()) || "SURYA".equalsIgnoreCase(p.getPlanetKey())) {
+                    sunAbsLong = (p.getSignNumber() - 1) * 30.0 + p.getDegreeInSign();
+                    break;
+                }
+            }
+        }
+        List<Map<String, Object>> d1Positions = new ArrayList<>();
+        if (c.getD1Chart() != null) {
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
                 String pKey = capitalizePlanet(p.getPlanetKey());
                 int sign = p.getSignNumber();
                 double pAbsLong = (sign - 1) * 30.0 + p.getDegreeInSign();
+                int house = ((sign - lagnaSign + 12) % 12) + 1;
 
-                StringBuilder tag = new StringBuilder();
-                if (PlanetDignityUtils.isExalted(pKey, sign)) tag.append("[Exalted]");
-                else if (PlanetDignityUtils.isDebilitated(pKey, sign)) tag.append("[Debilitated]");
-                else if (PlanetDignityUtils.isOwnSign(pKey, sign)) tag.append("[Own]");
+                String dignity = "NEUTRAL";
+                if (PlanetDignityUtils.isExalted(pKey, sign)) dignity = "EXALTED";
+                else if (PlanetDignityUtils.isDebilitated(pKey, sign)) dignity = "DEBILITATED";
+                else if (PlanetDignityUtils.isOwnSign(pKey, sign)) dignity = "OWN_SIGN";
 
-                if (PlanetDignityUtils.isCombust(pKey, pAbsLong, sunAbsLong)) {
-                    tag.append("[Combust]");
-                }
+                boolean combust = PlanetDignityUtils.isCombust(pKey, pAbsLong, sunAbsLong);
 
-                sb.append(String.format("%s:%s(Rasi%d@%.1f°)%s ",
-                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
-                        p.getRashiName(), p.getSignNumber(), p.getDegreeInSign(), tag.toString()));
+                Map<String, Object> pObj = new LinkedHashMap<>();
+                pObj.put("planet", p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey());
+                pObj.put("rashi", p.getRashiName());
+                pObj.put("signNumber", sign);
+                pObj.put("degreeInSign", Math.round(p.getDegreeInSign() * 100.0) / 100.0);
+                pObj.put("houseFromLagna", house);
+                pObj.put("dignity", dignity);
+                pObj.put("isCombust", combust);
+                d1Positions.add(pObj);
             }
-            sb.append("\n");
-
-            sb.append("Bhava[Houses-From-Lagna]: ");
-            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
-                int house = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
-                sb.append(String.format("%s:House%d(%s) ",
-                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
-                        house, p.getRashiName()));
-            }
-            sb.append("\n");
         }
+        inputData.put("planetaryPositionsD1", d1Positions);
 
-        // 12-Varga Planetary Dignities (D2 Hora, D3 Drekkana, D7 Saptamsa, D9 Navamsa, D10 Dasamsa, D12 Dwadasamsa, D30 Trimsamsa)
+        // 4. Divisional Vargas (D2, D9, D10, D12, D30)
+        Map<String, Object> vargas = new LinkedHashMap<>();
         if (c.getD1Chart() != null && !c.getD1Chart().isEmpty()) {
-            sb.append("D2[Hora-Wealth]: ");
+            Map<String, String> d2 = new LinkedHashMap<>();
+            Map<String, String> d10 = new LinkedHashMap<>();
+            Map<String, String> d12 = new LinkedHashMap<>();
+            Map<String, String> d30 = new LinkedHashMap<>();
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                String key = p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey();
                 int d2Sign = vargaEngineService != null
                         ? vargaEngineService.calculateVargaSign(2, p.getSignNumber(), p.getDegreeInSign(), p.getSignNumber() * 30.0 + p.getDegreeInSign())
                         : (p.getSignNumber() % 2 != 0 ? (p.getDegreeInSign() < 15.0 ? 5 : 4) : (p.getDegreeInSign() < 15.0 ? 4 : 5));
-                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":").append(d2Sign == 5 ? "Leo(Sun)" : "Can(Moon)").append(" ");
-            }
-            sb.append("\n");
+                d2.put(key, d2Sign == 5 ? "Leo(Sun)" : "Cancer(Moon)");
 
-            sb.append("D9[Navamsa-Inner/Dharma]: ");
-            if (c.getD9Chart() != null && !c.getD9Chart().isEmpty()) {
-                for (ChartResponseDTO.PositionDetail p : c.getD9Chart()) {
-                    sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":").append(p.getRashiName()).append(" ");
-                }
-            }
-            sb.append("\n");
-
-            sb.append("D10[Dasamsa-Career]: ");
-            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
                 int d10Sign = vargaEngineService != null
                         ? vargaEngineService.calculateVargaSign(10, p.getSignNumber(), p.getDegreeInSign(), p.getSignNumber() * 30.0 + p.getDegreeInSign())
                         : ((p.getSignNumber() - 1 + (int)(p.getDegreeInSign() / 3.0)) % 12 + 1);
-                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":Rasi").append(d10Sign).append(" ");
-            }
-            sb.append("\n");
+                d10.put(key, RASHIS[d10Sign - 1]);
 
-            sb.append("D12[Dwadasamsa-Parents/Heritage]: ");
-            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
                 int d12Sign = vargaEngineService != null
                         ? vargaEngineService.calculateVargaSign(12, p.getSignNumber(), p.getDegreeInSign(), p.getSignNumber() * 30.0 + p.getDegreeInSign())
                         : ((p.getSignNumber() - 1 + (int)(p.getDegreeInSign() / 2.5)) % 12 + 1);
-                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":Rasi").append(d12Sign).append(" ");
-            }
-            sb.append("\n");
+                d12.put(key, RASHIS[d12Sign - 1]);
 
-            sb.append("D30[Trimsamsa-Health/Affliction]: ");
-            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
                 int d30Sign = vargaEngineService != null
                         ? vargaEngineService.calculateVargaSign(30, p.getSignNumber(), p.getDegreeInSign(), p.getSignNumber() * 30.0 + p.getDegreeInSign())
                         : 1;
-                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":Rasi").append(d30Sign).append(" ");
+                d30.put(key, RASHIS[d30Sign - 1]);
             }
-            sb.append("\n\n");
+            vargas.put("d2Hora", d2);
+            if (c.getD9Chart() != null && !c.getD9Chart().isEmpty()) {
+                Map<String, String> d9 = new LinkedHashMap<>();
+                for (ChartResponseDTO.PositionDetail p : c.getD9Chart()) {
+                    d9.put(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(), p.getRashiName());
+                }
+                vargas.put("d9Navamsa", d9);
+            }
+            vargas.put("d10Dasamsa", d10);
+            vargas.put("d12Dwadasamsa", d12);
+            vargas.put("d30Trimsamsa", d30);
         }
+        inputData.put("divisionalVargas", vargas);
 
-        // Shadbala
+        // 5. Shadbala Strengths
         if (c.getShadbalaStrengths() != null && c.getShadbalaStrengths().getPlanetStrengths() != null) {
-            sb.append("Shadbala: ");
-            c.getShadbalaStrengths().getPlanetStrengths().forEach((planet, strength) -> {
-                sb.append(String.format("%s:%.2fR(%s) ", planet, strength.getTotalShadbalaRupas(), strength.getStrengthCategory()));
-            });
-            sb.append("\n\n");
+            inputData.put("shadbalaStrengths", c.getShadbalaStrengths().getPlanetStrengths());
         }
 
-        // Dasa & Bhukthi Timeline
+        // 6. Dasa & Bhukthi Timelines
         if (c.getCurrentDasaTimeline() != null && !c.getCurrentDasaTimeline().isEmpty()) {
-            sb.append("Vimshottari Dasa & Bhukthi Sub-Periods:\n");
+            List<Map<String, Object>> dasas = new ArrayList<>();
             LocalDate now = LocalDate.now();
             for (DasaPeriod d : c.getCurrentDasaTimeline()) {
-                if (d.getEndDate() != null && d.getEndDate().isBefore(now.minusYears(2))) {
-                    continue; // Skip dasas completed before recent years
-                }
-                sb.append(String.format("- %s Mahadasa (%s to %s):\n", d.getPlanetName(), d.getStartDate(), d.getEndDate()));
+                if (d.getEndDate() != null && d.getEndDate().isBefore(now.minusYears(2))) continue;
+                Map<String, Object> dObj = new LinkedHashMap<>();
+                dObj.put("dasa", d.getPlanetName());
+                dObj.put("startDate", d.getStartDate() != null ? d.getStartDate().toString() : "");
+                dObj.put("endDate", d.getEndDate() != null ? d.getEndDate().toString() : "");
                 if (d.getBhukthis() != null && !d.getBhukthis().isEmpty()) {
+                    List<Map<String, String>> bhukthis = new ArrayList<>();
                     for (DasaPeriod.BhukthiPeriod bPeriod : d.getBhukthis()) {
-                        sb.append(String.format("   * %s-%s Bhukthi: %s to %s\n",
-                                d.getPlanetName(), bPeriod.getPlanetName(), bPeriod.getStartDate(), bPeriod.getEndDate()));
+                        bhukthis.add(Map.of(
+                                "bhukthi", bPeriod.getPlanetName(),
+                                "startDate", bPeriod.getStartDate() != null ? bPeriod.getStartDate().toString() : "",
+                                "endDate", bPeriod.getEndDate() != null ? bPeriod.getEndDate().toString() : ""
+                        ));
                     }
+                    dObj.put("activeBhukthis", bhukthis);
                 }
+                dasas.add(dObj);
             }
-            sb.append("\n");
+            inputData.put("vimshottariTimeline", dasas);
         }
 
-        // Pre-Calculated Astrological Diagnostics (Yogas & Evaluated Doshams)
-        if (c.getStructuralDiagnostics() != null) {
-            var diag = c.getStructuralDiagnostics();
-            if (diag.getActiveYogas() != null && !diag.getActiveYogas().isEmpty()) {
-                sb.append("Pre-Calculated Yogas: ");
-                for (var y : diag.getActiveYogas()) {
-                    sb.append(y.getName());
-                    if (y.getDescription() != null && !y.getDescription().isBlank()) {
-                        sb.append(" (").append(y.getDescription()).append(")");
-                    }
-                    sb.append("; ");
-                }
-                sb.append("\n");
-            }
-            if (diag.getDiscoveredDoshams() != null && !diag.getDiscoveredDoshams().isEmpty()) {
-                sb.append("Evaluated Doshams: ");
-                for (var dosh : diag.getDiscoveredDoshams()) {
-                    if (dosh.isDetected()) {
-                        sb.append(dosh.getName()).append(" [")
-                          .append(dosh.isNullified() ? "Nullified: " + dosh.getNullificationReason() : "Active")
-                          .append("]; ");
-                    }
-                }
-                sb.append("\n");
-            }
-            sb.append("\n");
+        String inputJson = "{}";
+        try {
+            inputJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(inputData);
+        } catch (Exception e) {
+            log.error("Could not serialize astrological input data to JSON: {}", e.getMessage());
         }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== STRUCTURED ASTROLOGICAL INPUT DATA (JSON) ===\n")
+          .append(inputJson).append("\n\n");
 
         sb.append("=== GENERATION DIRECTIVES ===\n")
           .append("1. 'nativePersonality': Deep core psychological temperament, 3-4 key strengths, and 2-3 vulnerabilities/karmic patterns.\n")
@@ -335,8 +344,8 @@ public class GeminiPredictionService {
           .append("   - 'organVulnerabilities': 2-4 specific vulnerable organs deduced from 6th/8th/12th houses & D30 Trimsamsa.\n")
           .append("   - 'longevityVitalitySummary': FIRST execute a rigorous classical Ayurdaya Determination (ஆயுள் நிர்ணயம்) analyzing Lagna Lord & 8th Lord dignity, Ayushkaraka Saturn, 3rd house, 8th house, and Maraka/Badhaka running dasas (2nd/7th houses & D30). Explicitly state the longevity classification (Alpayu 0-32 / Madhyayu 33-66/72 / Poornayu 72-100+) and state the calculated lifespan ceiling age (e.g. 'பூர்ணாயுள் (Poornayu: ~80-84 வயது)').\n")
           .append("   - 'recommendedDietAndLifestyle': Targeted Ayurvedic diet and lifestyle practices.\n")
-          .append("3. 'aiYogas': Analyze planetary positions across D1, D9, D10 to independently identify ALL classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Vipareeta Raja Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana) with name, forming planets, and lifelong impact.\n")
-          .append("4. 'aiDoshams': Independently evaluate all major doshams (Sevvai/Kuja Dosha, Kala Sarpa Dosha, Pitru Dosha, Papakarthari, Rahu-Ketu afflictions), determining whether they are active or nullified, the exact astrological nullification factors, and authentic Vedic remedies.\n")
+          .append("3. 'aiYogas': Calculate and identify ALL classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Vipareeta Raja Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana) from the input JSON data with name, forming planets, and lifelong impact.\n")
+          .append("4. 'aiDoshams': Evaluate all major doshams (Sevvai/Kuja Dosha, Kala Sarpa Dosha, Pitru Dosha, Papakarthari, Rahu-Ketu afflictions) from the input JSON data, determining whether they are active or nullified, the exact astrological nullification factors, and authentic Vedic remedies.\n")
           .append("5. 'pastKeyPhases': 2-3 pivotal life-defining turning points from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n")
           .append("6. 'lifetimePredictions': Exhaustive, year-by-year forecasts covering the native's FULL REMAINING LIFESPAN starting from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") continuously through the EXACT calculated Ayurdaya lifespan age determined in Step 2.\n")
           .append("   - For EACH year, you MUST provide 'yearlyTheme', 'detailedPrediction', 'astrologicalBasis' (explicit planetary combinations from D1/D9/D10/D12/D30 & running Dasa-Bhukthi), and 'cautionsAndRemedies'.\n")
@@ -389,14 +398,13 @@ public class GeminiPredictionService {
     public String constructDailySystemInstruction(String lang) {
         StringBuilder sb = new StringBuilder();
         sb.append("You are an expert Vedic Astrologer specializing in Gochara (daily planetary transits) and Panchangam synthesis.\n")
-          .append("Analyze the native's natal Moon/Lagna matrix and today's planetary transit to generate a precise, actionable Daily Balan (இன்றைய ராசி பலன்) in language: '").append(lang).append("'.\n")
+          .append("Analyze the native's natal Moon/Lagna matrix and today's planetary transit from the provided structured JSON data to generate a precise, actionable Daily Balan (இன்றைய ராசி பலன்) in language: '").append(lang).append("'.\n")
           .append("Write 100% of all JSON text fields in the native script of '").append(lang).append("'. Output concise, practical, empowering guidance.\n")
           .append("CRITICAL ASTROLOGICAL INTERPRETATION RULES:\n")
-          .append("- 'Rasi' (Rasi 1-12) refers to the fixed ZODIAC SIGN (1=Mesha/Aries, 2=Vrishabha/Taurus, ..., 12=Meena/Pisces).\n")
+          .append("- The input is provided in clean, structured JSON containing the native's details, natal planets and houses, today's transit Moon sign and nakshatra, Tarabalam score, and Gochara Moon house relative to Janma Rasi and Janma Lagna.\n")
           .append("- 'Bhava' (House 1-12) refers to the HOUSE reckoned relative to Lagna (Ascendant = House 1).\n")
-          .append("- STRICTLY use Bhava (House) positions for all house-based analysis (e.g. transit Moon through native's 6th house for health, 7th for relationships, 10th for career).\n")
-          .append("- NEVER confuse Rasi index with House number unless Lagna is Mesha (Aries).\n")
-          .append("Return ONLY valid JSON matching the schema.\n");
+          .append("- Strictly interpret transit Moon house positions relative to Janma Rasi and Janma Lagna as calculated in the input JSON.\n")
+          .append("- Return ONLY valid JSON matching the schema.\n");
         return sb.toString();
     }
 
@@ -419,17 +427,19 @@ public class GeminiPredictionService {
 
         DeterministicDailyAnchors anchors = calculateDeterministicAnchors(targetDate, lang);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== DAILY GOCHARA & TRANSIT MATRIX ===\n")
-          .append("Date: ").append(targetDate).append(" (Weekday: ").append(targetDate.getDayOfWeek()).append(")\n")
-          .append("Native: ").append(b.name());
-        if (!lagna.isBlank()) {
-            sb.append(" | Janma Lagna: ").append(lagna);
-        }
-        sb.append(" | Janma Rasi: ").append(rasi).append(" | Janma Nakshatra: ").append(nakshatra).append("\n")
-          .append("Running Dasa-Bhukthi: ").append(runningDasa).append("\n");
+        Map<String, Object> dailyInput = new LinkedHashMap<>();
+        dailyInput.put("targetDate", targetDate.toString());
+        dailyInput.put("weekday", targetDate.getDayOfWeek().toString());
 
-        // Natal D1 Rasi & Bhava positions for house-aware daily transit analysis
+        Map<String, Object> nativeInfo = new LinkedHashMap<>();
+        nativeInfo.put("name", b.name());
+        nativeInfo.put("janmaLagna", lagna);
+        nativeInfo.put("janmaRasi", rasi);
+        nativeInfo.put("janmaNakshatra", nakshatra);
+        nativeInfo.put("runningDasaBhukthi", runningDasa);
+        dailyInput.put("native", nativeInfo);
+
+        // Natal Planets & Houses
         if (c.getD1Chart() != null && !c.getD1Chart().isEmpty()) {
             int lagnaSign = 1;
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
@@ -438,21 +448,17 @@ public class GeminiPredictionService {
                     break;
                 }
             }
-            sb.append("Natal-D1[Rasi]: ");
-            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
-                sb.append(String.format("%s:%s(Rasi%d@%.1f°) ",
-                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
-                        p.getRashiName(), p.getSignNumber(), p.getDegreeInSign()));
-            }
-            sb.append("\n");
-            sb.append("Natal-Bhava[Houses-From-Lagna]: ");
+            List<Map<String, Object>> natalPlanets = new ArrayList<>();
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
                 int house = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
-                sb.append(String.format("%s:House%d(%s) ",
-                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
-                        house, p.getRashiName()));
+                Map<String, Object> np = new LinkedHashMap<>();
+                np.put("planet", p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey());
+                np.put("rashi", p.getRashiName());
+                np.put("signNumber", p.getSignNumber());
+                np.put("houseFromLagna", house);
+                natalPlanets.add(np);
             }
-            sb.append("\n");
+            dailyInput.put("natalPlanetsAndHouses", natalPlanets);
         }
 
         // Tarabalam calculation
@@ -462,22 +468,41 @@ public class GeminiPredictionService {
                 : (panchangam != null && panchangam.nakshatra() != null ? getNakshatraIndex(panchangam.nakshatra().name()) : birthNakNum);
         String tarabalamInfo = calculateTarabalam(birthNakNum, transitNakNum, lang);
 
-        // Gochara Moon House from Janma Rasi calculation
+        // Gochara Moon House calculation
         int birthRasiNum = getRasiIndex(rasi);
         int transitRasiNum = getRasiIndex(todayMoonRasi);
         int moonHouseFromRasi = ((transitRasiNum - birthRasiNum + 12) % 12) + 1;
         String moonHouseMeaning = getGocharaMoonHouseMeaning(moonHouseFromRasi, lang);
 
-        sb.append("Today Transit Moon Sign: ").append(todayMoonRasi).append(" | Transit Nakshatra: ").append(todayNakshatra).append("\n")
-          .append("Today Tithi: ").append(todayTithi).append(" | Yoga: ").append(todayYoga).append("\n")
-          .append("Tarabalam: ").append(tarabalamInfo).append("\n")
-          .append("Gochara Moon from Janma Rasi: House ").append(moonHouseFromRasi).append(" (").append(moonHouseMeaning).append(")\n")
-          .append("Chandrashtama Active: ").append(chandrashtama).append("\n")
-          .append("Fixed Astrological Anchors: Vara Lord=").append(anchors.varaLord)
-          .append(", Lucky Color=").append(anchors.luckyColor)
-          .append(", Lucky Number=").append(anchors.luckyNumber)
-          .append(", Favorable Direction=").append(anchors.favorableDirection)
-          .append(", Best Time Window=").append(anchors.auspiciousTimeWindow).append("\n\n")
+        Map<String, Object> gochara = new LinkedHashMap<>();
+        gochara.put("transitMoonSign", todayMoonRasi);
+        gochara.put("transitNakshatra", todayNakshatra);
+        gochara.put("tithi", todayTithi);
+        gochara.put("yoga", todayYoga);
+        gochara.put("tarabalam", tarabalamInfo);
+        gochara.put("transitMoonHouseFromJanmaRasi", moonHouseFromRasi);
+        gochara.put("transitMoonHouseSignificance", moonHouseMeaning);
+        gochara.put("chandrashtamaActive", chandrashtama);
+        dailyInput.put("todayGocharaAndPanchangam", gochara);
+
+        Map<String, String> anchorsMap = new LinkedHashMap<>();
+        anchorsMap.put("varaLord", anchors.varaLord);
+        anchorsMap.put("luckyColor", anchors.luckyColor);
+        anchorsMap.put("luckyNumber", anchors.luckyNumber);
+        anchorsMap.put("favorableDirection", anchors.favorableDirection);
+        anchorsMap.put("bestTimeWindow", anchors.auspiciousTimeWindow);
+        dailyInput.put("fixedDailyAnchors", anchorsMap);
+
+        String dailyJson = "{}";
+        try {
+            dailyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dailyInput);
+        } catch (Exception e) {
+            log.error("Could not serialize daily input data to JSON: {}", e.getMessage());
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== STRUCTURED DAILY GOCHARA & PANCHANGAM INPUT (JSON) ===\n")
+          .append(dailyJson).append("\n\n")
           .append("Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
           .append("  \"generalOutlook\": \"(1-2 sentence overall energy & mood for the day)\",\n")
@@ -1104,70 +1129,55 @@ public class GeminiPredictionService {
     public String constructMatchingSystemInstruction(String lang) {
         StringBuilder sb = new StringBuilder();
         sb.append("You are a revered Vedic Marriage Astrologer (Vivaha Jyotish Acharya) with masterful command of Brihat Parasara Hora Shastra, Prasna Marga, Muhurtha Chintamani, and Jathaka Porutham.\n")
-          .append("Your task is to analyze the complete dual-horoscope planetary matrix (D1, D9 Navamsa, Shadbala, Kuja Dosha, Papasamya, Dasa Sandhi, and classical Koota results) for the Boy and Girl to provide an authoritative, deep, compassionate, and authentic Vedic Marriage Compatibility Analysis in language '").append(lang).append("'.\n\n")
+          .append("Your task is to analyze the complete dual-horoscope structured JSON matrix (D1, D9 Navamsa, house lordships, and classical Koota results) for the Boy and Girl to provide an authoritative, deep, compassionate, and authentic Vedic Marriage Compatibility Analysis in language '").append(lang).append("'.\n\n")
           .append("CRITICAL REQUIREMENTS:\n")
           .append("- Write 100% of all JSON text values in the native script of '").append(lang).append("'.\n")
-          .append("- Rigorously apply all authentic classical nullifications (e.g. Kuja Dosha cancellation if Mars is in own/exalted sign, in 2nd/4th/7th/8th/12th in friendly signs, or if both charts possess balanced Kuja Dosha; Rajju exceptions when nakshatras have different padas or lords are friends; Gana Dosha cancellation if Rasi lords are identical or friendly).\n")
+          .append("- Rigorously apply all authentic classical nullifications from the JSON matrix (e.g. Kuja Dosha cancellation if Mars is in own/exalted sign, in friendly signs, or if both charts possess balanced Kuja Dosha; Rajju exceptions when nakshatras have different padas; Gana Dosha cancellation if Rasi lords are identical or friendly).\n")
           .append("- Provide profound psychological, financial, health, progeny, and spiritual insight rather than generic cliches.\n")
-          .append("- CRITICAL ASTROLOGICAL INTERPRETATION RULES:\n")
-          .append("  * 'Rasi' (Rasi 1-12) refers to the fixed ZODIAC SIGN (1=Mesha/Aries, 2=Vrishabha/Taurus, ..., 12=Meena/Pisces).\n")
+          .append("- CRITICAL ASTROLOGICAL INTERPRETATION & LORDSHIP RULES:\n")
+          .append("  * The input is provided in clean, structured JSON containing the Boy's and Girl's birth details, exact house lordships, D1 planetary placements with houses and dignities, D9 Navamsa positions, and classical Koota breakdown.\n")
           .append("  * 'Bhava' (House 1-12) refers to the HOUSE reckoned relative to Lagna (Ascendant = House 1).\n")
-          .append("  * STRICTLY use Bhava (House) positions for all house-based lordships and functional analysis (e.g. 7th house for marriage, 2nd/7th for maraka, 5th for progeny, 8th for longevity).\n")
-          .append("  * NEVER confuse Rasi index with House number unless Lagna is Mesha (Aries).\n")
+          .append("  * Strictly use Bhava (House) positions for all house-based lordships and functional analysis (7th house for marriage, 2nd/7th for maraka, 5th for progeny, 8th for longevity).\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
         return sb.toString();
     }
 
     public String constructMatchingPrompt(MatchingRequestDTO req, MatchingResponseDTO classicalResult) {
+        Map<String, Object> matchingInput = new LinkedHashMap<>();
+
+        // 1. Groom (Boy) Profile
+        matchingInput.put("groomBoy", buildMatchingProfileJson(req.boy(), classicalResult.getBoyProfile()));
+
+        // 2. Bride (Girl) Profile
+        matchingInput.put("brideGirl", buildMatchingProfileJson(req.girl(), classicalResult.getGirlProfile()));
+
+        // 3. Classical Scored Results & Warnings
+        Map<String, Object> classical = new LinkedHashMap<>();
+        classical.put("matchingSystem", req.matchingSystem());
+        classical.put("strictness", req.strictness());
+        classical.put("totalScore", classicalResult.getTotalScore());
+        classical.put("maxScore", classicalResult.getMaxScore());
+        classical.put("percentage", classicalResult.getPercentage());
+        classical.put("verdict", classicalResult.getVerdict());
+        if (classicalResult.getKootas() != null) {
+            classical.put("kootaBreakdown", classicalResult.getKootas());
+        }
+        if (classicalResult.getWarnings() != null) {
+            classical.put("warnings", classicalResult.getWarnings());
+        }
+        matchingInput.put("classicalKootaResults", classical);
+
+        String matchingJson = "{}";
+        try {
+            matchingJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(matchingInput);
+        } catch (Exception e) {
+            log.error("Could not serialize matching input data to JSON: {}", e.getMessage());
+        }
+
         StringBuilder sb = new StringBuilder();
-        sb.append("=== VEDIC DUAL HOROSCOPE MARRIAGE MATCHING REQUEST ===\n\n");
-
-        sb.append("--- GROOM (BOY) DETAILS ---\n")
-          .append("Name: ").append(req.boy().name()).append("\n")
-          .append("Date of Birth: ").append(req.boy().day()).append("/").append(req.boy().month()).append("/").append(req.boy().year()).append("\n")
-          .append("Time of Birth: ").append(req.boy().hour()).append(":").append(req.boy().minute()).append("\n");
-        if (classicalResult.getBoyProfile() != null && classicalResult.getBoyProfile().getBirthProfile() != null) {
-            var p = classicalResult.getBoyProfile().getBirthProfile();
-            sb.append("Lagna: ").append(p.getLagna()).append(" | Rasi: ").append(p.getRashi()).append(" | Nakshatra: ").append(p.getNakshatra()).append(" (Pada: ").append(p.getNakshatraPada()).append(")\n");
-        }
-        appendChartPositions(sb, "Boy", classicalResult.getBoyProfile());
-        sb.append("\n");
-
-        sb.append("--- BRIDE (GIRL) DETAILS ---\n")
-          .append("Name: ").append(req.girl().name()).append("\n")
-          .append("Date of Birth: ").append(req.girl().day()).append("/").append(req.girl().month()).append("/").append(req.girl().year()).append("\n")
-          .append("Time of Birth: ").append(req.girl().hour()).append(":").append(req.girl().minute()).append("\n");
-        if (classicalResult.getGirlProfile() != null && classicalResult.getGirlProfile().getBirthProfile() != null) {
-            var p = classicalResult.getGirlProfile().getBirthProfile();
-            sb.append("Lagna: ").append(p.getLagna()).append(" | Rasi: ").append(p.getRashi()).append(" | Nakshatra: ").append(p.getNakshatra()).append(" (Pada: ").append(p.getNakshatraPada()).append(")\n");
-        }
-        appendChartPositions(sb, "Girl", classicalResult.getGirlProfile());
-        sb.append("\n");
-
-        sb.append("--- CLASSICAL MATCHING RESULTS ---\n")
-          .append("Matching System: ").append(req.matchingSystem()).append("\n")
-          .append("Strictness: ").append(req.strictness()).append("\n")
-          .append("Classical Scored Points: ").append(classicalResult.getTotalScore()).append(" / ").append(classicalResult.getMaxScore())
-          .append(" (").append(String.format("%.1f", classicalResult.getPercentage())).append("%)\n")
-          .append("Classical Verdict: ").append(classicalResult.getVerdict()).append("\n");
-
-        if (classicalResult.getKootas() != null && !classicalResult.getKootas().isEmpty()) {
-            sb.append("Koota/Porutham Breakdown:\n");
-            for (KootaResultDTO k : classicalResult.getKootas()) {
-                sb.append(String.format("- %s: %s (Scored: %.1f/%.1f) - %s\n", k.getName(), k.getStatus(), k.getScoredPoints(), k.getMaxPoints(), k.getDescription()));
-            }
-            sb.append("\n");
-        }
-
-        if (classicalResult.getWarnings() != null && !classicalResult.getWarnings().isEmpty()) {
-            sb.append("Algorithmic Warnings:\n");
-            for (String w : classicalResult.getWarnings()) {
-                sb.append("- ").append(w).append("\n");
-            }
-            sb.append("\n");
-        }
-
-        sb.append("=== GENERATION DIRECTIVES ===\n")
+        sb.append("=== STRUCTURED DUAL HOROSCOPE MATCHING INPUT (JSON) ===\n")
+          .append(matchingJson).append("\n\n")
+          .append("=== GENERATION DIRECTIVES ===\n")
           .append("1. 'overallVerdict': EXCELLENT, VERY_GOOD, GOOD, AVERAGE, or NOT_RECOMMENDED.\n")
           .append("2. 'compatibilityPercentage': Numeric value between 0.0 and 100.0 synthesizing the total compatibility.\n")
           .append("3. 'executiveSummary': Comprehensive 2-3 paragraph synthesis explaining the fundamental karmic harmony, life path synergy, and long-term potential of this marriage.\n")
@@ -1223,15 +1233,23 @@ public class GeminiPredictionService {
         return sb.toString();
     }
 
-    /**
-     * Appends D1 chart Rasi, Bhava (House), and D9 Navamsa positions for a given profile to the prompt.
-     * Reusable for boy/girl matching charts.
-     */
-    private void appendChartPositions(StringBuilder sb, String label, ChartUiResponseDTO profile) {
-        if (profile == null) {
-            return;
+    private Map<String, Object> buildMatchingProfileJson(BirthDetailsDTO b, ChartUiResponseDTO profile) {
+        Map<String, Object> data = new LinkedHashMap<>();
+        if (b != null) {
+            data.put("name", b.name());
+            data.put("dob", String.format("%04d-%02d-%02d", b.year(), b.month(), b.day()));
+            data.put("tob", String.format("%02d:%02d", b.hour(), b.minute()));
         }
-        if (profile.getD1Chart() != null && !profile.getD1Chart().isEmpty()) {
+
+        if (profile != null && profile.getBirthProfile() != null) {
+            var bp = profile.getBirthProfile();
+            data.put("lagna", bp.getLagna());
+            data.put("rasi", bp.getRashi());
+            data.put("nakshatra", bp.getNakshatra());
+            data.put("nakshatraPada", bp.getNakshatraPada());
+        }
+
+        if (profile != null && profile.getD1Chart() != null && !profile.getD1Chart().isEmpty()) {
             int lagnaSign = 1;
             for (ChartResponseDTO.PositionDetail p : profile.getD1Chart()) {
                 if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) {
@@ -1239,33 +1257,48 @@ public class GeminiPredictionService {
                     break;
                 }
             }
-            sb.append(label).append("-D1[Rasi]: ");
+            List<Map<String, Object>> d1List = new ArrayList<>();
             for (ChartResponseDTO.PositionDetail p : profile.getD1Chart()) {
-                sb.append(String.format("%s:%s(Rasi%d@%.1f°) ",
-                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
-                        p.getRashiName(), p.getSignNumber(), p.getDegreeInSign()));
+                String pKey = capitalizePlanet(p.getPlanetKey());
+                int sign = p.getSignNumber();
+                int house = ((sign - lagnaSign + 12) % 12) + 1;
+                String dignity = "NEUTRAL";
+                if (PlanetDignityUtils.isExalted(pKey, sign)) dignity = "EXALTED";
+                else if (PlanetDignityUtils.isDebilitated(pKey, sign)) dignity = "DEBILITATED";
+                else if (PlanetDignityUtils.isOwnSign(pKey, sign)) dignity = "OWN_SIGN";
+
+                Map<String, Object> pObj = new LinkedHashMap<>();
+                pObj.put("planet", p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey());
+                pObj.put("rashi", p.getRashiName());
+                pObj.put("signNumber", sign);
+                pObj.put("houseFromLagna", house);
+                pObj.put("dignity", dignity);
+                d1List.add(pObj);
             }
-            sb.append("\n");
-            sb.append(label).append("-Bhava[Houses-From-Lagna]: ");
-            for (ChartResponseDTO.PositionDetail p : profile.getD1Chart()) {
-                int house = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
-                sb.append(String.format("%s:House%d(%s) ",
-                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
-                        house, p.getRashiName()));
+            data.put("d1PlanetsAndHouses", d1List);
+
+            // House lordships
+            List<Map<String, Object>> houseLords = new ArrayList<>();
+            for (int h = 1; h <= 12; h++) {
+                int signNumber = ((lagnaSign - 1 + (h - 1)) % 12) + 1;
+                Map<String, Object> hObj = new LinkedHashMap<>();
+                hObj.put("house", h);
+                hObj.put("sign", RASHIS[signNumber - 1]);
+                hObj.put("lord", PlanetDignityUtils.getSignLord(signNumber));
+                houseLords.add(hObj);
             }
-            sb.append("\n");
+            data.put("houseLordships", houseLords);
         }
 
-        // D9 Navamsa Chart for Marriage Synastry
-        if (profile.getD9Chart() != null && !profile.getD9Chart().isEmpty()) {
-            sb.append(label).append("-D9[Navamsa]: ");
+        if (profile != null && profile.getD9Chart() != null && !profile.getD9Chart().isEmpty()) {
+            Map<String, String> d9 = new LinkedHashMap<>();
             for (ChartResponseDTO.PositionDetail p : profile.getD9Chart()) {
-                sb.append(String.format("%s:%s ",
-                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
-                        p.getRashiName()));
+                d9.put(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(), p.getRashiName());
             }
-            sb.append("\n");
+            data.put("d9Navamsa", d9);
         }
+
+        return data;
     }
 
     private static String capitalizePlanet(String key) {
@@ -1307,6 +1340,24 @@ public class GeminiPredictionService {
             }
         }
         return 1;
+    }
+
+    public static String getHouseSignificance(int house) {
+        return switch (house) {
+            case 1 -> "Lagnesha / Self, Physical Body & Vitality (Trikona & Kendra)";
+            case 2 -> "Dhana & Kutumba / Wealth, Speech, Family Assets (Maraka)";
+            case 3 -> "Bhratru & Sahaya / Courage, Siblings, Short Travels, Initiative";
+            case 4 -> "Sukha & Matru / Mother, Home, Inner Peace, Vehicles (Kendra)";
+            case 5 -> "Purva Punya & Putra / Intellect, Children, Past Merit (Trikona)";
+            case 6 -> "Roga, Rina, Shatru / Illness, Debts, Litigation, Work (Dusthana)";
+            case 7 -> "Kalathra & Vivaha / Marriage, Spouse, Business Partners (Kendra / Maraka)";
+            case 8 -> "Ayurdaya & Randhra / Longevity, Sudden Changes, Secrets (Dusthana)";
+            case 9 -> "Bhagya & Pitru / Father, Higher Wisdom, Luck, Dharma (Trikona)";
+            case 10 -> "Karma & Rajya / Career, Profession, Social Status, Fame (Kendra)";
+            case 11 -> "Labha & Aaya / Gains, Elder Siblings, Aspirations, Income (Badhaka for Movable)";
+            case 12 -> "Vyaya & Moksha / Expenditures, Losses, Foreign Residence, Sleep (Dusthana)";
+            default -> "";
+        };
     }
 
     public static String calculateTarabalam(int birthNak, int transitNak, String lang) {
