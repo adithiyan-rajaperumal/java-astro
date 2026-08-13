@@ -265,7 +265,7 @@ export default function LifeAnchorsLongevityView({ chartData, language }) {
               {language === 'ta' ? deities?.ishtaDevataTamil : deities?.ishtaDevata}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-              {deities?.ishtaDevataRationale}
+              {language === 'ta' ? (deities?.ishtaDevataRationaleTamil || deities?.ishtaDevataRationale) : (deities?.ishtaDevataRationaleEnglish || deities?.ishtaDevataRationale)}
             </div>
           </div>
 
@@ -301,7 +301,7 @@ export default function LifeAnchorsLongevityView({ chartData, language }) {
               {language === 'ta' ? deities?.dharmaDevataTamil : deities?.dharmaDevata}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-              {language === 'ta' ? 'வாழ்க்கையின் தர்ம நெறி, புண்ணிய பலன்கள் மற்றும் தொழில் மேன்மைக்கு வழிநடத்தும் தெய்வம்.' : 'Governs righteous living, accumulated karma protection, and life purpose.'}
+              {language === 'ta' ? (deities?.dharmaDevataRationaleTamil || deities?.dharmaDevataRationale) : (deities?.dharmaDevataRationaleEnglish || deities?.dharmaDevataRationale || (language === 'ta' ? 'வாழ்க்கையின் தர்ம நெறி மற்றும் நல்வழியை காட்டும் தெய்வம்.' : 'Governs righteous living, accumulated karma protection, and life purpose.'))}
             </div>
           </div>
         </div>

@@ -24,7 +24,7 @@ public class SpiritualDeityUtilsTest {
 
         List<ChartResponseDTO.PositionDetail> d9 = List.of(
                 ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(1).build(), // Mars in Mesha in D9 -> Karakamsa = Mesha (1)
-                ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").signNumber(12).build() // 12th from Mesha is Meena (12) -> Jupiter
+                ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").signNumber(12).build() // 12th from Mesha is Meena (12) -> Jupiter occupant
         );
 
         var deities = SpiritualDeityUtils.calculateSpiritualDeities(d1, d9);
@@ -32,7 +32,41 @@ public class SpiritualDeityUtilsTest {
         assertEquals("Mesha", deities.karakamsaSignD9());
         assertNotNull(deities.ishtaDevata());
         assertNotNull(deities.ishtaDevataTamil());
+        assertTrue(deities.ishtaDevataRationaleTamil().contains("அமர்ந்துள்ள கிரகம்"));
         assertEquals("BLESSED", deities.kulaDevataBlessingStatus());
+    }
+
+    @Test
+    public void testEmptyHouseSignLordScenario() {
+        Map<String, PlanetaryPosition> d1 = new HashMap<>();
+        d1.put("Mars", PlanetaryPosition.builder().name("Mars").signNumber(2).degreeInSign(29.0).build()); // AK = Mars
+        d1.put("Lagna", PlanetaryPosition.builder().name("Lagna").signNumber(9).degreeInSign(10.0).build());
+
+        List<ChartResponseDTO.PositionDetail> d9 = List.of(
+                ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(2).build() // Karakamsa = Vrishabha (2), 12th is Mesha (1) - empty
+        );
+
+        var deities = SpiritualDeityUtils.calculateSpiritualDeities(d1, d9);
+        assertEquals("Vrishabha", deities.karakamsaSignD9());
+        assertTrue(deities.ishtaDevataRationaleTamil().contains("கிரகங்கள் அமராததால்"));
+        assertTrue(deities.ishtaDevataRationaleTamil().contains("செவ்வாய்"));
+    }
+
+    @Test
+    public void testMultipleOccupantsConjunctionScenario() {
+        Map<String, PlanetaryPosition> d1 = new HashMap<>();
+        d1.put("Mars", PlanetaryPosition.builder().name("Mars").signNumber(2).degreeInSign(29.0).build()); // AK = Mars
+        d1.put("Lagna", PlanetaryPosition.builder().name("Lagna").signNumber(9).degreeInSign(10.0).build());
+
+        List<ChartResponseDTO.PositionDetail> d9 = List.of(
+                ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(2).build(), // Karakamsa = Vrishabha (2)
+                ChartResponseDTO.PositionDetail.builder().planetKey("MOON").signNumber(1).build(), // 12th house (Mesha) occupant 1
+                ChartResponseDTO.PositionDetail.builder().planetKey("KETU").signNumber(1).build()  // 12th house (Mesha) occupant 2
+        );
+
+        var deities = SpiritualDeityUtils.calculateSpiritualDeities(d1, d9);
+        assertEquals("Vrishabha", deities.karakamsaSignD9());
+        assertTrue(deities.ishtaDevataRationaleTamil().contains("பல கிரகங்கள்"));
     }
 
     @Test
