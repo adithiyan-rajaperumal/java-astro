@@ -31,7 +31,7 @@ public class PdfExportService {
             Locale locale = LocaleContextHolder.getLocale();
             String lang = locale.getLanguage();
             String fontFile = switch (lang) {
-                case "ta" -> "NotoSansTamil-Regular.ttf";
+                case "ta" -> "Bamini.ttf";
                 case "hi" -> "NotoSansDevanagari-Regular.ttf";
                 case "te" -> "NotoSansTelugu-Regular.ttf";
                 case "kn" -> "NotoSansKannada-Regular.ttf";
@@ -799,7 +799,7 @@ public class PdfExportService {
             } else {
                 String segmentStr = currentSegment.toString();
                 if (isCurrentTamil) {
-                    phrase.add(new Chunk(segmentStr, tamFont));
+                    phrase.add(new Chunk(org.vedic.astro.util.BaminiConverter.convert(segmentStr), tamFont));
                 } else {
                     phrase.add(new Chunk(segmentStr, engFont));
                 }
@@ -813,7 +813,7 @@ public class PdfExportService {
         if (currentSegment.length() > 0) {
             String segmentStr = currentSegment.toString();
             if (isCurrentTamil) {
-                phrase.add(new Chunk(segmentStr, tamFont));
+                phrase.add(new Chunk(org.vedic.astro.util.BaminiConverter.convert(segmentStr), tamFont));
             } else {
                 phrase.add(new Chunk(segmentStr, engFont));
             }

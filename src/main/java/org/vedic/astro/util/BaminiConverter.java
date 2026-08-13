@@ -256,9 +256,10 @@ public class BaminiConverter {
         UNICODE_TO_BAMINI.put("ஸே", "N]");
         UNICODE_TO_BAMINI.put("ஸை", "i]");
         UNICODE_TO_BAMINI.put("ஸ்", "];");
+        UNICODE_TO_BAMINI.put("ஸ்ரீ", "=");
         UNICODE_TO_BAMINI.put("வு", "T");
-        UNICODE_TO_BAMINI.put("வூ", "வு+");
-        UNICODE_TO_BAMINI.put("பூ", "பு+");
+        UNICODE_TO_BAMINI.put("வூ", "T+");
+        UNICODE_TO_BAMINI.put("பூ", "G+");
         UNICODE_TO_BAMINI.put("க", "f");
         UNICODE_TO_BAMINI.put("ங", "q");
         UNICODE_TO_BAMINI.put("ச", "r");

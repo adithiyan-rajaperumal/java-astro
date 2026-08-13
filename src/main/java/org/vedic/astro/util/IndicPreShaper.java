@@ -24,6 +24,19 @@ public class IndicPreShaper {
         // producing orphaned combining marks (visible as dotted circles in Malayalam).
         if (!isPdfMode()) return text;
 
+        // If the text contains Tamil characters, convert to Bamini instead!
+        boolean hasTamil = false;
+        for (int idx = 0; idx < text.length(); idx++) {
+            char c = text.charAt(idx);
+            if (c >= '\u0B80' && c <= '\u0BFF') {
+                hasTamil = true;
+                break;
+            }
+        }
+        if (hasTamil) {
+            return text;
+        }
+
         StringBuilder sb = new StringBuilder();
         char[] chars = text.toCharArray();
         int i = 0;
