@@ -3,10 +3,14 @@
 ## 1. Overview
 Introduce a configuration property in `application.yml` (`gemini.forecast-mode` or `gemini.forecast-years`) allowing the system to switch between:
 - `FULL_LIFESPAN` (continuous year-by-year predictions from current age up to calculated Ayurdaya ceiling, e.g. age 85-95+)
-- `NEXT_10_YEARS` (focused 10-year forecast window from current year to current year + 10)
+- `NEXT_10_YEARS` (focused 10-year forecast window from current year to current year + 10 with deep, enriched detail)
 - Custom integer years (e.g., `gemini.forecast-years: 10`, where `0` or negative defaults to Full Lifespan).
 
-The generated output payload, UI headers, and exported PDF reports will dynamically adapt their titles, badges, and year-range descriptions instead of displaying static "Lifetime" labels when in 10-year mode.
+The system utilizes **distinct prompt strategies based on the active mode**:
+- In `NEXT_10_YEARS` mode, the prompt instructs Gemini to leverage the available token budget to produce **rich, deep, multi-paragraph yearly breakdowns** (covering quarterly career pivots, specific transit impacts, relationship timings, and granular remedies).
+- In `FULL_LIFESPAN` mode, the prompt utilizes a **high-density synthesis** (2-3 potent sentences per year) ensuring all 40-60+ years fit cleanly within output token boundaries.
+
+The generated output payload, UI headers, and exported PDF reports dynamically adapt their titles, badges, and year-range descriptions.
 
 ---
 
@@ -23,11 +27,13 @@ gemini:
 
 ### `GeminiProperties.java`
 - Fields: `private String forecastMode = "FULL_LIFESPAN";` and `private int forecastYears = 0;`
-- Helper method: `public int resolveForecastYears(int currentAge, int ayurdayaCeilingAge)`
-  - If `forecastYears > 0`, return `forecastYears`.
-  - If `"NEXT_10_YEARS".equalsIgnoreCase(forecastMode)` or `"10".equals(forecastMode)`, return `10`.
-  - If `"NEXT_15_YEARS".equalsIgnoreCase(forecastMode)` or `"15".equals(forecastMode)`, return `15`.
-  - Default / `FULL_LIFESPAN`: return `Math.max(1, ayurdayaCeilingAge - currentAge)`.
+- Helper methods:
+  - `public boolean is10YearForecastMode()`: returns true if `NEXT_10_YEARS` or `forecastYears == 10`.
+  - `public int resolveForecastYears(int currentAge, int ayurdayaCeilingAge)`:
+    - If `forecastYears > 0`, return `forecastYears`.
+    - If `"NEXT_10_YEARS".equalsIgnoreCase(forecastMode)` or `"10".equals(forecastMode)`, return `10`.
+    - If `"NEXT_15_YEARS".equalsIgnoreCase(forecastMode)` or `"15".equals(forecastMode)`, return `15`.
+    - Default / `FULL_LIFESPAN`: return `Math.max(1, ayurdayaCeilingAge - currentAge)`.
 
 ---
 
@@ -49,17 +55,34 @@ Expose `forecastMode` and `forecastYears` in `/api/config` so the frontend knows
 
 ---
 
-## 4. Prompt Synthesis & Engine Logic (`GeminiPredictionService.java`)
+## 4. Mode-Differentiated Prompt Synthesis (`GeminiPredictionService.java`)
 
 In `constructAstrologicalPrompt`:
 - Calculate `maxForecastYears = geminiProperties.resolveForecastYears(currentAge, targetLifespanAge);`
+- Determine mode: `boolean isShortHorizon = maxForecastYears <= 15;`
 - Target end year = `currentYear + maxForecastYears`.
 - Target end age = `currentAge + maxForecastYears`.
 - Construct `yearlyAnchors` precisely for years `0 .. maxForecastYears`.
-- In prompt Directive 6:
-  - If `FULL_LIFESPAN`: instruct model to cover the full remaining lifespan from current age to target lifespan age.
-  - If `NEXT_10_YEARS` / custom years: instruct model to generate predictions specifically for the next $N$ years ($2026 - 2036$).
-- In `generateFallbackLifePredictions`: use the exact same resolved `maxForecastYears`.
+
+### Mode A: `NEXT_10_YEARS` Mode (Enriched, Deep Forecasting)
+When `isShortHorizon == true`:
+- Directive 6 instructs Gemini:
+  - `yearlyTheme`: Evocative and specific yearly theme headline.
+  - `detailedPrediction`: **Comprehensive 5–7 sentence in-depth breakdown** explicitly detailing:
+    1. **Career, Business & Wealth**: Major promotion/job change windows, business expansions, financial investments, real estate acquisition timings, and peak financial quarters.
+    2. **Health, Vitality & Ayurvedic Care**: Specific physical vulnerabilities, seasonal dosha imbalances, diet and lifestyle adjustments aligned with transiting planetary energies.
+    3. **Family, Marriage, Children & Relationships**: Marital harmony, auspicious marriage/progeny periods, children's milestones, and domestic peace.
+    4. **Mindset, Spiritual Evolution & Key Turning Points**: Mental resilience, spiritual sadhana, pilgrimage windows, and decisive life choices.
+  - `astrologicalBasis`: Detailed explanation citing active Dasa-Bhukthi-Pratyantar lords, planetary aspects (Drishti), transit impacts (Guru/Sani/Rahu/Ketu Gocharam), and relevant Varga alignments (D9, D10, D12, D30).
+  - `cautionsAndRemedies`: Granular, actionable Vedic remedies (exact mantra with recitation count, deity archana, specific charity on designated days, and timing recommendations).
+
+### Mode B: `FULL_LIFESPAN` Mode (High-Density Multi-Decade Synthesis)
+When `isShortHorizon == false`:
+- Directive 6 instructs Gemini:
+  - `yearlyTheme`: Sharp 1-line headline.
+  - `detailedPrediction`: 2–3 potent, comprehensive sentences synthesizing (a) Career, Business & Wealth, (b) Health & Vitality Realities, (c) Family, Marriage & Progeny, and (d) Parents, Elders & Mindset with spiritual milestones.
+  - `astrologicalBasis`: 1 concise sentence citing active Dasa-Bhukthi lords and D1/D9/D10/D12/D30 placements from the yearly anchor.
+  - `cautionsAndRemedies`: 1 practical cautionary note & authentic Vedic remedy.
 
 ---
 
@@ -74,7 +97,7 @@ In `AiPredictionsView.jsx`:
     - EN: `Full Lifetime Astrological Forecast (2026 – 2085 • Age 30 to 89)`
     - TA: `முழு வாழ்நாள் வருடாந்திர பலன்கள் (2026 – 2085 • வயது 30 முதல் 89 வரை)`
 - Scope Badge:
-  - Adds a styled badge next to the section title showing `[ 10-Year Scope ]` or `[ Full Lifespan • 59 Years ]`.
+  - Adds a styled badge next to the section title showing `[ 10-Year In-Depth Scope ]` or `[ Full Lifespan • 59 Years ]`.
 
 ---
 
