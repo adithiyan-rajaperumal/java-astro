@@ -778,6 +778,7 @@ public class PdfExportService {
         if (text == null || text.isEmpty()) {
             return phrase;
         }
+        text = org.vedic.astro.util.IndicPreShaper.shape(text);
         phrase.setLeading(tamFont.getSize() + 5f);
         boolean isTa = "ta".equalsIgnoreCase(LocaleContextHolder.getLocale().getLanguage());
         int i = 0;
@@ -798,7 +799,7 @@ public class PdfExportService {
             } else {
                 String segmentStr = currentSegment.toString();
                 if (isCurrentTamil) {
-                    phrase.add(new Chunk(org.vedic.astro.util.BaminiConverter.convert(segmentStr), tamFont));
+                    phrase.add(new Chunk(segmentStr, tamFont));
                 } else {
                     phrase.add(new Chunk(segmentStr, engFont));
                 }
@@ -812,7 +813,7 @@ public class PdfExportService {
         if (currentSegment.length() > 0) {
             String segmentStr = currentSegment.toString();
             if (isCurrentTamil) {
-                phrase.add(new Chunk(org.vedic.astro.util.BaminiConverter.convert(segmentStr), tamFont));
+                phrase.add(new Chunk(segmentStr, tamFont));
             } else {
                 phrase.add(new Chunk(segmentStr, engFont));
             }
