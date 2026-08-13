@@ -31,5 +31,7 @@ public class ComprehensiveReportDTO {
     private List<DasaPeriod> vimshottariTimeline;
     private ShadbalaDTO shadbalaStrengths;
     private DiagnosticsDTO structuralDiagnostics;
+    private org.vedic.astro.util.AyurvedicAstrologyUtils.AyurvedicHealthProfile ayurvedicHealth;
+    private org.vedic.astro.util.AyurdayaCalculationUtils.AyurdayaProfile ayurdayaProfile;
     private PredictionResponseDTO aiPredictions;
 }

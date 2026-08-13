@@ -37,7 +37,9 @@ public class ChartUiResponseDTO {
     // Core Panchangam Element Block
     private String thithi;
     private String yogam;
-    private String karanam;
+    // Health & Ayurdaya Longevity Engine
+    private org.vedic.astro.util.AyurvedicAstrologyUtils.AyurvedicHealthProfile ayurvedicHealth;
+    private org.vedic.astro.util.AyurdayaCalculationUtils.AyurdayaProfile ayurdayaProfile;
 
     // AI Prediction Capabilities
     private boolean aiPredictionsEnabled;
