@@ -39,6 +39,64 @@ export default function HealthLongevityView({ chartData, language }) {
     ? t('madhyayu', language)
     : t('alpayu', language);
 
+  const formatPairTitle = (key) => {
+    switch (key) {
+      case 'pair1_lagnaLord_and_8thLord':
+        return language === 'ta' ? '1. லக்னாதிபதி & 8-ஆம் அதிபதி' : '1. Lagna Lord & 8th Lord';
+      case 'pair2_moon_and_saturn':
+        return language === 'ta' ? '2. சந்திரன் & ஆயுள்காரகன் சனி' : '2. Moon & Saturn (Ayushkaraka)';
+      case 'pair3_lagna_and_moon':
+        return language === 'ta' ? '3. லக்னம் & சந்திரன்' : '3. Lagna & Moon';
+      case 'majorityConsensus':
+        return language === 'ta' ? 'பெரும்பான்மை முடிவு' : 'Majority Consensus';
+      default:
+        return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+  };
+
+  const translateModality = (text) => {
+    if (!text || language !== 'ta') return text;
+    return text
+      .replace(/CHARA/g, 'சர')
+      .replace(/STHIRA/g, 'ஸ்திர')
+      .replace(/DWISVABHAVA/g, 'உபய')
+      .replace(/Lagna/g, 'லக்னம்')
+      .replace(/Moon/g, 'சந்திரன்')
+      .replace(/Saturn/g, 'சனி')
+      .replace(/Sun/g, 'சூரியன்')
+      .replace(/Mars/g, 'செவ்வாய்')
+      .replace(/Mercury/g, 'புதன்')
+      .replace(/Jupiter/g, 'குரு')
+      .replace(/Venus/g, 'சுக்கிரன்')
+      .replace(/Rahu/g, 'ராகு')
+      .replace(/Ketu/g, 'கேது');
+  };
+
+  const renderSpanBadge = (span) => {
+    if (!span) return null;
+    const isP = span === 'Poornayu';
+    const isM = span === 'Madhyayu';
+    const bg = isP ? 'rgba(46, 204, 113, 0.15)' : isM ? 'rgba(241, 196, 15, 0.15)' : 'rgba(231, 76, 60, 0.15)';
+    const col = isP ? '#2ecc71' : isM ? '#f1c40f' : '#e74c3c';
+    const border = isP ? 'rgba(46, 204, 113, 0.3)' : isM ? 'rgba(241, 196, 15, 0.3)' : 'rgba(231, 76, 60, 0.3)';
+    const text = isP ? t('poornayu', language) : isM ? t('madhyayu', language) : t('alpayu', language);
+
+    return (
+      <span style={{
+        fontSize: '11px',
+        fontWeight: 'bold',
+        padding: '3px 9px',
+        borderRadius: '12px',
+        background: bg,
+        color: col,
+        border: `1px solid ${border}`,
+        whiteSpace: 'nowrap'
+      }}>
+        {text}
+      </span>
+    );
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
@@ -85,21 +143,41 @@ export default function HealthLongevityView({ chartData, language }) {
 
         {/* 3-Pair Modality Table */}
         {ayurdaya?.threePairsDetails && Object.keys(ayurdaya.threePairsDetails).length > 0 && (
-          <div style={{ marginBottom: '16px' }}>
-            <h4 style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+          <div style={{ marginBottom: '18px' }}>
+            <h4 style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               📊 {t('threePairsTitle', language)}
             </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
-              {Object.entries(ayurdaya.threePairsDetails).map(([pairKey, detail], idx) => (
-                <div key={idx} style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px', fontSize: '12px' }}>
-                  <strong style={{ color: 'var(--accent-gold)', display: 'block', marginBottom: '4px' }}>
-                    {pairKey}
-                  </strong>
-                  <div style={{ color: 'var(--text-primary)' }}>
-                    {String(detail)}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
+              {Object.entries(ayurdaya.threePairsDetails).map(([pairKey, detail], idx) => {
+                const isObj = typeof detail === 'object' && detail !== null;
+                const isConsensus = pairKey === 'majorityConsensus';
+
+                return (
+                  <div key={idx} style={{
+                    background: isConsensus ? 'rgba(212,175,55,0.06)' : 'rgba(255,255,255,0.02)',
+                    border: isConsensus ? '1px solid rgba(212,175,55,0.3)' : '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '8px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                      <strong style={{ color: 'var(--accent-gold)', fontSize: '12px' }}>
+                        {formatPairTitle(pairKey)}
+                      </strong>
+                      {isObj && detail.derivedSpan && renderSpanBadge(detail.derivedSpan)}
+                      {!isObj && renderSpanBadge(String(detail))}
+                    </div>
+                    {isObj && detail.planets && (
+                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        🪐 <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{translateModality(detail.planets)}</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
