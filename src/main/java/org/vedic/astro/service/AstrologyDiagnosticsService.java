@@ -19,7 +19,7 @@ public class AstrologyDiagnosticsService {
         List<DiagnosticsDTO.DoshaDetail> doshams = new ArrayList<>();
         List<String> specs = new ArrayList<>();
 
-        // 15 Classical Doshams
+        // 18 Classical Doshams
         doshams.add(evaluateSevvaiDosham(d1Map));
         doshams.add(evaluateKalaSarpaDosham(d1Map));
         doshams.add(evaluateSarpamDosham(d1Map));
@@ -35,8 +35,11 @@ public class AstrologyDiagnosticsService {
         doshams.add(evaluateDaridraYoga(d1Map));
         doshams.add(evaluateDuryoga(d1Map));
         doshams.add(evaluateSarpaDosha(d1Map));
+        doshams.add(evaluateKendraAdhipatyaDosham(d1Map));
+        doshams.add(evaluateBhadhakadhipatiDosham(d1Map));
+        doshams.add(evaluateGandantaDosham(d1Map));
 
-        // 26 Classical Yogas
+        // 31 Classical Yogas
         evaluateYogas(d1Map, yogas);
 
         return DiagnosticsDTO.builder().activeYogas(yogas).discoveredDoshams(doshams).horoscopicSpecialities(specs).build();
@@ -723,8 +726,142 @@ public class AstrologyDiagnosticsService {
                 .build();
     }
 
+    private DiagnosticsDTO.DoshaDetail evaluateKendraAdhipatyaDosham(Map<String, PlanetaryPosition> d1Map) {
+        PlanetaryPosition lagna = d1Map.get("Lagna");
+        if (lagna == null) return DiagnosticsDTO.DoshaDetail.builder().name(ts.getLabel("dosham.kendra_adhipatya")).detected(false).build();
+
+        int lagnaSign = lagna.getSignNumber();
+        boolean isDualLagna = (lagnaSign == 3 || lagnaSign == 6 || lagnaSign == 9 || lagnaSign == 12);
+
+        boolean detected = false;
+        boolean nullified = false;
+        String reason = null;
+
+        String[] naturalBenefics = {"Jupiter", "Venus", "Mercury"};
+        for (String b : naturalBenefics) {
+            PlanetaryPosition p = d1Map.get(b);
+            if (p != null) {
+                List<Integer> ruledHouses = getHousesRuledByPlanet(b, lagnaSign);
+                boolean rulesKendra = false;
+                for (int h : ruledHouses) {
+                    if (h == 4 || h == 7 || h == 10) {
+                        rulesKendra = true;
+                        break;
+                    }
+                }
+                if (rulesKendra) {
+                    detected = true;
+                    int pHouse = PlanetDignityUtils.getHouseFromLagna(p.getSignNumber(), lagnaSign);
+                    if (pHouse == 5 || pHouse == 9) {
+                        nullified = true;
+                        reason = "Placed in 5th/9th Trikona House Cancellation (திரிகோண ஸ்தானத்தில் அமர்ந்து தோஷம் நீங்கியது)";
+                        break;
+                    }
+                    if (isMaleficInSign(d1Map, p.getSignNumber())) {
+                        nullified = true;
+                        reason = "Conjunction with Natural Malefic Cancellation (பாப கிரக சேர்க்கையால் தோஷம் நீங்கியது)";
+                        break;
+                    }
+                }
+            }
+        }
+
+        return DiagnosticsDTO.DoshaDetail.builder()
+                .name(ts.getLabel("dosham.kendra_adhipatya"))
+                .detected(detected)
+                .nullified(nullified)
+                .active(detected && !nullified)
+                .severity(detected ? (nullified ? ts.getLabel("severity.cancelled") : (isDualLagna ? ts.getLabel("severity.high") : ts.getLabel("severity.medium"))) : ts.getLabel("severity.none"))
+                .nullificationReason(reason)
+                .remedySuggestion(detected && !nullified ? ts.getLabel("remedy.kendra_adhipatya") : null)
+                .build();
+    }
+
+    private DiagnosticsDTO.DoshaDetail evaluateBhadhakadhipatiDosham(Map<String, PlanetaryPosition> d1Map) {
+        PlanetaryPosition lagna = d1Map.get("Lagna");
+        if (lagna == null) return DiagnosticsDTO.DoshaDetail.builder().name(ts.getLabel("dosham.bhadhakadhipati")).detected(false).build();
+
+        int lagnaSign = lagna.getSignNumber();
+        int bhadhakaHouse = PlanetDignityUtils.getBhadhakaHouse(lagnaSign);
+        int bhadhakaSign = ((lagnaSign + bhadhakaHouse - 2 + 12) % 12) + 1;
+        String bhadhakaLord = PlanetDignityUtils.getSignLord(bhadhakaSign);
+        PlanetaryPosition bPos = d1Map.get(bhadhakaLord);
+
+        boolean detected = false;
+        boolean nullified = false;
+        String reason = null;
+
+        if (bPos != null) {
+            int bHouse = PlanetDignityUtils.getHouseFromLagna(bPos.getSignNumber(), lagnaSign);
+            String lagnaLord = PlanetDignityUtils.getSignLord(lagnaSign);
+            PlanetaryPosition lPos = d1Map.get(lagnaLord);
+
+            boolean afflictsLagnaLord = (lPos != null && (lPos.getSignNumber() == bPos.getSignNumber() || PlanetDignityUtils.isAspecting(bhadhakaLord, bPos.getSignNumber(), lPos.getSignNumber())));
+            if (bHouse == 1 || bHouse == 7 || bHouse == 8 || bHouse == 10 || afflictsLagnaLord) {
+                detected = true;
+
+                if (PlanetDignityUtils.isUpachaya(bHouse)) {
+                    nullified = true;
+                    reason = "Bhadhaka in Upachaya House Cancellation (உபசய ஸ்தானத்தில் அமர்ந்து தோஷ நிவர்த்தி)";
+                } else if (d1Map.get("Jupiter") != null) {
+                    PlanetaryPosition jup = d1Map.get("Jupiter");
+                    if (jup.getSignNumber() == bPos.getSignNumber() || PlanetDignityUtils.isAspecting("Jupiter", jup.getSignNumber(), bPos.getSignNumber())) {
+                        nullified = true;
+                        reason = ts.getLabel("nullification.sevvai.jupiter_aspect");
+                    }
+                }
+            }
+        }
+
+        return DiagnosticsDTO.DoshaDetail.builder()
+                .name(ts.getLabel("dosham.bhadhakadhipati"))
+                .detected(detected)
+                .nullified(nullified)
+                .active(detected && !nullified)
+                .severity(detected ? (nullified ? ts.getLabel("severity.cancelled") : ts.getLabel("severity.medium")) : ts.getLabel("severity.none"))
+                .nullificationReason(reason)
+                .remedySuggestion(detected && !nullified ? ts.getLabel("remedy.bhadhakadhipati") : null)
+                .build();
+    }
+
+    private DiagnosticsDTO.DoshaDetail evaluateGandantaDosham(Map<String, PlanetaryPosition> d1Map) {
+        PlanetaryPosition jupiter = d1Map.get("Jupiter");
+        boolean detected = false;
+        boolean nullified = false;
+        String reason = null;
+        List<String> gandantaPlanets = new ArrayList<>();
+
+        for (Map.Entry<String, PlanetaryPosition> entry : d1Map.entrySet()) {
+            if ("Lagna".equalsIgnoreCase(entry.getKey())) continue;
+            PlanetaryPosition p = entry.getValue();
+            if (p != null && PlanetDignityUtils.isGandanta(p.getAbsoluteLongitude())) {
+                detected = true;
+                gandantaPlanets.add(entry.getKey());
+                if (jupiter != null && PlanetDignityUtils.isAspecting("Jupiter", jupiter.getSignNumber(), p.getSignNumber())) {
+                    nullified = true;
+                    reason = ts.getLabel("nullification.sevvai.jupiter_aspect");
+                }
+            }
+        }
+
+        String name = ts.getLabel("dosham.gandanta");
+        if (!gandantaPlanets.isEmpty()) {
+            name += " (" + String.join(", ", gandantaPlanets) + ")";
+        }
+
+        return DiagnosticsDTO.DoshaDetail.builder()
+                .name(name)
+                .detected(detected)
+                .nullified(nullified)
+                .active(detected && !nullified)
+                .severity(detected ? (nullified ? ts.getLabel("severity.cancelled") : ts.getLabel("severity.high")) : ts.getLabel("severity.none"))
+                .nullificationReason(reason)
+                .remedySuggestion(detected && !nullified ? ts.getLabel("remedy.gandanta") : null)
+                .build();
+    }
+
     // =========================================================================
-    // 5. 26 CLASSICAL VEDIC YOGAS EVALUATION
+    // 5. 31 CLASSICAL VEDIC YOGAS EVALUATION
     // =========================================================================
     private void evaluateYogas(Map<String, PlanetaryPosition> d1Map, List<DiagnosticsDTO.YogaDetail> yogas) {
         PlanetaryPosition lagna = d1Map.get("Lagna");
@@ -1145,9 +1282,158 @@ public class AstrologyDiagnosticsService {
                 }
             }
         }
+
+        // U. Parijata Yoga (பாரிஜாத யோகம்)
+        String l1Lord = PlanetDignityUtils.getSignLord(lagnaSign);
+        PlanetaryPosition l1Pos = d1Map.get(l1Lord);
+        if (l1Pos != null) {
+            String l1DispositorName = PlanetDignityUtils.getSignLord(l1Pos.getSignNumber());
+            PlanetaryPosition l1DispPos = d1Map.get(l1DispositorName);
+            if (l1DispPos != null) {
+                String l2DispositorName = PlanetDignityUtils.getSignLord(l1DispPos.getSignNumber());
+                PlanetaryPosition l2DispPos = d1Map.get(l2DispositorName);
+                if (l2DispPos != null) {
+                    int h1 = PlanetDignityUtils.getHouseFromLagna(l1DispPos.getSignNumber(), lagnaSign);
+                    int h2 = PlanetDignityUtils.getHouseFromLagna(l2DispPos.getSignNumber(), lagnaSign);
+                    boolean h1Valid = (PlanetDignityUtils.isKendra(h1) || PlanetDignityUtils.isTrikona(h1)) &&
+                            (PlanetDignityUtils.isOwnSign(l1DispositorName, l1DispPos.getSignNumber()) || PlanetDignityUtils.isExalted(l1DispositorName, l1DispPos.getSignNumber()));
+                    boolean h2Valid = (PlanetDignityUtils.isKendra(h2) || PlanetDignityUtils.isTrikona(h2)) &&
+                            (PlanetDignityUtils.isOwnSign(l2DispositorName, l2DispPos.getSignNumber()) || PlanetDignityUtils.isExalted(l2DispositorName, l2DispPos.getSignNumber()));
+                    if (h1Valid && h2Valid) {
+                        yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                                .name(ts.getLabel("yoga.parijata"))
+                                .description(ts.getLabel("yoga.parijata.desc"))
+                                .impactLevel(ts.getLabel("severity.high"))
+                                .build());
+                    }
+                }
+            }
+        }
+
+        // V. Chatussagara Yoga (All 4 Kendra houses 1, 4, 7, 10 occupied by planets)
+        boolean k1 = false, k4 = false, k7 = false, k10 = false;
+        for (Map.Entry<String, PlanetaryPosition> entry : d1Map.entrySet()) {
+            if ("Lagna".equalsIgnoreCase(entry.getKey())) continue;
+            PlanetaryPosition p = entry.getValue();
+            if (p != null) {
+                int h = PlanetDignityUtils.getHouseFromLagna(p.getSignNumber(), lagnaSign);
+                if (h == 1) k1 = true;
+                else if (h == 4) k4 = true;
+                else if (h == 7) k7 = true;
+                else if (h == 10) k10 = true;
+            }
+        }
+        if (k1 && k4 && k7 && k10) {
+            yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                    .name(ts.getLabel("yoga.chatussagara"))
+                    .description(ts.getLabel("yoga.chatussagara.desc"))
+                    .impactLevel(ts.getLabel("severity.high"))
+                    .build());
+        }
+
+        // W. Mala Yoga (Garland of Benefics: all 3 benefics in Kendras, no malefics in Kendras)
+        if (jupiter != null && venus != null && mercury != null) {
+            int jH = PlanetDignityUtils.getHouseFromLagna(jupiter.getSignNumber(), lagnaSign);
+            int vH = PlanetDignityUtils.getHouseFromLagna(venus.getSignNumber(), lagnaSign);
+            int meH = PlanetDignityUtils.getHouseFromLagna(mercury.getSignNumber(), lagnaSign);
+            if (PlanetDignityUtils.isKendra(jH) && PlanetDignityUtils.isKendra(vH) && PlanetDignityUtils.isKendra(meH)) {
+                boolean maleficInKendra = false;
+                for (String m : new String[]{"Sun", "Mars", "Saturn", "Rahu", "Ketu"}) {
+                    PlanetaryPosition mp = d1Map.get(m);
+                    if (mp != null) {
+                        int mh = PlanetDignityUtils.getHouseFromLagna(mp.getSignNumber(), lagnaSign);
+                        if (PlanetDignityUtils.isKendra(mh)) {
+                            maleficInKendra = true;
+                            break;
+                        }
+                    }
+                }
+                if (!maleficInKendra) {
+                    yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                            .name(ts.getLabel("yoga.mala"))
+                            .description(ts.getLabel("yoga.mala.desc"))
+                            .impactLevel(ts.getLabel("severity.high"))
+                            .build());
+                }
+            }
+        }
+
+        // X. Indra Yoga
+        int h5Sign = ((lagnaSign + 5 - 2 + 12) % 12) + 1;
+        int h11Sign = ((lagnaSign + 11 - 2 + 12) % 12) + 1;
+        String l5Name = PlanetDignityUtils.getSignLord(h5Sign);
+        String l11Name = PlanetDignityUtils.getSignLord(h11Sign);
+        PlanetaryPosition p5 = d1Map.get(l5Name);
+        PlanetaryPosition p11 = d1Map.get(l11Name);
+        if (p5 != null && p11 != null) {
+            boolean parivartana = (p5.getSignNumber() == h11Sign && p11.getSignNumber() == h5Sign);
+            boolean moonIn11 = (p11.getSignNumber() == h5Sign && moon != null && moon.getSignNumber() == h11Sign);
+            if (parivartana || moonIn11) {
+                yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                        .name(ts.getLabel("yoga.indra"))
+                        .description(ts.getLabel("yoga.indra.desc"))
+                        .impactLevel(ts.getLabel("severity.high"))
+                        .build());
+            }
+        }
+
+        // Y. General Kendra-Trikona Sambandha Yoga
+        int[] kendras = {1, 4, 7, 10};
+        int[] trikonas = {1, 5, 9};
+        boolean sambandhaFound = false;
+        for (int k : kendras) {
+            if (sambandhaFound) break;
+            int kSign = ((lagnaSign + k - 2 + 12) % 12) + 1;
+            String kLord = PlanetDignityUtils.getSignLord(kSign);
+            PlanetaryPosition kPos = d1Map.get(kLord);
+            if (kPos == null) continue;
+            int kHouse = PlanetDignityUtils.getHouseFromLagna(kPos.getSignNumber(), lagnaSign);
+            if (PlanetDignityUtils.isDusthana(kHouse) || PlanetDignityUtils.isCombust(kLord, kPos.getAbsoluteLongitude(), sunLong)) continue;
+
+            for (int t : trikonas) {
+                if (k == t) continue;
+                int tSign = ((lagnaSign + t - 2 + 12) % 12) + 1;
+                String tLord = PlanetDignityUtils.getSignLord(tSign);
+                if (kLord.equalsIgnoreCase(tLord)) continue;
+                PlanetaryPosition tPos = d1Map.get(tLord);
+                if (tPos == null) continue;
+                int tHouse = PlanetDignityUtils.getHouseFromLagna(tPos.getSignNumber(), lagnaSign);
+                if (PlanetDignityUtils.isDusthana(tHouse) || PlanetDignityUtils.isCombust(tLord, tPos.getAbsoluteLongitude(), sunLong)) continue;
+
+                if (kPos.getSignNumber() == tPos.getSignNumber() && (PlanetDignityUtils.isKendra(kHouse) || PlanetDignityUtils.isTrikona(kHouse))) {
+                    sambandhaFound = true;
+                } else if (PlanetDignityUtils.isAspecting(kLord, kPos.getSignNumber(), tPos.getSignNumber()) &&
+                           PlanetDignityUtils.isAspecting(tLord, tPos.getSignNumber(), kPos.getSignNumber()) &&
+                           (PlanetDignityUtils.isKendra(kHouse) || PlanetDignityUtils.isTrikona(kHouse))) {
+                    sambandhaFound = true;
+                } else if (kPos.getSignNumber() == tSign && tPos.getSignNumber() == kSign) {
+                    sambandhaFound = true;
+                }
+
+                if (sambandhaFound) {
+                    yogas.add(DiagnosticsDTO.YogaDetail.builder()
+                            .name(ts.getLabel("yoga.kendra_trikona_sambandha") + " (" + ts.getLabel("planet." + kLord.toUpperCase()) + " & " + ts.getLabel("planet." + tLord.toUpperCase()) + ")")
+                            .description(ts.getLabel("yoga.kendra_trikona_sambandha.desc"))
+                            .impactLevel(ts.getLabel("severity.high"))
+                            .build());
+                    break;
+                }
+            }
+        }
     }
 
     // Helper functions
+    private static List<Integer> getHousesRuledByPlanet(String planet, int lagnaSign) {
+        List<Integer> houses = new ArrayList<>();
+        for (int h = 1; h <= 12; h++) {
+            int sign = ((lagnaSign + h - 2 + 12) % 12) + 1;
+            if (planet.equalsIgnoreCase(PlanetDignityUtils.getSignLord(sign))) {
+                houses.add(h);
+            }
+        }
+        return houses;
+    }
+
     private static boolean isKujaDoshaHouse(int h) {
         return h == 1 || h == 2 || h == 4 || h == 7 || h == 8 || h == 12;
     }
