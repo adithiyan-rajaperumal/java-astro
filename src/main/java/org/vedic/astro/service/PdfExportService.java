@@ -31,7 +31,7 @@ public class PdfExportService {
             Locale locale = LocaleContextHolder.getLocale();
             String lang = locale.getLanguage();
             String fontFile = switch (lang) {
-                case "ta" -> "Bamini.ttf";
+                case "ta" -> "NotoSansTamil-Regular.ttf";
                 case "hi" -> "NotoSansDevanagari-Regular.ttf";
                 case "te" -> "NotoSansTelugu-Regular.ttf";
                 case "kn" -> "NotoSansKannada-Regular.ttf";
@@ -285,6 +285,49 @@ public class PdfExportService {
                         pDesc.setSpacingAfter(10);
                         document.add(pDesc);
                     }
+                }
+
+                // Auspicious Life Anchors Section
+                if (data.getAiPredictions().getAuspiciousAnchors() != null) {
+                    var anch = data.getAiPredictions().getAuspiciousAnchors();
+                    String anchTitleStr = "ta".equalsIgnoreCase(lang) ? "வாழ்நாள் சுப அதிர்ஷ்ட அம்சங்கள் (Auspicious Life Anchors)" : "Auspicious Life Anchors";
+                    Paragraph anchH = buildMixedParagraph(anchTitleStr, sFont, engSFont);
+                    anchH.setSpacingAfter(8);
+                    document.add(anchH);
+
+                    PdfPTable anchTable = new PdfPTable(2);
+                    anchTable.setWidthPercentage(100);
+                    anchTable.setSpacingAfter(14);
+                    anchTable.setWidths(new float[]{40f, 60f});
+
+                    PdfPCell ah1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப அம்சம்" : "Life Anchor Factor", boldB, Element.ALIGN_CENTER); ah1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); anchTable.addCell(ah1);
+                    PdfPCell ah2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "விபரம் & வழிகாட்டுதல்" : "Auspicious Details", boldB, Element.ALIGN_CENTER); ah2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); anchTable.addCell(ah2);
+
+                    if (anch.getLifeGemstone() != null && !anch.getLifeGemstone().isBlank()) {
+                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "ஆயுள் இரத்தினம் (Life Gemstone)" : "Life Gemstone", boldB, Element.ALIGN_LEFT));
+                        anchTable.addCell(buildTableCell(anch.getLifeGemstone(), bFont, Element.ALIGN_LEFT));
+                    }
+                    if (anch.getFavorableColors() != null && !anch.getFavorableColors().isBlank()) {
+                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப நிறங்கள் (Favorable Colors)" : "Favorable Colors", boldB, Element.ALIGN_LEFT));
+                        anchTable.addCell(buildTableCell(anch.getFavorableColors(), bFont, Element.ALIGN_LEFT));
+                    }
+                    if (anch.getLuckyNumbers() != null && !anch.getLuckyNumbers().isBlank()) {
+                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "அதிர்ஷ்ட எண்கள் (Lucky Numbers)" : "Lucky Numbers", boldB, Element.ALIGN_LEFT));
+                        anchTable.addCell(buildTableCell(anch.getLuckyNumbers(), bFont, Element.ALIGN_LEFT));
+                    }
+                    if (anch.getFavorableDays() != null && !anch.getFavorableDays().isBlank()) {
+                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப கிழமைகள் (Favorable Days)" : "Favorable Days", boldB, Element.ALIGN_LEFT));
+                        anchTable.addCell(buildTableCell(anch.getFavorableDays(), bFont, Element.ALIGN_LEFT));
+                    }
+                    if (anch.getIshtaDevata() != null && !anch.getIshtaDevata().isBlank()) {
+                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "இஷ்ட & உபாசனை தெய்வம் (Ishta Devata)" : "Ishta & Kula Devata", boldB, Element.ALIGN_LEFT));
+                        anchTable.addCell(buildTableCell(anch.getIshtaDevata(), bFont, Element.ALIGN_LEFT));
+                    }
+                    if (anch.getFavorableDirections() != null && !anch.getFavorableDirections().isBlank()) {
+                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப திசைகள் (Favorable Directions)" : "Favorable Directions", boldB, Element.ALIGN_LEFT));
+                        anchTable.addCell(buildTableCell(anch.getFavorableDirections(), bFont, Element.ALIGN_LEFT));
+                    }
+                    document.add(anchTable);
                 }
 
                 // Health & Vitality Diagnostics Section
