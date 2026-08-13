@@ -91,24 +91,26 @@ public class GeminiPredictionServiceTest {
         String prompt = predictionService.constructAstrologicalPrompt(req);
         assertNotNull(prompt);
 
-        // Verify JSON input contains structured houseLordshipTable and planetaryPositionsD1
+        // Verify JSON input contains structured houseLordshipTable and planetaryMatrix
         assertTrue(prompt.contains("houseLordshipTable"));
-        assertTrue(prompt.contains("planetaryPositionsD1"));
+        assertTrue(prompt.contains("planetaryMatrix"));
+        assertTrue(prompt.contains("ayurvedicHealthProfile"));
 
         // Verify Sun in Leo (Sign 5) -> House 4 from Taurus (Sign 2) Lagna
         assertTrue(prompt.contains("\"planet\" : \"Sun\""));
-        assertTrue(prompt.contains("\"rashi\" : \"Simha\""));
-        assertTrue(prompt.contains("\"houseFromLagna\" : 4"));
+        assertTrue(prompt.contains("\"placedInD1Sign\" : \"Simha\""));
+        assertTrue(prompt.contains("\"placedInD1House\" : 4"));
 
         // Verify Moon in Aries (Sign 1) -> House 12 from Taurus (Sign 2) Lagna
         assertTrue(prompt.contains("\"planet\" : \"Moon\""));
-        assertTrue(prompt.contains("\"rashi\" : \"Mesha\""));
-        assertTrue(prompt.contains("\"houseFromLagna\" : 12"));
+        assertTrue(prompt.contains("\"placedInD1Sign\" : \"Mesha\""));
+        assertTrue(prompt.contains("\"placedInD1House\" : 12"));
 
         // Verify system instructions contain Rasi vs Bhava disambiguation and lordship rules
         String systemInstruction = predictionService.constructSystemInstruction("ta");
         assertTrue(systemInstruction.contains("CRITICAL ASTROLOGICAL INTERPRETATION & LORDSHIP RULES"));
-        assertTrue(systemInstruction.contains("Bhava"));
+        assertTrue(systemInstruction.contains("PLACEMENT VS. OWNERSHIP"));
+        assertTrue(systemInstruction.contains("AYURVEDIC PREDICTIONS"));
     }
 
     @Test
@@ -312,10 +314,10 @@ public class GeminiPredictionServiceTest {
 
         String prompt = predictionService.constructAstrologicalPrompt(req);
         assertNotNull(prompt);
-        assertTrue(prompt.contains("planetaryPositionsD1"));
-        assertTrue(prompt.contains("\"dignity\" : \"EXALTED\""));
-        assertTrue(prompt.contains("\"dignity\" : \"DEBILITATED\""));
-        assertTrue(prompt.contains("\"dignity\" : \"OWN_SIGN\""));
+        assertTrue(prompt.contains("planetaryMatrix"));
+        assertTrue(prompt.contains("\"d1Dignity\" : \"EXALTED\""));
+        assertTrue(prompt.contains("\"d1Dignity\" : \"DEBILITATED\""));
+        assertTrue(prompt.contains("\"d1Dignity\" : \"OWN_SIGN\""));
         assertTrue(prompt.contains("\"isCombust\" : true"));
     }
 
@@ -494,28 +496,36 @@ public class GeminiPredictionServiceTest {
         // House 1: Dhanus -> Jupiter
         assertEquals(1, houseLords.get(0).get("houseNumber").asInt());
         assertEquals("Dhanus", houseLords.get(0).get("signName").asText());
-        assertEquals("Jupiter", houseLords.get(0).get("lord").asText());
+        assertEquals("Jupiter", houseLords.get(0).get("houseLord").asText());
 
-        // House 6: Vrishabha -> Venus (Roga / Shatru lord)
+        // House 6: Vrishabha -> Venus (Roga / Shatru lord), Occupants: Venus
         assertEquals(6, houseLords.get(5).get("houseNumber").asInt());
         assertEquals("Vrishabha", houseLords.get(5).get("signName").asText());
-        assertEquals("Venus", houseLords.get(5).get("lord").asText());
+        assertEquals("Venus", houseLords.get(5).get("houseLord").asText());
 
-        // House 10: Kanya -> Mercury (Karma / Rajya lord - NOT Venus!)
+        // House 10: Kanya -> Mercury (Karma / Rajya lord - NOT Venus!), Vacant
         assertEquals(10, houseLords.get(9).get("houseNumber").asInt());
         assertEquals("Kanya", houseLords.get(9).get("signName").asText());
-        assertEquals("Mercury", houseLords.get(9).get("lord").asText());
+        assertEquals("Mercury", houseLords.get(9).get("houseLord").asText());
+        assertEquals(0, houseLords.get(9).get("occupantPlanets").size());
+        assertTrue(houseLords.get(9).get("lordshipClarification").asText().contains("vacant house"));
+
+        // House 5: Mesha -> Mars (5th Lord), Occupant: Sun
+        assertEquals(5, houseLords.get(4).get("houseNumber").asInt());
+        assertEquals("Mesha", houseLords.get(4).get("signName").asText());
+        assertEquals("Mars", houseLords.get(4).get("houseLord").asText());
+        assertTrue(houseLords.get(4).get("occupantPlanets").toString().contains("Sun"));
+        assertTrue(houseLords.get(4).get("lordshipClarification").asText().contains("Mars is the sole lord"));
 
         // House 11: Thula -> Venus (Labha lord)
         assertEquals(11, houseLords.get(10).get("houseNumber").asInt());
         assertEquals("Tula", houseLords.get(10).get("signName").asText());
-        assertEquals("Venus", houseLords.get(10).get("lord").asText());
+        assertEquals("Venus", houseLords.get(10).get("houseLord").asText());
 
-        // Verify Planetary Positions & Dignities
-        com.fasterxml.jackson.databind.JsonNode planets = root.get("planetaryPositionsD1");
+        // Verify Planetary Matrix (D1, D9, rulesHouses, lordshipTitle, occupantRole, Dignities, Dosha)
+        com.fasterxml.jackson.databind.JsonNode planets = root.get("planetaryMatrix");
         assertNotNull(planets);
 
-        // Mercury in Cancer -> House 8, Dignity: NEUTRAL (NOT own sign!)
         com.fasterxml.jackson.databind.JsonNode mercNode = null;
         com.fasterxml.jackson.databind.JsonNode jupNode = null;
         com.fasterxml.jackson.databind.JsonNode venNode = null;
@@ -529,27 +539,53 @@ public class GeminiPredictionServiceTest {
             if ("Sun".equalsIgnoreCase(pName)) sunNode = p;
         }
 
+        // Mercury in Cancer -> House 8, Dignity: NEUTRAL (NOT own sign!), Rules Houses [7, 10]
         assertNotNull(mercNode);
-        assertEquals("Kataka", mercNode.get("rashi").asText());
-        assertEquals(8, mercNode.get("houseFromLagna").asInt());
-        assertEquals("NEUTRAL", mercNode.get("dignity").asText());
+        assertEquals("Kataka", mercNode.get("placedInD1Sign").asText());
+        assertEquals(8, mercNode.get("placedInD1House").asInt());
+        assertEquals("NEUTRAL", mercNode.get("d1Dignity").asText());
+        assertEquals("[7,10]", mercNode.get("rulesHouses").toString());
+        assertTrue(mercNode.get("lordshipTitle").asText().contains("7th & 10th Lord"));
+        assertTrue(mercNode.get("occupantRole").asText().contains("NOT the 8th Lord"));
+        assertTrue(mercNode.get("primaryDosha").asText().contains("Tridosha"));
 
-        // Jupiter in Cancer -> House 8, Dignity: EXALTED (NOT own sign!)
+        // Jupiter in Cancer -> House 8, Dignity: EXALTED, Rules Houses [1, 4]
         assertNotNull(jupNode);
-        assertEquals("Kataka", jupNode.get("rashi").asText());
-        assertEquals(8, jupNode.get("houseFromLagna").asInt());
-        assertEquals("EXALTED", jupNode.get("dignity").asText());
+        assertEquals("Kataka", jupNode.get("placedInD1Sign").asText());
+        assertEquals(8, jupNode.get("placedInD1House").asInt());
+        assertEquals("EXALTED", jupNode.get("d1Dignity").asText());
+        assertEquals("[1,4]", jupNode.get("rulesHouses").toString());
+        assertTrue(jupNode.get("lordshipTitle").asText().contains("Lagnesha"));
+        assertTrue(jupNode.get("occupantRole").asText().contains("NOT the 8th Lord"));
+        assertTrue(jupNode.get("primaryDosha").asText().contains("Kapha"));
 
-        // Venus in Taurus -> House 6, Dignity: OWN_SIGN
+        // Venus in Taurus -> House 6, Dignity: OWN_SIGN, Rules Houses [6, 11]
         assertNotNull(venNode);
-        assertEquals("Vrishabha", venNode.get("rashi").asText());
-        assertEquals(6, venNode.get("houseFromLagna").asInt());
-        assertEquals("OWN_SIGN", venNode.get("dignity").asText());
+        assertEquals("Vrishabha", venNode.get("placedInD1Sign").asText());
+        assertEquals(6, venNode.get("placedInD1House").asInt());
+        assertEquals("OWN_SIGN", venNode.get("d1Dignity").asText());
+        assertEquals("[6,11]", venNode.get("rulesHouses").toString());
+        assertTrue(venNode.get("lordshipTitle").asText().contains("6th & 11th Lord"));
+        assertTrue(venNode.get("occupantRole").asText().contains("Own House"));
 
-        // Sun in Aries -> House 5, Dignity: EXALTED
+        // Sun in Aries -> House 5, Dignity: EXALTED, Rules Houses [9]
         assertNotNull(sunNode);
-        assertEquals("Mesha", sunNode.get("rashi").asText());
-        assertEquals(5, sunNode.get("houseFromLagna").asInt());
-        assertEquals("EXALTED", sunNode.get("dignity").asText());
+        assertEquals("Mesha", sunNode.get("placedInD1Sign").asText());
+        assertEquals(5, sunNode.get("placedInD1House").asInt());
+        assertEquals("EXALTED", sunNode.get("d1Dignity").asText());
+        assertEquals("[9]", sunNode.get("rulesHouses").toString());
+        assertTrue(sunNode.get("lordshipTitle").asText().contains("9th Lord"));
+        assertTrue(sunNode.get("occupantRole").asText().contains("NOT the 5th Lord"));
+        assertTrue(sunNode.get("primaryDosha").asText().contains("Pitta"));
+
+        // Verify Ayurvedic Health Profile
+        com.fasterxml.jackson.databind.JsonNode health = root.get("ayurvedicHealthProfile");
+        assertNotNull(health);
+        assertNotNull(health.get("dominantPrakriti"));
+        assertEquals("Agni (Fire) / Dhanus", health.get("lagnaElement").asText());
+        assertEquals("Vrishabha (House 6)", health.get("rogaSthanaSign").asText());
+        assertEquals("Venus", health.get("rogaLord").asText());
+        assertTrue(health.get("calculatedOrganVulnerabilities").size() > 0);
+        assertTrue(health.get("dietaryAndLifestyleDirectives").size() > 0);
     }
 }

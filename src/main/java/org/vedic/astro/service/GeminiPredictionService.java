@@ -14,6 +14,7 @@ import org.vedic.astro.matching.dto.MatchingRequestDTO;
 import org.vedic.astro.matching.dto.MatchingResponseDTO;
 import org.vedic.astro.matching.dto.KootaResultDTO;
 import org.vedic.astro.model.DasaPeriod;
+import org.vedic.astro.util.AyurvedicAstrologyUtils;
 import org.vedic.astro.util.PlanetDignityUtils;
 
 import java.time.LocalDate;
@@ -143,7 +144,7 @@ public class GeminiPredictionService {
         } else if ("hi".equalsIgnoreCase(lang)) {
             sb.append("  * Language: Hindi (हिन्दी). Use classical Vedic terms: लग्नेश, राजयोग, पूर्व पुण्य, दशा-अन्तर्दशा, षष्ठ भाव रोग, वैदिक उपाय.\n");
         } else if ("te".equalsIgnoreCase(lang)) {
-            sb.append("  * Language: Telugu (తెలుగు). Use authentic terms: లగ్నాధిపతి, రాజయోగాలు, పూర్వ పుణ్యం, దశ అంతర్దశ, రోగ స్థానం, పరిహారాలు.\n");
+            sb.append("  * Language: Telugu (తెలుగు). Use authentic terms: లగ్నాధిపతి, రాజయోగాలు, పూర్వ புణ్యం, దశ అంతర్దశ, రోగ స్థానం, పరిహారాలు.\n");
         } else if ("kn".equalsIgnoreCase(lang)) {
             sb.append("  * Language: Kannada (ಕನ್ನಡ). Use authentic terms: ಲಗ್ನಾಧಿಪತಿ, ರಾಜಯೋಗಗಳು, ಪೂರ್ವ ಪುಣ್ಯ, ದಶಾ ಭುಕ್ತಿ, ಪರಿಹಾರಗಳು.\n");
         } else if ("ml".equalsIgnoreCase(lang)) {
@@ -154,9 +155,10 @@ public class GeminiPredictionService {
         sb.append("- Output dense, punchy, actionable astrological readings. FORBID repetitive boilerplate or generic optimistic filler across years.\n")
           .append("- TRUTHFULLY AND ACCURATELY predict potential difficulties (job loss, career disruption, acute/chronic illness, surgeries, parental health decline/bereavement, debts) when Maraka/Dusthana/Badhaka/afflicted lords are active.\n")
           .append("- CRITICAL ASTROLOGICAL INTERPRETATION & LORDSHIP RULES:\n")
-          .append("  * The input is provided in clean, structured JSON containing the native's details, exact house lordships (House 1-12 signs & lords), D1 planetary positions with exact house numbers and dignities (EXALTED, DEBILITATED, OWN_SIGN, NEUTRAL), 12-varga divisional charts (D2, D9, D10, D12, D30), Shadbala, and Dasa-Bhukthi timelines.\n")
-          .append("  * You MUST strictly respect the pre-calculated house lordships and dignities in the input JSON (e.g. if House 10 is Kanya with lord Mercury, Mercury is the 10th lord; never assign house lords incorrectly).\n")
-          .append("  * 'Bhava' (House 1-12) refers to the HOUSE reckoned relative to Lagna (Ascendant = House 1).\n")
+          .append("  * The input is provided in clean, structured JSON containing the native's details, exact house lordships (House 1-12 signs & lords), unified planetary matrix (D1 physical placement, D9 Navamsa, rulesHouses, lordshipTitle, occupantRole), Ayurvedic health profile (Prakriti, Tattvas, organ vulnerabilities), 12-varga divisional charts (D2, D9, D10, D12, D30), Shadbala, and Dasa-Bhukthi timelines.\n")
+          .append("  * PLACEMENT VS. OWNERSHIP: A planet is ONLY the lord of the house(s) listed in 'rulesHouses'. A planet occupying a house is ONLY a guest/occupant (as stated in 'occupantRole'). NEVER call an occupant the lord of that house unless it rules that sign.\n")
+          .append("  * D1 VS. D9 DISTINCTION: 'placedInD1Sign' & 'placedInD1House' represent material/physical events in the world. 'placedInD9NavamsaSign' represents internal spiritual/dharma strength. In yearly predictions, NEVER state that a planet is placed in its D9 sign in the material chart.\n")
+          .append("  * AYURVEDIC PREDICTIONS: Ground all health, longevity, and vitality readings strictly in the pre-calculated 'ayurvedicHealthProfile' (dominant Prakriti, dosha percentages, and specific organ vulnerabilities). Do NOT default to generic boilerplate.\n")
           .append("  * Calculate and evaluate classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana, Vipareeta Raja Yoga) by evaluating the planetary houses and dignities from the JSON matrix according to authentic Parasari rules (e.g. Pancha Mahapurusha requires Kendra 1,4,7,10 in own/exalted sign; Gajakesari requires Moon-Jupiter Kendra 1,4,7,10; Budhaditya requires Sun-Mercury conjunction in the same sign).\n")
           .append("  * Evaluate all major Doshams (Sevvai/Kuja Dosha in 1,2,4,7,8,12, Kala Sarpa, Pitru, Papakarthari) and authentically apply classical nullification factors based on own/exalted status, friendly signs, or benefic aspects.\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
@@ -189,7 +191,7 @@ public class GeminiPredictionService {
         nativeInfo.put("karana", c.getKaranam());
         inputData.put("native", nativeInfo);
 
-        // 2. Pre-calculated 12 House Lordships reckoned from Lagna
+        // Determine Lagna sign
         int lagnaSign = 1;
         if (c.getD1Chart() != null) {
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
@@ -199,22 +201,42 @@ public class GeminiPredictionService {
                 }
             }
         }
+
+        // 2. Pre-calculated 12 House Lordships with Occupant Planets
+        Map<Integer, List<String>> houseOccupants = new HashMap<>();
+        for (int h = 1; h <= 12; h++) houseOccupants.put(h, new ArrayList<>());
+        if (c.getD1Chart() != null) {
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) continue;
+                int house = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
+                String name = p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey();
+                houseOccupants.get(house).add(name);
+            }
+        }
+
         List<Map<String, Object>> houseLordships = new ArrayList<>();
         for (int h = 1; h <= 12; h++) {
             int signNumber = ((lagnaSign - 1 + (h - 1)) % 12) + 1;
             String rasiName = RASHIS[signNumber - 1];
             String lord = PlanetDignityUtils.getSignLord(signNumber);
+            List<String> occupants = houseOccupants.get(h);
+
             Map<String, Object> hObj = new LinkedHashMap<>();
             hObj.put("houseNumber", h);
             hObj.put("signName", rasiName);
             hObj.put("signNumber", signNumber);
-            hObj.put("lord", lord);
+            hObj.put("houseLord", lord);
             hObj.put("significance", getHouseSignificance(h));
+            hObj.put("occupantPlanets", occupants);
+            String clarification = occupants.isEmpty()
+                    ? lord + " is the sole lord of House " + h + " (vacant house)."
+                    : lord + " is the sole lord of House " + h + ". Occupants " + occupants + " are guests/occupants.";
+            hObj.put("lordshipClarification", clarification);
             houseLordships.add(hObj);
         }
         inputData.put("houseLordshipTable", houseLordships);
 
-        // 3. D1 Planetary Positions with exact House & Dignity
+        // 3. Unified Planetary Matrix (D1 physical, D9 Navamsa, rulesHouses, lordshipTitle, occupantRole, Dignities, Dosha)
         double sunAbsLong = 0.0;
         if (c.getD1Chart() != null) {
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
@@ -224,35 +246,74 @@ public class GeminiPredictionService {
                 }
             }
         }
-        List<Map<String, Object>> d1Positions = new ArrayList<>();
+
+        Map<String, String> d9Map = new HashMap<>();
+        if (c.getD9Chart() != null) {
+            for (ChartResponseDTO.PositionDetail p : c.getD9Chart()) {
+                d9Map.put(p.getPlanetKey().toUpperCase(), p.getRashiName());
+            }
+        }
+
+        List<Map<String, Object>> planetaryMatrix = new ArrayList<>();
         if (c.getD1Chart() != null) {
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) continue;
+
                 String pKey = capitalizePlanet(p.getPlanetKey());
                 int sign = p.getSignNumber();
                 double pAbsLong = (sign - 1) * 30.0 + p.getDegreeInSign();
                 int house = ((sign - lagnaSign + 12) % 12) + 1;
 
-                String dignity = "NEUTRAL";
-                if (PlanetDignityUtils.isExalted(pKey, sign)) dignity = "EXALTED";
-                else if (PlanetDignityUtils.isDebilitated(pKey, sign)) dignity = "DEBILITATED";
-                else if (PlanetDignityUtils.isOwnSign(pKey, sign)) dignity = "OWN_SIGN";
+                String d1Dignity = "NEUTRAL";
+                if (PlanetDignityUtils.isExalted(pKey, sign)) d1Dignity = "EXALTED";
+                else if (PlanetDignityUtils.isDebilitated(pKey, sign)) d1Dignity = "DEBILITATED";
+                else if (PlanetDignityUtils.isOwnSign(pKey, sign)) d1Dignity = "OWN_SIGN";
 
                 boolean combust = PlanetDignityUtils.isCombust(pKey, pAbsLong, sunAbsLong);
+                List<Integer> ruledHouses = getRuledHouses(pKey, lagnaSign);
+                String lordshipTitle = getLordshipTitle(pKey, lagnaSign);
+
+                String d9Rasi = d9Map.getOrDefault(p.getPlanetKey().toUpperCase(), "");
+                int d9Sign = getRasiIndex(d9Rasi);
+                String d9Dignity = "NEUTRAL";
+                if (PlanetDignityUtils.isExalted(pKey, d9Sign)) d9Dignity = "EXALTED_NAVAMSA";
+                else if (PlanetDignityUtils.isDebilitated(pKey, d9Sign)) d9Dignity = "DEBILITATED_NAVAMSA";
+                else if (PlanetDignityUtils.isOwnSign(pKey, d9Sign)) d9Dignity = "OWN_SIGN_NAVAMSA";
+
+                boolean isVargottama = !d9Rasi.isBlank() && p.getRashiName().equalsIgnoreCase(d9Rasi);
+
+                String occupantRole = ruledHouses.contains(house)
+                        ? "Placed in House " + house + " (Own House / Swakshetra)"
+                        : "Placed in House " + house + " (Occupant/Guest, NOT the " + house + "th Lord)";
 
                 Map<String, Object> pObj = new LinkedHashMap<>();
                 pObj.put("planet", p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey());
-                pObj.put("rashi", p.getRashiName());
-                pObj.put("signNumber", sign);
-                pObj.put("degreeInSign", Math.round(p.getDegreeInSign() * 100.0) / 100.0);
-                pObj.put("houseFromLagna", house);
-                pObj.put("dignity", dignity);
+                pObj.put("placedInD1Sign", p.getRashiName());
+                pObj.put("placedInD1House", house);
+                pObj.put("occupantRole", occupantRole);
+                pObj.put("placedInD9NavamsaSign", d9Rasi);
+                pObj.put("isVargottama", isVargottama);
+                pObj.put("rulesHouses", ruledHouses);
+                pObj.put("lordshipTitle", lordshipTitle);
+                pObj.put("d1Dignity", d1Dignity);
+                pObj.put("d9Dignity", d9Dignity);
                 pObj.put("isCombust", combust);
-                d1Positions.add(pObj);
+                pObj.put("primaryDosha", AyurvedicAstrologyUtils.getPlanetaryPrimaryDosha(pKey) + " — " + AyurvedicAstrologyUtils.getPlanetaryTissueSignification(pKey));
+                planetaryMatrix.add(pObj);
             }
         }
-        inputData.put("planetaryPositionsD1", d1Positions);
+        inputData.put("planetaryMatrix", planetaryMatrix);
 
-        // 4. Divisional Vargas (D2, D9, D10, D12, D30)
+        // 4. Deterministic Ayurvedic Health Profile (Parashara / Charaka Samhita)
+        int moonSign = 1;
+        if (c.getBirthProfile() != null && c.getBirthProfile().getRashi() != null) {
+            moonSign = getRasiIndex(c.getBirthProfile().getRashi());
+        }
+        AyurvedicAstrologyUtils.AyurvedicHealthProfile healthProfile =
+                AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSign, moonSign, c.getD1Chart());
+        inputData.put("ayurvedicHealthProfile", healthProfile);
+
+        // 5. Divisional Vargas (D2, D9, D10, D12, D30)
         Map<String, Object> vargas = new LinkedHashMap<>();
         if (c.getD1Chart() != null && !c.getD1Chart().isEmpty()) {
             Map<String, String> d2 = new LinkedHashMap<>();
@@ -295,12 +356,12 @@ public class GeminiPredictionService {
         }
         inputData.put("divisionalVargas", vargas);
 
-        // 5. Shadbala Strengths
+        // 6. Shadbala Strengths
         if (c.getShadbalaStrengths() != null && c.getShadbalaStrengths().getPlanetStrengths() != null) {
             inputData.put("shadbalaStrengths", c.getShadbalaStrengths().getPlanetStrengths());
         }
 
-        // 6. Dasa & Bhukthi Timelines
+        // 7. Dasa & Bhukthi Timelines
         if (c.getCurrentDasaTimeline() != null && !c.getCurrentDasaTimeline().isEmpty()) {
             List<Map<String, Object>> dasas = new ArrayList<>();
             LocalDate now = LocalDate.now();
@@ -1257,8 +1318,17 @@ public class GeminiPredictionService {
                     break;
                 }
             }
+            Map<String, String> d9Map = new HashMap<>();
+            if (profile.getD9Chart() != null) {
+                for (ChartResponseDTO.PositionDetail p : profile.getD9Chart()) {
+                    d9Map.put(p.getPlanetKey().toUpperCase(), p.getRashiName());
+                }
+            }
+
             List<Map<String, Object>> d1List = new ArrayList<>();
             for (ChartResponseDTO.PositionDetail p : profile.getD1Chart()) {
+                if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) continue;
+
                 String pKey = capitalizePlanet(p.getPlanetKey());
                 int sign = p.getSignNumber();
                 int house = ((sign - lagnaSign + 12) % 12) + 1;
@@ -1267,24 +1337,30 @@ public class GeminiPredictionService {
                 else if (PlanetDignityUtils.isDebilitated(pKey, sign)) dignity = "DEBILITATED";
                 else if (PlanetDignityUtils.isOwnSign(pKey, sign)) dignity = "OWN_SIGN";
 
+                String d9Rasi = d9Map.getOrDefault(p.getPlanetKey().toUpperCase(), "");
+                List<Integer> ruledHouses = getRuledHouses(pKey, lagnaSign);
+                String lordshipTitle = getLordshipTitle(pKey, lagnaSign);
+
                 Map<String, Object> pObj = new LinkedHashMap<>();
                 pObj.put("planet", p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey());
-                pObj.put("rashi", p.getRashiName());
-                pObj.put("signNumber", sign);
-                pObj.put("houseFromLagna", house);
+                pObj.put("placedInD1Sign", p.getRashiName());
+                pObj.put("placedInD1House", house);
+                pObj.put("placedInD9Sign", d9Rasi);
+                pObj.put("rulesHouses", ruledHouses);
+                pObj.put("lordshipTitle", lordshipTitle);
                 pObj.put("dignity", dignity);
                 d1List.add(pObj);
             }
-            data.put("d1PlanetsAndHouses", d1List);
+            data.put("planetaryMatrix", d1List);
 
             // House lordships
             List<Map<String, Object>> houseLords = new ArrayList<>();
             for (int h = 1; h <= 12; h++) {
                 int signNumber = ((lagnaSign - 1 + (h - 1)) % 12) + 1;
                 Map<String, Object> hObj = new LinkedHashMap<>();
-                hObj.put("house", h);
-                hObj.put("sign", RASHIS[signNumber - 1]);
-                hObj.put("lord", PlanetDignityUtils.getSignLord(signNumber));
+                hObj.put("houseNumber", h);
+                hObj.put("signName", RASHIS[signNumber - 1]);
+                hObj.put("houseLord", PlanetDignityUtils.getSignLord(signNumber));
                 houseLords.add(hObj);
             }
             data.put("houseLordships", houseLords);
@@ -1299,6 +1375,40 @@ public class GeminiPredictionService {
         }
 
         return data;
+    }
+
+    public static List<Integer> getRuledHouses(String planet, int lagnaSign) {
+        if (planet == null) return List.of();
+        String p = planet.trim().toLowerCase();
+        List<Integer> signs = switch (p) {
+            case "sun", "surya" -> List.of(5);
+            case "moon", "chandra" -> List.of(4);
+            case "mars", "kuja", "sevvai", "mangal" -> List.of(1, 8);
+            case "mercury", "budha" -> List.of(3, 6);
+            case "jupiter", "guru" -> List.of(9, 12);
+            case "venus", "shukra" -> List.of(2, 7);
+            case "saturn", "shani" -> List.of(10, 11);
+            default -> List.of();
+        };
+        List<Integer> houses = new ArrayList<>();
+        for (int s : signs) {
+            houses.add(((s - lagnaSign + 12) % 12) + 1);
+        }
+        Collections.sort(houses);
+        return houses;
+    }
+
+    public static String getLordshipTitle(String planet, int lagnaSign) {
+        List<Integer> houses = getRuledHouses(planet, lagnaSign);
+        if (houses.isEmpty()) return "Shadow Node (Rahu/Ketu - no sign ownership)";
+        if (houses.size() == 1) {
+            int h = houses.get(0);
+            return h + "th Lord (" + (h == 1 ? "Lagnesha" : "") + ")";
+        }
+        int h1 = houses.get(0);
+        int h2 = houses.get(1);
+        String extra = (h1 == 1 || h2 == 1) ? " / Lagnesha" : "";
+        return h1 + "th & " + h2 + "th Lord" + extra;
     }
 
     private static String capitalizePlanet(String key) {
