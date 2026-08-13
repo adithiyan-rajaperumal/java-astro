@@ -14,6 +14,7 @@ import org.vedic.astro.matching.dto.MatchingRequestDTO;
 import org.vedic.astro.matching.dto.MatchingResponseDTO;
 import org.vedic.astro.matching.dto.KootaResultDTO;
 import org.vedic.astro.model.DasaPeriod;
+import org.vedic.astro.util.PlanetDignityUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -152,6 +153,11 @@ public class GeminiPredictionService {
         }
         sb.append("- Output dense, punchy, actionable astrological readings. FORBID repetitive boilerplate or generic optimistic filler across years.\n")
           .append("- TRUTHFULLY AND ACCURATELY predict potential difficulties (job loss, career disruption, acute/chronic illness, surgeries, parental health decline/bereavement, debts) when Maraka/Dusthana/Badhaka/afflicted lords are active.\n")
+          .append("- CRITICAL ASTROLOGICAL INTERPRETATION RULES:\n")
+          .append("  * 'Rasi' (Rasi 1-12) refers to the fixed ZODIAC SIGN (1=Mesha/Aries, 2=Vrishabha/Taurus, ..., 12=Meena/Pisces).\n")
+          .append("  * 'Bhava' (House 1-12) refers to the HOUSE reckoned relative to Lagna (Ascendant = House 1).\n")
+          .append("  * STRICTLY use Bhava (House) positions for all house-based lordships and functional analysis (e.g. 6th house for health/illness, 7th house for marriage, 10th house for career/status, 2nd/7th for maraka, 8th for ayurdaya longevity).\n")
+          .append("  * NEVER confuse Rasi index with House number unless Lagna is Mesha (Aries).\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
         return sb.toString();
     }
@@ -175,13 +181,46 @@ public class GeminiPredictionService {
           .append("Panchangam: ").append(c.getPanchangamSystem()).append(" | Tithi: ").append(c.getThithi())
           .append(" | Yoga: ").append(c.getYogam()).append(" | Karana: ").append(c.getKaranam()).append("\n\n");
 
-        // D1 Rasi Positions
+        // D1 Rasi Positions & Bhava (House from Lagna) with Dignity Tags
         if (c.getD1Chart() != null && !c.getD1Chart().isEmpty()) {
-            sb.append("D1[Rasi]: ");
+            int lagnaSign = 1;
+            double sunAbsLong = 0.0;
             for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
-                sb.append(String.format("%s:%s(H%d@%.1f°) ",
+                if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) {
+                    lagnaSign = p.getSignNumber();
+                }
+                if ("SUN".equalsIgnoreCase(p.getPlanetKey()) || "SURYA".equalsIgnoreCase(p.getPlanetKey())) {
+                    sunAbsLong = (p.getSignNumber() - 1) * 30.0 + p.getDegreeInSign();
+                }
+            }
+
+            sb.append("D1[Rasi-ZodiacSigns]: ");
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                String pKey = capitalizePlanet(p.getPlanetKey());
+                int sign = p.getSignNumber();
+                double pAbsLong = (sign - 1) * 30.0 + p.getDegreeInSign();
+
+                StringBuilder tag = new StringBuilder();
+                if (PlanetDignityUtils.isExalted(pKey, sign)) tag.append("[Exalted]");
+                else if (PlanetDignityUtils.isDebilitated(pKey, sign)) tag.append("[Debilitated]");
+                else if (PlanetDignityUtils.isOwnSign(pKey, sign)) tag.append("[Own]");
+
+                if (PlanetDignityUtils.isCombust(pKey, pAbsLong, sunAbsLong)) {
+                    tag.append("[Combust]");
+                }
+
+                sb.append(String.format("%s:%s(Rasi%d@%.1f°)%s ",
                         p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
-                        p.getRashiName(), p.getSignNumber(), p.getDegreeInSign()));
+                        p.getRashiName(), p.getSignNumber(), p.getDegreeInSign(), tag.toString()));
+            }
+            sb.append("\n");
+
+            sb.append("Bhava[Houses-From-Lagna]: ");
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                int house = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
+                sb.append(String.format("%s:House%d(%s) ",
+                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
+                        house, p.getRashiName()));
             }
             sb.append("\n");
         }
@@ -210,7 +249,7 @@ public class GeminiPredictionService {
                 int d10Sign = vargaEngineService != null
                         ? vargaEngineService.calculateVargaSign(10, p.getSignNumber(), p.getDegreeInSign(), p.getSignNumber() * 30.0 + p.getDegreeInSign())
                         : ((p.getSignNumber() - 1 + (int)(p.getDegreeInSign() / 3.0)) % 12 + 1);
-                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":S").append(d10Sign).append(" ");
+                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":Rasi").append(d10Sign).append(" ");
             }
             sb.append("\n");
 
@@ -219,7 +258,7 @@ public class GeminiPredictionService {
                 int d12Sign = vargaEngineService != null
                         ? vargaEngineService.calculateVargaSign(12, p.getSignNumber(), p.getDegreeInSign(), p.getSignNumber() * 30.0 + p.getDegreeInSign())
                         : ((p.getSignNumber() - 1 + (int)(p.getDegreeInSign() / 2.5)) % 12 + 1);
-                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":S").append(d12Sign).append(" ");
+                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":Rasi").append(d12Sign).append(" ");
             }
             sb.append("\n");
 
@@ -228,7 +267,7 @@ public class GeminiPredictionService {
                 int d30Sign = vargaEngineService != null
                         ? vargaEngineService.calculateVargaSign(30, p.getSignNumber(), p.getDegreeInSign(), p.getSignNumber() * 30.0 + p.getDegreeInSign())
                         : 1;
-                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":S").append(d30Sign).append(" ");
+                sb.append(p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey()).append(":Rasi").append(d30Sign).append(" ");
             }
             sb.append("\n\n");
         }
@@ -242,11 +281,49 @@ public class GeminiPredictionService {
             sb.append("\n\n");
         }
 
-        // Dasa Timeline
+        // Dasa & Bhukthi Timeline
         if (c.getCurrentDasaTimeline() != null && !c.getCurrentDasaTimeline().isEmpty()) {
-            sb.append("Vimshottari Dasa Timeline:\n");
+            sb.append("Vimshottari Dasa & Bhukthi Sub-Periods:\n");
+            LocalDate now = LocalDate.now();
             for (DasaPeriod d : c.getCurrentDasaTimeline()) {
-                sb.append(String.format("- %s Dasa: %s to %s\n", d.getPlanetName(), d.getStartDate(), d.getEndDate()));
+                if (d.getEndDate() != null && d.getEndDate().isBefore(now.minusYears(2))) {
+                    continue; // Skip dasas completed before recent years
+                }
+                sb.append(String.format("- %s Mahadasa (%s to %s):\n", d.getPlanetName(), d.getStartDate(), d.getEndDate()));
+                if (d.getBhukthis() != null && !d.getBhukthis().isEmpty()) {
+                    for (DasaPeriod.BhukthiPeriod bPeriod : d.getBhukthis()) {
+                        sb.append(String.format("   * %s-%s Bhukthi: %s to %s\n",
+                                d.getPlanetName(), bPeriod.getPlanetName(), bPeriod.getStartDate(), bPeriod.getEndDate()));
+                    }
+                }
+            }
+            sb.append("\n");
+        }
+
+        // Pre-Calculated Astrological Diagnostics (Yogas & Evaluated Doshams)
+        if (c.getStructuralDiagnostics() != null) {
+            var diag = c.getStructuralDiagnostics();
+            if (diag.getActiveYogas() != null && !diag.getActiveYogas().isEmpty()) {
+                sb.append("Pre-Calculated Yogas: ");
+                for (var y : diag.getActiveYogas()) {
+                    sb.append(y.getName());
+                    if (y.getDescription() != null && !y.getDescription().isBlank()) {
+                        sb.append(" (").append(y.getDescription()).append(")");
+                    }
+                    sb.append("; ");
+                }
+                sb.append("\n");
+            }
+            if (diag.getDiscoveredDoshams() != null && !diag.getDiscoveredDoshams().isEmpty()) {
+                sb.append("Evaluated Doshams: ");
+                for (var dosh : diag.getDiscoveredDoshams()) {
+                    if (dosh.isDetected()) {
+                        sb.append(dosh.getName()).append(" [")
+                          .append(dosh.isNullified() ? "Nullified: " + dosh.getNullificationReason() : "Active")
+                          .append("]; ");
+                    }
+                }
+                sb.append("\n");
             }
             sb.append("\n");
         }
@@ -314,6 +391,11 @@ public class GeminiPredictionService {
         sb.append("You are an expert Vedic Astrologer specializing in Gochara (daily planetary transits) and Panchangam synthesis.\n")
           .append("Analyze the native's natal Moon/Lagna matrix and today's planetary transit to generate a precise, actionable Daily Balan (இன்றைய ராசி பலன்) in language: '").append(lang).append("'.\n")
           .append("Write 100% of all JSON text fields in the native script of '").append(lang).append("'. Output concise, practical, empowering guidance.\n")
+          .append("CRITICAL ASTROLOGICAL INTERPRETATION RULES:\n")
+          .append("- 'Rasi' (Rasi 1-12) refers to the fixed ZODIAC SIGN (1=Mesha/Aries, 2=Vrishabha/Taurus, ..., 12=Meena/Pisces).\n")
+          .append("- 'Bhava' (House 1-12) refers to the HOUSE reckoned relative to Lagna (Ascendant = House 1).\n")
+          .append("- STRICTLY use Bhava (House) positions for all house-based analysis (e.g. transit Moon through native's 6th house for health, 7th for relationships, 10th for career).\n")
+          .append("- NEVER confuse Rasi index with House number unless Lagna is Mesha (Aries).\n")
           .append("Return ONLY valid JSON matching the schema.\n");
         return sb.toString();
     }
@@ -322,6 +404,7 @@ public class GeminiPredictionService {
         BirthDetailsDTO b = req.getBirthDetails();
         ChartUiResponseDTO c = req.getChartData();
         String lang = req.getLanguage() != null ? req.getLanguage() : "ta";
+        String lagna = c.getBirthProfile() != null && c.getBirthProfile().getLagna() != null ? c.getBirthProfile().getLagna() : "";
         String rasi = c.getBirthProfile() != null ? c.getBirthProfile().getRashi() : "Mesha";
         String nakshatra = c.getBirthProfile() != null ? c.getBirthProfile().getNakshatra() : "Ashwini";
         String runningDasa = findDasaForYear(c.getCurrentDasaTimeline(), targetDate.getYear());
@@ -339,10 +422,56 @@ public class GeminiPredictionService {
         StringBuilder sb = new StringBuilder();
         sb.append("=== DAILY GOCHARA & TRANSIT MATRIX ===\n")
           .append("Date: ").append(targetDate).append(" (Weekday: ").append(targetDate.getDayOfWeek()).append(")\n")
-          .append("Native: ").append(b.name()).append(" | Janma Rasi: ").append(rasi).append(" | Janma Nakshatra: ").append(nakshatra).append("\n")
-          .append("Running Dasa-Bhukthi: ").append(runningDasa).append("\n")
-          .append("Today Transit Moon Sign: ").append(todayMoonRasi).append(" | Transit Nakshatra: ").append(todayNakshatra).append("\n")
+          .append("Native: ").append(b.name());
+        if (!lagna.isBlank()) {
+            sb.append(" | Janma Lagna: ").append(lagna);
+        }
+        sb.append(" | Janma Rasi: ").append(rasi).append(" | Janma Nakshatra: ").append(nakshatra).append("\n")
+          .append("Running Dasa-Bhukthi: ").append(runningDasa).append("\n");
+
+        // Natal D1 Rasi & Bhava positions for house-aware daily transit analysis
+        if (c.getD1Chart() != null && !c.getD1Chart().isEmpty()) {
+            int lagnaSign = 1;
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) {
+                    lagnaSign = p.getSignNumber();
+                    break;
+                }
+            }
+            sb.append("Natal-D1[Rasi]: ");
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                sb.append(String.format("%s:%s(Rasi%d@%.1f°) ",
+                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
+                        p.getRashiName(), p.getSignNumber(), p.getDegreeInSign()));
+            }
+            sb.append("\n");
+            sb.append("Natal-Bhava[Houses-From-Lagna]: ");
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                int house = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
+                sb.append(String.format("%s:House%d(%s) ",
+                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
+                        house, p.getRashiName()));
+            }
+            sb.append("\n");
+        }
+
+        // Tarabalam calculation
+        int birthNakNum = getNakshatraIndex(nakshatra);
+        int transitNakNum = (panchangam != null && panchangam.nakshatra() != null && panchangam.nakshatra().number() > 0)
+                ? panchangam.nakshatra().number()
+                : (panchangam != null && panchangam.nakshatra() != null ? getNakshatraIndex(panchangam.nakshatra().name()) : birthNakNum);
+        String tarabalamInfo = calculateTarabalam(birthNakNum, transitNakNum, lang);
+
+        // Gochara Moon House from Janma Rasi calculation
+        int birthRasiNum = getRasiIndex(rasi);
+        int transitRasiNum = getRasiIndex(todayMoonRasi);
+        int moonHouseFromRasi = ((transitRasiNum - birthRasiNum + 12) % 12) + 1;
+        String moonHouseMeaning = getGocharaMoonHouseMeaning(moonHouseFromRasi, lang);
+
+        sb.append("Today Transit Moon Sign: ").append(todayMoonRasi).append(" | Transit Nakshatra: ").append(todayNakshatra).append("\n")
           .append("Today Tithi: ").append(todayTithi).append(" | Yoga: ").append(todayYoga).append("\n")
+          .append("Tarabalam: ").append(tarabalamInfo).append("\n")
+          .append("Gochara Moon from Janma Rasi: House ").append(moonHouseFromRasi).append(" (").append(moonHouseMeaning).append(")\n")
           .append("Chandrashtama Active: ").append(chandrashtama).append("\n")
           .append("Fixed Astrological Anchors: Vara Lord=").append(anchors.varaLord)
           .append(", Lucky Color=").append(anchors.luckyColor)
@@ -980,6 +1109,11 @@ public class GeminiPredictionService {
           .append("- Write 100% of all JSON text values in the native script of '").append(lang).append("'.\n")
           .append("- Rigorously apply all authentic classical nullifications (e.g. Kuja Dosha cancellation if Mars is in own/exalted sign, in 2nd/4th/7th/8th/12th in friendly signs, or if both charts possess balanced Kuja Dosha; Rajju exceptions when nakshatras have different padas or lords are friends; Gana Dosha cancellation if Rasi lords are identical or friendly).\n")
           .append("- Provide profound psychological, financial, health, progeny, and spiritual insight rather than generic cliches.\n")
+          .append("- CRITICAL ASTROLOGICAL INTERPRETATION RULES:\n")
+          .append("  * 'Rasi' (Rasi 1-12) refers to the fixed ZODIAC SIGN (1=Mesha/Aries, 2=Vrishabha/Taurus, ..., 12=Meena/Pisces).\n")
+          .append("  * 'Bhava' (House 1-12) refers to the HOUSE reckoned relative to Lagna (Ascendant = House 1).\n")
+          .append("  * STRICTLY use Bhava (House) positions for all house-based lordships and functional analysis (e.g. 7th house for marriage, 2nd/7th for maraka, 5th for progeny, 8th for longevity).\n")
+          .append("  * NEVER confuse Rasi index with House number unless Lagna is Mesha (Aries).\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
         return sb.toString();
     }
@@ -996,6 +1130,7 @@ public class GeminiPredictionService {
             var p = classicalResult.getBoyProfile().getBirthProfile();
             sb.append("Lagna: ").append(p.getLagna()).append(" | Rasi: ").append(p.getRashi()).append(" | Nakshatra: ").append(p.getNakshatra()).append(" (Pada: ").append(p.getNakshatraPada()).append(")\n");
         }
+        appendChartPositions(sb, "Boy", classicalResult.getBoyProfile());
         sb.append("\n");
 
         sb.append("--- BRIDE (GIRL) DETAILS ---\n")
@@ -1006,6 +1141,7 @@ public class GeminiPredictionService {
             var p = classicalResult.getGirlProfile().getBirthProfile();
             sb.append("Lagna: ").append(p.getLagna()).append(" | Rasi: ").append(p.getRashi()).append(" | Nakshatra: ").append(p.getNakshatra()).append(" (Pada: ").append(p.getNakshatraPada()).append(")\n");
         }
+        appendChartPositions(sb, "Girl", classicalResult.getGirlProfile());
         sb.append("\n");
 
         sb.append("--- CLASSICAL MATCHING RESULTS ---\n")
@@ -1085,6 +1221,128 @@ public class GeminiPredictionService {
           .append("}\n");
 
         return sb.toString();
+    }
+
+    /**
+     * Appends D1 chart Rasi, Bhava (House), and D9 Navamsa positions for a given profile to the prompt.
+     * Reusable for boy/girl matching charts.
+     */
+    private void appendChartPositions(StringBuilder sb, String label, ChartUiResponseDTO profile) {
+        if (profile == null) {
+            return;
+        }
+        if (profile.getD1Chart() != null && !profile.getD1Chart().isEmpty()) {
+            int lagnaSign = 1;
+            for (ChartResponseDTO.PositionDetail p : profile.getD1Chart()) {
+                if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) {
+                    lagnaSign = p.getSignNumber();
+                    break;
+                }
+            }
+            sb.append(label).append("-D1[Rasi]: ");
+            for (ChartResponseDTO.PositionDetail p : profile.getD1Chart()) {
+                sb.append(String.format("%s:%s(Rasi%d@%.1f°) ",
+                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
+                        p.getRashiName(), p.getSignNumber(), p.getDegreeInSign()));
+            }
+            sb.append("\n");
+            sb.append(label).append("-Bhava[Houses-From-Lagna]: ");
+            for (ChartResponseDTO.PositionDetail p : profile.getD1Chart()) {
+                int house = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
+                sb.append(String.format("%s:House%d(%s) ",
+                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
+                        house, p.getRashiName()));
+            }
+            sb.append("\n");
+        }
+
+        // D9 Navamsa Chart for Marriage Synastry
+        if (profile.getD9Chart() != null && !profile.getD9Chart().isEmpty()) {
+            sb.append(label).append("-D9[Navamsa]: ");
+            for (ChartResponseDTO.PositionDetail p : profile.getD9Chart()) {
+                sb.append(String.format("%s:%s ",
+                        p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey(),
+                        p.getRashiName()));
+            }
+            sb.append("\n");
+        }
+    }
+
+    private static String capitalizePlanet(String key) {
+        if (key == null || key.isBlank()) return "";
+        String lower = key.trim().toLowerCase();
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+    }
+
+    private static final String[] NAKSHATRAS = {
+            "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra",
+            "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
+            "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+            "Moola", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha",
+            "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+    };
+
+    private static final String[] RASHIS = {
+            "Mesha", "Vrishabha", "Mithuna", "Kataka", "Simha", "Kanya",
+            "Tula", "Vrishchika", "Dhanus", "Makara", "Kumbha", "Meena"
+    };
+
+    public static int getNakshatraIndex(String nakName) {
+        if (nakName == null || nakName.isBlank()) return 1;
+        String clean = nakName.trim().toLowerCase();
+        for (int i = 0; i < NAKSHATRAS.length; i++) {
+            if (clean.contains(NAKSHATRAS[i].toLowerCase()) || NAKSHATRAS[i].toLowerCase().contains(clean)) {
+                return i + 1;
+            }
+        }
+        return 1;
+    }
+
+    public static int getRasiIndex(String rasiName) {
+        if (rasiName == null || rasiName.isBlank()) return 1;
+        String clean = rasiName.trim().toLowerCase();
+        for (int i = 0; i < RASHIS.length; i++) {
+            if (clean.contains(RASHIS[i].toLowerCase()) || RASHIS[i].toLowerCase().contains(clean)) {
+                return i + 1;
+            }
+        }
+        return 1;
+    }
+
+    public static String calculateTarabalam(int birthNak, int transitNak, String lang) {
+        int tara = ((transitNak - birthNak + 27) % 9) + 1;
+        boolean isTa = "ta".equalsIgnoreCase(lang);
+        return switch (tara) {
+            case 1 -> isTa ? "ஜன்ம தாரை (1/9 - எச்சரிக்கை / உடல் நலம் கவனம்)" : "Janma Tara (1/9 - Body Energy / Caution)";
+            case 2 -> isTa ? "சம்பத்து தாரை (2/9 - தன லாபம் / அதிர்ஷ்டம்)" : "Sampat Tara (2/9 - Wealth & Prosperity)";
+            case 3 -> isTa ? "விபத்து தாரை (3/9 - தடைகள் / விழிப்புணர்வு தேவை)" : "Vipat Tara (3/9 - Obstacles / Caution)";
+            case 4 -> isTa ? "க்ஷேம தாரை (4/9 - சௌக்கியம் / நலம்)" : "Kshema Tara (4/9 - Wellbeing & Security)";
+            case 5 -> isTa ? "பிரத்யக் தாரை (5/9 - தாமதங்கள் / சவால்கள்)" : "Pratyak Tara (5/9 - Resistance & Delays)";
+            case 6 -> isTa ? "சாதக தாரை (6/9 - வெற்றி / காரிய சித்தி)" : "Sadhana Tara (6/9 - High Success & Achievement)";
+            case 7 -> isTa ? "நைதன தாரை (7/9 - வீண் விரயம் / பெரும் கவனம்)" : "Naidhana Tara (7/9 - Heavy Caution / Restraint)";
+            case 8 -> isTa ? "மித்ர தாரை (8/9 - நட்பு / சுப பலன்கள்)" : "Mitra Tara (8/9 - Friendship & Favorable)";
+            case 9 -> isTa ? "பரம மித்ர தாரை (9/9 - உன்னத வெற்றி / பரம யோகம்)" : "Parama Mitra Tara (9/9 - Supreme Favor & Victory)";
+            default -> isTa ? "சாதாரண தாரை" : "Neutral Tara";
+        };
+    }
+
+    public static String getGocharaMoonHouseMeaning(int house, String lang) {
+        boolean isTa = "ta".equalsIgnoreCase(lang);
+        return switch (house) {
+            case 1 -> isTa ? "1-ம் இடம் (உடல் சோர்வு / புதிய சிந்தனை)" : "1st House (Mental activity & self-focus)";
+            case 2 -> isTa ? "2-ம் இடம் (பண வரவு / பேச்சு கவனம்)" : "2nd House (Financial transactions & speech care)";
+            case 3 -> isTa ? "3-ம் இடம் (தைரியம் / முயற்சி வெற்றி)" : "3rd House (Courage & initiative success)";
+            case 4 -> isTa ? "4-ம் இடம் (மன அமைதி / தாயார் நலம்)" : "4th House (Domestic matters & emotional peace)";
+            case 5 -> isTa ? "5-ம் இடம் (புத்தி கூர்மை / பிள்ளைகள் நலம்)" : "5th House (Intellect & children focus)";
+            case 6 -> isTa ? "6-ம் இடம் (எதிரிகள் வீழ்ச்சி / உடல் சுறுசுறுப்பு / உத்தம பலன்)" : "6th House (Victory, debts resolution & vitality)";
+            case 7 -> isTa ? "7-ம் இடம் (மகிழ்ச்சியான உறவுகள் / தொழில் கூட்டு)" : "7th House (Partnerships & social harmony)";
+            case 8 -> isTa ? "8-ம் இடம் (சந்திராஷ்டமம் / அமைதி காக்கவும்)" : "8th House (Chandrashtama / Mental restraint)";
+            case 9 -> isTa ? "9-ம் இடம் (பாக்கிய வளர்ச்சி / ஆன்மீகம்)" : "9th House (Fortune, spirituality & guidance)";
+            case 10 -> isTa ? "10-ம் இடம் (தொழில் மேன்மை / காரிய வெற்றி)" : "10th House (Career momentum & status)";
+            case 11 -> isTa ? "11-ம் இடம் (லாபங்கள் / ஆசை நிறைவேறுதல் / மிக நன்று)" : "11th House (All-round gains & fulfillment)";
+            case 12 -> isTa ? "12-ம் இடம் (சுப விரயம் / பயணங்கள்)" : "12th House (Expenditure & rest needed)";
+            default -> "";
+        };
     }
 
     private MatchingAiPredictionDTO parseMatchingGeminiResponse(
