@@ -91,4 +91,30 @@ public class PdfExportServiceTest {
         assertNotNull(pdfBytes);
         assertTrue(pdfBytes.length > 1000, "PDF bytes should be generated successfully with substantial content");
     }
+
+    @Autowired
+    private org.vedic.astro.panchangam.PanchangamFactory panchangamFactory;
+
+    @Autowired
+    private org.vedic.astro.service.ChartOrchestrationService orchestrationService;
+
+    @Test
+    public void testFullPdfReportWith12ChartVargaSuite() {
+        LocaleContextHolder.setLocale(new Locale("ta"));
+
+        BirthDetailsDTO birth = new BirthDetailsDTO("Adithiyan", 1996, 7, 25, 17, 45, 0, 13.0827, 80.2707, "LAHIRI");
+        var panchangam = panchangamFactory.getEngine(org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM);
+        var chartResult = panchangam.calculate(birth);
+
+        ComprehensiveReportDTO report = orchestrationService.compileComprehensivePdfData(chartResult, birth, new double[12]);
+        assertNotNull(report);
+        assertNotNull(report.getVargaChartsMap());
+        assertTrue(report.getVargaChartsMap().containsKey("D1") || report.getVargaChartsMap().containsKey("d1"));
+        assertTrue(report.getVargaChartsMap().containsKey("D9") || report.getVargaChartsMap().containsKey("d9"));
+        assertTrue(report.getVargaChartsMap().containsKey("Bhava") || report.getVargaChartsMap().containsKey("bhava"));
+
+        byte[] pdfBytes = pdfExportService.generateAstrologyReport(report);
+        assertNotNull(pdfBytes);
+        assertTrue(pdfBytes.length > 5000, "PDF with full 12-chart varga suite should be substantial in size");
+    }
 }

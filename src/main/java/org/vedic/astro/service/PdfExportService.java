@@ -180,8 +180,21 @@ public class PdfExportService {
                 PdfPCell layoutCell = new PdfPCell(); layoutCell.setBorder(PdfPCell.NO_BORDER); layoutCell.setPadding(6);
                 String resolvedTitleText = ts.getLabel(vargaKeys[i]);
 
-                List<ChartResponseDTO.PositionDetail> planets = data.getVargaChartsMap() != null ? data.getVargaChartsMap().get(chartMapKeys[i]) : null;
-                if (planets != null) {
+                List<ChartResponseDTO.PositionDetail> planets = null;
+                if (data.getVargaChartsMap() != null) {
+                    planets = data.getVargaChartsMap().get(chartMapKeys[i]);
+                    if (planets == null) {
+                        planets = data.getVargaChartsMap().get(chartMapKeys[i].toUpperCase());
+                    }
+                    if (planets == null) {
+                        planets = data.getVargaChartsMap().get(chartMapKeys[i].substring(0, 1).toUpperCase() + chartMapKeys[i].substring(1));
+                    }
+                }
+                if (planets == null && ("d1".equalsIgnoreCase(chartMapKeys[i]) || "D1".equalsIgnoreCase(chartMapKeys[i]))) {
+                    planets = data.getBirthPlanetaryPositions();
+                }
+
+                if (planets != null && !planets.isEmpty()) {
                     if (isHi) {
                         Paragraph chartLabel = buildMixedParagraph(resolvedTitleText, boldB, engBoldB);
                         chartLabel.setSpacingAfter(4);
@@ -883,7 +896,7 @@ public class PdfExportService {
         // Collect planetary abbreviations on clean vertical lines inside the grid boxes
         String inlinePlanets = planets.stream()
                 .filter(p -> p.getSignNumber() == targetSign)
-                .map(ChartResponseDTO.PositionDetail::getDisplayName)
+                .map(p -> p.getDisplayName() != null && !p.getDisplayName().isBlank() ? p.getDisplayName() : (p.getPlanetKey() != null ? p.getPlanetKey() : ""))
                 .collect(Collectors.joining("\n"));
 
         BaseFont engBase = currentEngBf.get();

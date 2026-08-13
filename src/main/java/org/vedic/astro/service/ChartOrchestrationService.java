@@ -159,8 +159,13 @@ public class ChartOrchestrationService {
         Map<String, List<ChartResponseDTO.PositionDetail>> suiteMap = new LinkedHashMap<>();
         int[] vargas = { 1, 2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60 };
         for (int v : vargas) {
-            suiteMap.put("D" + v, compileVargaList(v, d1, cusps));
+            var vargaList = compileVargaList(v, d1, cusps);
+            suiteMap.put("D" + v, vargaList);
+            suiteMap.put("d" + v, vargaList);
         }
+        var bhavaList = compileVargaList(-1, d1, cusps);
+        suiteMap.put("Bhava", bhavaList);
+        suiteMap.put("bhava", bhavaList);
 
         List<ChartResponseDTO.PositionDetail> d1PosList = d1.entrySet().stream()
                 .map(e -> mapToDetail(e.getKey().toUpperCase(), e.getValue())).collect(Collectors.toList());
