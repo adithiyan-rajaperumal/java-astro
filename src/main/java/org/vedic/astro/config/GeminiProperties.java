@@ -20,6 +20,7 @@ public class GeminiProperties {
     private String model = "gemini-3.6-flash";
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
+    private Integer maxOutputTokens; // null means do not set, let API default
 
     public String getResolvedApiKey() {
         if (apiKey == null || apiKey.trim().isEmpty()) {

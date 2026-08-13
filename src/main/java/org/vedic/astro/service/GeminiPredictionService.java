@@ -652,7 +652,10 @@ public class GeminiPredictionService {
         Map<String, Object> generationConfig = new HashMap<>();
         generationConfig.put("temperature", geminiProperties.getTemperature());
         generationConfig.put("responseMimeType", "application/json");
-        generationConfig.put("maxOutputTokens", 8192);
+        // Only set maxOutputTokens when explicitly configured; otherwise let the API use its default to avoid truncation
+        if (geminiProperties.getMaxOutputTokens() != null && geminiProperties.getMaxOutputTokens() > 0) {
+            generationConfig.put("maxOutputTokens", geminiProperties.getMaxOutputTokens());
+        }
 
         if (geminiProperties.getThinkingBudget() > 0) {
             generationConfig.put("thinkingConfig", Map.of("thinkingBudget", geminiProperties.getThinkingBudget()));
