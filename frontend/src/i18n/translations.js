@@ -326,7 +326,12 @@ const translations = {
     strong: "Strong",
     optimum: "Optimum",
     moderate: "Moderate",
-    weak: "Weak"
+    weak: "Weak",
+    forecast10YearsTitle: "10-Year Astrological Forecast",
+    forecastLifetimeTitle: "Year-by-Year Lifetime Predictions",
+    lifetimeForecastTitle: "Year-by-Year Lifetime Predictions",
+    scope10Years: "10-Year In-Depth Scope",
+    scopeLifetime: "Full Lifespan"
   },
   ta: {
     panchangam: "பஞ்சாங்கம்",
@@ -663,7 +668,12 @@ const translations = {
     strong: "பலம்",
     optimum: "உத்தமம்",
     moderate: "மிதமான பலம்",
-    weak: "பலவீனமானது"
+    weak: "பலவீனமானது",
+    forecast10YearsTitle: "அடுத்த 10 ஆண்டுகளுக்கான வருடாந்திர பலன்கள்",
+    forecastLifetimeTitle: "முழு வாழ்நாள் வருடாந்திர பலன்கள்",
+    lifetimeForecastTitle: "முழு வாழ்நாள் வருடாந்திர பலன்கள்",
+    scope10Years: "10 ஆண்டு விரிவான பலன்கள்",
+    scopeLifetime: "முழு வாழ்நாள்"
   },
   hi: {
     panchangam: "पंचांग",
@@ -989,7 +999,12 @@ const translations = {
     strong: "बली",
     optimum: "उत्तम",
     moderate: "मध्यम",
-    weak: "दुर्बल / कमजोर"
+    weak: "दुर्बल / कमजोर",
+    forecast10YearsTitle: "आगामी 10 वर्षों का वार्षिक भविष्यफल",
+    forecastLifetimeTitle: "संपूर्ण जीवन काल वार्षिक भविष्यफल",
+    lifetimeForecastTitle: "संपूर्ण जीवन काल वार्षिक भविष्यफल",
+    scope10Years: "10 वर्ष विस्तृत दायरा",
+    scopeLifetime: "पूर्ण जीवनकाल"
   },
   kn: {
     panchangam: "ಪಂಚಾಂಗ",
@@ -1318,7 +1333,12 @@ const translations = {
     strong: "ಬಲಶಾಲಿ",
     optimum: "ಉತ್ತಮ",
     moderate: "ಮಧ್ಯಮ",
-    weak: "ದುರ್ಬಲ"
+    weak: "ದುರ್ಬಲ",
+    forecast10YearsTitle: "ಮುಂದಿನ 10 ವರ್ಷಗಳ ವಾರ್ಷಿಕ ಭವಿಷ್ಯ",
+    forecastLifetimeTitle: "ಸಂಪೂರ್ಣ ಜೀವಿತಾವಧಿಯ ವಾರ್ಷಿಕ ಭವಿಷ್ಯ",
+    lifetimeForecastTitle: "ಸಂಪೂರ್ಣ ಜೀವಿತಾವಧಿಯ ವಾರ್ಷಿಕ ಭವಿಷ್ಯ",
+    scope10Years: "10 ವರ್ಷಗಳ ವಿವರವಾದ ವ್ಯಾಪ್ತಿ",
+    scopeLifetime: "ಸಂಪೂರ್ಣ ಜೀವಿತಾವಧಿ"
   },
   te: {
     panchangam: "పంచాంగం",
@@ -1647,7 +1667,12 @@ const translations = {
     strong: "బలమైనది",
     optimum: "ఉత్తమం",
     moderate: "మధ్యస్థం",
-    weak: "బలహీనం"
+    weak: "బలహీనం",
+    forecast10YearsTitle: "రాబోయే 10 సంవత్సరాల వార్షిక ఫలితాలు",
+    forecastLifetimeTitle: "సంపూర్ణ జీవితకాల వార్షిక ఫలితాలు",
+    lifetimeForecastTitle: "సంపూర్ణ జీవితకాల వార్షిక ఫలితాలు",
+    scope10Years: "10 సంవత్సరాల సమగ్ర పరిధి",
+    scopeLifetime: "పూర్తి జీవితకాలం"
   },
   ml: {
     panchangam: "പഞ്ചാംഗം",
@@ -1973,7 +1998,12 @@ const translations = {
     strong: "ബലവത്തായത്",
     optimum: "ഉത്തമം",
     moderate: "മിതമായത്",
-    weak: "ദുർബലം"
+    weak: "ദുർബലം",
+    forecast10YearsTitle: "അടുത്ത 10 വർഷത്തെ വാർഷിക ഫലങ്ങൾ",
+    forecastLifetimeTitle: "സമ്പൂർണ്ണ ആയുഷ്കാല വാർഷിക ഫലങ്ങൾ",
+    lifetimeForecastTitle: "സമ്പൂർണ്ണ ആയുഷ്കാല വാർഷിക ഫലങ്ങൾ",
+    scope10Years: "10 വർഷത്തെ വിശദമായ വ്യാപ്തി",
+    scopeLifetime: "പൂർണ്ണ ആയുഷ്കാലം"
   }
 };
 

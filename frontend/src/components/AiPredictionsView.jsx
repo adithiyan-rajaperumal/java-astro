@@ -453,16 +453,37 @@ function AiPredictionsView({
         </div>
       )}
 
-      {/* Year-by-Year Lifetime Predictions (Unified Narrative) */}
-      {lifetimeList.length > 0 && (
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
-            <h3 style={{ margin: 0, color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              🔮 {t('lifetimeForecastTitle', language)}
-            </h3>
-          </div>
+      {/* Year-by-Year Predictions (Unified Narrative) */}
+      {lifetimeList.length > 0 && (() => {
+        const is10Year = predictions?.forecastMode === 'NEXT_10_YEARS' || lifetimeList.length <= 15;
+        const sYr = predictions?.startYear || lifetimeList[0]?.year || '';
+        const eYr = predictions?.endYear || lifetimeList[lifetimeList.length - 1]?.year || '';
+        const sAge = predictions?.startAge ?? lifetimeList[0]?.age;
+        const eAge = predictions?.endAge ?? lifetimeList[lifetimeList.length - 1]?.age;
+        const yearRangeText = sYr && eYr ? ` (${sYr} – ${eYr}${sAge !== undefined && eAge !== undefined ? ` • ${language === 'ta' ? `வயது ${sAge} - ${eAge}` : `Age ${sAge} to ${eAge}`}` : ''})` : '';
+        const titleKey = is10Year ? 'forecast10YearsTitle' : 'forecastLifetimeTitle';
+        const scopeBadgeText = is10Year ? t('scope10Years', language) : `${t('scopeLifetime', language)} (${lifetimeList.length} ${language === 'ta' ? 'ஆண்டுகள்' : 'Years'})`;
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '15px' }}>
+        return (
+          <div className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+              <h3 style={{ margin: 0, color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                🔮 {t(titleKey, language)}{yearRangeText}
+              </h3>
+              <span style={{
+                fontSize: '12px',
+                fontWeight: 'bold',
+                padding: '4px 10px',
+                borderRadius: '12px',
+                background: is10Year ? 'rgba(52, 152, 219, 0.15)' : 'rgba(155, 89, 182, 0.15)',
+                color: is10Year ? '#3498db' : '#9b59b6',
+                border: `1px solid ${is10Year ? 'rgba(52, 152, 219, 0.3)' : 'rgba(155, 89, 182, 0.3)'}`
+              }}>
+                {is10Year ? '✨ ' : '🪐 '}{scopeBadgeText}
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '15px' }}>
             {lifetimeList.map((fp, idx) => {
               const narrativeText = fp.detailedPrediction || [fp.careerAndFinance, fp.healthAndFamily, fp.careerProfession, fp.wealthFinance, fp.healthVitality, fp.marriageFamily, fp.parentsKids].filter(Boolean).join(' ');
 
@@ -526,9 +547,10 @@ function AiPredictionsView({
                 </div>
               );
             })}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
