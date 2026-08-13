@@ -269,6 +269,86 @@ public class PdfExportService {
             document.add(ds);
 
             // =================================================================
+            // 6B. PERSONAL ELEMENTS, DEITIES & LIFE ANCHORS (IF AVAILABLE)
+            // =================================================================
+            if (data.getLifeAnchors() != null) {
+                var anchors = data.getLifeAnchors();
+                document.newPage();
+                String anchorsHeader = "ta".equalsIgnoreCase(lang)
+                        ? "வாழ்க்கை நங்கூரங்கள் & அதிர்ஷ்ட கூறுகள் (Life Anchors & Longevity)"
+                        : "Personal Elements, Deities & Life Anchors";
+                Paragraph anchTitle = buildMixedParagraph(anchorsHeader, tFont, engTFont);
+                anchTitle.setAlignment(Element.ALIGN_CENTER);
+                anchTitle.setSpacingAfter(12);
+                document.add(anchTitle);
+
+                PdfPTable anchTab = new PdfPTable(2);
+                anchTab.setWidthPercentage(100);
+                anchTab.setSpacingAfter(14);
+                anchTab.setWidths(new float[]{40f, 60f});
+
+                PdfPCell h1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நங்கூரம் / அதிர்ஷ்ட கூறு" : "Life Anchor Factor", boldB, Element.ALIGN_CENTER);
+                h1.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                anchTab.addCell(h1);
+
+                PdfPCell h2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "விபரம் & வழிகாட்டுதல்" : "Details & Astrological Guidance", boldB, Element.ALIGN_CENTER);
+                h2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                anchTab.addCell(h2);
+
+                if (anchors.deities() != null) {
+                    var d = anchors.deities();
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "இஷ்ட தெய்வம் (Ishta Devata)" : "Ishta Devata (12th from Karakamsa)", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? d.ishtaDevataTamil() : d.ishtaDevata(), bFont, Element.ALIGN_LEFT));
+
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "தர்ம தெய்வம் (Dharma Devata)" : "Dharma Devata (9th from Karakamsa)", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? d.dharmaDevataTamil() : d.dharmaDevata(), bFont, Element.ALIGN_LEFT));
+
+                    if (d.kulaDevataRemedy() != null) {
+                        anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "குலதெய்வ அருள் நிலை (Kula Devata)" : "Kula Devata Status", boldB, Element.ALIGN_LEFT));
+                        anchTab.addCell(buildTableCell(d.kulaDevataRemedy(), bFont, Element.ALIGN_LEFT));
+                    }
+                }
+
+                if (anchors.gemology() != null) {
+                    var g = anchors.gemology();
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "யோக ரத்தினம் (Lucky Gemstone)" : "Recommended Gemstone", boldB, Element.ALIGN_LEFT));
+                    String gemDetails = ("ta".equalsIgnoreCase(lang) ? g.primaryGemstoneTamil() : g.primaryGemstone()) +
+                            " | " + g.recommendedMetal() + " | " + g.recommendedFinger() + " | " + g.activationDayAndTiming();
+                    anchTab.addCell(buildTableCell(gemDetails, bFont, Element.ALIGN_LEFT));
+                }
+
+                if (anchors.numerology() != null) {
+                    var n = anchors.numerology();
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "எண்கணிதம் (Numerology)" : "Numerology Numbers", boldB, Element.ALIGN_LEFT));
+                    String numStr = "Driver: " + n.radicalDriverNumber() + " (" + n.radicalRulingPlanet() + ") | Conductor: " +
+                            n.destinyConductorNumber() + " (" + n.destinyRulingPlanet() + ") | Planet No: " + n.astrologicalPlanetNumber();
+                    anchTab.addCell(buildTableCell(numStr, bFont, Element.ALIGN_LEFT));
+                }
+
+                if (anchors.luckyDates() != null && anchors.luckyDates().primaryLuckyDates() != null) {
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "அதிர்ஷ்ட தேதிகள் (Lucky Dates)" : "Monthly Lucky Dates", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(anchors.luckyDates().primaryLuckyDates().toString(), bFont, Element.ALIGN_LEFT));
+                }
+
+                if (anchors.luckyDay() != null) {
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப கிழமை (Lucky Weekday)" : "Lucky Weekday (Vara)", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(anchors.luckyDay().vedicWeekdayName() + " - " + anchors.luckyDay().luckySignifications(), bFont, Element.ALIGN_LEFT));
+                }
+
+                if (anchors.directions() != null) {
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப திசைகள் (Auspicious Directions)" : "Auspicious Directions", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell("Vastu: " + anchors.directions().permanentVastuDirection() + " | Travel: " + anchors.directions().travelDirection(), bFont, Element.ALIGN_LEFT));
+                }
+
+                if (anchors.structuralAnchors() != null) {
+                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சமூக அந்தஸ்து (Arudha Lagna)" : "Arudha Lagna (AL)", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(anchors.structuralAnchors().arudhaLagna(), bFont, Element.ALIGN_LEFT));
+                }
+
+                document.add(anchTab);
+            }
+
+            // =================================================================
             // 7. AI LIFE BALAN & YEAR-BY-YEAR PREDICTIONS (IF ENABLED)
             // =================================================================
             if (data.getAiPredictions() != null && data.getAiPredictions().isEnabled()) {
