@@ -7,8 +7,9 @@ Introduce a configuration property in `application.yml` (`gemini.forecast-mode` 
 - Custom integer years (e.g., `gemini.forecast-years: 10`, where `0` or negative defaults to Full Lifespan).
 
 The system utilizes **distinct prompt strategies based on the active mode**:
-- In `NEXT_10_YEARS` mode, the prompt instructs Gemini to leverage the available token budget to produce **rich, deep, multi-paragraph yearly breakdowns** (covering quarterly career pivots, specific transit impacts, relationship timings, and granular remedies).
-- In `FULL_LIFESPAN` mode, the prompt utilizes a **high-density synthesis** (2-3 potent sentences per year) ensuring all 40-60+ years fit cleanly within output token boundaries.
+- In `NEXT_10_YEARS` mode, the prompt instructs Gemini to produce **rich, deep, multi-paragraph yearly breakdowns** (covering quarterly career pivots, specific transit impacts, relationship timings, and granular remedies).
+- In `FULL_LIFESPAN` mode, the existing full lifespan prompt is preserved without any token ceiling restriction or artificial cap, allowing Gemini's native unconstrained output.
+- `maxOutputTokens` is omitted by default from API payloads to prevent JSON truncation issues.
 
 The generated output payload, UI headers, and exported PDF reports dynamically adapt their titles, badges, and year-range descriptions.
 
