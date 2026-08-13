@@ -10,6 +10,7 @@ import org.vedic.astro.service.GeminiPredictionService;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +23,9 @@ public class GeminiPredictionServiceTest {
 
     @Autowired
     private GeminiPredictionService predictionService;
+
+    @Autowired
+    private org.vedic.astro.config.GeminiProperties geminiProperties;
 
     @Test
     public void testPromptConstructionWithoutPrecalculatedDiagnostics() {
@@ -735,5 +739,42 @@ public class GeminiPredictionServiceTest {
         assertNotNull(leoAnchors);
         assertTrue(leoAnchors.getLifeGemstone().contains("Ruby"));
         assertEquals("1, 4, 9", leoAnchors.getLuckyNumbers());
+    }
+
+    @Test
+    public void test10YearModePromptDirectives() {
+        BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
+        ChartResponseDTO.PositionDetail lagna = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("LAGNA").displayName("Lagna").signNumber(1).rashiName("Mesha").build();
+        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
+                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Vrishabha").nakshatra("Rohini").build())
+                .d1Chart(List.of(lagna))
+                .currentDasaTimeline(Collections.emptyList())
+                .build();
+
+        PredictionRequestDTO req = PredictionRequestDTO.builder()
+                .birthDetails(birth)
+                .chartData(chart)
+                .language("ta")
+                .build();
+
+        geminiProperties.setForecastMode("NEXT_10_YEARS");
+        geminiProperties.setForecastYears(10);
+        String prompt = predictionService.constructAstrologicalPrompt(req);
+        assertNotNull(prompt);
+        assertTrue(prompt.contains("NEXT 10 YEARS") || prompt.contains("10 YEARS"));
+        assertTrue(prompt.contains("Career, Business & Wealth"));
+
+        // Test fallback prediction returns populated metadata
+        PredictionResponseDTO fallback = predictionService.generateOfflineRuleBasedBalan(req);
+        assertNotNull(fallback);
+        assertEquals("NEXT_10_YEARS", fallback.getForecastMode());
+        assertEquals(11, fallback.getTotalForecastYears());
+        assertTrue(fallback.getStartYear() > 2020);
+        assertTrue(fallback.getEndYear() >= fallback.getStartYear() + 10);
+
+        // Reset
+        geminiProperties.setForecastMode("FULL_LIFESPAN");
+        geminiProperties.setForecastYears(0);
     }
 }

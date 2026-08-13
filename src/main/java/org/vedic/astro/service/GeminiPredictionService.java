@@ -416,7 +416,13 @@ public class GeminiPredictionService {
         int targetLifespanAge = ayurdayaProfile != null && ayurdayaProfile.estimatedLifespanCeiling() > 0
                 ? ayurdayaProfile.estimatedLifespanCeiling()
                 : 85;
-        int maxForecastYears = Math.max(1, targetLifespanAge - currentAge);
+        int maxForecastYears = geminiProperties != null
+                ? geminiProperties.resolveForecastYears(currentAge, targetLifespanAge)
+                : Math.max(1, targetLifespanAge - currentAge);
+        boolean is10YearMode = maxForecastYears <= 15;
+        int targetEndYear = currentYear + maxForecastYears;
+        int targetEndAge = currentAge + maxForecastYears;
+
         List<Map<String, Object>> yearlyAnchors = new ArrayList<>();
         for (int i = 0; i <= maxForecastYears; i++) {
             int yr = currentYear + i;
@@ -457,15 +463,26 @@ public class GeminiPredictionService {
           .append("   - 'PER-YEAR ANCHOR MANDATE': For all longitudinal predictions, rely on the preComputedYearlyAnchors object in the JSON for the correct planetary dignity and placement at any specific age.\n")
           .append("3. 'aiYogas': Calculate and identify ALL classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Vipareeta Raja Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana) from the input JSON data with name, forming planets, and lifelong impact.\n")
           .append("4. 'aiDoshams': Evaluate all major doshams (Sevvai/Kuja Dosha, Kala Sarpa Dosha, Pitru Dosha, Papakarthari, Rahu-Ketu afflictions) from the input JSON data, determining whether they are active or nullified, the exact astrological nullification factors, and authentic Vedic remedies.\n")
-          .append("5. 'pastKeyPhases': 2-3 pivotal life-defining turning points from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n")
-          .append("6. 'lifetimePredictions': Exhaustive, unbroken year-by-year forecasts covering the native's FULL REMAINING LIFESPAN continuously from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") through year ").append(currentYear + maxForecastYears).append(" (Age ").append(targetLifespanAge).append(").\n")
-          .append("   - CRITICAL REQUIREMENT: You MUST include an entry in 'lifetimePredictions' for EVERY single year provided in 'preComputedYearlyAnchors' (total of ").append(maxForecastYears + 1).append(" years). Do NOT stop early or limit to 10-15 years.\n")
-          .append("   - To ensure the full lifespan fits perfectly without truncation, keep each year's entry concise, high-density, and impactful:\n")
-          .append("     * 'yearlyTheme': Sharp 1-line headline.\n")
-          .append("     * 'detailedPrediction': 2-3 potent, comprehensive sentences synthesizing (a) Career, Business & Wealth, (b) Health & Vitality Realities, (c) Family, Marriage & Progeny, and (d) Parents, Elders & Mindset with spiritual milestones.\n")
-          .append("     * 'astrologicalBasis': 1 concise sentence citing active Dasa-Bhukthi lords and D1/D9/D10/D12/D30 placements from the yearly anchor.\n")
-          .append("     * 'cautionsAndRemedies': 1 practical cautionary note & authentic Vedic remedy.\n\n")
-          .append("Return ONLY valid JSON matching this schema:\n")
+          .append("5. 'pastKeyPhases': 2-3 pivotal life-defining turning points from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n");
+
+        if (is10YearMode) {
+            sb.append("6. 'lifetimePredictions': Deep, enriched, year-by-year forecasts for the NEXT ").append(maxForecastYears).append(" YEARS continuously from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") through year ").append(targetEndYear).append(" (Age ").append(targetEndAge).append(").\n")
+              .append("   - CRITICAL REQUIREMENT: You MUST include an entry in 'lifetimePredictions' for EVERY single year provided in 'preComputedYearlyAnchors' (total of ").append(maxForecastYears + 1).append(" years).\n")
+              .append("   - Leverage the focused time horizon to deliver maximum analytical depth and actionable predictive detail for each year:\n")
+              .append("     * 'yearlyTheme': Evocative, specific 1-line headline capturing the year's primary astrological trajectory.\n")
+              .append("     * 'detailedPrediction': Comprehensive 5-7 sentence in-depth breakdown synthesizing (a) Career, Business & Wealth (quarterly promotion/job change windows, business expansions, investment gains/cautions), (b) Health & Vitality Realities (seasonal dosha vulnerabilities, transits, diet/lifestyle care), (c) Family, Marriage & Progeny (marital harmony, progeny timing, family milestones), and (d) Parents, Elders & Mindset with spiritual milestones and decisive life choices.\n")
+              .append("     * 'astrologicalBasis': Detailed astrological explanation explaining active Dasa-Bhukthi-Pratyantar lords, transits (Jupiter, Saturn, Rahu-Ketu Gocharam), and relevant Varga alignments (D9, D10, D12, D30).\n")
+              .append("     * 'cautionsAndRemedies': Highly specific, practical Vedic remedies (exact mantra with recitation count, specific deity archana, targeted charity on designated days, and timing guidance).\n\n");
+        } else {
+            sb.append("6. 'lifetimePredictions': Exhaustive, unbroken year-by-year forecasts covering the native's FULL REMAINING LIFESPAN continuously from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") through year ").append(targetEndYear).append(" (Age ").append(targetEndAge).append(").\n")
+              .append("   - CRITICAL REQUIREMENT: You MUST include an entry in 'lifetimePredictions' for EVERY single year provided in 'preComputedYearlyAnchors' (total of ").append(maxForecastYears + 1).append(" years). Do NOT stop early or limit to 10-15 years.\n")
+              .append("   - Keep each year's entry concise, high-density, and impactful:\n")
+              .append("     * 'yearlyTheme': Sharp 1-line headline.\n")
+              .append("     * 'detailedPrediction': 2-3 potent, comprehensive sentences synthesizing (a) Career, Business & Wealth, (b) Health & Vitality Realities, (c) Family, Marriage & Progeny, and (d) Parents, Elders & Mindset with spiritual milestones.\n")
+              .append("     * 'astrologicalBasis': 1 concise sentence citing active Dasa-Bhukthi lords and D1/D9/D10/D12/D30 placements from the yearly anchor.\n")
+              .append("     * 'cautionsAndRemedies': 1 practical cautionary note & authentic Vedic remedy.\n\n");
+        }
+        sb.append("Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
           .append("  \"overallSummary\": \"(Comprehensive synthesis)\",\n")
           .append("  \"nativePersonality\": {\n")
@@ -732,6 +749,23 @@ public class GeminiPredictionService {
                     } else if (parsed.getLifetimePredictions() == null && parsed.getFuturePredictions() != null) {
                         parsed.setLifetimePredictions(parsed.getFuturePredictions());
                     }
+
+                    var fut = parsed.getLifetimePredictions() != null ? parsed.getLifetimePredictions() : parsed.getFuturePredictions();
+                    int count = fut != null ? fut.size() : 0;
+                    int birthYear = req.getBirthDetails() != null ? req.getBirthDetails().year() : 1995;
+                    int curYear = LocalDate.now().getYear();
+                    int curAge = Math.max(0, curYear - birthYear);
+                    int sYr = fut != null && !fut.isEmpty() ? fut.get(0).getYear() : curYear;
+                    int eYr = fut != null && !fut.isEmpty() ? fut.get(fut.size() - 1).getYear() : sYr + count;
+                    int sAge = fut != null && !fut.isEmpty() ? fut.get(0).getAge() : curAge;
+                    int eAge = fut != null && !fut.isEmpty() ? fut.get(fut.size() - 1).getAge() : sAge + count;
+
+                    parsed.setForecastMode(count <= 15 ? "NEXT_10_YEARS" : "FULL_LIFESPAN");
+                    parsed.setStartYear(sYr);
+                    parsed.setEndYear(eYr);
+                    parsed.setStartAge(sAge);
+                    parsed.setEndAge(eAge);
+                    parsed.setTotalForecastYears(count);
 
                     if (parsed.getAuspiciousAnchors() == null || parsed.getAuspiciousAnchors().getLifeGemstone() == null) {
                         int lagnaSign = 1;
@@ -1120,7 +1154,9 @@ public class GeminiPredictionService {
                 ? AyurdayaCalculationUtils.calculateAyurdaya(lagnaSign, moonSign, c != null ? c.getD1Chart() : null, dasas, birthYear)
                 : null;
         int targetLifespanAge = ayurProfile != null && ayurProfile.estimatedLifespanCeiling() > 0 ? ayurProfile.estimatedLifespanCeiling() : 85;
-        int maxForecastYears = Math.max(1, targetLifespanAge - currentAge);
+        int maxForecastYears = geminiProperties != null
+                ? geminiProperties.resolveForecastYears(currentAge, targetLifespanAge)
+                : Math.max(1, targetLifespanAge - currentAge);
 
         List<PredictionResponseDTO.YearlyPrediction> predictions = new ArrayList<>();
         for (int i = 0; i <= maxForecastYears; i++) {
@@ -1145,6 +1181,12 @@ public class GeminiPredictionService {
                 .pastKeyPhases(pastKeyPhases)
                 .futurePredictions(predictions)
                 .lifetimePredictions(predictions)
+                .forecastMode(maxForecastYears <= 15 ? "NEXT_10_YEARS" : "FULL_LIFESPAN")
+                .startYear(currentYear)
+                .endYear(currentYear + maxForecastYears)
+                .startAge(currentAge)
+                .endAge(currentAge + maxForecastYears)
+                .totalForecastYears(maxForecastYears + 1)
                 .build();
     }
 
