@@ -5,6 +5,8 @@ import com.lowagie.text.pdf.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.vedic.astro.config.PdfExportProperties;
 import org.vedic.astro.dto.ChartResponseDTO;
 import org.vedic.astro.dto.ComprehensiveReportDTO;
 
@@ -18,7 +20,13 @@ public class PdfExportService {
 
     private static final ThreadLocal<BaseFont> currentEngBf = new ThreadLocal<>();
     private final TranslationService ts;
-    public PdfExportService(TranslationService ts) { this.ts = ts; }
+    private final PdfExportProperties pdfExportProperties;
+
+    @Autowired
+    public PdfExportService(TranslationService ts, PdfExportProperties pdfExportProperties) {
+        this.ts = ts;
+        this.pdfExportProperties = pdfExportProperties != null ? pdfExportProperties : new PdfExportProperties();
+    }
 
     public byte[] generateAstrologyReport(ComprehensiveReportDTO data) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -269,9 +277,89 @@ public class PdfExportService {
             document.add(ds);
 
             // =================================================================
-            // 6B. PERSONAL ELEMENTS, DEITIES & LIFE ANCHORS (IF AVAILABLE)
+            // 6A. YOGAMS & DHOSAMS (IF ENABLED BY CONFIG FLAG)
             // =================================================================
-            if (data.getLifeAnchors() != null) {
+            if (pdfExportProperties.isIncludeYogasDoshams() && data.getStructuralDiagnostics() != null) {
+                var diag = data.getStructuralDiagnostics();
+
+                // 1. FIRST: YOGAMS
+                if (diag.getActiveYogas() != null && !diag.getActiveYogas().isEmpty()) {
+                    document.newPage();
+                    String yogasHeader = "ta".equalsIgnoreCase(lang)
+                            ? "சுப யோகங்கள் & அமைப்புகள் (Active Auspicious Yogas)"
+                            : "Active Auspicious Yogas";
+                    Paragraph yogaTitle = buildMixedParagraph(yogasHeader, tFont, engTFont);
+                    yogaTitle.setAlignment(Element.ALIGN_CENTER);
+                    yogaTitle.setSpacingAfter(12);
+                    document.add(yogaTitle);
+
+                    PdfPTable yogaTab = new PdfPTable(2);
+                    yogaTab.setWidthPercentage(100);
+                    yogaTab.setSpacingAfter(14);
+                    yogaTab.setWidths(new float[]{35f, 65f});
+
+                    PdfPCell yh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "யோகத்தின் பெயர்" : "Yoga Name", boldB, Element.ALIGN_CENTER);
+                    yh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                    yogaTab.addCell(yh1);
+
+                    PdfPCell yh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "விபரம் & சுப பலன்கள்" : "Description & Impact", boldB, Element.ALIGN_CENTER);
+                    yh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                    yogaTab.addCell(yh2);
+
+                    for (var y : diag.getActiveYogas()) {
+                        yogaTab.addCell(buildTableCell(y.getName(), boldB, Element.ALIGN_LEFT));
+                        String desc = (y.getDescription() != null ? y.getDescription() : "") +
+                                (y.getImpactLevel() != null ? " [" + y.getImpactLevel() + "]" : "");
+                        yogaTab.addCell(buildTableCell(desc, bFont, Element.ALIGN_LEFT));
+                    }
+                    document.add(yogaTab);
+                }
+
+                // 2. SECOND: DHOSAMS
+                if (diag.getDiscoveredDoshams() != null && !diag.getDiscoveredDoshams().isEmpty()) {
+                    String doshasHeader = "ta".equalsIgnoreCase(lang)
+                            ? "தோஷங்கள் & நிவர்த்தி/பரிகாரங்கள் (Discovered Doshams & Remedies)"
+                            : "Discovered Doshams & Remedies";
+                    Paragraph doshaTitle = buildMixedParagraph(doshasHeader, sFont, engSFont);
+                    doshaTitle.setSpacingAfter(8);
+                    document.add(doshaTitle);
+
+                    PdfPTable doshaTab = new PdfPTable(3);
+                    doshaTab.setWidthPercentage(100);
+                    doshaTab.setSpacingAfter(14);
+                    doshaTab.setWidths(new float[]{30f, 20f, 50f});
+
+                    PdfPCell dh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "தோஷம்" : "Dosha Name", boldB, Element.ALIGN_CENTER);
+                    dh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                    doshaTab.addCell(dh1);
+
+                    PdfPCell dh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நிலை" : "Status", boldB, Element.ALIGN_CENTER);
+                    dh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                    doshaTab.addCell(dh2);
+
+                    PdfPCell dh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நிவர்த்தி & பரிகாரம்" : "Nullification & Remedy", boldB, Element.ALIGN_CENTER);
+                    dh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                    doshaTab.addCell(dh3);
+
+                    for (var d : diag.getDiscoveredDoshams()) {
+                        doshaTab.addCell(buildTableCell(d.getName(), boldB, Element.ALIGN_LEFT));
+                        String statusStr = d.isNullified()
+                                ? ("ta".equalsIgnoreCase(lang) ? "நிவர்த்தி" : "Nullified")
+                                : (d.isActive() ? ("ta".equalsIgnoreCase(lang) ? "செயலில் உள்ளது" : "Active") : ("ta".equalsIgnoreCase(lang) ? "இல்லை" : "None"));
+                        doshaTab.addCell(buildTableCell(statusStr, bFont, Element.ALIGN_CENTER));
+
+                        String remedy = (d.getNullificationReason() != null ? d.getNullificationReason() + " " : "") +
+                                (d.getRemedySuggestion() != null ? d.getRemedySuggestion() : "");
+                        doshaTab.addCell(buildTableCell(remedy.isBlank() ? "-" : remedy, bFont, Element.ALIGN_LEFT));
+                    }
+                    document.add(doshaTab);
+                }
+            }
+
+            // =================================================================
+            // 6B. THIRD: LIFE ANCHORS (IF ENABLED BY CONFIG FLAG)
+            // =================================================================
+            if (pdfExportProperties.isIncludeLifeAnchors() && data.getLifeAnchors() != null) {
                 var anchors = data.getLifeAnchors();
                 document.newPage();
                 String anchorsHeader = "ta".equalsIgnoreCase(lang)

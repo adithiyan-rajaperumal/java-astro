@@ -39,3 +39,8 @@ gemini:
   model: ${GEMINI_MODEL:gemini-3.6-flash}
   temperature: ${GEMINI_TEMPERATURE:0.4}
   thinking-budget: ${GEMINI_THINKING_BUDGET:1024}
+
+pdf:
+  include-life-anchors: ${PDF_INCLUDE_LIFE_ANCHORS:false}
+  include-yogas-doshams: ${PDF_INCLUDE_YOGAS_DOSHAMS:false}
+

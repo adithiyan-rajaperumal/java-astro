@@ -133,4 +133,31 @@ public class PdfExportServiceTest {
         assertNotNull(uiDto.getLifeAnchors().structuralAnchors());
         assertEquals(7, uiDto.getLifeAnchors().numerology().radicalDriverNumber());
     }
+
+    @Autowired
+    private org.vedic.astro.service.TranslationService translationService;
+
+    @Test
+    public void testPdfWithCustomFlagsForYogasDoshamsAndLifeAnchors() {
+        BirthDetailsDTO birth = new BirthDetailsDTO("Adithiyan", 1996, 7, 25, 17, 45, 0, 13.0827, 80.2707, "LAHIRI");
+        var panchangam = panchangamFactory.getEngine(org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM);
+        var chartResult = panchangam.calculate(birth);
+
+        ComprehensiveReportDTO report = orchestrationService.compileComprehensivePdfData(chartResult, birth, new double[12]);
+        assertNotNull(report);
+
+        // Test with custom properties where both flags are enabled
+        org.vedic.astro.config.PdfExportProperties customProps = new org.vedic.astro.config.PdfExportProperties();
+        customProps.setIncludeLifeAnchors(true);
+        customProps.setIncludeYogasDoshams(true);
+
+        org.vedic.astro.service.PdfExportService customPdfService = new org.vedic.astro.service.PdfExportService(
+                translationService,
+                customProps
+        );
+
+        byte[] pdfWithSections = customPdfService.generateAstrologyReport(report);
+        assertNotNull(pdfWithSections);
+        assertTrue(pdfWithSections.length > 5000);
+    }
 }
