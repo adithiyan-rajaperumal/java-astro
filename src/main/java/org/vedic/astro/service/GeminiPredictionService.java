@@ -159,15 +159,15 @@ public class GeminiPredictionService {
           .append("  * The input is provided in clean, structured JSON containing the native's details, exact house lordships (House 1-12 signs & lords), unified planetary matrix (D1 physical placement, D9 Navamsa, rulesHouses, lordshipTitle, occupantRole), Ayurvedic health profile (Prakriti, Tattvas, organ vulnerabilities), 12-varga divisional charts (D2, D9, D10, D12, D30), Shadbala, and Dasa-Bhukthi timelines.\n")
           .append("  * PLACEMENT VS. OWNERSHIP: A planet is ONLY the lord of the house(s) listed in 'rulesHouses'. A planet occupying a house is ONLY a guest/occupant (as stated in 'occupantRole'). NEVER call an occupant the lord of that house unless it rules that sign.\n")
           .append("  * D1 VS. D9 DISTINCTION: 'placedInD1Sign' & 'placedInD1House' represent material/physical events in the world. 'placedInD9NavamsaSign' represents internal spiritual/dharma strength. In yearly predictions, NEVER state that a planet is placed in its D9 sign in the material chart.\n")
-          .append("  * AYURVEDIC PREDICTIONS: Ground all health, longevity, and vitality readings strictly in the pre-calculated 'ayurvedicHealthProfile' (dominant Prakriti, dosha percentages, and specific organ vulnerabilities). Do NOT default to generic boilerplate.\n")
-          .append("  * AYURDAYA (LONGEVITY) DETERMINATION: Ground the longevity classification and lifespan ceiling age strictly in the pre-calculated 'ayurdayaProfile' (longevityClassification, estimatedLifespanCeiling, lifespanRange, and criticalMarakaWindow). Your lifetime forecasts MUST span up to this exact pre-calculated lifespan ceiling.\n")
+          .append("  * AYURVEDIC HEALTH PREDICTIONS: Ground health and constitution readings in the provided 'ayurvedicHealthProfile' (dominant Prakriti, dosha percentages, and specific organ vulnerabilities).\n")
+          .append("  * AUTONOMOUS AYURDAYA (LONGEVITY) CALCULATION: Independently calculate the native's classical Ayurdaya by evaluating the Lagna Lord, 8th Lord, 3rd Lord, Moon, and Saturn (Ayushkaraka), applying Parashara and Jaimini 3-pair longevity principles and Kakshya adjustments directly from the astrological data. Classify the longevity (Poornayu / Madhyayu / Alpayu) and determine your own estimated lifespan ceiling age (e.g. 75 - 95+). Your lifetime forecasts MUST span up to this calculated lifespan ceiling age.\n")
           .append("  * PER-YEAR ANCHOR INJECTION (ANTI-DRIFT): For EACH year in lifetimePredictions, a 'preComputedAnchor' block is provided containing the exact Dasa Lord and Bhukthi Lord with their house placements (placedInBhava), ruled houses (rulesHouses), Lagna Lord identity (isLagnaLord: true/false), and dignity (d1Dignity). You MUST use ONLY these anchor values when describing planetary roles for that year. NEVER override or contradict the anchor data. The 'isLagnaLord' flag is definitive — if it says false, that planet is NOT the Lagna Lord. The 'lagnaLordReminder' field states the true Lagna Lord for EVERY year — reference it.\n")
           .append("  * YOGAS & DOSHAMS STRICT PARASARI RULES (ZERO FALSE POSITIVES):\n")
           .append("    (1) Gajakesari Yoga REQUIRES Jupiter in a Kendra (1, 4, 7, 10 house) from the MOON (NOT from Lagna unless Moon is also there).\n")
           .append("    (2) Budhaditya Yoga REQUIRES Sun and Mercury in the EXACT SAME SIGN without deep combustion.\n")
           .append("    (3) Pancha Mahapurusha Yogas (Ruchaka, Bhadra, Hamsa, Malavya, Sasa) REQUIRE Mars, Mercury, Jupiter, Venus, or Saturn in a KENDRA (1, 4, 7, 10) from JANMA LAGNA and placed in OWN SIGN or EXALTED SIGN. Placements in 5th, 9th, 2nd, 3rd, 6th, 8th, 11th, 12th do NOT form Mahapurusha yogas.\n")
           .append("    (4) Dharma-Karmadhipati Yoga REQUIRES conjunction or mutual 7th aspect between the exact 9th Lord and 10th Lord of that Lagna.\n")
-          .append("    (5) Sevvai/Kuja Dosha in 1,2,4,7,8,12 MUST authentically apply classical cancellations (Own/Exalted sign, Jupiter/Venus aspect, friendly sign Leo/Cancer, etc.). If preCalculatedDiagnostics is provided in the JSON, use it as your verified baseline.\n")
+          .append("    (5) Sevvai/Kuja Dosha in 1,2,4,7,8,12 MUST authentically apply classical cancellations (Own/Exalted sign, Jupiter/Venus aspect, friendly sign Leo/Cancer, etc.). Independently calculate all Yogas and Doshams directly from the planetary matrix and divisional charts.\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
         return sb.toString();
     }
@@ -319,16 +319,6 @@ public class GeminiPredictionService {
         AyurvedicAstrologyUtils.AyurvedicHealthProfile healthProfile =
                 AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSign, moonSign, c.getD1Chart());
         inputData.put("ayurvedicHealthProfile", healthProfile);
-
-        // 4b. Deterministic Parashara-Jaimini Ayurdaya (Longevity) Profile
-        AyurdayaCalculationUtils.AyurdayaProfile ayurdayaProfile =
-                AyurdayaCalculationUtils.calculateAyurdaya(lagnaSign, moonSign, c.getD1Chart(), c.getCurrentDasaTimeline(), birthYear);
-        inputData.put("ayurdayaProfile", ayurdayaProfile);
-
-        // 4c. Pre-Calculated Horoscopic Diagnostics (Verified Yogas & Doshams)
-        if (c.getStructuralDiagnostics() != null) {
-            inputData.put("preCalculatedDiagnostics", c.getStructuralDiagnostics());
-        }
 
         // 5. Divisional Vargas (D2, D9, D10, D12, D30)
         Map<String, Object> vargas = new LinkedHashMap<>();
