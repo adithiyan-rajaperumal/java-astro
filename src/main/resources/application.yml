@@ -32,6 +32,10 @@ gemini:
   daily-balan-enabled: ${GEMINI_DAILY_BALAN_ENABLED:true}
   matching-enabled: ${GEMINI_MATCHING_ENABLED:true}
   pdf-predictions-enabled: ${GEMINI_PDF_PREDICTIONS_ENABLED:true}
+  # Forecast span mode: FULL_LIFESPAN (entire Ayurdaya lifespan) or NEXT_10_YEARS / NEXT_15_YEARS
+  forecast-mode: ${GEMINI_FORECAST_MODE:FULL_LIFESPAN}
+  # forecast-mode: NEXT_10_YEARS
+  forecast-years: ${GEMINI_FORECAST_YEARS:0}
   model: ${GEMINI_MODEL:gemini-3.6-flash}
   temperature: ${GEMINI_TEMPERATURE:0.4}
   thinking-budget: ${GEMINI_THINKING_BUDGET:1024}

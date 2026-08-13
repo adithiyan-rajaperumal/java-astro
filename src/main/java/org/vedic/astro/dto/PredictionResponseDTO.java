@@ -26,6 +26,12 @@ public class PredictionResponseDTO {
     private List<PastMilestone> pastMilestones;
     private List<YearlyPrediction> futurePredictions;
     private List<YearlyPrediction> lifetimePredictions;
+    private String forecastMode;
+    private int startYear;
+    private int endYear;
+    private int startAge;
+    private int endAge;
+    private int totalForecastYears;
 
     @Data
     @Builder

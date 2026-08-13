@@ -17,4 +17,6 @@ public class AppConfigDTO {
     private String geminiModel;
     private double temperature;
     private int thinkingBudget;
+    private String forecastMode;
+    private int forecastYears;
 }

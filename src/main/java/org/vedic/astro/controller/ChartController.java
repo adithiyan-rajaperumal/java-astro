@@ -37,6 +37,8 @@ public class ChartController {
         String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-3.6-flash";
         double temperature = geminiProperties != null ? geminiProperties.getTemperature() : 0.4;
         int thinkingBudget = geminiProperties != null ? geminiProperties.getThinkingBudget() : 1024;
+        String forecastMode = geminiProperties != null ? geminiProperties.getForecastMode() : "FULL_LIFESPAN";
+        int forecastYears = geminiProperties != null ? geminiProperties.getForecastYears() : 0;
         return ResponseEntity.ok(org.vedic.astro.dto.AppConfigDTO.builder()
                 .aiPredictionsEnabled(lifeEnabled)
                 .lifePredictionsEnabled(lifeEnabled)
@@ -45,6 +47,8 @@ public class ChartController {
                 .geminiModel(model)
                 .temperature(temperature)
                 .thinkingBudget(thinkingBudget)
+                .forecastMode(forecastMode)
+                .forecastYears(forecastYears)
                 .build());
     }
 

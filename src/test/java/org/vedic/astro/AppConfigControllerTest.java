@@ -27,6 +27,8 @@ public class AppConfigControllerTest {
                 .andExpect(jsonPath("$.dailyBalanEnabled").isBoolean())
                 .andExpect(jsonPath("$.pdfPredictionsEnabled").isBoolean())
                 .andExpect(jsonPath("$.temperature").isNumber())
-                .andExpect(jsonPath("$.thinkingBudget").isNumber());
+                .andExpect(jsonPath("$.thinkingBudget").isNumber())
+                .andExpect(jsonPath("$.forecastMode").isNotEmpty())
+                .andExpect(jsonPath("$.forecastYears").isNumber());
     }
 }

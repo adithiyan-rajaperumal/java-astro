@@ -21,6 +21,21 @@ public class GeminiProperties {
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
     private Integer maxOutputTokens; // null means do not set, let API default
+    private String forecastMode = "FULL_LIFESPAN";
+    private int forecastYears = 0;
+
+    public int resolveForecastYears(int currentAge, int ayurdayaCeilingAge) {
+        if (forecastYears > 0) {
+            return forecastYears;
+        }
+        if ("NEXT_10_YEARS".equalsIgnoreCase(forecastMode) || "10".equals(forecastMode)) {
+            return 10;
+        }
+        if ("NEXT_15_YEARS".equalsIgnoreCase(forecastMode) || "15".equals(forecastMode)) {
+            return 15;
+        }
+        return Math.max(1, ayurdayaCeilingAge - currentAge);
+    }
 
     public String getResolvedApiKey() {
         if (apiKey == null || apiKey.trim().isEmpty()) {
