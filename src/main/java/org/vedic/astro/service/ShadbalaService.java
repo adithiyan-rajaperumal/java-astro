@@ -294,9 +294,9 @@ public class ShadbalaService {
 
     private String evaluateStrengthCategory(double totalRupas, double minRequired) {
         double ratio = totalRupas / minRequired;
-        if (ratio >= 1.25) return "Very Strong";
-        if (ratio >= 1.0) return "Strong / Optimum";
-        if (ratio >= 0.8) return "Moderate";
-        return "Weak";
+        if (ratio >= 1.25) return "VERY_STRONG";
+        if (ratio >= 1.0) return "STRONG";
+        if (ratio >= 0.8) return "MODERATE";
+        return "WEAK";
     }
 }

@@ -622,16 +622,28 @@ function HoroscopePage({ settings }) {
                       {totalRupas.toFixed(2)} R ({pct}%)
                     </td>
                     <td>
-                      <span style={{ 
-                        color: isStrong ? '#27ae60' : '#e67e22',
-                        background: isStrong ? 'rgba(39, 174, 96, 0.1)' : 'rgba(230, 126, 34, 0.1)',
-                        padding: '2px 8px',
-                        borderRadius: '10px',
-                        fontWeight: 'bold',
-                        fontSize: '12px'
-                      }}>
-                        {strength.strengthCategory || (isStrong ? 'STRONG' : 'MODERATE')}
-                      </span>
+                      {(() => {
+                        const rawCat = (strength.strengthCategory || '').toLowerCase().replace(/[\s/_]+/g, '');
+                        let statusText = '';
+                        if (rawCat === 'verystrong') statusText = t('veryStrong', settings?.language) || 'Very Strong';
+                        else if (rawCat === 'strong' || rawCat === 'strongoptimum' || rawCat === 'optimum') statusText = t('strong', settings?.language) || t('optimum', settings?.language) || 'Strong';
+                        else if (rawCat === 'moderate') statusText = t('moderate', settings?.language) || 'Moderate';
+                        else if (rawCat === 'weak') statusText = t('weak', settings?.language) || 'Weak';
+                        else statusText = isStrong ? (t('strong', settings?.language) || 'Strong') : (t('moderate', settings?.language) || 'Moderate');
+
+                        return (
+                          <span style={{ 
+                            color: isStrong ? '#27ae60' : '#e67e22',
+                            background: isStrong ? 'rgba(39, 174, 96, 0.1)' : 'rgba(230, 126, 34, 0.1)',
+                            padding: '2px 8px',
+                            borderRadius: '10px',
+                            fontWeight: 'bold',
+                            fontSize: '12px'
+                          }}>
+                            {statusText}
+                          </span>
+                        );
+                      })()}
                     </td>
                   </tr>
                 );

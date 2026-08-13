@@ -213,7 +213,7 @@ public class PdfExportService {
 
             data.getShadbalaStrengths().getPlanetStrengths().forEach((p, s) -> {
                 String localizedPName = ts.getLabel("planet." + p.toUpperCase() + ".short");
-                String localizedStatus = ts.getLabel("shadbala.status." + s.getStrengthCategory().toLowerCase().replaceAll("\\s+", ""));
+                String localizedStatus = ts.getLabel("shadbala.status." + s.getStrengthCategory().toLowerCase().replaceAll("[\\s/_]+", ""));
                 sb.addCell(buildTableCell(localizedPName, bFont, Element.ALIGN_CENTER));
                 sb.addCell(buildTableCell(String.format("%.1f", s.getSthanaBala()), engBFont, Element.ALIGN_CENTER));
                 sb.addCell(buildTableCell(String.format("%.1f", s.getDigBala()), engBFont, Element.ALIGN_CENTER));
