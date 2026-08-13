@@ -413,7 +413,10 @@ public class GeminiPredictionService {
             planetLookup.put(pName.toLowerCase(), pObj);
         }
 
-        int maxForecastYears = Math.min(100 - currentAge, 30);
+        int targetLifespanAge = ayurdayaProfile != null && ayurdayaProfile.estimatedLifespanCeiling() > 0
+                ? ayurdayaProfile.estimatedLifespanCeiling()
+                : 85;
+        int maxForecastYears = Math.max(1, targetLifespanAge - currentAge);
         List<Map<String, Object>> yearlyAnchors = new ArrayList<>();
         for (int i = 0; i <= maxForecastYears; i++) {
             int yr = currentYear + i;
@@ -455,14 +458,13 @@ public class GeminiPredictionService {
           .append("3. 'aiYogas': Calculate and identify ALL classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Vipareeta Raja Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana) from the input JSON data with name, forming planets, and lifelong impact.\n")
           .append("4. 'aiDoshams': Evaluate all major doshams (Sevvai/Kuja Dosha, Kala Sarpa Dosha, Pitru Dosha, Papakarthari, Rahu-Ketu afflictions) from the input JSON data, determining whether they are active or nullified, the exact astrological nullification factors, and authentic Vedic remedies.\n")
           .append("5. 'pastKeyPhases': 2-3 pivotal life-defining turning points from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n")
-          .append("6. 'lifetimePredictions': Exhaustive, year-by-year forecasts covering the native's FULL REMAINING LIFESPAN starting from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") continuously through the EXACT calculated Ayurdaya lifespan age determined in Step 2.\n")
-          .append("   - For EACH year, a 'preComputedAnchor' is provided in the 'preComputedYearlyAnchors' section of the input JSON. You MUST cross-reference it for the correct Dasa-Bhukthi lords, their house placements, ruled houses, isLagnaLord flag, and dignity. DO NOT deviate from the anchor data.\n")
-          .append("   - For EACH year, you MUST provide 'yearlyTheme', 'detailedPrediction', 'astrologicalBasis' (explicit planetary combinations from D1/D9/D10/D12/D30 & running Dasa-Bhukthi), and 'cautionsAndRemedies'.\n")
-          .append("   - 'detailedPrediction' MUST be a deeply articulated, unconstrained narrative synthesized with unbroken lifespan continuity covering ALL 4 core life pillars without omission:\n")
-          .append("     (a) Career, Business & Wealth: Promotions, career transitions, entrepreneurial ventures, income trajectory, real estate/property/vehicle purchases, debts or wealth accumulation.\n")
-          .append("     (b) Health & Vitality Realities: Specific physical energy, organ health alerts, surgical/hospitalization risks during malefic periods, and vitality recovery phases.\n")
-          .append("     (c) Family, Marriage & Progeny: Marital dynamics, relationship harmony, spouse milestones, children's birth/education/achievements.\n")
-          .append("     (d) Parents, Elders & Mindset: Father/mother wellbeing (D12), elder care, bereavement risks if indicated during Maraka/Dusthana dasas, and spiritual growth.\n\n")
+          .append("6. 'lifetimePredictions': Exhaustive, unbroken year-by-year forecasts covering the native's FULL REMAINING LIFESPAN continuously from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") through year ").append(currentYear + maxForecastYears).append(" (Age ").append(targetLifespanAge).append(").\n")
+          .append("   - CRITICAL REQUIREMENT: You MUST include an entry in 'lifetimePredictions' for EVERY single year provided in 'preComputedYearlyAnchors' (total of ").append(maxForecastYears + 1).append(" years). Do NOT stop early or limit to 10-15 years.\n")
+          .append("   - To ensure the full lifespan fits perfectly without truncation, keep each year's entry concise, high-density, and impactful:\n")
+          .append("     * 'yearlyTheme': Sharp 1-line headline.\n")
+          .append("     * 'detailedPrediction': 2-3 potent, comprehensive sentences synthesizing (a) Career, Business & Wealth, (b) Health & Vitality Realities, (c) Family, Marriage & Progeny, and (d) Parents, Elders & Mindset with spiritual milestones.\n")
+          .append("     * 'astrologicalBasis': 1 concise sentence citing active Dasa-Bhukthi lords and D1/D9/D10/D12/D30 placements from the yearly anchor.\n")
+          .append("     * 'cautionsAndRemedies': 1 practical cautionary note & authentic Vedic remedy.\n\n")
           .append("Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
           .append("  \"overallSummary\": \"(Comprehensive synthesis)\",\n")
@@ -650,6 +652,7 @@ public class GeminiPredictionService {
         Map<String, Object> generationConfig = new HashMap<>();
         generationConfig.put("temperature", geminiProperties.getTemperature());
         generationConfig.put("responseMimeType", "application/json");
+        generationConfig.put("maxOutputTokens", 8192);
 
         if (geminiProperties.getThinkingBudget() > 0) {
             generationConfig.put("thinkingConfig", Map.of("thinkingBudget", geminiProperties.getThinkingBudget()));
@@ -1098,8 +1101,25 @@ public class GeminiPredictionService {
                     .build());
         }
 
+        int lagnaSign = 1;
+        int moonSign = 1;
+        if (c != null && c.getD1Chart() != null) {
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                if ("LAGNA".equalsIgnoreCase(p.getPlanetKey()) || "ASCENDANT".equalsIgnoreCase(p.getPlanetKey())) {
+                    lagnaSign = p.getSignNumber();
+                }
+                if ("MOON".equalsIgnoreCase(p.getPlanetKey()) || "CHANDRA".equalsIgnoreCase(p.getPlanetKey())) {
+                    moonSign = p.getSignNumber();
+                }
+            }
+        }
+        AyurdayaCalculationUtils.AyurdayaProfile ayurProfile = AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSign, moonSign, c != null ? c.getD1Chart() : null) != null
+                ? AyurdayaCalculationUtils.calculateAyurdaya(lagnaSign, moonSign, c != null ? c.getD1Chart() : null, dasas, birthYear)
+                : null;
+        int targetLifespanAge = ayurProfile != null && ayurProfile.estimatedLifespanCeiling() > 0 ? ayurProfile.estimatedLifespanCeiling() : 85;
+        int maxForecastYears = Math.max(1, targetLifespanAge - currentAge);
+
         List<PredictionResponseDTO.YearlyPrediction> predictions = new ArrayList<>();
-        int maxForecastYears = Math.min(100 - currentAge, 30);
         for (int i = 0; i <= maxForecastYears; i++) {
             int yr = currentYear + i;
             int age = currentAge + i;
