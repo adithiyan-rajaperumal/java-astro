@@ -3,7 +3,7 @@ import BirthForm from '../components/BirthForm';
 import IndianChart from '../components/IndianChart';
 import AiPredictionsView from '../components/AiPredictionsView';
 import DailyBalanView from '../components/DailyBalanView';
-import HealthLongevityView from '../components/HealthLongevityView';
+import LifeAnchorsLongevityView from '../components/LifeAnchorsLongevityView';
 import { t } from '../i18n/translations';
 import { getSavedHoroscopes, saveHoroscope, deleteSavedHoroscope, isProfileAlreadySaved } from '../utils/savedHoroscopes';
 
@@ -937,7 +937,7 @@ function HoroscopePage({ settings }) {
               className={`tab-btn ${activeSubTab === 'health' ? 'active' : ''}`}
               onClick={() => setActiveSubTab('health')}
             >
-              🌿 {t('healthAndLongevityTab', settings.language)}
+              {t('healthAndLongevityTab', settings.language)}
             </button>
             {lifeEnabled && (
               <button 
@@ -955,7 +955,7 @@ function HoroscopePage({ settings }) {
           {activeSubTab === 'shadbala' && renderShadbalaTab()}
           {activeSubTab === 'diagnostics' && renderDiagnosticsTab()}
           {activeSubTab === 'health' && (
-            <HealthLongevityView
+            <LifeAnchorsLongevityView
               chartData={report}
               language={settings.language}
             />
