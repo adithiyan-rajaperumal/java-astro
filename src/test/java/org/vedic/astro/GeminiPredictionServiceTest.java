@@ -56,7 +56,7 @@ public class GeminiPredictionServiceTest {
         // Pre-calculated structural diagnostics should NOT be passed to Gemini
         assertFalse(prompt.contains("Diagnostics:"));
         assertTrue(prompt.contains("detailedPrediction"));
-        assertTrue(prompt.contains("Ayurdaya Determination") || prompt.contains("ஆயுள் நிர்ணயம்"));
+        assertTrue(prompt.contains("Ayurdaya") || prompt.contains("ayurdayaProfile") || prompt.contains("ஆயுள் நிர்ணயம்"));
         assertTrue(prompt.contains("Career, Business & Wealth"));
         assertTrue(prompt.contains("Health & Vitality Realities"));
         assertTrue(prompt.contains("Family, Marriage & Progeny"));
@@ -461,6 +461,10 @@ public class GeminiPredictionServiceTest {
                 .karanam("Taitila")
                 .d1Chart(java.util.List.of(lagna, mercury, jupiter, venus, sun, saturn))
                 .currentDasaTimeline(java.util.List.of(dasa))
+                .structuralDiagnostics(DiagnosticsDTO.builder()
+                        .activeYogas(java.util.List.of(DiagnosticsDTO.YogaDetail.builder().name("Gajakesari Yoga").description("Moon-Jupiter Kendra").impactLevel("High").build()))
+                        .discoveredDoshams(Collections.emptyList())
+                        .build())
                 .build();
 
         PredictionRequestDTO req = PredictionRequestDTO.builder()
@@ -587,6 +591,21 @@ public class GeminiPredictionServiceTest {
         assertEquals("Venus", health.get("rogaLord").asText());
         assertTrue(health.get("calculatedOrganVulnerabilities").size() > 0);
         assertTrue(health.get("dietaryAndLifestyleDirectives").size() > 0);
+
+        // Verify Deterministic Ayurdaya Profile
+        com.fasterxml.jackson.databind.JsonNode ayurdaya = root.get("ayurdayaProfile");
+        assertNotNull(ayurdaya, "ayurdayaProfile must be present in prompt JSON");
+        assertNotNull(ayurdaya.get("longevityClassification"));
+        assertEquals("Poornayu", ayurdaya.get("longevityClassification").asText());
+        assertTrue(ayurdaya.get("estimatedLifespanCeiling").asInt() >= 75);
+        assertNotNull(ayurdaya.get("lifespanRange"));
+        assertNotNull(ayurdaya.get("threePairsDetails"));
+        assertNotNull(ayurdaya.get("criticalMarakaWindow"));
+        assertNotNull(ayurdaya.get("classicalRationale"));
+
+        // Verify Pre-Calculated Horoscopic Diagnostics
+        com.fasterxml.jackson.databind.JsonNode diag = root.get("preCalculatedDiagnostics");
+        assertNotNull(diag, "preCalculatedDiagnostics must be present in prompt JSON when available");
 
         // Verify Pre-Computed Yearly Anchors exist and are accurate
         com.fasterxml.jackson.databind.JsonNode anchors = root.get("preComputedYearlyAnchors");
