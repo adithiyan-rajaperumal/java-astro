@@ -42,13 +42,33 @@ export default function HealthLongevityView({ chartData, language }) {
   const formatPairTitle = (key) => {
     switch (key) {
       case 'pair1_lagnaLord_and_8thLord':
-        return language === 'ta' ? '1. லக்னாதிபதி & 8-ஆம் அதிபதி' : '1. Lagna Lord & 8th Lord';
+        return language === 'ta' ? '1. லக்னாதிபதி & 8-ஆம் அதிபதி' :
+               language === 'hi' ? '1. लग्नेश और अष्टमेश' :
+               language === 'te' ? '1. లగ్నాధిపతి & 8వ అధిపతి' :
+               language === 'kn' ? '1. ಲಗ್ನಾಧಿಪತಿ & 8ನೇ ಅಧಿಪತಿ' :
+               language === 'ml' ? '1. ലഗ്നാധിപനും 8-ാം അധിപനും' :
+               '1. Lagna Lord & 8th Lord';
       case 'pair2_moon_and_saturn':
-        return language === 'ta' ? '2. சந்திரன் & ஆயுள்காரகன் சனி' : '2. Moon & Saturn (Ayushkaraka)';
+        return language === 'ta' ? '2. சந்திரன் & ஆயுள்காரகன் சனி' :
+               language === 'hi' ? '2. चन्द्र और आयुष्कारक शनि' :
+               language === 'te' ? '2. చంద్రుడు & ఆయుష్కారక శని' :
+               language === 'kn' ? '2. ಚಂದ್ರ & ಆಯುಷ್ಕಾರಕ ಶನಿ' :
+               language === 'ml' ? '2. ചന്ദ്രനും ആയുഷ്കാരകനായ ശനിയും' :
+               '2. Moon & Saturn (Ayushkaraka)';
       case 'pair3_lagna_and_moon':
-        return language === 'ta' ? '3. லக்னம் & சந்திரன்' : '3. Lagna & Moon';
+        return language === 'ta' ? '3. லக்னம் & சந்திரன்' :
+               language === 'hi' ? '3. लग्न और चन्द्र' :
+               language === 'te' ? '3. లగ్నం & చంద్రుడు' :
+               language === 'kn' ? '3. ಲಗ್ನ & ಚಂದ್ರ' :
+               language === 'ml' ? '3. ലഗ്നവും ചന്ദ്രനും' :
+               '3. Lagna & Moon';
       case 'majorityConsensus':
-        return language === 'ta' ? 'பெரும்பான்மை முடிவு' : 'Majority Consensus';
+        return language === 'ta' ? 'பெரும்பான்மை முடிவு' :
+               language === 'hi' ? 'बहुमत सर्वसम्मत निर्णय' :
+               language === 'te' ? 'మెజారిటీ నిర్ణయం' :
+               language === 'kn' ? 'ಬಹುಮತದ ನಿರ್ಧಾರ' :
+               language === 'ml' ? 'ഭൂരിപക്ഷ തീരുമാനം' :
+               'Majority Consensus';
       default:
         return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
