@@ -43,6 +43,9 @@ public class ChartUiResponseDTO {
     private org.vedic.astro.util.AyurvedicAstrologyUtils.AyurvedicHealthProfile ayurvedicHealth;
     private org.vedic.astro.util.AyurdayaCalculationUtils.AyurdayaProfile ayurdayaProfile;
 
+    // Personal Elements, Deities & Life Anchors Engine
+    private LifeAnchorsProfile lifeAnchors;
+
     // AI Prediction Capabilities
     private boolean aiPredictionsEnabled;
 }

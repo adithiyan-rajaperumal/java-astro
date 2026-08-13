@@ -117,4 +117,20 @@ public class PdfExportServiceTest {
         assertNotNull(pdfBytes);
         assertTrue(pdfBytes.length > 5000, "PDF with full 12-chart varga suite should be substantial in size");
     }
+
+    @Test
+    public void testLifeAnchorsProfileIntegration() {
+        BirthDetailsDTO birth = new BirthDetailsDTO("Adithiyan", 1996, 7, 25, 17, 45, 0, 13.0827, 80.2707, "LAHIRI");
+        var panchangam = panchangamFactory.getEngine(org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM);
+        var chartResult = panchangam.calculate(birth);
+
+        ChartUiResponseDTO uiDto = orchestrationService.convertToUiDashboardResponse(chartResult, birth);
+        assertNotNull(uiDto.getLifeAnchors());
+        assertNotNull(uiDto.getLifeAnchors().numerology());
+        assertNotNull(uiDto.getLifeAnchors().deities());
+        assertNotNull(uiDto.getLifeAnchors().gemology());
+        assertNotNull(uiDto.getLifeAnchors().directions());
+        assertNotNull(uiDto.getLifeAnchors().structuralAnchors());
+        assertEquals(7, uiDto.getLifeAnchors().numerology().radicalDriverNumber());
+    }
 }

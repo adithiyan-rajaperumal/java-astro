@@ -33,5 +33,6 @@ public class ComprehensiveReportDTO {
     private DiagnosticsDTO structuralDiagnostics;
     private org.vedic.astro.util.AyurvedicAstrologyUtils.AyurvedicHealthProfile ayurvedicHealth;
     private org.vedic.astro.util.AyurdayaCalculationUtils.AyurdayaProfile ayurdayaProfile;
+    private LifeAnchorsProfile lifeAnchors;
     private PredictionResponseDTO aiPredictions;
 }

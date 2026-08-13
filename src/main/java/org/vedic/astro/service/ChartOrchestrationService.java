@@ -6,6 +6,7 @@ import org.vedic.astro.dto.BirthDetailsDTO;
 import org.vedic.astro.dto.ChartResponseDTO;
 import org.vedic.astro.dto.ChartUiResponseDTO;
 import org.vedic.astro.dto.ComprehensiveReportDTO;
+import org.vedic.astro.dto.LifeAnchorsProfile;
 import org.vedic.astro.model.ChartResult;
 import org.vedic.astro.model.DasaPeriod;
 import org.vedic.astro.model.PlanetaryPosition;
@@ -82,6 +83,8 @@ public class ChartOrchestrationService {
 
         var healthProfile = org.vedic.astro.util.AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSignNum, moonSignNum, d1List);
         var ayurdayaProfile = org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(lagnaSignNum, moonSignNum, d1List, dasas, pay.year());
+        var d9PosList = compileVargaList(9, res.getD1Positions(), null);
+        var lifeAnchorsProfile = buildLifeAnchorsProfile(lagnaSignNum, moonSignNum, d1, d9PosList, pay, res.getJulianDayUT());
 
         return ChartUiResponseDTO.builder().name(res.getName()).dateOfBirth(dob.toString())
                 .timeOfBirth(String.format("%02d:%02d:%02d", pay.hour(), pay.minute(), pay.second()))
@@ -96,13 +99,14 @@ public class ChartOrchestrationService {
                 .aiPredictionsEnabled(geminiProperties != null && geminiProperties.isFeatureEnabled())
                 .localMeanTime(res.getLocalMeanTime()).birthProfile(buildProfileHeader(res.getD1Positions()))
                 .d1Chart(d1List)
-                .d9Chart(compileVargaList(9, res.getD1Positions(), null))
+                .d9Chart(d9PosList)
                 .bhavaChart(compileVargaList(-1, res.getD1Positions(), null))
                 .currentDasaTimeline(dasas)
                 .shadbalaStrengths(shadbalaService.calculateShadbala(d1))
                 .structuralDiagnostics(diagnosticsService.runHoroscopeDiagnostics(d1))
                 .ayurvedicHealth(healthProfile)
                 .ayurdayaProfile(ayurdayaProfile)
+                .lifeAnchors(lifeAnchorsProfile)
                 .build();
     }
 
@@ -175,6 +179,8 @@ public class ChartOrchestrationService {
 
         var pdfHealthProfile = org.vedic.astro.util.AyurvedicAstrologyUtils.calculateHealthProfile(pdfLagnaSign, pdfMoonSign, d1PosList);
         var pdfAyurdayaProfile = org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(pdfLagnaSign, pdfMoonSign, d1PosList, pdfDasas, pay.year());
+        var pdfD9List = compileVargaList(9, d1, cusps);
+        var pdfLifeAnchors = buildLifeAnchorsProfile(pdfLagnaSign, pdfMoonSign, d1, pdfD9List, pay, res.getJulianDayUT());
 
         return ComprehensiveReportDTO.builder()
                 .name(res.getName())
@@ -198,6 +204,7 @@ public class ChartOrchestrationService {
                 .structuralDiagnostics(diagnosticsService.runHoroscopeDiagnostics(d1))
                 .ayurvedicHealth(pdfHealthProfile)
                 .ayurdayaProfile(pdfAyurdayaProfile)
+                .lifeAnchors(pdfLifeAnchors)
                 .build();
     }
 
@@ -258,5 +265,31 @@ public class ChartOrchestrationService {
                 .displayName(ts.getLabel("planet." + key + ".short")).signNumber(p.getSignNumber())
                 .rashiName(ts.getLocalizedRashi(p.getSignNumber())).degreeInSign(p.getDegreeInSign())
                 .formattedDegree(ZodiacUtils.formatDMS(p.getDegreeInSign())).build();
+    }
+
+    private LifeAnchorsProfile buildLifeAnchorsProfile(
+            int lagnaSign,
+            int moonSign,
+            Map<String, PlanetaryPosition> d1,
+            List<ChartResponseDTO.PositionDetail> d9,
+            BirthDetailsDTO pay,
+            double julianDay) {
+
+        String lagnaLord = org.vedic.astro.util.PlanetDignityUtils.getSignLord(lagnaSign);
+        var numerology = org.vedic.astro.util.NumerologyUtils.calculateNumerology(pay.day(), pay.month(), pay.year(), lagnaLord);
+        var luckyDates = org.vedic.astro.util.NumerologyUtils.calculateLuckyDates(numerology.radicalDriverNumber(), moonSign, java.util.Collections.emptyList());
+        var deities = org.vedic.astro.util.SpiritualDeityUtils.calculateSpiritualDeities(d1, d9);
+        var gemology = org.vedic.astro.util.GemologyEngineUtils.calculateGemologyRecommendation(lagnaSign, d1);
+        var structuralBundle = org.vedic.astro.util.StructuralAnchorsUtils.calculateStructuralAnchors(lagnaSign, moonSign, d1, julianDay);
+
+        return new LifeAnchorsProfile(
+                numerology,
+                structuralBundle.luckyDay(),
+                luckyDates,
+                structuralBundle.directions(),
+                deities,
+                gemology,
+                structuralBundle.structuralAnchors()
+        );
     }
 }
