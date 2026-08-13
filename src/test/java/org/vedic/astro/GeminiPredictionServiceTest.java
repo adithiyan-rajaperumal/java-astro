@@ -64,6 +64,56 @@ public class GeminiPredictionServiceTest {
     }
 
     @Test
+    public void testRasiAndBhavaDisambiguationWithNonAriesLagna() {
+        BirthDetailsDTO birth = new BirthDetailsDTO("Suresh", 1990, 8, 20, 10, 15, 0, 13.0827, 80.2707, "LAHIRI");
+
+        // Lagna in Taurus (Sign 2 / Vrishabha), Sun in Leo (Sign 5 / Simha), Moon in Aries (Sign 1 / Mesha)
+        ChartResponseDTO.PositionDetail lagnaPos = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("LAGNA").displayName("Lagna").signNumber(2).rashiName("Vrishabha").degreeInSign(12.5).build();
+        ChartResponseDTO.PositionDetail sunPos = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SUN").displayName("Sun").signNumber(5).rashiName("Simha").degreeInSign(4.2).build();
+        ChartResponseDTO.PositionDetail moonPos = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("MOON").displayName("Moon").signNumber(1).rashiName("Mesha").degreeInSign(18.0).build();
+
+        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
+                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Vrishabha").rashi("Mesha").nakshatra("Bharani").build())
+                .panchangamSystem("DRIK_TIRUKANITHAM")
+                .d1Chart(java.util.List.of(lagnaPos, sunPos, moonPos))
+                .currentDasaTimeline(Collections.emptyList())
+                .build();
+
+        PredictionRequestDTO req = PredictionRequestDTO.builder()
+                .birthDetails(birth)
+                .chartData(chart)
+                .language("ta")
+                .build();
+
+        String prompt = predictionService.constructAstrologicalPrompt(req);
+        assertNotNull(prompt);
+
+        // Verify D1 Rasi formatting uses Rasi, NOT H
+        assertTrue(prompt.contains("D1[Rasi-ZodiacSigns]:"));
+        assertTrue(prompt.contains("Sun:Simha(Rasi5@4.2°)"));
+        assertTrue(prompt.contains("Moon:Mesha(Rasi1@18.0°)"));
+        assertFalse(prompt.contains("Sun:Simha(H5"));
+
+        // Verify Bhava (House) from Taurus (Sign 2) Lagna:
+        // Lagna in Sign 2 -> House 1
+        // Sun in Sign 5 -> House 4 ((5 - 2 + 12) % 12 + 1 = 4)
+        // Moon in Sign 1 -> House 12 ((1 - 2 + 12) % 12 + 1 = 12)
+        assertTrue(prompt.contains("Bhava[Houses-From-Lagna]:"));
+        assertTrue(prompt.contains("Lagna:House1(Vrishabha)"));
+        assertTrue(prompt.contains("Sun:House4(Simha)"));
+        assertTrue(prompt.contains("Moon:House12(Mesha)"));
+
+        // Verify system instructions contain Rasi vs Bhava disambiguation rules
+        String systemInstruction = predictionService.constructSystemInstruction("ta");
+        assertTrue(systemInstruction.contains("CRITICAL ASTROLOGICAL INTERPRETATION RULES"));
+        assertTrue(systemInstruction.contains("Rasi"));
+        assertTrue(systemInstruction.contains("Bhava"));
+    }
+
+    @Test
     public void testUnavailableResponseWhenDisabledOrFails() {
         PredictionResponseDTO lifeResp = predictionService.createUnavailableLifeResponse("ta");
         assertNotNull(lifeResp);
@@ -234,5 +284,157 @@ public class GeminiPredictionServiceTest {
         assertNotNull(unavail);
         assertFalse(unavail.isEnabled());
         assertTrue(unavail.getMessage().contains("கிடைக்கவில்லை"));
+    }
+
+    @Test
+    public void testLifetimePromptIncludesPlanetaryDignities() {
+        BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
+
+        // Sun in Aries (Sign 1) -> Exalted
+        ChartResponseDTO.PositionDetail sun = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SUN").displayName("Sun").signNumber(1).rashiName("Mesha").degreeInSign(10.0).build();
+        // Saturn in Aries (Sign 1) -> Debilitated, and Combust (close to Sun at 12°)
+        ChartResponseDTO.PositionDetail saturn = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SATURN").displayName("Saturn").signNumber(1).rashiName("Mesha").degreeInSign(12.0).build();
+        // Mars in Aries (Sign 1) -> Own Sign
+        ChartResponseDTO.PositionDetail mars = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("MARS").displayName("Mars").signNumber(1).rashiName("Mesha").degreeInSign(25.0).build();
+
+        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
+                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Mesha").nakshatra("Ashwini").build())
+                .panchangamSystem("DRIK_TIRUKANITHAM")
+                .d1Chart(java.util.List.of(sun, saturn, mars))
+                .build();
+
+        PredictionRequestDTO req = PredictionRequestDTO.builder()
+                .birthDetails(birth)
+                .chartData(chart)
+                .language("ta")
+                .build();
+
+        String prompt = predictionService.constructAstrologicalPrompt(req);
+        assertNotNull(prompt);
+        assertTrue(prompt.contains("D1[Rasi-ZodiacSigns]:"));
+        assertTrue(prompt.contains("Sun:Mesha(Rasi1@10.0°)[Exalted]"));
+        assertTrue(prompt.contains("Saturn:Mesha(Rasi1@12.0°)[Debilitated][Combust]"));
+        assertTrue(prompt.contains("Mars:Mesha(Rasi1@25.0°)[Own]"));
+    }
+
+    @Test
+    public void testLifetimePromptIncludesDetailedBhukthisAndDiagnostics() {
+        BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
+
+        org.vedic.astro.model.DasaPeriod.BhukthiPeriod bhukthi1 = org.vedic.astro.model.DasaPeriod.BhukthiPeriod.builder()
+                .planetName("Venus").startDate(LocalDate.of(2024, 1, 1)).endDate(LocalDate.of(2026, 5, 1)).build();
+        org.vedic.astro.model.DasaPeriod.BhukthiPeriod bhukthi2 = org.vedic.astro.model.DasaPeriod.BhukthiPeriod.builder()
+                .planetName("Sun").startDate(LocalDate.of(2026, 5, 2)).endDate(LocalDate.of(2027, 5, 1)).build();
+
+        org.vedic.astro.model.DasaPeriod dasa = org.vedic.astro.model.DasaPeriod.builder()
+                .planetName("Jupiter")
+                .startDate(LocalDate.of(2020, 1, 1))
+                .endDate(LocalDate.of(2036, 1, 1))
+                .bhukthis(java.util.List.of(bhukthi1, bhukthi2))
+                .build();
+
+        DiagnosticsDTO diag = DiagnosticsDTO.builder()
+                .activeYogas(java.util.List.of(DiagnosticsDTO.YogaDetail.builder().name("Gajakesari Yoga").description("Jupiter-Moon Kendra").build()))
+                .discoveredDoshams(java.util.List.of(DiagnosticsDTO.DoshaDetail.builder().name("Sevvai Dosha").detected(true).nullified(true).nullificationReason("Jupiter Aspect").build()))
+                .build();
+
+        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
+                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Mesha").nakshatra("Ashwini").build())
+                .panchangamSystem("DRIK_TIRUKANITHAM")
+                .currentDasaTimeline(java.util.List.of(dasa))
+                .structuralDiagnostics(diag)
+                .build();
+
+        PredictionRequestDTO req = PredictionRequestDTO.builder()
+                .birthDetails(birth)
+                .chartData(chart)
+                .language("ta")
+                .build();
+
+        String prompt = predictionService.constructAstrologicalPrompt(req);
+        assertNotNull(prompt);
+        assertTrue(prompt.contains("Vimshottari Dasa & Bhukthi Sub-Periods:"));
+        assertTrue(prompt.contains("Jupiter Mahadasa"));
+        assertTrue(prompt.contains("Jupiter-Venus Bhukthi"));
+        assertTrue(prompt.contains("Jupiter-Sun Bhukthi"));
+        assertTrue(prompt.contains("Pre-Calculated Yogas:"));
+        assertTrue(prompt.contains("Gajakesari Yoga"));
+        assertTrue(prompt.contains("Evaluated Doshams:"));
+        assertTrue(prompt.contains("Sevvai Dosha [Nullified: Jupiter Aspect]"));
+    }
+
+    @Test
+    public void testDailyPromptIncludesTarabalamAndGocharaHouse() {
+        BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
+
+        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
+                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Mesha").nakshatra("Ashwini").build())
+                .build();
+
+        DailyBalanRequestDTO req = DailyBalanRequestDTO.builder()
+                .birthDetails(birth)
+                .chartData(chart)
+                .language("ta")
+                .build();
+
+        // Transit Moon in Kanya (Virgo / Sign 6) with Hasta Nakshatra (Star 13)
+        // From Ashwini (Star 1) to Hasta (Star 13): (13 - 1 + 27) % 9 + 1 = 12 % 9 + 1 = 4 (Kshema Tara)
+        // From Mesha (Sign 1) to Kanya (Sign 6): (6 - 1 + 12) % 12 + 1 = 6 (6th House)
+        DailyPanchangamDTO panchangam = new DailyPanchangamDTO(
+                "2026-08-10", "06:00", "18:00", "07:00", "19:00",
+                null,
+                new DailyPanchangamDTO.PanchangamElementDTO(13, "Hasta", "அஸ்தம்", "18:00", null, null, null),
+                null, null,
+                "Kanya",
+                null, null, null, null, null, null, null, null,
+                java.util.List.of(),
+                0, 0.0, false, false, false, false, false, null, null
+        );
+
+        String prompt = predictionService.constructDailyAstrologicalPrompt(req, panchangam, LocalDate.of(2026, 8, 10));
+        assertNotNull(prompt);
+        assertTrue(prompt.contains("Tarabalam:"));
+        assertTrue(prompt.contains("க்ஷேம தாரை (4/9"));
+        assertTrue(prompt.contains("Gochara Moon from Janma Rasi: House 6"));
+    }
+
+    @Test
+    public void testMatchingPromptIncludesD9NavamsaPositions() {
+        BirthDetailsDTO boy = new BirthDetailsDTO("Karthik", 1992, 4, 18, 9, 30, 0, 13.0827, 80.2707, "LAHIRI");
+        BirthDetailsDTO girl = new BirthDetailsDTO("Priya", 1995, 8, 22, 14, 15, 0, 13.0827, 80.2707, "LAHIRI");
+
+        org.vedic.astro.matching.dto.MatchingRequestDTO req = new org.vedic.astro.matching.dto.MatchingRequestDTO(
+                boy, girl, org.vedic.astro.matching.MatchingType.ASHTA_KOOTA, org.vedic.astro.matching.StrictnessLevel.MODERATE
+        );
+
+        ChartResponseDTO.PositionDetail boyD9Sun = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SUN").displayName("Sun").rashiName("Simha").build();
+        ChartResponseDTO.PositionDetail girlD9Moon = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("MOON").displayName("Moon").rashiName("Vrishabha").build();
+
+        org.vedic.astro.matching.dto.MatchingResponseDTO classical = org.vedic.astro.matching.dto.MatchingResponseDTO.builder()
+                .totalScore(28.0)
+                .maxScore(36.0)
+                .percentage(77.8)
+                .verdict("Good")
+                .boyProfile(ChartUiResponseDTO.builder()
+                        .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Mesha").rashi("Thula").nakshatra("Swati").nakshatraPada(2).build())
+                        .d9Chart(java.util.List.of(boyD9Sun))
+                        .build())
+                .girlProfile(ChartUiResponseDTO.builder()
+                        .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Karka").rashi("Mithuna").nakshatra("Ardra").nakshatraPada(3).build())
+                        .d9Chart(java.util.List.of(girlD9Moon))
+                        .build())
+                .build();
+
+        String prompt = predictionService.constructMatchingPrompt(req, classical);
+        assertNotNull(prompt);
+        assertTrue(prompt.contains("Boy-D9[Navamsa]:"));
+        assertTrue(prompt.contains("Sun:Simha"));
+        assertTrue(prompt.contains("Girl-D9[Navamsa]:"));
+        assertTrue(prompt.contains("Moon:Vrishabha"));
     }
 }
