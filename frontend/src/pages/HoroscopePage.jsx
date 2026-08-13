@@ -148,7 +148,7 @@ function HoroscopePage({ settings }) {
     setDailyBalan(null);
     setActiveSubTab('charts'); // Always default to charts on calculate
     try {
-      const response = await fetch('/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM', {
+      const response = await fetch(`/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM&language=${settings.language}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -168,6 +168,25 @@ function HoroscopePage({ settings }) {
       setLoading(false);
     }
   };
+
+  // Automatically refresh horoscope report when language changes
+  useEffect(() => {
+    if (formPayload && report) {
+      fetch(`/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM&language=${settings.language}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
+        body: JSON.stringify(formPayload)
+      })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setReport(data);
+      })
+      .catch(console.error);
+    }
+  }, [settings.language]);
 
   const getLifeStorageKey = (payload, lang) => {
     if (!payload) return null;

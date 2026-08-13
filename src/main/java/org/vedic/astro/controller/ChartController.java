@@ -55,7 +55,14 @@ public class ChartController {
     @PostMapping(path = "/calculate", produces = "application/json;charset=UTF-8")
     public ResponseEntity<ChartUiResponseDTO> calculateNatalCharts(
             @RequestBody BirthDetailsDTO birthDetails,
-            @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType) {
+            @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType,
+            @RequestParam(required = false) String language,
+            @RequestHeader(value = "Accept-Language", defaultValue = "en") String acceptLanguage) {
+
+        String lang = (language != null && !language.isBlank()) ? language : acceptLanguage;
+        if (lang != null && !lang.isBlank()) {
+            org.springframework.context.i18n.LocaleContextHolder.setLocale(new Locale(lang.split("[,;_-]")[0]));
+        }
 
         // Factory resolves strategy pattern dynamically
         PanchangamEngine engine = panchangamFactory.getEngine(systemType);
