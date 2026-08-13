@@ -413,13 +413,11 @@ public class GeminiPredictionService {
             planetLookup.put(pName.toLowerCase(), pObj);
         }
 
-        int targetLifespanAge = ayurdayaProfile != null && ayurdayaProfile.estimatedLifespanCeiling() > 0
-                ? ayurdayaProfile.estimatedLifespanCeiling()
-                : 85;
-        int maxForecastYears = geminiProperties != null
+        int targetLifespanAge = 95;
+        int maxForecastYears = geminiProperties != null && geminiProperties.is10YearForecastMode()
                 ? geminiProperties.resolveForecastYears(currentAge, targetLifespanAge)
                 : Math.max(1, targetLifespanAge - currentAge);
-        boolean is10YearMode = maxForecastYears <= 15;
+        boolean is10YearMode = geminiProperties != null && geminiProperties.is10YearForecastMode();
         int targetEndYear = currentYear + maxForecastYears;
         int targetEndAge = currentAge + maxForecastYears;
 
@@ -458,11 +456,11 @@ public class GeminiPredictionService {
           .append("2. 'healthAnalysis':\n")
           .append("   - 'ayurvedicConstitution': Vata/Pitta/Kapha balance deduced from Lagna, Moon, and 6th house.\n")
           .append("   - 'organVulnerabilities': 2-4 specific vulnerable organs deduced from 6th/8th/12th houses & D30 Trimsamsa.\n")
-          .append("   - 'longevityVitalitySummary': Ground your longevity reading in the pre-calculated 'ayurdayaProfile' from the input JSON. Explicitly state the longevity classification (").append(ayurdayaProfile.longevityClassification()).append(") and state the exact calculated lifespan range and ceiling age (e.g. '").append(ayurdayaProfile.lifespanRange()).append("'). Explain the Parashara-Jaimini three-pair evaluation and Kakshya adjustments from the JSON data.\n")
+          .append("   - 'longevityVitalitySummary': Independently calculate and determine the native's classical Ayurdaya (Longevity) by evaluating the Lagna Lord, 8th Lord, Moon, and Saturn (Ayushkaraka), applying Parashara and Jaimini 3-pair principles and Kakshya adjustments from the astrological data. State your calculated longevity classification (Poornayu / Madhyayu / Alpayu) and the exact estimated lifespan range & ceiling age (e.g. '75 - 90 Years') derived from your astrological evaluation. Explain the underlying planetary rationale.\n")
           .append("   - 'recommendedDietAndLifestyle': Targeted Ayurvedic diet and lifestyle practices.\n")
           .append("   - 'PER-YEAR ANCHOR MANDATE': For all longitudinal predictions, rely on the preComputedYearlyAnchors object in the JSON for the correct planetary dignity and placement at any specific age.\n")
-          .append("3. 'aiYogas': Calculate and identify ALL classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Vipareeta Raja Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana) from the input JSON data with name, forming planets, and lifelong impact.\n")
-          .append("4. 'aiDoshams': Evaluate all major doshams (Sevvai/Kuja Dosha, Kala Sarpa Dosha, Pitru Dosha, Papakarthari, Rahu-Ketu afflictions) from the input JSON data, determining whether they are active or nullified, the exact astrological nullification factors, and authentic Vedic remedies.\n")
+          .append("3. 'aiYogas': Independently identify and calculate ALL classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Vipareeta Raja Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana) from the planetary matrix and 12-Varga charts with yoga name, forming planets, and lifelong impact.\n")
+          .append("4. 'aiDoshams': Independently evaluate all major Vedic Doshams (Sevvai/Kuja Dosha, Kala Sarpa Dosha, Pitru Dosha, Papakarthari, Rahu-Ketu afflictions) from the planetary data, calculating whether each is active or nullified based on classical cancellation rules, the exact astrological nullification factors, and authentic Vedic remedies.\n")
           .append("5. 'pastKeyPhases': 2-3 pivotal life-defining turning points from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n");
 
         if (is10YearMode) {
@@ -474,8 +472,8 @@ public class GeminiPredictionService {
               .append("     * 'astrologicalBasis': Detailed astrological explanation explaining active Dasa-Bhukthi-Pratyantar lords, transits (Jupiter, Saturn, Rahu-Ketu Gocharam), and relevant Varga alignments (D9, D10, D12, D30).\n")
               .append("     * 'cautionsAndRemedies': Highly specific, practical Vedic remedies (exact mantra with recitation count, specific deity archana, targeted charity on designated days, and timing guidance).\n\n");
         } else {
-            sb.append("6. 'lifetimePredictions': Exhaustive, unbroken year-by-year forecasts covering the native's FULL REMAINING LIFESPAN continuously from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") through year ").append(targetEndYear).append(" (Age ").append(targetEndAge).append(").\n")
-              .append("   - CRITICAL REQUIREMENT: You MUST include an entry in 'lifetimePredictions' for EVERY single year provided in 'preComputedYearlyAnchors' (total of ").append(maxForecastYears + 1).append(" years). Do NOT stop early or limit to 10-15 years.\n")
+            sb.append("6. 'lifetimePredictions': Exhaustive, unbroken year-by-year forecasts covering the native's FULL REMAINING LIFESPAN continuously from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") up to your calculated Ayurdaya Lifespan Ceiling Age (e.g. Age 80 to 95+).\n")
+              .append("   - CRITICAL REQUIREMENT: You MUST include an unbroken, sequential entry in 'lifetimePredictions' for EVERY single year from current age ").append(currentAge).append(" continuously up to the lifespan ceiling age you calculated in your Ayurdaya evaluation (e.g. 40 to 60+ continuous yearly entries). Do NOT stop early or limit to 10-15 years.\n")
               .append("   - Keep each year's entry concise, high-density, and impactful:\n")
               .append("     * 'yearlyTheme': Sharp 1-line headline.\n")
               .append("     * 'detailedPrediction': 2-3 potent, comprehensive sentences synthesizing (a) Career, Business & Wealth, (b) Health & Vitality Realities, (c) Family, Marriage & Progeny, and (d) Parents, Elders & Mindset with spiritual milestones.\n")

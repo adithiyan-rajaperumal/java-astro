@@ -24,6 +24,14 @@ public class GeminiProperties {
     private String forecastMode = "FULL_LIFESPAN";
     private int forecastYears = 0;
 
+    public boolean is10YearForecastMode() {
+        return (forecastYears > 0 && forecastYears <= 15)
+                || "NEXT_10_YEARS".equalsIgnoreCase(forecastMode)
+                || "10".equals(forecastMode)
+                || "NEXT_15_YEARS".equalsIgnoreCase(forecastMode)
+                || "15".equals(forecastMode);
+    }
+
     public int resolveForecastYears(int currentAge, int ayurdayaCeilingAge) {
         if (forecastYears > 0) {
             return forecastYears;
