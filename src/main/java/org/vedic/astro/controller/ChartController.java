@@ -16,6 +16,7 @@ import org.vedic.astro.service.ChartOrchestrationService;
 import org.vedic.astro.service.PdfExportService;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/v1/astrology")
