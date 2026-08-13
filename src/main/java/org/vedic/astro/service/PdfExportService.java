@@ -285,9 +285,7 @@ public class PdfExportService {
                 // 1. FIRST: YOGAMS
                 if (diag.getActiveYogas() != null && !diag.getActiveYogas().isEmpty()) {
                     document.newPage();
-                    String yogasHeader = "ta".equalsIgnoreCase(lang)
-                            ? "சுப யோகங்கள் & அமைப்புகள் (Active Auspicious Yogas)"
-                            : "Active Auspicious Yogas";
+                    String yogasHeader = ts.getLabel("pdf.yogas.title");
                     Paragraph yogaTitle = buildMixedParagraph(yogasHeader, tFont, engTFont);
                     yogaTitle.setAlignment(Element.ALIGN_CENTER);
                     yogaTitle.setSpacingAfter(12);
@@ -298,11 +296,11 @@ public class PdfExportService {
                     yogaTab.setSpacingAfter(14);
                     yogaTab.setWidths(new float[]{35f, 65f});
 
-                    PdfPCell yh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "யோகத்தின் பெயர்" : "Yoga Name", boldB, Element.ALIGN_CENTER);
+                    PdfPCell yh1 = buildTableCell(ts.getLabel("pdf.yogas.hdr.name"), boldB, Element.ALIGN_CENTER);
                     yh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                     yogaTab.addCell(yh1);
 
-                    PdfPCell yh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "விபரம் & சுப பலன்கள்" : "Description & Impact", boldB, Element.ALIGN_CENTER);
+                    PdfPCell yh2 = buildTableCell(ts.getLabel("pdf.yogas.hdr.desc"), boldB, Element.ALIGN_CENTER);
                     yh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                     yogaTab.addCell(yh2);
 
@@ -317,9 +315,7 @@ public class PdfExportService {
 
                 // 2. SECOND: DHOSAMS
                 if (diag.getDiscoveredDoshams() != null && !diag.getDiscoveredDoshams().isEmpty()) {
-                    String doshasHeader = "ta".equalsIgnoreCase(lang)
-                            ? "தோஷங்கள் & நிவர்த்தி/பரிகாரங்கள் (Discovered Doshams & Remedies)"
-                            : "Discovered Doshams & Remedies";
+                    String doshasHeader = ts.getLabel("pdf.doshas.title");
                     Paragraph doshaTitle = buildMixedParagraph(doshasHeader, sFont, engSFont);
                     doshaTitle.setSpacingAfter(8);
                     document.add(doshaTitle);
@@ -329,23 +325,23 @@ public class PdfExportService {
                     doshaTab.setSpacingAfter(14);
                     doshaTab.setWidths(new float[]{30f, 20f, 50f});
 
-                    PdfPCell dh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "தோஷம்" : "Dosha Name", boldB, Element.ALIGN_CENTER);
+                    PdfPCell dh1 = buildTableCell(ts.getLabel("pdf.doshas.hdr.name"), boldB, Element.ALIGN_CENTER);
                     dh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                     doshaTab.addCell(dh1);
 
-                    PdfPCell dh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நிலை" : "Status", boldB, Element.ALIGN_CENTER);
+                    PdfPCell dh2 = buildTableCell(ts.getLabel("pdf.doshas.hdr.status"), boldB, Element.ALIGN_CENTER);
                     dh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                     doshaTab.addCell(dh2);
 
-                    PdfPCell dh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நிவர்த்தி & பரிகாரம்" : "Nullification & Remedy", boldB, Element.ALIGN_CENTER);
+                    PdfPCell dh3 = buildTableCell(ts.getLabel("pdf.doshas.hdr.remedy"), boldB, Element.ALIGN_CENTER);
                     dh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                     doshaTab.addCell(dh3);
 
                     for (var d : diag.getDiscoveredDoshams()) {
                         doshaTab.addCell(buildTableCell(d.getName(), boldB, Element.ALIGN_LEFT));
                         String statusStr = d.isNullified()
-                                ? ("ta".equalsIgnoreCase(lang) ? "நிவர்த்தி" : "Nullified")
-                                : (d.isActive() ? ("ta".equalsIgnoreCase(lang) ? "செயலில் உள்ளது" : "Active") : ("ta".equalsIgnoreCase(lang) ? "இல்லை" : "None"));
+                                ? ts.getLabel("pdf.status.nullified")
+                                : (d.isActive() ? ts.getLabel("pdf.status.active") : ts.getLabel("pdf.status.none"));
                         doshaTab.addCell(buildTableCell(statusStr, bFont, Element.ALIGN_CENTER));
 
                         String remedy = (d.getNullificationReason() != null ? d.getNullificationReason() + " " : "") +
@@ -362,9 +358,7 @@ public class PdfExportService {
             if (pdfExportProperties.isIncludeLifeAnchors() && data.getLifeAnchors() != null) {
                 var anchors = data.getLifeAnchors();
                 document.newPage();
-                String anchorsHeader = "ta".equalsIgnoreCase(lang)
-                        ? "வாழ்க்கை நங்கூரங்கள் & அதிர்ஷ்ட கூறுகள் (Life Anchors & Longevity)"
-                        : "Personal Elements, Deities & Life Anchors";
+                String anchorsHeader = ts.getLabel("pdf.lifeanchors.title");
                 Paragraph anchTitle = buildMixedParagraph(anchorsHeader, tFont, engTFont);
                 anchTitle.setAlignment(Element.ALIGN_CENTER);
                 anchTitle.setSpacingAfter(12);
@@ -375,31 +369,31 @@ public class PdfExportService {
                 anchTab.setSpacingAfter(14);
                 anchTab.setWidths(new float[]{40f, 60f});
 
-                PdfPCell h1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நங்கூரம் / அதிர்ஷ்ட கூறு" : "Life Anchor Factor", boldB, Element.ALIGN_CENTER);
+                PdfPCell h1 = buildTableCell(ts.getLabel("pdf.lifeanchors.hdr.factor"), boldB, Element.ALIGN_CENTER);
                 h1.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                 anchTab.addCell(h1);
 
-                PdfPCell h2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "விபரம் & வழிகாட்டுதல்" : "Details & Astrological Guidance", boldB, Element.ALIGN_CENTER);
+                PdfPCell h2 = buildTableCell(ts.getLabel("pdf.lifeanchors.hdr.details"), boldB, Element.ALIGN_CENTER);
                 h2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                 anchTab.addCell(h2);
 
                 if (anchors.deities() != null) {
                     var d = anchors.deities();
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "இஷ்ட தெய்வம் (Ishta Devata)" : "Ishta Devata (12th from Karakamsa)", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.ishta_devata"), boldB, Element.ALIGN_LEFT));
                     anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? d.ishtaDevataTamil() : d.ishtaDevata(), bFont, Element.ALIGN_LEFT));
 
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "தர்ம தெய்வம் (Dharma Devata)" : "Dharma Devata (9th from Karakamsa)", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.dharma_devata"), boldB, Element.ALIGN_LEFT));
                     anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? d.dharmaDevataTamil() : d.dharmaDevata(), bFont, Element.ALIGN_LEFT));
 
                     if (d.kulaDevataRemedy() != null) {
-                        anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "குலதெய்வ அருள் நிலை (Kula Devata)" : "Kula Devata Status", boldB, Element.ALIGN_LEFT));
+                        anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.kula_devata"), boldB, Element.ALIGN_LEFT));
                         anchTab.addCell(buildTableCell(d.kulaDevataRemedy(), bFont, Element.ALIGN_LEFT));
                     }
                 }
 
                 if (anchors.gemology() != null) {
                     var g = anchors.gemology();
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "யோக ரத்தினம் (Lucky Gemstone)" : "Recommended Gemstone", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.gemstone"), boldB, Element.ALIGN_LEFT));
                     String gemDetails = ("ta".equalsIgnoreCase(lang) ? g.primaryGemstoneTamil() : g.primaryGemstone()) +
                             " | " + g.recommendedMetal() + " | " + g.recommendedFinger() + " | " + g.activationDayAndTiming();
                     anchTab.addCell(buildTableCell(gemDetails, bFont, Element.ALIGN_LEFT));
@@ -407,29 +401,29 @@ public class PdfExportService {
 
                 if (anchors.numerology() != null) {
                     var n = anchors.numerology();
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "எண்கணிதம் (Numerology)" : "Numerology Numbers", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.numerology"), boldB, Element.ALIGN_LEFT));
                     String numStr = "Driver: " + n.radicalDriverNumber() + " (" + n.radicalRulingPlanet() + ") | Conductor: " +
                             n.destinyConductorNumber() + " (" + n.destinyRulingPlanet() + ") | Planet No: " + n.astrologicalPlanetNumber();
                     anchTab.addCell(buildTableCell(numStr, bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.luckyDates() != null && anchors.luckyDates().primaryLuckyDates() != null) {
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "அதிர்ஷ்ட தேதிகள் (Lucky Dates)" : "Monthly Lucky Dates", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.lucky_dates"), boldB, Element.ALIGN_LEFT));
                     anchTab.addCell(buildTableCell(anchors.luckyDates().primaryLuckyDates().toString(), bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.luckyDay() != null) {
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப கிழமை (Lucky Weekday)" : "Lucky Weekday (Vara)", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.lucky_day"), boldB, Element.ALIGN_LEFT));
                     anchTab.addCell(buildTableCell(anchors.luckyDay().vedicWeekdayName() + " - " + anchors.luckyDay().luckySignifications(), bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.directions() != null) {
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப திசைகள் (Auspicious Directions)" : "Auspicious Directions", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.directions"), boldB, Element.ALIGN_LEFT));
                     anchTab.addCell(buildTableCell("Vastu: " + anchors.directions().permanentVastuDirection() + " | Travel: " + anchors.directions().travelDirection(), bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.structuralAnchors() != null) {
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சமூக அந்தஸ்து (Arudha Lagna)" : "Arudha Lagna (AL)", boldB, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.arudha_lagna"), boldB, Element.ALIGN_LEFT));
                     anchTab.addCell(buildTableCell(anchors.structuralAnchors().arudhaLagna(), bFont, Element.ALIGN_LEFT));
                 }
 
@@ -444,8 +438,8 @@ public class PdfExportService {
                         || (data.getAiPredictions().getLifetimePredictions() != null && data.getAiPredictions().getLifetimePredictions().size() <= 15)
                         || (data.getAiPredictions().getFuturePredictions() != null && data.getAiPredictions().getFuturePredictions().size() <= 15);
                 String aiTitleStr = is10YearScope
-                        ? ("ta".equalsIgnoreCase(lang) ? "AI 10 ஆண்டு பலன்கள் & கணிப்பு (10-Year Forecast)" : "AI 10-Year Astrological Forecast")
-                        : ("ta".equalsIgnoreCase(lang) ? "AI வாழ்நாள் பலன்கள் & வருடாந்திர கணிப்பு" : "AI Life Balan & Yearly Predictions");
+                        ? ts.getLabel("pdf.ai.10year.title")
+                        : ts.getLabel("pdf.ai.lifepredictions.title");
                 Paragraph aiTitle = buildMixedParagraph(aiTitleStr, tFont, engTFont);
                 aiTitle.setAlignment(Element.ALIGN_CENTER);
                 aiTitle.setSpacingAfter(12);

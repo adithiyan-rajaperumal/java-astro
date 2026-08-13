@@ -160,4 +160,31 @@ public class PdfExportServiceTest {
         assertNotNull(pdfWithSections);
         assertTrue(pdfWithSections.length > 5000);
     }
+
+    @Test
+    public void testPdfExportAcrossAll6Languages() {
+        String[] languages = {"en", "ta", "hi", "te", "kn", "ml"};
+        BirthDetailsDTO birth = new BirthDetailsDTO("Adithiyan", 1996, 7, 25, 17, 45, 0, 13.0827, 80.2707, "LAHIRI");
+        var panchangam = panchangamFactory.getEngine(org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM);
+        var chartResult = panchangam.calculate(birth);
+
+        ComprehensiveReportDTO report = orchestrationService.compileComprehensivePdfData(chartResult, birth, new double[12]);
+        assertNotNull(report);
+
+        org.vedic.astro.config.PdfExportProperties customProps = new org.vedic.astro.config.PdfExportProperties();
+        customProps.setIncludeLifeAnchors(true);
+        customProps.setIncludeYogasDoshams(true);
+
+        org.vedic.astro.service.PdfExportService customPdfService = new org.vedic.astro.service.PdfExportService(
+                translationService,
+                customProps
+        );
+
+        for (String lang : languages) {
+            LocaleContextHolder.setLocale(new Locale(lang));
+            byte[] pdfBytes = customPdfService.generateAstrologyReport(report);
+            assertNotNull(pdfBytes, "PDF generation failed for language: " + lang);
+            assertTrue(pdfBytes.length > 5000, "PDF size too small for language: " + lang);
+        }
+    }
 }
