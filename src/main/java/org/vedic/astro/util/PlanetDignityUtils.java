@@ -1,6 +1,7 @@
 package org.vedic.astro.util;
 
 public class PlanetDignityUtils {
+
     public static boolean isExalted(String planet, int sign) {
         return switch (planet) {
             case "Sun" -> sign == 1;
@@ -13,6 +14,7 @@ public class PlanetDignityUtils {
             default -> false;
         };
     }
+
     public static boolean isDebilitated(String planet, int sign) {
         return switch (planet) {
             case "Sun" -> sign == 7;
@@ -25,6 +27,7 @@ public class PlanetDignityUtils {
             default -> false;
         };
     }
+
     public static boolean isOwnSign(String planet, int sign) {
         return switch (planet) {
             case "Sun" -> sign == 5;
@@ -37,10 +40,27 @@ public class PlanetDignityUtils {
             default -> false;
         };
     }
+
     public static int getHouseFromLagna(int planetSign, int lagnaSign) {
         return ((planetSign - lagnaSign + 12) % 12) + 1;
     }
-    
+
+    public static boolean isKendra(int house) {
+        return house == 1 || house == 4 || house == 7 || house == 10;
+    }
+
+    public static boolean isTrikona(int house) {
+        return house == 1 || house == 5 || house == 9;
+    }
+
+    public static boolean isUpachaya(int house) {
+        return house == 3 || house == 6 || house == 10 || house == 11;
+    }
+
+    public static boolean isDusthana(int house) {
+        return house == 6 || house == 8 || house == 12;
+    }
+
     public static boolean isAspecting(String planet, int aspectingPlanetSign, int targetHouseSign) {
         int diff = getHouseFromLagna(targetHouseSign, aspectingPlanetSign);
         if (diff == 7) return true; // All planets aspect 7th
@@ -52,11 +72,35 @@ public class PlanetDignityUtils {
         };
     }
 
-    public static boolean isCombust(String planet, double planetAbsLong, double sunAbsLong) {
+    /**
+     * Exact Combustion (Moudhya) Orbs per BPHS Master Specification:
+     * - Moon: <= 12°
+     * - Mars: <= 17°
+     * - Mercury: <= 14° (Direct) / <= 12° (Retrograde)
+     * - Jupiter: <= 11°
+     * - Venus: <= 10° (Direct) / <= 8° (Retrograde)
+     * - Saturn: <= 15°
+     */
+    public static boolean isCombust(String planet, double planetAbsLong, double sunAbsLong, boolean isRetrograde) {
         if ("Sun".equalsIgnoreCase(planet) || "Rahu".equalsIgnoreCase(planet) || "Ketu".equalsIgnoreCase(planet)) return false;
         double diff = Math.abs(planetAbsLong - sunAbsLong);
         if (diff > 180.0) diff = 360.0 - diff;
-        return diff < 14.0;
+
+        double maxOrb = switch (planet.toLowerCase()) {
+            case "moon" -> 12.0;
+            case "mars" -> 17.0;
+            case "mercury" -> isRetrograde ? 12.0 : 14.0;
+            case "jupiter" -> 11.0;
+            case "venus" -> isRetrograde ? 8.0 : 10.0;
+            case "saturn" -> 15.0;
+            default -> 12.0;
+        };
+
+        return diff <= maxOrb;
+    }
+
+    public static boolean isCombust(String planet, double planetAbsLong, double sunAbsLong) {
+        return isCombust(planet, planetAbsLong, sunAbsLong, false);
     }
 
     public static int getExaltationSign(String planet) {
