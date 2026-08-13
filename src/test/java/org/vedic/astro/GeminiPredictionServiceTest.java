@@ -587,5 +587,117 @@ public class GeminiPredictionServiceTest {
         assertEquals("Venus", health.get("rogaLord").asText());
         assertTrue(health.get("calculatedOrganVulnerabilities").size() > 0);
         assertTrue(health.get("dietaryAndLifestyleDirectives").size() > 0);
+
+        // Verify Pre-Computed Yearly Anchors exist and are accurate
+        com.fasterxml.jackson.databind.JsonNode anchors = root.get("preComputedYearlyAnchors");
+        assertNotNull(anchors, "preComputedYearlyAnchors must be present in prompt JSON");
+        assertTrue(anchors.isArray() && anchors.size() > 0, "Anchors array must not be empty");
+
+        // Check first anchor entry for Sagittarius Lagna: Lagna Lord = Jupiter
+        com.fasterxml.jackson.databind.JsonNode firstAnchor = anchors.get(0);
+        assertNotNull(firstAnchor);
+        assertTrue(firstAnchor.get("lagnaLordReminder").asText().contains("Jupiter"),
+                "Sagittarius Lagna must have Jupiter as Lagna Lord, got: " + firstAnchor.get("lagnaLordReminder").asText());
+        assertTrue(firstAnchor.get("lagnaLordReminder").asText().contains("Dhanus"),
+                "lagnaLordReminder must include Lagna rasi name");
+
+        // Verify dasaLord and bhukthiLord sub-objects exist with required fields
+        com.fasterxml.jackson.databind.JsonNode dasaLord = firstAnchor.get("dasaLord");
+        com.fasterxml.jackson.databind.JsonNode bhukthiLord = firstAnchor.get("bhukthiLord");
+        assertNotNull(dasaLord, "dasaLord anchor must exist");
+        assertNotNull(bhukthiLord, "bhukthiLord anchor must exist");
+        assertNotNull(dasaLord.get("planet"));
+        assertNotNull(dasaLord.get("placedInBhava"));
+        assertNotNull(dasaLord.get("rulesHouses"));
+        assertNotNull(dasaLord.get("isLagnaLord"));
+        assertNotNull(dasaLord.get("d1Dignity"));
+        assertNotNull(bhukthiLord.get("planet"));
+        assertNotNull(bhukthiLord.get("isLagnaLord"));
+    }
+
+    @Test
+    public void testBuildPlanetAnchorWithCapricornLagna() {
+        // Capricorn Lagna (sign 10): Lagna Lord = Saturn
+        int lagnaSign = 10; // Makara
+        String lagnaLord = org.vedic.astro.util.PlanetDignityUtils.getSignLord(lagnaSign);
+        assertEquals("Saturn", lagnaLord, "Capricorn/Makara Lagna Lord must be Saturn");
+
+        // Build a mock planetLookup
+        java.util.Map<String, java.util.Map<String, Object>> planetLookup = new java.util.HashMap<>();
+
+        java.util.Map<String, Object> saturnEntry = new java.util.LinkedHashMap<>();
+        saturnEntry.put("planet", "Saturn");
+        saturnEntry.put("placedInD1House", 2);
+        saturnEntry.put("rulesHouses", java.util.List.of(1, 2));
+        saturnEntry.put("d1Dignity", "OWN_SIGN");
+        planetLookup.put("saturn", saturnEntry);
+
+        java.util.Map<String, Object> venusEntry = new java.util.LinkedHashMap<>();
+        venusEntry.put("planet", "Venus");
+        venusEntry.put("placedInD1House", 6);
+        venusEntry.put("rulesHouses", java.util.List.of(5, 10));
+        venusEntry.put("d1Dignity", "NEUTRAL");
+        planetLookup.put("venus", venusEntry);
+
+        // Test Saturn anchor (should be isLagnaLord = true)
+        java.util.Map<String, Object> saturnAnchor = GeminiPredictionService.buildPlanetAnchor(
+                "Saturn", lagnaSign, lagnaLord, planetLookup);
+        assertEquals("Saturn", saturnAnchor.get("planet"));
+        assertEquals(2, saturnAnchor.get("placedInBhava"));
+        assertEquals(java.util.List.of(1, 2), saturnAnchor.get("rulesHouses"));
+        assertEquals("OWN_SIGN", saturnAnchor.get("d1Dignity"));
+        assertEquals(true, saturnAnchor.get("isLagnaLord"),
+                "Saturn must be isLagnaLord=true for Capricorn/Makara Lagna");
+
+        // Test Venus anchor (should be isLagnaLord = false)
+        java.util.Map<String, Object> venusAnchor = GeminiPredictionService.buildPlanetAnchor(
+                "Venus", lagnaSign, lagnaLord, planetLookup);
+        assertEquals("Venus", venusAnchor.get("planet"));
+        assertEquals(6, venusAnchor.get("placedInBhava"));
+        assertEquals(java.util.List.of(5, 10), venusAnchor.get("rulesHouses"));
+        assertEquals("NEUTRAL", venusAnchor.get("d1Dignity"));
+        assertEquals(false, venusAnchor.get("isLagnaLord"),
+                "Venus must be isLagnaLord=false for Capricorn/Makara Lagna — the exact bug that caused the drift");
+
+        // Test Rahu anchor (shadow node, not in planetLookup)
+        java.util.Map<String, Object> rahuAnchor = GeminiPredictionService.buildPlanetAnchor(
+                "Rahu", lagnaSign, lagnaLord, planetLookup);
+        assertEquals("Rahu", rahuAnchor.get("planet"));
+        assertEquals(0, rahuAnchor.get("placedInBhava"));  // Shadow node default
+        assertEquals(false, rahuAnchor.get("isLagnaLord"));
+    }
+
+    @Test
+    public void testFindDasaAndBhukthiForYear() {
+        // Build test dasa timeline: Saturn Mahadasa 2060-2079, Venus Bhukthi 2070-2073
+        java.util.List<org.vedic.astro.model.DasaPeriod> dasas = new java.util.ArrayList<>();
+        org.vedic.astro.model.DasaPeriod saturn = org.vedic.astro.model.DasaPeriod.builder()
+                .planetName("Saturn")
+                .startDate(LocalDate.of(2060, 1, 1))
+                .endDate(LocalDate.of(2079, 12, 31))
+                .bhukthis(java.util.List.of(
+                        org.vedic.astro.model.DasaPeriod.BhukthiPeriod.builder()
+                                .planetName("Mercury")
+                                .startDate(LocalDate.of(2060, 1, 1))
+                                .endDate(LocalDate.of(2062, 8, 15))
+                                .build(),
+                        org.vedic.astro.model.DasaPeriod.BhukthiPeriod.builder()
+                                .planetName("Venus")
+                                .startDate(LocalDate.of(2070, 1, 1))
+                                .endDate(LocalDate.of(2073, 3, 31))
+                                .build()
+                ))
+                .build();
+        dasas.add(saturn);
+
+        // Year 2071 mid-year should find Saturn-Venus
+        String[] result = GeminiPredictionService.findDasaAndBhukthiForYear(dasas, 2071);
+        assertEquals("Saturn", result[0], "Dasa Lord for 2071 must be Saturn");
+        assertEquals("Venus", result[1], "Bhukthi Lord for 2071 must be Venus");
+
+        // Year 2061 should find Saturn-Mercury
+        String[] result2 = GeminiPredictionService.findDasaAndBhukthiForYear(dasas, 2061);
+        assertEquals("Saturn", result2[0]);
+        assertEquals("Mercury", result2[1]);
     }
 }

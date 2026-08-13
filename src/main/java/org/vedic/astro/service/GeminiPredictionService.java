@@ -159,6 +159,7 @@ public class GeminiPredictionService {
           .append("  * PLACEMENT VS. OWNERSHIP: A planet is ONLY the lord of the house(s) listed in 'rulesHouses'. A planet occupying a house is ONLY a guest/occupant (as stated in 'occupantRole'). NEVER call an occupant the lord of that house unless it rules that sign.\n")
           .append("  * D1 VS. D9 DISTINCTION: 'placedInD1Sign' & 'placedInD1House' represent material/physical events in the world. 'placedInD9NavamsaSign' represents internal spiritual/dharma strength. In yearly predictions, NEVER state that a planet is placed in its D9 sign in the material chart.\n")
           .append("  * AYURVEDIC PREDICTIONS: Ground all health, longevity, and vitality readings strictly in the pre-calculated 'ayurvedicHealthProfile' (dominant Prakriti, dosha percentages, and specific organ vulnerabilities). Do NOT default to generic boilerplate.\n")
+          .append("  * PER-YEAR ANCHOR INJECTION (ANTI-DRIFT): For EACH year in lifetimePredictions, a 'preComputedAnchor' block is provided containing the exact Dasa Lord and Bhukthi Lord with their house placements (placedInBhava), ruled houses (rulesHouses), Lagna Lord identity (isLagnaLord: true/false), and dignity (d1Dignity). You MUST use ONLY these anchor values when describing planetary roles for that year. NEVER override or contradict the anchor data. The 'isLagnaLord' flag is definitive — if it says false, that planet is NOT the Lagna Lord. The 'lagnaLordReminder' field states the true Lagna Lord for EVERY year — reference it.\n")
           .append("  * Calculate and evaluate classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana, Vipareeta Raja Yoga) by evaluating the planetary houses and dignities from the JSON matrix according to authentic Parasari rules (e.g. Pancha Mahapurusha requires Kendra 1,4,7,10 in own/exalted sign; Gajakesari requires Moon-Jupiter Kendra 1,4,7,10; Budhaditya requires Sun-Mercury conjunction in the same sign).\n")
           .append("  * Evaluate all major Doshams (Sevvai/Kuja Dosha in 1,2,4,7,8,12, Kala Sarpa, Pitru, Papakarthari) and authentically apply classical nullification factors based on own/exalted status, friendly signs, or benefic aspects.\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
@@ -387,6 +388,35 @@ public class GeminiPredictionService {
             inputData.put("vimshottariTimeline", dasas);
         }
 
+        // 8. Pre-Computed Yearly Anchors (Anti-Drift: Lagna Lord, Dasa/Bhukthi Lord placement per year)
+        String lagnaLord = PlanetDignityUtils.getSignLord(lagnaSign);
+        String lagnaRasiName = RASHIS[lagnaSign - 1];
+        Map<String, Map<String, Object>> planetLookup = new HashMap<>();
+        for (Map<String, Object> pObj : planetaryMatrix) {
+            String pName = pObj.get("planet").toString();
+            planetLookup.put(pName.toLowerCase(), pObj);
+        }
+
+        int maxForecastYears = Math.min(100 - currentAge, 30);
+        List<Map<String, Object>> yearlyAnchors = new ArrayList<>();
+        for (int i = 0; i <= maxForecastYears; i++) {
+            int yr = currentYear + i;
+            int age = currentAge + i;
+            String[] dasaBhukthi = findDasaAndBhukthiForYear(c.getCurrentDasaTimeline(), yr);
+            String dasaLordName = dasaBhukthi[0];
+            String bhukthiLordName = dasaBhukthi[1];
+
+            Map<String, Object> anchor = new LinkedHashMap<>();
+            anchor.put("year", yr);
+            anchor.put("age", age);
+            anchor.put("dasaBhukthi", dasaLordName + " - " + bhukthiLordName);
+            anchor.put("lagnaLordReminder", lagnaLord + " (" + lagnaRasiName + " Lagna)");
+            anchor.put("dasaLord", buildPlanetAnchor(dasaLordName, lagnaSign, lagnaLord, planetLookup));
+            anchor.put("bhukthiLord", buildPlanetAnchor(bhukthiLordName, lagnaSign, lagnaLord, planetLookup));
+            yearlyAnchors.add(anchor);
+        }
+        inputData.put("preComputedYearlyAnchors", yearlyAnchors);
+
         String inputJson = "{}";
         try {
             inputJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(inputData);
@@ -405,10 +435,12 @@ public class GeminiPredictionService {
           .append("   - 'organVulnerabilities': 2-4 specific vulnerable organs deduced from 6th/8th/12th houses & D30 Trimsamsa.\n")
           .append("   - 'longevityVitalitySummary': FIRST execute a rigorous classical Ayurdaya Determination (ஆயுள் நிர்ணயம்) analyzing Lagna Lord & 8th Lord dignity, Ayushkaraka Saturn, 3rd house, 8th house, and Maraka/Badhaka running dasas (2nd/7th houses & D30). Explicitly state the longevity classification (Alpayu 0-32 / Madhyayu 33-66/72 / Poornayu 72-100+) and state the calculated lifespan ceiling age (e.g. 'பூர்ணாயுள் (Poornayu: ~80-84 வயது)').\n")
           .append("   - 'recommendedDietAndLifestyle': Targeted Ayurvedic diet and lifestyle practices.\n")
+          .append("   - 'PER-YEAR ANCHOR MANDATE': For all longitudinal predictions, rely on the preComputedYearlyAnchors object in the JSON for the correct planetary dignity and placement at any specific age.\n")
           .append("3. 'aiYogas': Calculate and identify ALL classical Vedic Yogas (Gajakesari, Raja Yoga, Dhana Yoga, Vipareeta Raja Yoga, Budhaditya, Neechabhanga, Pancha Mahapurusha, Parivarthana) from the input JSON data with name, forming planets, and lifelong impact.\n")
           .append("4. 'aiDoshams': Evaluate all major doshams (Sevvai/Kuja Dosha, Kala Sarpa Dosha, Pitru Dosha, Papakarthari, Rahu-Ketu afflictions) from the input JSON data, determining whether they are active or nullified, the exact astrological nullification factors, and authentic Vedic remedies.\n")
           .append("5. 'pastKeyPhases': 2-3 pivotal life-defining turning points from birth to present age ").append(currentAge).append(" (periodOrAge, dasaBhukthi, phaseTitle, livedExperience, astrologicalBasis).\n")
           .append("6. 'lifetimePredictions': Exhaustive, year-by-year forecasts covering the native's FULL REMAINING LIFESPAN starting from current year ").append(currentYear).append(" (Age ").append(currentAge).append(") continuously through the EXACT calculated Ayurdaya lifespan age determined in Step 2.\n")
+          .append("   - For EACH year, a 'preComputedAnchor' is provided in the 'preComputedYearlyAnchors' section of the input JSON. You MUST cross-reference it for the correct Dasa-Bhukthi lords, their house placements, ruled houses, isLagnaLord flag, and dignity. DO NOT deviate from the anchor data.\n")
           .append("   - For EACH year, you MUST provide 'yearlyTheme', 'detailedPrediction', 'astrologicalBasis' (explicit planetary combinations from D1/D9/D10/D12/D30 & running Dasa-Bhukthi), and 'cautionsAndRemedies'.\n")
           .append("   - 'detailedPrediction' MUST be a deeply articulated, unconstrained narrative synthesized with unbroken lifespan continuity covering ALL 4 core life pillars without omission:\n")
           .append("     (a) Career, Business & Wealth: Promotions, career transitions, entrepreneurial ventures, income trajectory, real estate/property/vehicle purchases, debts or wealth accumulation.\n")
@@ -1108,6 +1140,58 @@ public class GeminiPredictionService {
             }
         }
         return dasas.get(0).getPlanetName() + " Dasa";
+    }
+
+    /**
+     * Returns [dasaLordName, bhukthiLordName] for a given year.
+     * If no bhukthi is found, bhukthiLordName defaults to the dasa lord.
+     */
+    public static String[] findDasaAndBhukthiForYear(List<DasaPeriod> dasas, int year) {
+        if (dasas == null || dasas.isEmpty()) return new String[]{"Dasa", "Bhukthi"};
+        LocalDate date = LocalDate.of(year, 6, 15);
+        for (DasaPeriod d : dasas) {
+            if (d.getStartDate() != null && d.getEndDate() != null
+                    && !date.isBefore(d.getStartDate()) && !date.isAfter(d.getEndDate())) {
+                String dasaLord = d.getPlanetName();
+                if (d.getBhukthis() != null) {
+                    for (DasaPeriod.BhukthiPeriod b : d.getBhukthis()) {
+                        if (b.getStartDate() != null && b.getEndDate() != null
+                                && !date.isBefore(b.getStartDate()) && !date.isAfter(b.getEndDate())) {
+                            return new String[]{dasaLord, b.getPlanetName()};
+                        }
+                    }
+                }
+                return new String[]{dasaLord, dasaLord};
+            }
+        }
+        return new String[]{dasas.get(0).getPlanetName(), dasas.get(0).getPlanetName()};
+    }
+
+    /**
+     * Builds a compact anchor object for a planet (Dasa Lord or Bhukthi Lord) containing:
+     * planet name, placedInBhava, rulesHouses, isLagnaLord, d1Dignity.
+     */
+    public static Map<String, Object> buildPlanetAnchor(
+            String planetName, int lagnaSign, String lagnaLord,
+            Map<String, Map<String, Object>> planetLookup) {
+        Map<String, Object> anchor = new LinkedHashMap<>();
+        anchor.put("planet", planetName);
+
+        Map<String, Object> matrixEntry = planetLookup.get(planetName.toLowerCase());
+        if (matrixEntry != null) {
+            anchor.put("placedInBhava", matrixEntry.get("placedInD1House"));
+            anchor.put("rulesHouses", matrixEntry.get("rulesHouses"));
+            anchor.put("d1Dignity", matrixEntry.get("d1Dignity"));
+        } else {
+            // Shadow nodes (Rahu/Ketu) or unresolved planets
+            List<Integer> ruledHouses = getRuledHouses(planetName, lagnaSign);
+            anchor.put("placedInBhava", 0);
+            anchor.put("rulesHouses", ruledHouses);
+            anchor.put("d1Dignity", "NEUTRAL");
+        }
+
+        anchor.put("isLagnaLord", planetName.equalsIgnoreCase(lagnaLord));
+        return anchor;
     }
 
     private String getTamilPastMilestoneTitle(int age) {
