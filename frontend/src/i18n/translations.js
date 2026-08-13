@@ -314,7 +314,19 @@ const translations = {
     doshaPapasamyaParity: "Dosha, Papasamya & Dasa Sandhi Balance",
     keyStrengthsTitle: "Key Relationship Strengths",
     cautionsTitle: "Areas of Caution & Growth",
-    remediesTitle: "Authentic Vedic Remedies"
+    remediesTitle: "Authentic Vedic Remedies",
+    shadbalaTitle: "Shadbala Planetary Strength Metrics",
+    sthana: "Sthana",
+    dig: "Dig",
+    kala: "Kala",
+    cheshta: "Cheshta",
+    total: "Total",
+    status: "Status",
+    veryStrong: "Very Strong",
+    strong: "Strong",
+    optimum: "Optimum",
+    moderate: "Moderate",
+    weak: "Weak"
   },
   ta: {
     panchangam: "பஞ்சாங்கம்",
@@ -639,7 +651,19 @@ const translations = {
     doshaPapasamyaParity: "தோஷ சமநிலை & திசா சந்தி பகுப்பாய்வு",
     keyStrengthsTitle: "முக்கிய நன்மைகள் & பலங்கள்",
     cautionsTitle: "எச்சரிக்கைகள் & கவனிக்க வேண்டியவை",
-    remediesTitle: "சாஸ்திர பரிகாரங்கள்"
+    remediesTitle: "சாஸ்திர பரிகாரங்கள்",
+    shadbalaTitle: "ஷட்பலம் கிரக பலங்கள்",
+    sthana: "ஸ்தான பலம்",
+    dig: "திக் பலம்",
+    kala: "கால பலம்",
+    cheshta: "சேஷ்டா பலம்",
+    total: "மொத்த ரூபங்கள்",
+    status: "நிலை",
+    veryStrong: "மிகவும் பலம்",
+    strong: "பலம்",
+    optimum: "உத்தமம்",
+    moderate: "மிதமான பலம்",
+    weak: "பலவீனமானது"
   },
   hi: {
     panchangam: "पंचांग",
@@ -953,7 +977,19 @@ const translations = {
     doshaPapasamyaParity: "दोष संतुलन व दशा संधि विश्लेषण",
     keyStrengthsTitle: "संबंध के मुख्य लाभ व शक्तियां",
     cautionsTitle: "सावधानियां व सुधार क्षेत्र",
-    remediesTitle: "शास्त्रीय वैदिक उपाय"
+    remediesTitle: "शास्त्रीय वैदिक उपाय",
+    shadbalaTitle: "षड्बल ग्रह बल",
+    sthana: "स्थान बल",
+    dig: "दिग् बल",
+    kala: "काल बल",
+    cheshta: "चेष्टा बल",
+    total: "कुल रूप",
+    status: "स्थिति",
+    veryStrong: "अत्यधिक बली",
+    strong: "बली",
+    optimum: "उत्तम",
+    moderate: "मध्यम",
+    weak: "दुर्बल / कमजोर"
   },
   kn: {
     panchangam: "ಪಂಚಾಂಗ",
@@ -1270,7 +1306,19 @@ const translations = {
     doshaPapasamyaParity: "ದೋಷ ಸಮತೋಲನ & ದಶಾ ಸಂಧಿ ವಿಶ್ಲೇಷಣೆ",
     keyStrengthsTitle: "ಸಂಬಂಧದ ಮುಖ್ಯ ಸಾಮರ್ಥ್ಯಗಳು",
     cautionsTitle: "ಎಚ್ಚರಿಕೆಗಳು ಮತ್ತು ಗಮನಿಸಬೇಕಾದ ಅಂಶಗಳು",
-    remediesTitle: "ಶಾಸ್ತ್ರೀಯ ವೈದಿಕ ಪರಿಹಾರಗಳು"
+    remediesTitle: "ಶಾಸ್ತ್ರೀಯ ವೈದಿಕ ಪರಿಹಾರಗಳು",
+    shadbalaTitle: "ಷಡ್ಬಲ ಗ್ರಹ ಬಲಗಳು",
+    sthana: "ಸ್ಥಾನ ಬಲ",
+    dig: "ದಿಗ್ ಬಲ",
+    kala: "ಕಾಲ ಬಲ",
+    cheshta: "ಚೇಷ್ಟಾ ಬಲ",
+    total: "ಒಟ್ಟು ರೂಪಗಳು",
+    status: "ಸ್ಥಿತಿ",
+    veryStrong: "ಅತ್ಯಂತ ಬಲಶಾಲಿ",
+    strong: "ಬಲಶಾಲಿ",
+    optimum: "ಉತ್ತಮ",
+    moderate: "ಮಧ್ಯಮ",
+    weak: "ದುರ್ಬಲ"
   },
   te: {
     panchangam: "పంచాంగం",
@@ -1587,7 +1635,19 @@ const translations = {
     doshaPapasamyaParity: "దోష సమతుల్యత & దశా సంధి విశ్లేషణ",
     keyStrengthsTitle: "సంబంధం యొక్క ప్రధాన బలాలు",
     cautionsTitle: "హెచ్చరికలు మరియు జాగ్రత్తలు",
-    remediesTitle: "శాస్త్రీయ వైదిక పరిహారాలు"
+    remediesTitle: "శాస్త్రీయ వైదిక పరిహారాలు",
+    shadbalaTitle: "షడ్బల గ్రహ బలాలు",
+    sthana: "స్థాన బలం",
+    dig: "దిగ్ బలం",
+    kala: "కాల బలం",
+    cheshta: "చేష్టా బలం",
+    total: "మొత్తం రూపాలు",
+    status: "స్థితి",
+    veryStrong: "అత్యంత బలమైనది",
+    strong: "బలమైనది",
+    optimum: "ఉత్తమం",
+    moderate: "మధ్యస్థం",
+    weak: "బలహీనం"
   },
   ml: {
     panchangam: "പഞ്ചാംഗം",
@@ -1901,7 +1961,19 @@ const translations = {
     doshaPapasamyaParity: "ദോഷ സാമ്യവും ദശാ സന്ധി വിശകലനവും",
     keyStrengthsTitle: "ബന്ധത്തിന്റെ പ്രധാന ഗുണങ്ങൾ",
     cautionsTitle: "ശ്രദ്ധിക്കേണ്ട കാര്യങ്ങൾ",
-    remediesTitle: "ശാസ്തീയ വൈദിക പരിഹാരങ്ങൾ"
+    remediesTitle: "ശാസ്തീയ വൈദിക പരിഹാരങ്ങൾ",
+    shadbalaTitle: "ഷഡ്ബല ഗ്രഹ ബലങ്ങൾ",
+    sthana: "സ്ഥാന ബലം",
+    dig: "ദിഗ് ബലം",
+    kala: "കാല ബലം",
+    cheshta: "ചേഷ്ടാ ബലം",
+    total: "ആകെ രൂപങ്ങൾ",
+    status: "നില",
+    veryStrong: "വളരെ ബലവത്തായത്",
+    strong: "ബലവത്തായത്",
+    optimum: "ഉത്തമം",
+    moderate: "മിതമായത്",
+    weak: "ദുർബലം"
   }
 };
 

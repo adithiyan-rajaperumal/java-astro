@@ -569,11 +569,12 @@ function HoroscopePage({ settings }) {
 
   const renderShadbalaTab = () => {
     const shadbala = report?.shadbalaStrengths;
+    const language = settings?.language || 'en';
     if (!report || !shadbala || !shadbala.planetStrengths) {
       return (
         <div className="card">
-          <h3 className="title-gold">{t('shadbalaTab', settings.language)}</h3>
-          <p style={{ color: 'var(--text-secondary)' }}>No Shadbala strength data available.</p>
+          <h3 className="title-gold">{t('shadbalaTab', language)}</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>{t('calculating', language) || 'No Shadbala strength data available.'}</p>
         </div>
       );
     }
@@ -582,7 +583,7 @@ function HoroscopePage({ settings }) {
 
     return (
       <div className="card">
-        <h3 className="title-gold">{t('shadbalaTab', settings.language)}</h3>
+        <h3 className="title-gold">{t('shadbalaTab', language)}</h3>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '15px' }}>
           {language === 'ta' ? '6 விதமான கிரக பலங்களின் (ஸ்தான, திக், கால, சேஷ்டா, திருக், நைசர்கிக) மதிப்பீடு' : 'Six-fold Planetary Strength Assessment (in Rupas)'}
         </p>
@@ -591,20 +592,20 @@ function HoroscopePage({ settings }) {
           <table className="horai-table">
             <thead>
               <tr>
-                <th>{t('planet', settings.language)}</th>
-                <th>{t('sthana', settings.language)}</th>
-                <th>{t('dig', settings.language)}</th>
-                <th>{t('kala', settings.language)}</th>
-                <th>{t('cheshta', settings.language)}</th>
-                <th>{t('total', settings.language)}</th>
-                <th>{t('status', settings.language)}</th>
+                <th>{t('planet', language)}</th>
+                <th>{t('sthana', language)}</th>
+                <th>{t('dig', language)}</th>
+                <th>{t('kala', language)}</th>
+                <th>{t('cheshta', language)}</th>
+                <th>{t('total', language)}</th>
+                <th>{t('status', language)}</th>
               </tr>
             </thead>
             <tbody>
               {planets.map((planetKey, idx) => {
                 const strength = shadbala.planetStrengths[planetKey];
-                const localizedPlanet = t('planet.' + planetKey.toLowerCase(), settings.language) !== ('planet.' + planetKey.toLowerCase())
-                  ? t('planet.' + planetKey.toLowerCase(), settings.language)
+                const localizedPlanet = t('planet.' + planetKey.toLowerCase(), language) !== ('planet.' + planetKey.toLowerCase())
+                  ? t('planet.' + planetKey.toLowerCase(), language)
                   : planetKey;
                 const reqRupas = REQUIRED_SHADBALA_RUPAS[planetKey.toUpperCase()] || 6.0;
                 const totalRupas = strength.totalShadbalaRupas || 0;
@@ -625,11 +626,11 @@ function HoroscopePage({ settings }) {
                       {(() => {
                         const rawCat = (strength.strengthCategory || '').toLowerCase().replace(/[\s/_]+/g, '');
                         let statusText = '';
-                        if (rawCat === 'verystrong') statusText = t('veryStrong', settings?.language) || 'Very Strong';
-                        else if (rawCat === 'strong' || rawCat === 'strongoptimum' || rawCat === 'optimum') statusText = t('strong', settings?.language) || t('optimum', settings?.language) || 'Strong';
-                        else if (rawCat === 'moderate') statusText = t('moderate', settings?.language) || 'Moderate';
-                        else if (rawCat === 'weak') statusText = t('weak', settings?.language) || 'Weak';
-                        else statusText = isStrong ? (t('strong', settings?.language) || 'Strong') : (t('moderate', settings?.language) || 'Moderate');
+                        if (rawCat === 'verystrong') statusText = t('veryStrong', language);
+                        else if (rawCat === 'strong' || rawCat === 'strongoptimum' || rawCat === 'optimum') statusText = t('strong', language);
+                        else if (rawCat === 'moderate') statusText = t('moderate', language);
+                        else if (rawCat === 'weak') statusText = t('weak', language);
+                        else statusText = isStrong ? t('strong', language) : t('moderate', language);
 
                         return (
                           <span style={{ 
