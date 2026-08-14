@@ -33,38 +33,10 @@ const I18N_TERMS = {
   'Lagna': { en: 'Lagna', ta: 'லக்னம்', hi: 'लग्न', te: 'లగ్నం', kn: 'ಲಗ್ನ', ml: 'ലഗ്നം' },
 
   // Elements
-  'Agni (Fire)': {
-    en: 'Agni (Fire)',
-    ta: 'அக்னி (நெருப்பு / Fire)',
-    hi: 'अग्नि (अग्नि तत्व / Fire)',
-    te: 'అగ్ని (అగ్ని తత్త్వం / Fire)',
-    kn: 'ಅಗ್ನಿ (ಅಗ್ನಿ ತತ್ವ / Fire)',
-    ml: 'അഗ്നി (അഗ്നി തത്വം / Fire)'
-  },
-  'Prithvi (Earth)': {
-    en: 'Prithvi (Earth)',
-    ta: 'பிருத்வி (பூமி / Earth)',
-    hi: 'पृथ्वी (पृथ्वी तत्व / Earth)',
-    te: 'పృథ్వి (భూమి తత్త్వం / Earth)',
-    kn: 'ಪೃಥ್ವಿ (ಭೂಮಿ ತತ್ವ / Earth)',
-    ml: 'പൃഥ്വി (ഭൂമി തത്വം / Earth)'
-  },
-  'Vayu (Air)': {
-    en: 'Vayu (Air)',
-    ta: 'வாயு (காற்று / Air)',
-    hi: 'वायु (वायु तत्व / Air)',
-    te: 'వాయు (వాయు తత్త్వం / Air)',
-    kn: 'ವಾಯು (ವಾಯು ತತ್ವ / Air)',
-    ml: 'വായു (വായു തത്വം / Air)'
-  },
-  'Jala (Water)': {
-    en: 'Jala (Water)',
-    ta: 'ஜலம் (நீர் / Water)',
-    hi: 'जल (जल तत्व / Water)',
-    te: 'జలం (నీరు తత్త్వం / Water)',
-    kn: 'ಜಲ (ಜಲ ತತ್ವ / Water)',
-    ml: 'ജലം (ജല തത്വം / Water)'
-  },
+  'Agni (Fire)': { en: 'Agni (Fire)', ta: 'அக்னி (நெருப்பு)', hi: 'अग्नि (अग्नि तत्व)', te: 'అగ్ని (అగ్ని తత్త్వం)', kn: 'ಅಗ್ನಿ (ಅಗ್ನಿ ತತ್ವ)', ml: 'അഗ്നി (അഗ്നി തത്വം)' },
+  'Prithvi (Earth)': { en: 'Prithvi (Earth)', ta: 'பிருத்வி (பூமி)', hi: 'पृथ्वी (पृथ्वी तत्व)', te: 'పృథ్వి (భూమి తత్త్వం)', kn: 'ಪೃಥ್ವಿ (ಭೂಮಿ ತತ್ವ)', ml: 'പൃഥ്വി (ഭൂമി തത്വം)' },
+  'Vayu (Air)': { en: 'Vayu (Air)', ta: 'வாயு (காற்று)', hi: 'वायु (वायु तत्व)', te: 'వాయు (వాయు తత్త్వం)', kn: 'ವಾಯು (ವಾಯು ತತ್ವ)', ml: 'വായു (വായു തത്വം)' },
+  'Jala (Water)': { en: 'Jala (Water)', ta: 'ஜலம் (நீர்)', hi: 'जल (जल तत्व)', te: 'జలం (నీరు తత్త్వం)', kn: 'ಜಲ (ಜಲ ತತ್ವ)', ml: 'ജലം (ജല തത്വം)' },
 
   // Modalities
   'CHARA': { en: 'Movable (Chara)', ta: 'சர', hi: 'चर', te: 'చర', kn: 'ಚರ', ml: 'ചര' },
@@ -72,15 +44,15 @@ const I18N_TERMS = {
   'DWISVABHAVA': { en: 'Dual (Dwisvabhava)', ta: 'உபய', hi: 'द्विस्वभाव', te: 'ద్విస్వభావ', kn: 'ದ್ವಿಸ್ವಭಾವ', ml: 'ദ്വിസ്വഭാവ' },
 
   // Prakritis
-  'Vata-Pitta': { en: 'Vata-Pitta', ta: 'வாத-பித்தம் (Vata-Pitta)', hi: 'वात-पित्त (Vata-Pitta)', te: 'వాత-పిత్తం (Vata-Pitta)', kn: 'ವಾತ-ಪಿತ್ತ (Vata-Pitta)', ml: 'വാത-പിത്തം (Vata-Pitta)' },
-  'Pitta-Vata': { en: 'Pitta-Vata', ta: 'பித்த-வாதம் (Pitta-Vata)', hi: 'पित्त-वात (Pitta-Vata)', te: 'పిత్త-వాతం (Pitta-Vata)', kn: 'ಪಿತ್ತ-ವಾತ (Pitta-Vata)', ml: 'പിത്ത-വാതം (Pitta-Vata)' },
-  'Kapha-Pitta': { en: 'Kapha-Pitta', ta: 'கப-பித்தம் (Kapha-Pitta)', hi: 'कफ-पित्त (Kapha-Pitta)', te: 'కఫ-పిత్తం (Kapha-Pitta)', kn: 'ಕಫ-ಪಿತ್ತ (Kapha-Pitta)', ml: 'കഫ-പിത്തം (Kapha-Pitta)' },
-  'Pitta-Kapha': { en: 'Pitta-Kapha', ta: 'பித்த-கபம் (Pitta-Kapha)', hi: 'पित्त-कफ (Pitta-Kapha)', te: 'పిత్త-కఫం (Pitta-Kapha)', kn: 'ಪಿತ್ತ-ಕಫ (Pitta-Kapha)', ml: 'പിത്ത-കഫം (Pitta-Kapha)' },
-  'Vata-Kapha': { en: 'Vata-Kapha', ta: 'வாத-கபம் (Vata-Kapha)', hi: 'वात-कफ (Vata-Kapha)', te: 'వాత-కఫం (Vata-Kapha)', kn: 'ವಾತ-ಕಫ (Vata-Kapha)', ml: 'വാത-കഫം (Vata-Kapha)' },
-  'Kapha-Vata': { en: 'Kapha-Vata', ta: 'கப-வாதம் (Kapha-Vata)', hi: 'कफ-वात (Kapha-Vata)', te: 'కఫ-వాతం (Kapha-Vata)', kn: 'ಕಫ-ವಾತ (Kapha-Vata)', ml: 'കഫ-വാതം (Kapha-Vata)' },
-  'Pitta Dominant': { en: 'Pitta Dominant', ta: 'பித்த பிரதானம் (Pitta)', hi: 'पित्त प्रधान (Pitta)', te: 'పిత్త ప్రధానం (Pitta)', kn: 'ಪಿತ್ತ ಪ್ರಧಾನ (Pitta)', ml: 'പിത്ത പ്രധാനം (Pitta)' },
-  'Vata Dominant': { en: 'Vata Dominant', ta: 'வாத பிரதானம் (Vata)', hi: 'वात प्रधान (Vata)', te: 'వాత ప్రధానం (Vata)', kn: 'ವಾತ ಪ್ರಧಾನ (Vata)', ml: 'വാത പ്രധാനം (Vata)' },
-  'Kapha Dominant': { en: 'Kapha Dominant', ta: 'கப பிரதானம் (Kapha)', hi: 'कफ प्रधान (Kapha)', te: 'కఫ ప్రధానం (Kapha)', kn: 'ಕಫ ಪ್ರಧಾನ (Kapha)', ml: 'കഫ പ്രധാനം (Kapha)' }
+  'Vata-Pitta': { en: 'Vata-Pitta', ta: 'வாத-பித்தம்', hi: 'वात-पित्त', te: 'వాత-పిత్తం', kn: 'ವಾತ-ಪಿತ್ತ', ml: 'വാത-പിത്തം' },
+  'Pitta-Vata': { en: 'Pitta-Vata', ta: 'பித்த-வாதம்', hi: 'पित्त-वात', te: 'పిత్త-వాతం', kn: 'ಪಿತ್ತ-ವಾತ', ml: 'പിത്ത-വാതം' },
+  'Kapha-Pitta': { en: 'Kapha-Pitta', ta: 'கப-பித்தம்', hi: 'कफ-पित्त', te: 'కఫ-పిత్తం', kn: 'ಕಫ-ಪಿತ್ತ', ml: 'കഫ-പിത്തം' },
+  'Pitta-Kapha': { en: 'Pitta-Kapha', ta: 'பித்த-கபம்', hi: 'पित्त-कफ', te: 'పిత్త-కఫం', kn: 'ಪಿತ್ತ-ಕಫ', ml: 'പിത്ത-കഫം' },
+  'Vata-Kapha': { en: 'Vata-Kapha', ta: 'வாத-கபம்', hi: 'वात-कफ', te: 'వాత-కఫం', kn: 'ವಾತ-ಕಫ', ml: 'വാത-കഫം' },
+  'Kapha-Vata': { en: 'Kapha-Vata', ta: 'கப-வாதம்', hi: 'कफ-वात', te: 'కఫ-వాతం', kn: 'ಕಫ-ವಾತ', ml: 'കഫ-ವಾതം' },
+  'Pitta Dominant': { en: 'Pitta Dominant', ta: 'பித்த பிரதானம்', hi: 'पित्त प्रधान', te: 'పిత్త ప్రధానం', kn: 'ಪಿತ್ತ ಪ್ರಧಾನ', ml: 'പിത്ത പ്രധാനം' },
+  'Vata Dominant': { en: 'Vata Dominant', ta: 'வாத பிரதானம்', hi: 'वात प्रधान', te: 'వాత ప్రధానం', kn: 'ವಾತ ಪ್ರಧಾನ', ml: 'വാത ಪ್ರಧാനം' },
+  'Kapha Dominant': { en: 'Kapha Dominant', ta: 'கப பிரதானம்', hi: 'कफ प्रधान', te: 'ಕಫ ప్రధానం', kn: 'ಕಫ ಪ್ರಧಾನ', ml: 'കഫ പ്രധാനം' }
 };
 
 const DEITY_NAMES_I18N = {
@@ -226,18 +198,18 @@ const KULA_DEVATA_MESSAGES = {
 };
 
 const GEMOLOGY_I18N = {
-  gems: {
-    'Diamond': { en: 'Diamond', ta: 'வைரம் (Diamond)', hi: 'हीरा (Diamond)', te: 'వజ్రం (Diamond)', kn: 'ವಜ್ರ (Diamond)', ml: 'വൈരം (Diamond)' },
-    'Ruby': { en: 'Ruby', ta: 'மாணிக்கம் (Ruby)', hi: 'माणिक्य (Ruby)', te: 'మాణిక్యం (Ruby)', kn: 'ಮಾಣಿಕ್ಯ (Ruby)', ml: 'മാണിക്യം (Ruby)' },
-    'Natural Pearl': { en: 'Natural Pearl', ta: 'இயற்கை முத்து (Pearl)', hi: 'सच्चा मोती (Pearl)', te: 'సహజ ముత్యం (Pearl)', kn: 'ನೈಸರ್ಗಿಕ ಮುತ್ತು (Pearl)', ml: 'സ്വാഭാവിക മുത്ത് (Pearl)' },
-    'Pearl': { en: 'Pearl', ta: 'முத்து (Pearl)', hi: 'मोती (Pearl)', te: 'ముత్యం (Pearl)', kn: 'ಮುತ್ತು (Pearl)', ml: 'മുത്ത് (Pearl)' },
-    'Red Coral': { en: 'Red Coral', ta: 'செம்பவளம் (Red Coral)', hi: 'लाल मूंगा (Red Coral)', te: 'పగడం (Red Coral)', kn: 'ಹವಳ (Red Coral)', ml: 'പവിഴം (Red Coral)' },
-    'Emerald': { en: 'Emerald', ta: 'மரகதம் (Emerald)', hi: 'पन्ना (Emerald)', te: 'మరకతం (Emerald)', kn: 'ಪಚ್ಚೆ (Emerald)', ml: 'മരതകം (Emerald)' },
-    'Yellow Sapphire': { en: 'Yellow Sapphire', ta: 'புஷ்பராகம் (Yellow Sapphire)', hi: 'पुखराज (Yellow Sapphire)', te: 'పుష్యరాగం (Yellow Sapphire)', kn: 'ಪುಷ್ಯರಾಗ (Yellow Sapphire)', ml: 'ಪುಷ್ಯരാഗം (Yellow Sapphire)' },
-    'Blue Sapphire': { en: 'Blue Sapphire', ta: 'நீலக்கல் (Blue Sapphire)', hi: 'नीलम (Blue Sapphire)', te: 'నీలం (Blue Sapphire)', kn: 'ನೀಲಂ (Blue Sapphire)', ml: 'ഇന്ദ്രനീലക്കല്ല് (Blue Sapphire)' },
-    'Hessonite Garnet': { en: 'Hessonite (Gomed)', ta: 'கோமேதகம் (Hessonite)', hi: 'गोमेद (Hessonite)', te: 'గోమేధికం (Hessonite)', kn: 'ಗೋಮೇಧಿಕ (Hessonite)', ml: 'ಗೋമേದകം (Hessonite)' },
-    'Hessonite': { en: 'Hessonite (Gomed)', ta: 'கோமேதகம் (Hessonite)', hi: 'गोमेद (Hessonite)', te: 'గోమేధికం (Hessonite)', kn: 'ಗೋಮೇಧಿಕ (Hessonite)', ml: 'ಗೋമേದകം (Hessonite)' },
-    "Cat's Eye": { en: "Cat's Eye (Vaidurya)", ta: "வைடூரியம் (Cat's Eye)", hi: "लहसुनिया (Cat's Eye)", te: "వైడూర్యం (Cat's Eye)", kn: "ವೈಡೂರ್ಯ (Cat's Eye)", ml: "വൈഡൂര്യം (Cat's Eye)" }
+    gems: {
+    'Diamond': { en: 'Diamond', ta: 'வைரம்', hi: 'हीरा', te: 'వజ్రం', kn: 'ವಜ್ರ', ml: 'വൈരം' },
+    'Ruby': { en: 'Ruby', ta: 'மாணிக்கம்', hi: 'माणिक्य', te: 'మాణిక్యం', kn: 'ಮಾಣಿಕ್ಯ', ml: 'മാണിക്യം' },
+    'Natural Pearl': { en: 'Natural Pearl', ta: 'இயற்கை முத்து', hi: 'सच्चा मोती', te: 'సహజ ముత్యం', kn: 'ನೈಸರ್ಗಿಕ ಮುತ್ತು', ml: 'സ്വാഭാവിക മുത്ത്' },
+    'Pearl': { en: 'Pearl', ta: 'முத்து', hi: 'मोती', te: 'ముత్యం', kn: 'ಮುತ್ತು', ml: 'മുത്ത്' },
+    'Red Coral': { en: 'Red Coral', ta: 'செம்பவளம்', hi: 'लाल मूंगा', te: 'పగడం', kn: 'ಹವಳ', ml: 'പവിഴം' },
+    'Emerald': { en: 'Emerald', ta: 'மரகதம்', hi: 'पन्ना', te: 'మరకతం', kn: 'ಪಚ್ಚೆ', ml: 'മരതകം' },
+    'Yellow Sapphire': { en: 'Yellow Sapphire', ta: 'கனக புஷ்பராகம்', hi: 'पुखराज', te: 'పుష్యరాగం', kn: 'ಪುಷ್ಯರಾಗ', ml: 'പുഷ്യരാഗം' },
+    'Blue Sapphire': { en: 'Blue Sapphire', ta: 'நீலக்கல்', hi: 'नीलम', te: 'నీలం', kn: 'ನೀಲಂ', ml: 'ഇന്ദ്രനീലക്കല്ല്' },
+    'Hessonite Garnet': { en: 'Hessonite (Gomed)', ta: 'கோமேதகம்', hi: 'गोमेद', te: 'గోమేధికం', kn: 'ಗೋಮೇಧಿಕ', ml: 'ഗോമേദകം' },
+    'Hessonite': { en: 'Hessonite (Gomed)', ta: 'கோமேதகம்', hi: 'गोमेद', te: 'గోమేధికం', kn: 'ಗೋಮೇಧಿಕ', ml: 'ಗೋമേದകം' },
+    "Cat's Eye": { en: "Cat's Eye (Vaidurya)", ta: 'வைடூரியம்', hi: 'लहसुनिया', te: 'వైడూర్యం', kn: 'ವೈಡೂರ್ಯ', ml: 'വൈഡൂര്യം' }
   },
   substitutes: {
     'White Sapphire / Zircon': { en: 'White Sapphire / Zircon', ta: 'வெள்ளை சபையர் / ஜிர்கான்', hi: 'सफेद पुखराज / जिरकॉन', te: 'తెల్ల పుష్యరాగం / జిర్కాన్', kn: 'ಬಿಳಿ ಪುಷ್ಯರಾಗ / ಜಿರ್ಕಾನ್', ml: 'വെള്ള പുഷ്യരാഗം / സിർക്കോൺ' },
@@ -262,13 +234,13 @@ const GEMOLOGY_I18N = {
     'Iron / Silver / Panchaloha': { en: 'Iron / Silver / Panchaloha', ta: 'இரும்பு / வெள்ளி / பஞ்சலோகம்', hi: 'लोहा / चांदी / पंचधातु', te: 'ఇనుము / వెండి / పంచలోహం', kn: 'ಕಬ್ಬಿಣ / ಬೆಳ್ಳಿ / ಪಂಚಲೋಹ', ml: 'ഇരുമ്പ് / വെള്ളി / പഞ്ചലോഹം' },
     'Silver / Ashtadhatu': { en: 'Silver / Ashtadhatu', ta: 'வெள்ளி / அஷ்டதாது', hi: 'चांदी / अष्टधातु', te: 'వెండి / అష్టధాతువు', kn: 'ಬೆಳ್ಳಿ / ಅಷ್ಟಧಾತು', ml: 'വെള്ളി / ಅಷ್ಟധാതു' }
   },
-  fingers: {
+    fingers: {
     'Middle / Little Finger': { en: 'Middle / Little Finger', ta: 'நடுவிரல் / சுண்டு விரல்', hi: 'मध्यमा / कनिष्ठिका अंगुली', te: 'మధ్య / చిటికెన వేలు', kn: 'ಮಧ್ಯದ / ಕಿರುಬೆರಳು', ml: 'നടുവിരൽ / ചെറുവിരൽ' },
-    'Ring Finger': { en: 'Ring Finger', ta: 'மோதிர விரல் (Ring Finger)', hi: 'अनामिका अंगुली (Ring Finger)', te: 'ఉంగరపు వేలు (Ring Finger)', kn: 'ಉಂಗುರದ ಬೆರಳು (Ring Finger)', ml: 'മോതിരവിരൽ (Ring Finger)' },
-    'Little Finger': { en: 'Little Finger', ta: 'சுண்டு விரல் (Little Finger)', hi: 'कनिष्ठिका अंगुली (Little Finger)', te: 'చిటికెన వేలు (Little Finger)', kn: 'ಕಿರುಬೆರಳು (Little Finger)', ml: 'ചെറുവിരൽ (Little Finger)' },
+    'Ring Finger': { en: 'Ring Finger', ta: 'மோதிர விரல்', hi: 'अनामिका अंगुली', te: 'ఉంగరపు వేలు', kn: 'ಉಂಗುರದ ಬೆರಳು', ml: 'മോതിരവിരൽ' },
+    'Little Finger': { en: 'Little Finger', ta: 'சுண்டு விரல்', hi: 'कनिष्ठिका अंगुली', te: 'చిటికెన వేలు', kn: 'ಕಿರುಬೆರಳು', ml: 'ചെറുവിരൽ' },
     'Index / Ring Finger': { en: 'Index / Ring Finger', ta: 'ஆள்காட்டி / மோதிர விரல்', hi: 'तर्जनी / अनामिका अंगुली', te: 'చూపుడు / ఉంగరపు వేలు', kn: 'ತೋರ್ಬೆರಳು / ಉಂಗುರದ ಬೆರಳು', ml: 'ചൂണ്ടുവിരൽ / മോതിരവിരൽ' },
-    'Index Finger': { en: 'Index Finger', ta: 'ஆள்காட்டி விரல் (Index Finger)', hi: 'तर्जनी अंगुली (Index Finger)', te: 'చూపుడు వేలు (Index Finger)', kn: 'ತೋರ್ಬೆರಳು (Index Finger)', ml: 'ചൂണ്ടുവിരൽ (Index Finger)' },
-    'Middle Finger': { en: 'Middle Finger', ta: 'நடுவிரல் (Middle Finger)', hi: 'मध्यमा अंगुली (Middle Finger)', te: 'మధ్య వేలు (Middle Finger)', kn: 'ಮಧ್ಯದ ಬೆರಳು (Middle Finger)', ml: 'നടുവിരൽ (Middle Finger)' }
+    'Index Finger': { en: 'Index Finger', ta: 'ஆள்காட்டி விரல்', hi: 'तर्जनी अंगुली', te: 'చూపుడు వేలు', kn: 'ತೋರ್ಬೆರಳು', ml: 'ചೂണ്ടുവിരൽ' },
+    'Middle Finger': { en: 'Middle Finger', ta: 'நடுவிரல்', hi: 'मध्यमा अंगुली', te: 'మధ్య వేలు', kn: 'ಮಧ್ಯದ ಬೆರಳು', ml: 'നടുവിരൽ' }
   },
   timings: {
     'Friday Sunrise': { en: 'Friday Sunrise', ta: 'வெள்ளிக்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'शुक्रवार सूर्योदय', te: 'శుక్రవారం సూర్యోదయం', kn: 'ಶುಕ್ರವಾರ ಸೂರ್ಯೋದಯ', ml: 'വെള്ളിയാഴ്ച സൂര്യോദയം' },
@@ -365,10 +337,10 @@ const WEEKDAY_I18N = {
 };
 
 const DIRECTIONS_I18N = {
-  'East': { en: 'East', ta: 'கிழக்கு (East)', hi: 'पूर्व (East)', te: 'తూర్పు (East)', kn: 'ಪೂರ್ವ (East)', ml: 'കിഴക്ക് (East)' },
-  'South': { en: 'South', ta: 'தெற்கு (South)', hi: 'दक्षिण (South)', te: 'దక్షిణం (South)', kn: 'ದಕ್ಷಿಣ (South)', ml: 'തെക്ക് (South)' },
-  'West': { en: 'West', ta: 'மேற்கு (West)', hi: 'पश्चिम (West)', te: 'పడమర (West)', kn: 'ಪಶ್ಚಿಮ (West)', ml: 'പടിഞ്ഞാറ് (West)' },
-  'North': { en: 'North', ta: 'வடக்கு (North)', hi: 'उत्तर (North)', te: 'ఉత్తరం (North)', kn: 'ಉತ್ತರ (North)', ml: 'വടക്ക് (North)' },
+  'East': { en: 'East', ta: 'கிழக்கு', hi: 'पूर्व', te: 'తూర్పు', kn: 'ಪೂರ್ವ', ml: 'കിഴക്ക്' },
+  'South': { en: 'South', ta: 'தெற்கு', hi: 'दक्षिण', te: 'దక్షిణం', kn: 'ದಕ್ಷಿಣ', ml: 'തെക്ക്' },
+  'West': { en: 'West', ta: 'மேற்கு', hi: 'पश्चिम', te: 'పడమర', kn: 'ಪಶ್ಚಿಮ', ml: 'പടിഞ്ഞാറ്' },
+  'North': { en: 'North', ta: 'வடக்கு', hi: 'उत्तर', te: 'ఉత్తరం', kn: 'ಉತ್ತರ', ml: 'വടക്ക്' },
   'North-East': { en: 'North-East', ta: 'வடகிழக்கு (ஈசானியம்)', hi: 'उत्तर-पूर्व (ईशान)', te: 'ఈశాన్యం', kn: 'ಈಶಾನ್ಯ', ml: 'വടക്കുകിഴക്ക് (ഈശാന)' },
   'South-East': { en: 'South-East', ta: 'தென்கிழக்கு (ஆக்னேயம்)', hi: 'दक्षिण-पूर्व (आग्नेय)', te: 'ఆగ్నేయం', kn: 'ಆಗ್ನೇಯ', ml: 'തെക്കുകിഴക്ക് (ആഗ്നേയം)' },
   'South-West': { en: 'South-West', ta: 'தென்மேற்கு (நைருதி)', hi: 'दक्षिण-पश्चिम (नैऋत्य)', te: 'నైరుతి', kn: 'ನೈಋತ್ಯ', ml: 'തെക്കുപടിഞ്ഞാറ് (നൈരൃതി)' },
@@ -631,25 +603,21 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     ? t('madhyayu', language)
     : t('alpayu', language);
 
-  const formatPairTitle = (key) => {
-    switch (key) {
-      case 'pair1_lagnaLord_and_8thLord':
-        return t('pair1Label', language);
-      case 'pair2_moon_and_saturn':
-        return t('pair2Label', language);
-      case 'pair3_lagna_and_horaLagna':
-      case 'pair3_lagna_and_moon':
-        return t('pair3Label', language);
-      case 'majorityConsensus':
-        return language === 'ta' ? 'பெரும்பான்மை முடிவு' :
-               language === 'hi' ? 'बहुमत सर्वसम्मत निर्णय' :
-               language === 'te' ? 'మెజారిటీ నిర్ణయం' :
-               language === 'kn' ? 'ಬಹುಮತದ ನಿರ್ಧಾರ' :
-               language === 'ml' ? 'ഭൂരിപക്ഷ തീരുമാനം' :
-               'Majority Consensus';
-      default:
-        return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const formatPairTitle = (key) => {
+    const k = key.toLowerCase();
+    if (k.includes('pair1') || k.includes('lagnalord')) {
+      return t('pair1Label', language);
     }
+    if (k.includes('pair2') || k.includes('saturn')) {
+      return t('pair2Label', language);
+    }
+    if (k.includes('pair3') || k.includes('horalagna') || k.includes('hora')) {
+      return t('pair3Label', language);
+    }
+    if (k.includes('majority') || k.includes('consensus')) {
+      return t('majorityConsensusLabel', language);
+    }
+    return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   };
 
   const translateModality = (text) => {
@@ -660,11 +628,18 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
         res = res.replaceAll(m, I18N_TERMS[m][language]);
       }
     });
-    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu', 'Lagna'].forEach(p => {
+    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(p => {
       if (I18N_TERMS[p]?.[language]) {
         res = res.replaceAll(p, I18N_TERMS[p][language]);
       }
     });
+    const lagnaStr = I18N_TERMS['Lagna']?.[language] || 'Lagna';
+    const horaStr = language === 'ta' ? 'ஹோரா' : language === 'hi' ? 'होरा' : language === 'te' ? 'హోరా' : language === 'kn' ? 'ಹೋರಾ' : language === 'ml' ? 'ഹോരാ' : 'Hora';
+    res = res.replaceAll('Hora Lagna', `${horaStr} ${lagnaStr}`)
+             .replaceAll('Hora லக்னம்', `${horaStr} ${lagnaStr}`)
+             .replaceAll('Hora', horaStr)
+             .replaceAll('Lagna', lagnaStr);
+
     ['Mesha', 'Vrishabha', 'Mithuna', 'Kataka', 'Simha', 'Kanya', 'Tula', 'Vrishchika', 'Dhanus', 'Makara', 'Kumbha', 'Meena'].forEach(r => {
       if (I18N_TERMS[r]?.[language]) {
         res = res.replaceAll(r, I18N_TERMS[r][language]);
@@ -889,8 +864,12 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     return res;
   };
 
-  const translateDeityRationale = (englishRationale, tamilRationale) => {
-    if (language === 'ta' && tamilRationale) return tamilRationale;
+    const translateDeityRationale = (englishRationale, tamilRationale) => {
+    if (language === 'ta' && tamilRationale) {
+      return tamilRationale
+        .replace(/\s*\/\s*[A-Za-z]+/g, '')
+        .replace(/\s*\([A-Za-z]+\)/g, '');
+    }
     if (language === 'en' && englishRationale) return englishRationale;
     if (!englishRationale) return '';
 
@@ -899,17 +878,14 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     const hasMultiple = englishRationale.includes('among multiple occupants');
     const hasKetuSpecial = englishRationale.includes('Ketu as Moksha Karaka');
 
-    // Extract karakamsa: "from Karakamsa (Makara)"
     const karakamsaMatch = englishRationale.match(/from Karakamsa \((.*?)\)/i);
     const rawKarakamsa = karakamsaMatch ? karakamsaMatch[1] : '';
     const karakamsa = I18N_TERMS[rawKarakamsa]?.[language] || rawKarakamsa;
 
-    // Extract sign lord: "(Sign lord: Mercury)" or "sign lord Jupiter"
     const signLordMatch = englishRationale.match(/Sign lord:\s*([^)]+)/i) || englishRationale.match(/sign lord\s*([a-zA-Z]+)/i);
     const rawSignLord = signLordMatch ? signLordMatch[1].trim() : '';
     const signLord = I18N_TERMS[rawSignLord]?.[language] || rawSignLord;
 
-    // Extract target sign name: "Dharma Sthana) Kanya" or "Moksha Sthana) Dhanus"
     const signMatch = englishRationale.match(/(?:Dharma|Moksha) Sthana\)\s*([A-Za-z]+)/i);
     const rawSign = signMatch ? signMatch[1].trim() : '';
     const sign = I18N_TERMS[rawSign]?.[language] || rawSign;
@@ -1030,97 +1006,115 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     return `Vitality challenges and health caution during ${localizedPlanet} Dasa period (around age ${ageStr}).`;
   };
 
-  const translateStructuralAnchor = (type, rawText) => {
+    const translateStructuralAnchor = (type, rawText) => {
     if (!rawText) return '';
     if (language === 'en') return rawText;
 
-    // Replace Rashis and Planets
-    let res = rawText;
-    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(p => {
-      if (I18N_TERMS[p]?.[language]) {
-        res = res.replaceAll(p, I18N_TERMS[p][language]);
-      }
-    });
-    ['Mesha', 'Vrishabha', 'Mithuna', 'Kataka', 'Simha', 'Kanya', 'Tula', 'Vrishchika', 'Dhanus', 'Makara', 'Kumbha', 'Meena'].forEach(r => {
-      if (I18N_TERMS[r]?.[language]) {
-        res = res.replaceAll(r, I18N_TERMS[r][language]);
-      }
-    });
-
     if (type === 'vitality') {
-      if (language === 'hi') {
-        res = res.replaceAll('லக்னம்:', 'लग्न:')
-                 .replaceAll('பாக லக்னம் (லக்னாதிபதி அமர்ந்த ராசி):', 'पाक लग्न (लग्नेश की राशि):')
-                 .replaceAll('-ஆம் பாவகம்).', 'वां भाव)।')
-                 .replaceAll('சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று (Strong Vitality).', 'उत्कृष्ट शारीरिक जीवन शक्ति एवं रोग प्रतिरोधक क्षमता (Strong Vitality)।')
-                 .replaceAll('உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.', 'स्वास्थ्य में नियमित सतर्कता आवश्यक।');
-      } else if (language === 'te') {
-        res = res.replaceAll('லக்னம்:', 'లగ్నం:')
-                 .replaceAll('பாக லக்னம் (லக்னாதிபதி அமர்ந்த ராசி):', 'పాక లగ్నం (లగ్నాధిపతి ఉన్న రాశి):')
-                 .replaceAll('-ஆம் பாவகம்).', 'వ స్థానం).')
-                 .replaceAll('சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று (Strong Vitality).', 'మంచి శారీరక బలం మరియు రోగనిరోధక శక్తి (Strong Vitality).')
-                 .replaceAll('உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.', 'ఆరోగ్యంపై శ్రద్ధ అవసరం.');
-      } else if (language === 'kn') {
-        res = res.replaceAll('லக்னம்:', 'ಲಗ್ನ:')
-                 .replaceAll('பாக லக்னம் (லக்னாதிபதி அமர்ந்த ராசி):', 'ಪಾಕ ಲಗ್ನ (ಲಗ್ನಾಧಿಪತಿ ಇರುವ ರಾಶಿ):')
-                 .replaceAll('-ஆம் பாவகம்).', 'ನೇ ಮನೆ).')
-                 .replaceAll('சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று (Strong Vitality).', 'ಉತ್ತಮ ಶಾರೀರಿಕ ಬಲ ಮತ್ತು ರೋಗನಿರೋಧಕ ಶಕ್ತಿ (Strong Vitality).')
-                 .replaceAll('உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.', 'ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಕಾಳಜಿ ಅಗತ್ಯ.');
-      } else if (language === 'ml') {
-        res = res.replaceAll('லக்னம்:', 'ലഗ്നം:')
-                 .replaceAll('பாக லக்னம் (லக்னாதிபதி அமர்ந்த ராசி):', 'പാക ലഗ്നം (ലഗ്നാധിപൻ നിൽക്കുന്ന രാശി):')
-                 .replaceAll('-ஆம் பாவகம்).', '-ാം ഭാവം).')
-                 .replaceAll('சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று (Strong Vitality).', 'മികച്ച ശാരീരിക ബലവും പ്രതിരോധശേഷിയും (Strong Vitality).')
-                 .replaceAll('உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.', 'ആരോഗ്യത്തിൽ ശ്രദ്ധ ആവശ്യം.');
+      const match = rawText.match(/Lagna:\s*([A-Za-z]+)\s*\|\s*Paka Lagna.*?([A-Za-z]+)\s*\(House\s*(\d+)\)\.\s*(.*)/i);
+      if (match) {
+        const rawLagna = match[1];
+        const rawPaka = match[2];
+        const houseNum = match[3];
+        const msg = match[4];
+
+        const locLagna = I18N_TERMS[rawLagna]?.[language] || rawLagna;
+        const locPaka = I18N_TERMS[rawPaka]?.[language] || rawPaka;
+        const isStrong = msg.toLowerCase().includes('strong physical vitality');
+
+        if (language === 'ta') {
+          return `லக்னம்: ${locLagna} | பாக லக்னம் (லக்னாதிபதி நின்ற ராசி): ${locPaka} (${houseNum}-ஆம் பாவகம்). ${isStrong ? 'சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று.' : 'உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.'}`;
+        }
+        if (language === 'hi') {
+          return `लग्न: ${locLagna} | पाक लग्न (लग्नेश की राशि): ${locPaka} (${houseNum}वां भाव)। ${isStrong ? 'उत्कृष्ट शारीरिक जीवन शक्ति एवं रोग प्रतिरोधक क्षमता।' : 'स्वास्थ्य में नियमित सतर्कता आवश्यक।'}`;
+        }
+        if (language === 'te') {
+          return `లగ్నం: ${locLagna} | పాక లగ్నం (లగ్నాధిపతి ఉన్న రాశి): ${locPaka} (${houseNum}వ స్థానం). ${isStrong ? 'మంచి శారీరక బలం మరియు రోగనిరోధక శక్తి.' : 'ఆరోగ్యంపై శ్రద్ధ అవసరం.'}`;
+        }
+        if (language === 'kn') {
+          return `ಲಗ್ನ: ${locLagna} | ಪಾಕ ಲಗ್ನ (ಲಗ್ನಾಧಿಪತಿ ಇರುವ ರಾಶಿ): ${locPaka} (${houseNum}ನೇ ಮನೆ). ${isStrong ? 'ಉತ್ತಮ ಶಾರೀರಿಕ ಬಲ ಮತ್ತು ರೋಗನಿರೋಧಕ ಶಕ್ತಿ.' : 'ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಕಾಳಜಿ ಅಗತ್ಯ.'}`;
+        }
+        if (language === 'ml') {
+          return `ലഗ്നം: ${locLagna} | പാക ലഗ്നം (ലഗ്നാധിപൻ നിൽക്കുന്ന രാശി): ${locPaka} (${houseNum}-ാം ഭാവം). ${isStrong ? 'മികച്ച ശാരീരിക ബലവും പ്രതിരോധശേഷിയും.' : 'ആരോഗ്യത്തിൽ ശ്രദ്ധ ആവശ്യം.'}`;
+        }
       }
     } else if (type === 'arudha') {
-      if (language === 'hi') {
-        res = res.replaceAll('-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி நங்கூரம் (Arudha Lagna - AL)', 'वां भाव) - सामाजिक प्रतिष्ठा एवं कार्यक्षेत्र सफलता आधार (Arudha Lagna - AL)');
-      } else if (language === 'te') {
-        res = res.replaceAll('-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி நங்கூரம் (Arudha Lagna - AL)', 'వ స్థానం) - సామాజిక హోదా & వృత్తి విజయ ఆధారం (Arudha Lagna - AL)');
-      } else if (language === 'kn') {
-        res = res.replaceAll('-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி நங்கூரம் (Arudha Lagna - AL)', 'ನೇ ಮನೆ) - ಸಾಮಾಜಿಕ ಪ್ರತಿಷ್ಠೆ & ವೃತ್ತಿ ಯಶಸ್ಸಿನ ಆಧಾರ (Arudha Lagna - AL)');
-      } else if (language === 'ml') {
-        res = res.replaceAll('-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி நங்கூரம் (Arudha Lagna - AL)', '-ാം ഭാവം) - സാമൂഹിക പദവിയും തൊഴിൽ വിജയവും (Arudha Lagna - AL)');
+      const match = rawText.match(/^([A-Za-z]+)\s*\(House\s*(\d+)\)/i);
+      if (match) {
+        const rawAl = match[1];
+        const houseNum = match[2];
+        const locAl = I18N_TERMS[rawAl]?.[language] || rawAl;
+
+        if (language === 'ta') {
+          return `${locAl} (${houseNum}-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி ஆதாரம் (ஆருட லக்னம் - AL)`;
+        }
+        if (language === 'hi') {
+          return `${locAl} (${houseNum}वां भाव) - सामाजिक प्रतिष्ठा एवं कार्यक्षेत्र सफलता आधार (आरूढ़ लग्न - AL)`;
+        }
+        if (language === 'te') {
+          return `${locAl} (${houseNum}వ స్థానం) - సామాజిక హోదా & వృత్తి విజయ ఆధారం (ఆరూఢ లగ్నం - AL)`;
+        }
+        if (language === 'kn') {
+          return `${locAl} (${houseNum}ನೇ ಮನೆ) - ಸಾಮಾಜಿಕ ಪ್ರತಿಷ್ಠೆ & ವೃತ್ತಿ ಯಶಸ್ಸಿನ ಆಧಾರ (ಆರೂಢ ಲಗ್ನ - AL)`;
+        }
+        if (language === 'ml') {
+          return `${locAl} (${houseNum}-ാം ഭാവം) - സാമൂഹിക പദവിയും തൊഴിൽ വിജയവും (ആരൂഢ ലഗ്നം - AL)`;
+        }
       }
     } else if (type === 'mind') {
-      if (language === 'hi') {
-        res = res.replaceAll('ராசிநாதன்', 'चन्द्र राशि स्वामी')
-                 .replaceAll('-ஆம் பாவகம்) - மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம் (High Resilience).', 'वां भाव) - मानसिक दृढ़ता एवं उच्च लचीलापन (High Resilience)।')
-                 .replaceAll('-ஆம் பாவகம்) - தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.', 'वां भाव) - ध्यान एवं पूजा द्वारा मानसिक शांति बनाए रखें।');
-      } else if (language === 'te') {
-        res = res.replaceAll('ராசிநாதன்', 'చంద్ర రాశ్యాధిపతి')
-                 .replaceAll('-ஆம் பாவகம்) - மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம் (High Resilience).', 'వ స్థానం) - మానసిక స్థైర్యం మరియు ధైర్యం (High Resilience).')
-                 .replaceAll('-ஆம் பாவகம்) - தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.', 'వ స్థానం) - ధ్యానం ద్వారా మనశ్శాంతిని పొందండి.');
-      } else if (language === 'kn') {
-        res = res.replaceAll('ராசிநாதன்', 'ಚಂದ್ರ ರಾಶ್ಯಾಧಿಪತಿ')
-                 .replaceAll('-ஆம் பாவகம்) - மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம் (High Resilience).', 'ನೇ ಮನೆ) - ಮಾನಸಿಕ ಸ್ಥೈರ್ಯ ಮತ್ತು ಧೈರ್ಯ (High Resilience).')
-                 .replaceAll('-ஆம் பாவகம்) - தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.', 'ನೇ ಮನೆ) - ಧ್ಯಾನದಿಂದ ಮನಶ್ಶಾಂತಿ ಪಡೆಯಿರಿ.');
-      } else if (language === 'ml') {
-        res = res.replaceAll('ராசிநாதன்', 'ചന്ദ്ര രാശ്യാധിപൻ')
-                 .replaceAll('-ஆம் பாவகம்) - மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம் (High Resilience).', '-ാം ഭാവം) - മാനസിക സ്ഥിരതയും ധൈര്യവും (High Resilience).')
-                 .replaceAll('-ஆம் பாவகம்) - தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.', '-ാം ഭാവം) - ധ്യാനത്തിലൂടെ മനഃസമാധാനം നേടുക.');
+      const match = rawText.match(/Moon Sign Lord\s*([A-Za-z]+)\s*\(House\s*(\d+)\)\s*-\s*(.*)/i);
+      if (match) {
+        const rawLord = match[1];
+        const houseNum = match[2];
+        const msg = match[3];
+
+        const locLord = I18N_TERMS[rawLord]?.[language] || rawLord;
+        const isStrong = msg.toLowerCase().includes('strong mental fortitude');
+
+        if (language === 'ta') {
+          return `சந்திர ராசி நாதன் ${locLord} (${houseNum}-ஆம் பாவகம்) - ${isStrong ? 'மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம்.' : 'தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.'}`;
+        }
+        if (language === 'hi') {
+          return `चन्द्र राशि स्वामी ${locLord} (${houseNum}वां भाव) - ${isStrong ? 'मानसिक दृढ़ता एवं उच्च लचीलापन।' : 'ध्यान एवं पूजा द्वारा मानसिक शांति बनाए रखें।'}`;
+        }
+        if (language === 'te') {
+          return `చంద్ర రాశ్యాధిపతి ${locLord} (${houseNum}వ స్థానం) - ${isStrong ? 'మానసిక స్థైర్యం మరియు ధైర్యం.' : 'ధ్యానం ద్వారా మనశ్శాంతిని పొందండి.'}`;
+        }
+        if (language === 'kn') {
+          return `ಚಂದ್ರ ರಾಶ್ಯಾಧಿಪತಿ ${locLord} (${houseNum}ನೇ ಮನೆ) - ${isStrong ? 'ಮಾನಸಿಕ ಸ್ಥೈರ್ಯ ಮತ್ತು ಧೈರ್ಯ.' : 'ಧ್ಯಾನದಿಂದ ಮನಶ್ಶಾಂತಿ ಪಡೆಯಿರಿ.'}`;
+        }
+        if (language === 'ml') {
+          return `ചന്ദ്ര രാശ്യാധിപൻ ${locLord} (${houseNum}-ാം ഭാവം) - ${isStrong ? 'മാനസിക സ്ഥിരതയും ധൈര്യവും.' : 'ധ്യാനത്തിലൂടെ മനഃസമാധാനം നേടുക.'}`;
+        }
       }
     } else if (type === 'karma') {
-      if (language === 'hi') {
-        res = res.replaceAll('10-ஆம் பாவகமான', '10वां भाव')
-                 .replaceAll('(அதிபதி', '(स्वामी')
-                 .replaceAll('& 11-ஆம் லாப பாவகம் - தொழில் & பொருளாதார யோக நங்கூரம் (SAV Karma Anchor).', 'एवं 11वां लाभ भाव - कर्म एवं समृद्धि आधार (SAV Karma Anchor)।');
-      } else if (language === 'te') {
-        res = res.replaceAll('10-ஆம் பாவகமான', '10వ స్థానం')
-                 .replaceAll('(அதிபதி', '(అధిపతి')
-                 .replaceAll('& 11-ஆம் லாப பாவகம் - தொழில் & பொருளாதார யோக நங்கூரம் (SAV Karma Anchor).', '& 11వ లాభ స్థానం - కర్మ & సంపద ఆధారం (SAV Karma Anchor).');
-      } else if (language === 'kn') {
-        res = res.replaceAll('10-ஆம் பாவகமான', '10ನೇ ಮನೆ')
-                 .replaceAll('(அதிபதி', '(ಅಧಿಪತಿ')
-                 .replaceAll('& 11-ஆம் லாப பாவகம் - தொழில் & பொருளாதார யோக நங்கூரம் (SAV Karma Anchor).', '& 11ನೇ ಲಾಭದ ಮನೆ - ಕರ್ಮ ಮತ್ತು ಸಮೃದ್ಧಿ ಆಧಾರ (SAV Karma Anchor).');
-      } else if (language === 'ml') {
-        res = res.replaceAll('10-ஆம் பாவகமான', '10-ാം ഭാവം')
-                 .replaceAll('(அதிபதி', '(അധിപൻ')
-                 .replaceAll('& 11-ஆம் லாப பாவகம் - தொழில் & பொருளாதார யோக நங்கூரம் (SAV Karma Anchor).', '& 11-ാം ലാഭ ഭാവം - തൊഴിലും സമൃദ്ധിയും (SAV Karma Anchor).');
+      const match = rawText.match(/House 10:\s*([A-Za-z]+)\s*\(Lord:\s*([A-Za-z]+)\)/i);
+      if (match) {
+        const rawSign = match[1];
+        const rawLord = match[2];
+
+        const locSign = I18N_TERMS[rawSign]?.[language] || rawSign;
+        const locLord = I18N_TERMS[rawLord]?.[language] || rawLord;
+
+        if (language === 'ta') {
+          return `10-ஆம் பாவகம்: ${locSign} (அதிபதி: ${locLord}) & 11-ஆம் பாவகம் (லாபம்) - தொழில் & பொருளாதார யோக ஆதாரம் (SAV கர்ம ஆதாரம்).`;
+        }
+        if (language === 'hi') {
+          return `10वां भाव: ${locSign} (स्वामी: ${locLord}) एवं 11वां भाव (लाभ) - कर्म एवं समृद्धि आधार (SAV कर्म आधार)।`;
+        }
+        if (language === 'te') {
+          return `10వ స్థానం: ${locSign} (అధిపతి: ${locLord}) & 11వ స్థానం (లాభం) - కర్మ & సంపద ఆధారం (SAV కర్మ ఆధారం).`;
+        }
+        if (language === 'kn') {
+          return `10ನೇ ಮನೆ: ${locSign} (ಅಧಿಪತಿ: ${locLord}) & 11ನೇ ಮನೆ (ಲಾಭ) - ಕರ್ಮ ಮತ್ತು ಸಮೃದ್ಧಿ ಆಧಾರ (SAV ಕರ್ಮ ಆಧಾರ).`;
+        }
+        if (language === 'ml') {
+          return `10-ാം ഭാവം: ${locSign} (അധിപൻ: ${locLord}) & 11-ാം ഭാവം (ലാഭം) - തൊഴിലും സമൃദ്ധിയും (SAV കർമ്മ ആധാരം).`;
+        }
       }
     }
-    return res;
+
+    return rawText;
   };
 
   const num = anchors?.numerology;

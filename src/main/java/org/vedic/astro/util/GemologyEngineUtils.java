@@ -64,7 +64,7 @@ public class GemologyEngineUtils {
         String p = planet != null ? planet.trim().toLowerCase() : "sun";
         return switch (p) {
             case "sun", "surya" -> new GemologyResult(
-                    "Ruby", "மாணிக்கம் (Ruby)",
+                    "Ruby", "மாணிக்கம்",
                     "Red Garnet / Spinel",
                     "Sun",
                     "Gold / Copper",
@@ -74,7 +74,7 @@ public class GemologyEngineUtils {
                     rationale
             );
             case "moon", "chandra" -> new GemologyResult(
-                    "Natural Pearl", "முத்து (Natural Pearl)",
+                    "Natural Pearl", "முத்து",
                     "Moonstone",
                     "Moon",
                     "Silver",
@@ -84,7 +84,7 @@ public class GemologyEngineUtils {
                     rationale
             );
             case "mars", "kuja", "sevvai", "mangal" -> new GemologyResult(
-                    "Red Coral", "செம்பவளம் (Red Coral)",
+                    "Red Coral", "செம்பவளம்",
                     "Carnelian",
                     "Mars",
                     "Gold / Copper",
@@ -94,7 +94,7 @@ public class GemologyEngineUtils {
                     rationale
             );
             case "mercury", "budha" -> new GemologyResult(
-                    "Emerald", "மரகதம் (Emerald)",
+                    "Emerald", "மரகதம்",
                     "Peridot / Green Tourmaline",
                     "Mercury",
                     "Gold / Silver",
@@ -104,7 +104,7 @@ public class GemologyEngineUtils {
                     rationale
             );
             case "jupiter", "guru" -> new GemologyResult(
-                    "Yellow Sapphire", "கனக புஷ்பராகம் (Yellow Sapphire)",
+                    "Yellow Sapphire", "கனக புஷ்பராகம்",
                     "Yellow Topaz / Citrine",
                     "Jupiter",
                     "Gold",
@@ -114,7 +114,7 @@ public class GemologyEngineUtils {
                     rationale
             );
             case "venus", "shukra" -> new GemologyResult(
-                    "Diamond", "வைரம் (Diamond)",
+                    "Diamond", "வைரம்",
                     "White Sapphire / Zircon",
                     "Venus",
                     "Platinum / Silver / White Gold",
@@ -124,7 +124,7 @@ public class GemologyEngineUtils {
                     rationale
             );
             case "saturn", "shani" -> new GemologyResult(
-                    "Blue Sapphire", "நீலக்கல் (Blue Sapphire)",
+                    "Blue Sapphire", "நீலக்கல்",
                     "Amethyst / Iolite",
                     "Saturn",
                     "Silver / Iron",
@@ -134,23 +134,23 @@ public class GemologyEngineUtils {
                     rationale
             );
             case "rahu" -> new GemologyResult(
-                    "Hessonite Garnet", "கோமேதகம் (Hessonite Garnet)",
+                    "Hessonite Garnet", "கோமேதகம்",
                     "Spessartite",
                     "Rahu",
                     "Silver",
                     "Middle Finger",
                     "Saturday Night / Rahu Kalam",
-                    List.of("Ruby", "Pearl", "Yellow Sapphire"),
+                    List.of("Ruby", "Pearl", "Red Coral", "Yellow Sapphire"),
                     rationale
             );
             case "ketu" -> new GemologyResult(
-                    "Cat's Eye", "வைடூரியம் (Cat's Eye)",
+                    "Cat's Eye", "வைடூரியம்",
                     "Chrysoberyl",
                     "Ketu",
-                    "Silver",
-                    "Ring Finger",
+                    "Gold / Silver",
+                    "Middle Finger",
                     "Tuesday Evening",
-                    List.of("Ruby", "Pearl", "Diamond"),
+                    List.of("Ruby", "Pearl", "Emerald", "Diamond"),
                     rationale
             );
             default -> defaultGemologyResult();

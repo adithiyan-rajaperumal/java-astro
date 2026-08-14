@@ -189,9 +189,9 @@ public class SpiritualDeityUtils {
 
         if (occupants.isEmpty()) {
             // Scenario 1: Empty House -> Sign Lord takes precedence
-            String rationaleTa = "ஜைமினி சூத்திரப்படி நவாம்ச காரகாம்ச ராசிக்கு (" + karakamsaNameTa + " / " + karakamsaNameEn +
-                    ") " + houseLabelTa + " " + signNameTa + " (" + signNameEn + ") -ல் கிரகங்கள் அமராததால், " +
-                    "அந்த வீட்டின் அதிபதி " + lordTa + " (" + signLord + ") மூலம் நிர்ணயிக்கப்பட்டது.";
+            String rationaleTa = "ஜைமினி சூத்திரப்படி நவாம்ச காரகாம்ச ராசிக்கு (" + karakamsaNameTa +
+                    ") " + houseLabelTa + " " + signNameTa + " -ல் கிரகங்கள் அமராததால், " +
+                    "அந்த வீட்டின் அதிபதி " + lordTa + " மூலம் நிர்ணயிக்கப்பட்டது.";
             String rationaleEn = "According to Jaimini Sutras, since the " + houseLabelEn + " " + signNameEn +
                     " from Karakamsa (" + karakamsaNameEn + ") in D9 Navamsa is unoccupied, it is governed by its sign lord " + signLord + ".";
             return new HouseAnalysis(signLord, occupants, signLord, false, false, rationaleTa, rationaleEn);
@@ -202,9 +202,9 @@ public class SpiritualDeityUtils {
             String ketuSpecialTa = occ.equalsIgnoreCase("Ketu") ? " (மோக்ஷ காரகரான கேது பகவான் நின்றதால் ஞான முக்தி அருள் கிட்டும்)" : "";
             String ketuSpecialEn = occ.equalsIgnoreCase("Ketu") ? " (Ketu as Moksha Karaka grants spiritual liberation/Kaivalya)" : "";
 
-            String rationaleTa = "ஜைமினி சூத்திரப்படி நவாம்ச காரகாம்சத்திற்கு (" + karakamsaNameTa + " / " + karakamsaNameEn +
-                    ") " + houseLabelTa + " " + signNameTa + " (" + signNameEn + ") -ல் அமர்ந்துள்ள கிரகம் " +
-                    occTa + " (" + occ + ") மூலம் நிர்ணயிக்கப்பட்டது. (ராசி அதிபதி: " + lordTa + ")." + ketuSpecialTa;
+            String rationaleTa = "ஜைமினி சூத்திரப்படி நவாம்ச காரகாம்சத்திற்கு (" + karakamsaNameTa +
+                    ") " + houseLabelTa + " " + signNameTa + " -ல் அமர்ந்துள்ள கிரகம் " +
+                    occTa + " மூலம் நிர்ணயிக்கப்பட்டது. (ராசி அதிபதி: " + lordTa + ")." + ketuSpecialTa;
             String rationaleEn = "According to Jaimini Sutras, governed by " + occ + " occupying the " +
                     houseLabelEn + " " + signNameEn + " from Karakamsa (" + karakamsaNameEn + ") in D9 Navamsa (Sign lord: " + signLord + ")." + ketuSpecialEn;
             return new HouseAnalysis(occ, occupants, signLord, true, false, rationaleTa, rationaleEn);
@@ -215,9 +215,9 @@ public class SpiritualDeityUtils {
             String allOccTa = occupants.stream().map(SpiritualDeityUtils::getPlanetNameTamil).collect(Collectors.joining(", "));
             String allOccEn = String.join(", ", occupants);
 
-            String rationaleTa = "ஜைமினி சூத்திரப்படி நவாம்ச காரகாம்சத்திற்கு (" + karakamsaNameTa + " / " + karakamsaNameEn +
-                    ") " + houseLabelTa + " " + signNameTa + " (" + signNameEn + ") -ல் பல கிரகங்கள் (" + allOccTa +
-                    ") இணைந்துள்ளன. இதில் முதன்மையான கிரகம் " + domTa + " (" + dominant + ") வழியே நிர்ணயிக்கப்பட்டது. (ராசி அதிபதி: " + lordTa + ").";
+            String rationaleTa = "ஜைமினி சூத்திரப்படி நவாம்ச காரகாம்சத்திற்கு (" + karakamsaNameTa +
+                    ") " + houseLabelTa + " " + signNameTa + " -ல் பல கிரகங்கள் (" + allOccTa +
+                    ") இணைந்துள்ளன. இதில் முதன்மையான கிரகம் " + domTa + " வழியே நிர்ணயிக்கப்பட்டது. (ராசி அதிபதி: " + lordTa + ").";
             String rationaleEn = "According to Jaimini Sutras, governed by dominant planet " + dominant +
                     " among multiple occupants (" + allOccEn + ") in the " + houseLabelEn + " " + signNameEn +
                     " from Karakamsa (" + karakamsaNameEn + ") in D9 Navamsa (Sign lord: " + signLord + ").";
