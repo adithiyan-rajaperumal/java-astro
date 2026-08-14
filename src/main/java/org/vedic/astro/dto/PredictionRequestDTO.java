@@ -16,5 +16,4 @@ public class PredictionRequestDTO {
     private ChartUiResponseDTO chartData;
     private String language;
     private boolean forceRefresh;
-    private Boolean isTenYears;
 }

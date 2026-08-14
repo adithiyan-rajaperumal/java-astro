@@ -388,10 +388,8 @@ public class GeminiPredictionService {
             inputData.put("vimshottariTimeline", dasas);
         }
 
-        // 7. Forecast Configuration
-        boolean is10YearMode = (req != null && req.getIsTenYears() != null)
-                ? req.getIsTenYears()
-                : (geminiProperties == null || geminiProperties.is10YearForecastMode());
+        // 7. Forecast Configuration (Controlled strictly via application.yml)
+        boolean is10YearMode = geminiProperties != null && geminiProperties.is10YearForecastMode();
         int targetLifespanAge = 95;
         int maxForecastYears = is10YearMode
                 ? (geminiProperties != null ? geminiProperties.resolveForecastYears(currentAge, targetLifespanAge) : 10)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { t } from '../i18n/translations';
 
 function AiPredictionsView({
@@ -10,8 +10,6 @@ function AiPredictionsView({
   loading,
   error
 }) {
-  const [selectedMode, setSelectedMode] = useState('10y'); // '10y' | 'life'
-
   if (!predictions && !loading) {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '40px 20px' }}>
@@ -24,44 +22,26 @@ function AiPredictionsView({
             : 'Authentic astrological predictions synthesized from 12 Divisional Varga charts (D1, D9, D10, D12, D30...), Shadbala planetary matrices, and Vimshottari Dasa-Bhukthi timelines.'}
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <button
-            onClick={() => onGenerate(false, true)}
+            onClick={() => onGenerate(false)}
             className="btn-primary"
             style={{
-              padding: '12px 24px',
-              fontSize: '15px',
+              padding: '14px 32px',
+              fontSize: '16px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
-              background: 'linear-gradient(135deg, #3498db, #2980b9)',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              color: '#fff',
-              fontWeight: '600'
-            }}
-          >
-            ⚡ {t('tenYearMode', language)}
-          </button>
-          <button
-            onClick={() => onGenerate(false, false)}
-            className="btn-primary"
-            style={{
-              padding: '12px 24px',
-              fontSize: '15px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
+              gap: '10px',
               background: 'linear-gradient(135deg, #f1c40f, #d4ac0d)',
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer',
               color: '#1a1a1a',
-              fontWeight: '600'
+              fontWeight: '700',
+              boxShadow: '0 4px 15px rgba(241, 196, 15, 0.3)'
             }}
           >
-            🪐 {t('lifetimeMode', language)}
+            ✨ {t('generateAiBalan', language) || 'Generate AI Life Predictions'}
           </button>
         </div>
       </div>
@@ -87,14 +67,9 @@ function AiPredictionsView({
           ⚠️ {t('calculationFaulted', language)}
         </h4>
         <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>{error}</p>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={() => onGenerate(true, true)} className="btn-primary" style={{ padding: '8px 16px' }}>
-            🔄 {t('tenYearMode', language)}
-          </button>
-          <button onClick={() => onGenerate(true, false)} className="btn-primary" style={{ padding: '8px 16px' }}>
-            🔄 {t('lifetimeMode', language)}
-          </button>
-        </div>
+        <button onClick={() => onGenerate(true)} className="btn-primary" style={{ padding: '8px 20px' }}>
+          🔄 {t('retry', language)}
+        </button>
       </div>
     );
   }
@@ -108,7 +83,7 @@ function AiPredictionsView({
         <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>
           {predictions.message || t('aiPredictionUnavailable', language)}
         </p>
-        <button onClick={() => onGenerate(true, true)} className="btn-primary" style={{ padding: '8px 20px' }}>
+        <button onClick={() => onGenerate(true)} className="btn-primary" style={{ padding: '8px 20px' }}>
           🔄 {t('retry', language)}
         </button>
       </div>
@@ -161,28 +136,13 @@ function AiPredictionsView({
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div>
           <button
-            onClick={() => onGenerate(true, !is10Year)}
+            onClick={() => onGenerate(true)}
             className="btn-primary"
             style={{
-              padding: '6px 14px',
-              fontSize: '12px',
-              background: 'none',
-              border: '1px solid var(--border)',
-              color: 'var(--text-primary)',
-              borderRadius: '6px',
-              cursor: 'pointer'
-            }}
-          >
-            🔄 {is10Year ? t('lifetimeMode', language) : t('tenYearMode', language)}
-          </button>
-          <button
-            onClick={() => onGenerate(true, is10Year)}
-            className="btn-primary"
-            style={{
-              padding: '6px 14px',
-              fontSize: '12px',
+              padding: '8px 18px',
+              fontSize: '13px',
               background: 'rgba(255, 215, 0, 0.1)',
               border: '1px solid var(--accent-gold)',
               color: 'var(--accent-gold)',
