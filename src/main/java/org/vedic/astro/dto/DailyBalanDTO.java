@@ -19,6 +19,7 @@ public class DailyBalanDTO {
     private String nakshatra;
     private String runningDasaBhukthi;
     private boolean chandrashtama;
+    private String dailyNarrative;
     private String generalOutlook;
     private String careerWork;
     private String financeWealth;

@@ -119,6 +119,26 @@ public class GeminiPredictionServiceTest {
     }
 
     @Test
+    public void testDailyBalanDTOSerializationWithDailyNarrative() throws Exception {
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        DailyBalanDTO dto = DailyBalanDTO.builder()
+                .enabled(true)
+                .targetDate("2026-08-15")
+                .rasi("Mesha")
+                .dailyNarrative("Today's transit Moon brings auspicious energy for career and wealth growth.")
+                .dailyRemedy("Chant Gayatri Mantra 9 times.")
+                .luckyColor("Ruby Red")
+                .luckyNumber("1 & 4")
+                .favorableDirection("East")
+                .bestTimeWindow("07:30 AM - 09:00 AM")
+                .build();
+        String json = mapper.writeValueAsString(dto);
+        assertTrue(json.contains("dailyNarrative"));
+        DailyBalanDTO deserialized = mapper.readValue(json, DailyBalanDTO.class);
+        assertEquals("Today's transit Moon brings auspicious energy for career and wealth growth.", deserialized.getDailyNarrative());
+    }
+
+    @Test
     public void testUnavailableResponseWhenDisabledOrFails() {
         PredictionResponseDTO lifeResp = predictionService.createUnavailableLifeResponse("ta");
         assertNotNull(lifeResp);
