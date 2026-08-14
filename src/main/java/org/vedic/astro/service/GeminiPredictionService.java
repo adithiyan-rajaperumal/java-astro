@@ -896,99 +896,6 @@ public class GeminiPredictionService {
         };
     }
 
-    public static PredictionResponseDTO.AuspiciousAnchors calculateAuspiciousAnchors(int lagnaSign, int rasiSign, String lang) {
-        boolean isTa = "ta".equalsIgnoreCase(lang);
-        boolean isHi = "hi".equalsIgnoreCase(lang);
-        boolean isTe = "te".equalsIgnoreCase(lang);
-        boolean isKn = "kn".equalsIgnoreCase(lang);
-        boolean isMl = "ml".equalsIgnoreCase(lang);
-
-        String lord = PlanetDignityUtils.getSignLord(lagnaSign);
-
-        String gemstone;
-        String colors;
-        String numbers;
-        String days;
-        String deity;
-        String directions;
-
-        switch (lord.toUpperCase()) {
-            case "SUN" -> {
-                gemstone = isTa ? "மாணிக்கம் (Ruby / Manikkam)" : (isHi ? "माणिक्य (Ruby)" : "Ruby (Manikkam)");
-                colors = isTa ? "தாமரை சிவப்பு, ஆரஞ்சு, பொன்னிறம்" : (isHi ? "माणिक्य लाल, नारंगी, स्वर्णिम" : "Ruby Red, Saffron, Gold");
-                numbers = "1, 4, 9";
-                days = isTa ? "ஞாயிறு & செவ்வாய்" : (isHi ? "रविवार और मंगलवार" : "Sunday & Tuesday");
-                deity = isTa ? "ஸ்ரீ சூரிய நாராயணர் & சிவபெருமான்" : (isHi ? "भगवान सूर्य और शिव जी" : "Surya Bhagavan & Lord Shiva");
-                directions = isTa ? "கிழக்கு (East)" : (isHi ? "पूर्व (East)" : "East");
-            }
-            case "MOON" -> {
-                gemstone = isTa ? "முத்து / சந்திரகாந்தம் (Natural Pearl)" : (isHi ? "मोती (Natural Pearl)" : "Natural Pearl (Muthu)");
-                colors = isTa ? "முத்து வெள்ளை, வெள்ளி, கிரீம்" : (isHi ? "सफेद, चांदी, क्रीम" : "Pearl White, Silver, Cream");
-                numbers = "2, 7, 9";
-                days = isTa ? "திங்கள் & வியாழன்" : (isHi ? "सोमवार और गुरुवार" : "Monday & Thursday");
-                deity = isTa ? "ஸ்ரீ பார்வதி தேவி & லலிதாம்பிகை" : (isHi ? "मां पार्वती और ललिता त्रिपुरसुंदरी" : "Goddess Parvathi & Lalitha Tripurasundari");
-                directions = isTa ? "வடமேற்கு (North-West)" : (isHi ? "उत्तर-पश्चिम (North-West)" : "North-West");
-            }
-            case "MARS" -> {
-                gemstone = isTa ? "செம்பவளம் (Red Coral)" : (isHi ? "मूंगा (Red Coral)" : "Red Coral (Pavazham)");
-                colors = isTa ? "பவள சிவப்பு, அடர் சிவப்பு, குங்கும நிறம்" : (isHi ? "मूंगा लाल, सिंदूरी, गहरा लाल" : "Coral Red, Crimson, Vermilion");
-                numbers = "9, 1, 3";
-                days = isTa ? "செவ்வாய் & வியாழன்" : (isHi ? "मंगलवार और गुरुवार" : "Tuesday & Thursday");
-                deity = isTa ? "ஸ்ரீ முருகப்பெருமான் & சுப்ரமண்யர்" : (isHi ? "भगवान कार्तिकेय और सुब्रमण्य" : "Lord Muruga (Subramanya)");
-                directions = isTa ? "தெற்கு & கிழக்கு (South & East)" : (isHi ? "दक्षिण और पूर्व (South & East)" : "South & East");
-            }
-            case "MERCURY" -> {
-                gemstone = isTa ? "மரகத பச்சை (Emerald / Maragatham)" : (isHi ? "पन्ना (Emerald)" : "Emerald (Maragatham)");
-                colors = isTa ? "மரகத பச்சை, கிளிப்பச்சை, வெளிர் பச்சை" : (isHi ? "पन्ना हरा, तोतिया हरा" : "Emerald Green, Light Green");
-                numbers = "5, 6, 1";
-                days = isTa ? "புதன் & வெள்ளி" : (isHi ? "बुधवार और शुक्रवार" : "Wednesday & Friday");
-                deity = isTa ? "ஸ்ரீ மகாவிஷ்ணு & பெருமாள்" : (isHi ? "भगवान महाविष्णु और श्री रंगनाथ" : "Lord Maha Vishnu & Sri Ranganatha");
-                directions = isTa ? "வடக்கு (North)" : (isHi ? "उत्तर (North)" : "North");
-            }
-            case "JUPITER" -> {
-                gemstone = isTa ? "மஞ்சள் புஷ்பராகம் (Yellow Sapphire)" : (isHi ? "पुखराज (Yellow Sapphire)" : "Yellow Sapphire (Pushparagam)");
-                colors = isTa ? "பொன் மஞ்சள், தங்கம், சந்தன நிறம்" : (isHi ? "स्वर्णिम पीला, केसरिया, चंदन" : "Golden Yellow, Saffron, Sandalwood");
-                numbers = "3, 9, 1";
-                days = isTa ? "வியாழன் & ஞாயிறு" : (isHi ? "गुरुवार और रविवार" : "Thursday & Sunday");
-                deity = isTa ? "ஸ்ரீ தட்சிணாமூர்த்தி & குரு பகவான்" : (isHi ? "भगवान दक्षिणामूर्ति और गुरु" : "Lord Dakshinamurthy & Guru Bhagavan");
-                directions = isTa ? "வடகிழக்கு / ஈசானியம் (North-East)" : (isHi ? "उत्तर-पूर्व / ईशान (North-East)" : "North-East");
-            }
-            case "VENUS" -> {
-                gemstone = isTa ? "வைரம் / வெள்ளை புஷ்பராகம் (Diamond / White Sapphire)" : (isHi ? "हीरा / सफेद पुखराज" : "Diamond / White Sapphire");
-                colors = isTa ? "பட்டு வெள்ளை, ரோஸ், கிரீம்" : (isHi ? "सफेद, गुलाबी, क्रीम" : "Silk White, Rose Pink, Cream");
-                numbers = "6, 5, 8";
-                days = isTa ? "வெள்ளி & புதன்" : (isHi ? "शुक्रवार और बुधवार" : "Friday & Wednesday");
-                deity = isTa ? "ஸ்ரீ மகாலட்சுமி & ஸ்ரீ வித்யா" : (isHi ? "मां महालक्ष्मी और श्री विद्या" : "Goddess Mahalakshmi & Sri Lalitha");
-                directions = isTa ? "தென்கிழக்கு / ஆக்னேயம் (South-East)" : (isHi ? "दक्षिण-पूर्व / आग्नेय (South-East)" : "South-East");
-            }
-            case "SATURN" -> {
-                gemstone = isTa ? "நீலக்கல் / அமேதிஸ்ட் (Blue Sapphire / Amethyst)" : (isHi ? "नीलम / जामुनिया" : "Blue Sapphire / Amethyst");
-                colors = isTa ? "நீலம், கருநீலம், சாம்பல்" : (isHi ? "गहरा नीला, काला, धूसर" : "Navy Blue, Royal Blue, Grey");
-                numbers = "8, 4, 6";
-                days = isTa ? "சனி & புதன்" : (isHi ? "शनिवार और बुधवार" : "Saturday & Wednesday");
-                deity = isTa ? "ஸ்ரீ வெங்கடேஸ்வரர், அய்யப்பன் & அனுமன்" : (isHi ? "भगवान वेंकटेश्वर, अय्यप्पा और हनुमान" : "Lord Venkateshwara, Ayyappa & Hanuman");
-                directions = isTa ? "மேற்கு (West)" : (isHi ? "पश्चिम (West)" : "West");
-            }
-            default -> {
-                gemstone = isTa ? "இயற்கை நவரத்தினம்" : "Navaratna";
-                colors = isTa ? "பொன் மஞ்சள், வெள்ளை" : "Gold, White";
-                numbers = "1, 3, 9";
-                days = isTa ? "வியாழன் & ஞாயிறு" : "Thursday & Sunday";
-                deity = isTa ? "ஸ்ரீ விநாயகர் & குலதெய்வம்" : "Lord Ganesha & Kula Devata";
-                directions = isTa ? "வடகிழக்கு (North-East)" : "North-East";
-            }
-        }
-
-        return PredictionResponseDTO.AuspiciousAnchors.builder()
-                .lifeGemstone(gemstone)
-                .favorableColors(colors)
-                .luckyNumbers(numbers)
-                .favorableDays(days)
-                .ishtaDevata(deity)
-                .favorableDirections(directions)
-                .build();
-    }
-
     public PredictionResponseDTO generateOfflineRuleBasedBalan(PredictionRequestDTO req) {
         BirthDetailsDTO b = req.getBirthDetails();
         ChartUiResponseDTO c = req.getChartData();
@@ -1176,25 +1083,12 @@ public class GeminiPredictionService {
             cautionsRem = isTa ? "எச்சரிக்கை: அவநம்பிக்கை மற்றும் தனிமை உணர்வை தவிர்த்து சுறுசுறுப்பாக இருக்கவும். பரிகாரம்: விநாயகர் வழிபாடு மற்றும் சங்கடஹர சதுர்த்தி விரதம்." : "Caution: Avoid excessive self-isolation. Remedy: Worship Lord Ganesha with Arugampul on Sankatahara Chaturthi.";
         }
 
+        String annualNarrative = theme + " " + astroBasis + " " + careerFin + " " + healthFam + " " + cautionsRem;
         return PredictionResponseDTO.YearlyPrediction.builder()
                 .year(yr)
                 .age(age)
                 .dasaBhukthi(runningDasa)
-                .yearlyTheme(theme)
-                .astrologicalBasis(astroBasis)
-                .careerAndFinance(careerFin)
-                .healthAndFamily(healthFam)
-                .cautionsAndRemedies(cautionsRem)
-                .personalMindset(theme)
-                .careerProfession(careerFin)
-                .careerFinance(careerFin)
-                .wealthFinance(careerFin)
-                .healthVitality(healthFam)
-                .marriageFamily(healthFam)
-                .familyMarriage(healthFam)
-                .parentsKids(healthFam)
-                .favorableVsCaution(cautionsRem)
-                .remediesGuidance(cautionsRem)
+                .annualNarrative(annualNarrative)
                 .build();
     }
 
