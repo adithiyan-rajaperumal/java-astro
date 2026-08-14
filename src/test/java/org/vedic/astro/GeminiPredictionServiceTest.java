@@ -115,7 +115,7 @@ public class GeminiPredictionServiceTest {
         String systemInstruction = predictionService.constructSystemInstruction("ta");
         assertTrue(systemInstruction.contains("CRITICAL ASTROLOGICAL INTERPRETATION & NOTATION RULES"));
         assertTrue(systemInstruction.contains("AUTONOMOUS AYURDAYA (LONGEVITY) CALCULATION"));
-        assertTrue(systemInstruction.contains("YEARLY PREDICTIONS (UNCAPPED RICH NARRATIVE)"));
+        assertTrue(systemInstruction.contains("UNIFORM COMPREHENSIVE DEPTH ACROSS ALL YEARS"));
     }
 
     @Test

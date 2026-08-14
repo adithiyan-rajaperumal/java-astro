@@ -141,28 +141,32 @@ public class GeminiPredictionService {
           .append("CRITICAL LANGUAGE & SCRIPT DIRECTIVES:\n")
           .append("- You MUST write 100% of all JSON text fields in the native script of language code '").append(lang).append("':\n");
         if ("ta".equalsIgnoreCase(lang)) {
-            sb.append("  * Language: Tamil (தமிழ்). Use classical terminology: லக்னாதிபதி, பூர்வ புண்ணியம், யோககாரகன், விம்சோத்தரி திசா புக்தி, கஜகேசரி யோகம், ரோக ஸ்தானம், பரிகாரங்கள்.\n");
+            sb.append("  * Language: Tamil (தமிழ்). Use classical terminology: லக்னாதிபதி, பூர்வ புண்ணியம், யோககாரகன், விம்சோத்தரி திசா புக்தி, கஜகேசரி யோகம், ரோக ஸ்தானம், கோச்சாரம், பரிகாரங்கள்.\n");
         } else if ("hi".equalsIgnoreCase(lang)) {
-            sb.append("  * Language: Hindi (हिन्दी). Use classical Vedic terms: लग्नेश, राजयोग, पूर्व पुण्य, दशा-अन्तर्दशा, षष्ठ भाव रोग, वैदिक उपाय.\n");
+            sb.append("  * Language: Hindi (हिन्दी). Use classical Vedic terms: लग्नेश, राजयोग, पूर्व पुण्य, दशा-अन्तर्दशा, गोचर, षष्ठ भाव रोग, वैदिक उपाय.\n");
         } else if ("te".equalsIgnoreCase(lang)) {
-            sb.append("  * Language: Telugu (తెలుగు). Use authentic terms: లగ్నాధిపతి, రాజయోగాలు, పూర్వ పుణ్యం, దశ అంతర్దశ, రోగ స్థానం, పరిహారాలు.\n");
+            sb.append("  * Language: Telugu (తెలుగు). Use authentic terms: లగ్నాధిపతి, రాజయోగాలు, పూర్వ పుణ్యం, దశ అంతర్దశ, గోచారం, రోగ స్థానం, పరిహారాలు.\n");
         } else if ("kn".equalsIgnoreCase(lang)) {
-            sb.append("  * Language: Kannada (ಕನ್ನಡ). Use authentic terms: ಲಗ್ನಾಧಿಪತಿ, ರಾಜಯೋಗಗಳು, ಪೂರ್ವ ಪುಣ್ಯ, ದಶಾ ಭುಕ್ತಿ, ಪರಿಹಾರಗಳು.\n");
+            sb.append("  * Language: Kannada (ಕನ್ನಡ). Use authentic terms: ಲಗ್ನಾಧಿಪತಿ, ರಾಜಯೋಗಗಳು, ಪೂರ್ವ ಪುಣ್ಯ, ದಶಾ ಭುಕ್ತಿ, ಗೋಚಾರ, ಪರಿಹಾರಗಳು.\n");
         } else if ("ml".equalsIgnoreCase(lang)) {
-            sb.append("  * Language: Malayalam (മലയാളം). Use authentic terms: ലഗ്നാധിപൻ, രാജയോഗങ്ങൾ, പൂർവ്വ പുണ്യം, ദശാ ഫലങ്ങൾ, പരിഹാരങ്ങൾ.\n");
+            sb.append("  * Language: Malayalam (മലയാളം). Use authentic terms: ലഗ്നാധിപൻ, രാജയോഗങ്ങൾ, പൂർവ്വ പുണ്യം, ദശാ ഫലങ്ങൾ, ഗോചാരം, പരിഹാരങ്ങൾ.\n");
         } else {
             sb.append("  * Language: English with classical Sanskrit astrological terms in parentheses.\n");
         }
-        sb.append("- Output dense, insightful, and authentic astrological readings. FORBID repetitive boilerplate or generic filler.\n")
-          .append("- TRUTHFULLY AND ACCURATELY predict potential challenges (health vulnerability, career disruption, financial caution, emotional strain) when Maraka/Dusthana/Badhaka/afflicted lords are active.\n")
+        sb.append("- STRICT ASTROLOGICAL RIGOR OVER NARRATIVE EMPATHY:\n")
+          .append("  * STRICTLY FORBID emotional sympathy, novelistic storytelling, social essays, and generic age-based assumptions (e.g. NEVER write cultural clichés like 'celebrating 60th birthday Mani Vizha / Sashtiapthapoorthi', '70th Bhimaratha Shanthi', '80th Sadabhishekam', 'enjoying grandchildren's smiles', 'peaceful retirement', or 'family will take care of you').\n")
+          .append("  * Every prediction MUST BE rigorous, technical, and deep Vedic astrological deduction derived strictly from planetary house activations, Bhavas, dignities, aspects (Drishti), Dasa-Bhukthi mutual relationships, and Gochara transits.\n")
+          .append("  * TRUTHFULLY AND ACCURATELY predict potential challenges (health vulnerability, career disruption, financial caution, emotional strain) when Maraka/Dusthana/Badhaka/afflicted lords are active.\n")
+          .append("- UNIFORM COMPREHENSIVE DEPTH ACROSS ALL YEARS (NO CONTENT COMPRESSION):\n")
+          .append("  * Every single year from beginning to end must have a full, high-density astrological paragraph of 4 to 6 substantial, content-rich sentences. Content MUST NOT shrink, fade, or generalize as years advance.\n")
+          .append("  * Each year's 'annualNarrative' MUST systematically integrate: (1) Active Dasa & Bhukthi lords, their house ownerships & mutual relationship (e.g. 6/8 Sashtashtaka, 2/12, 5/9, Kendra), (2) Career/Karma & Status (D10), (3) Wealth, Finances & Assets (D2/D11), (4) Physical Health, Organ vulnerabilities & Dosha balance (D30/6th/8th houses), (5) Family & Marital dynamics (D9/D7/D12), and (6) Actionable Graha propitiation / Vedic remedy.\n")
           .append("- CRITICAL ASTROLOGICAL INTERPRETATION & NOTATION RULES:\n")
-          .append("  * NOTATION IN DIVISIONAL CHARTS: In 'divisionalCharts', '(H#)' denotes the House number (1-12) from that specific Varga's Lagna (e.g. 'Mesha (H9 - Exalted)' means Aries in the 9th House of that Varga). 'Lagna' is the Ascendant of that Varga.\n")
+          .append("  * NOTATION IN DIVISIONAL CHARTS: In 'divisionalCharts', '(H#)' denotes the House number (1-12) from that specific Varga's Lagna. 'Lagna' is the Ascendant of that Varga.\n")
           .append("  * SIGN VS HOUSE DISTINCTION: Zodiac Sign index (1 to 12 from Aries) is NEVER the House/Bhava index (1 to 12 from Lagna). You MUST always use 'placedInD1House' for D1 houses and NEVER confuse sign number with house number.\n")
-          .append("  * PLACEMENT VS. OWNERSHIP: A planet is ONLY the lord of the house(s) listed in 'rulesHouses'. A planet occupying a house is ONLY a guest/occupant (as stated in 'occupantRole').\n")
-          .append("  * AUTONOMOUS AYURDAYA (LONGEVITY) CALCULATION: Independently calculate the native's classical Ayurdaya (Lifespan Ceiling) by evaluating Lagna Lord, 8th Lord, Moon, and Saturn (Ayushkaraka), applying Parashara and Jaimini 3-pair longevity principles and Kakshya adjustments. Classify the longevity (Poornayu / Madhyayu / Alpayu) and determine your own calculated lifespan ceiling age (e.g. ~75 to 95+).\n")
+          .append("  * PLACEMENT VS. OWNERSHIP: A planet is ONLY the lord of the house(s) listed in 'rulesHouses'. A planet occupying a house is ONLY a guest/occupant.\n")
+          .append("  * AUTONOMOUS AYURDAYA (LONGEVITY) CALCULATION: Independently calculate the native's classical Ayurdaya (Lifespan Ceiling) by evaluating Lagna Lord, 8th Lord, Moon, and Saturn (Ayushkaraka), applying Parashara and Jaimini 3-pair longevity principles and Kakshya adjustments. Classify the longevity (Poornayu / Madhyayu / Alpayu) and determine your own calculated lifespan ceiling age.\n")
           .append("  * AUTONOMOUS YOGAS & DOSHAMS: Independently identify and evaluate all prominent active Yogas and Doshas directly from the planetary matrix and divisional charts.\n")
-          .append("  * RETROSPECTIVE PAST MILESTONES: Reconstruct 2-3 significant past life milestones till date. For adults, focus on education, career inflection, marriage, or family transitions. For children/infants (age < 6), focus on birth conditions, early health/vitality milestones, and parental dynamics.\n")
-          .append("  * YEARLY PREDICTIONS (UNCAPPED RICH NARRATIVE): For each year, provide an immersive, comprehensive story paragraph weaving together Career & Business (D10), Wealth & Investments (D2), Health & Vitality (D1/D30), Family (Spouse in D9, Kids in D7, Parents in D12), Education (D24), and spiritual progress. Do NOT impose artificial brevity or sentence caps; provide rich, deep narrative paragraphs.\n")
+          .append("  * RETROSPECTIVE PAST MILESTONES: Reconstruct 2-3 significant past life milestones till date based on historical Dasa-Bhukthi periods.\n")
           .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
         return sb.toString();
     }
@@ -405,6 +409,17 @@ public class GeminiPredictionService {
             planetLookup.put(pName.toLowerCase(), pObj);
         }
 
+        // Determine Moon sign for Gochara analysis
+        int moonSign = 1;
+        if (c.getD1Chart() != null) {
+            for (ChartResponseDTO.PositionDetail p : c.getD1Chart()) {
+                if ("MOON".equalsIgnoreCase(p.getPlanetKey()) || "CHANDRA".equalsIgnoreCase(p.getPlanetKey())) {
+                    moonSign = p.getSignNumber();
+                    break;
+                }
+            }
+        }
+
         List<Map<String, Object>> yearlyAnchors = new ArrayList<>();
         for (int i = 0; i <= maxForecastYears; i++) {
             int yr = currentYear + i;
@@ -413,13 +428,31 @@ public class GeminiPredictionService {
             String dasaLordName = dasaBhukthi[0];
             String bhukthiLordName = dasaBhukthi[1];
 
+            Map<String, Object> dasaObj = buildPlanetAnchor(dasaLordName, lagnaSign, lagnaLord, planetLookup);
+            Map<String, Object> bhukthiObj = buildPlanetAnchor(bhukthiLordName, lagnaSign, lagnaLord, planetLookup);
+
+            int dHouse = (int) dasaObj.getOrDefault("placedInBhava", 1);
+            int bHouse = (int) bhukthiObj.getOrDefault("placedInBhava", 1);
+            String mutualRel = getMutualRelationship(dHouse, bHouse);
+
+            int saturnTransitSign = getApproxSaturnSign(yr);
+            int saturnHouseFromMoon = ((saturnTransitSign - moonSign + 12) % 12) + 1;
+            String saturnTransitDesc = RASHIS[saturnTransitSign - 1] + " (House " + saturnHouseFromMoon + " from Janma Rasi" + getSaturnTransitSpecialTag(saturnHouseFromMoon) + ")";
+
+            int jupiterTransitSign = getApproxJupiterSign(yr);
+            int jupiterHouseFromMoon = ((jupiterTransitSign - moonSign + 12) % 12) + 1;
+            String jupiterTransitDesc = RASHIS[jupiterTransitSign - 1] + " (House " + jupiterHouseFromMoon + " from Janma Rasi" + (isAuspiciousJupiterTransit(jupiterHouseFromMoon) ? " - Favorable" : " - Moderate") + ")";
+
             Map<String, Object> anchor = new LinkedHashMap<>();
             anchor.put("year", yr);
             anchor.put("age", age);
             anchor.put("dasaBhukthi", dasaLordName + " - " + bhukthiLordName);
+            anchor.put("mutualDasaBhukthiRelationship", mutualRel);
             anchor.put("lagnaLordReminder", lagnaLord + " (" + lagnaRasiName + " Lagna)");
-            anchor.put("dasaLord", buildPlanetAnchor(dasaLordName, lagnaSign, lagnaLord, planetLookup));
-            anchor.put("bhukthiLord", buildPlanetAnchor(bhukthiLordName, lagnaSign, lagnaLord, planetLookup));
+            anchor.put("dasaLord", dasaObj);
+            anchor.put("bhukthiLord", bhukthiObj);
+            anchor.put("gocharaSaturn", saturnTransitDesc);
+            anchor.put("gocharaJupiter", jupiterTransitDesc);
             yearlyAnchors.add(anchor);
         }
         inputData.put("preComputedYearlyAnchors", yearlyAnchors);
@@ -443,17 +476,20 @@ public class GeminiPredictionService {
           .append("   - 'activeYogasIdentified': Prominent yogas formed in the chart (name, effect).\n")
           .append("   - 'activeDoshasIdentified': Prominent doshas/afflictions with authentic remedies.\n")
           .append("2. 'personalityAndBehavior':\n")
-          .append("   - 'coreTemperament': In-depth narrative analyzing psychological traits, temperament, emotional patterns, decision-making, and innate strengths.\n")
+          .append("   - 'coreTemperament': In-depth astrological profile analyzing Lagna lord, Moon sign, 1st/5th/9th houses, psychological traits, decision-making, and strengths.\n")
           .append("3. 'retrospectivePastMilestones':\n")
           .append("   - 2-3 pivotal milestones up to present age ").append(currentAge).append(" ('approxPeriod', 'milestoneTitle', 'eventNarrative').\n")
-          .append("4. 'yearlyPredictions':\n");
+          .append("4. 'yearlyPredictions' (PURE ASTROLOGICAL ANALYSIS - ZERO ESSAY FILLER / NO AGE-BASED SOCIAL CLICHÉS):\n");
 
         if (is10YearMode) {
-            sb.append("   - Provide year-by-year predictions for the NEXT ").append(maxForecastYears).append(" YEARS (from ").append(currentYear).append(" to ").append(currentYear + maxForecastYears).append(").\n");
+            sb.append("   - Provide unbroken year-by-year predictions for the NEXT ").append(maxForecastYears).append(" YEARS (from ").append(currentYear).append(" to ").append(currentYear + maxForecastYears).append(").\n");
         } else {
             sb.append("   - Provide unbroken year-by-year predictions from current year ").append(currentYear).append(" continuously up to your calculated Ayul lifespan ceiling.\n");
         }
-        sb.append("   - 'annualNarrative': For EACH year, provide an immersive, comprehensive, full-length story paragraph weaving together Career & Business (D10), Wealth & Investments (D2), Health & Vitality (D1/D30), Family (Spouse in D9, Kids in D7, Parents in D12), Education (D24), and Spiritual progress. Do NOT impose artificial word caps.\n")
+        sb.append("   - 'annualNarrative': For EVERY SINGLE YEAR without exception, write a comprehensive, dense paragraph of 4 to 6 content-rich sentences.\n")
+          .append("     * DO NOT use generic social/cultural age platitudes (e.g. NEVER write 'celebrating 60th birthday Mani Vizha / Sashtiapthapoorthi', 'grandchildren serving you', 'peaceful retirement', or 'family will take care of you').\n")
+          .append("     * DO NOT compress or reduce content in later years; every year must have equal, exhaustive depth.\n")
+          .append("     * EVERY year's paragraph MUST specifically detail: (1) Running Dasa-Bhukthi Lords and their mutual relationship (e.g. 6/8 Sashtashtaka, 5/9 Trikona, 4/10 Kendra) and activated houses, (2) Career, Professional Status & Karma (D10), (3) Finances, Wealth & Inflow/Expenditure (D2), (4) Health & Specific anatomical organ vulnerabilities (D30/6th/8th house), (5) Family & Marital harmony (D9), and (6) Actionable Graha mantra / Vedic remedy.\n")
           .append("5. LANGUAGE & SCRIPT:\n")
           .append("   - You MUST write 100% of all narrative, analysis, titles, and explanations in the user's selected language: '").append(req.getLanguage() != null ? req.getLanguage() : "ta").append("'.\n\n");
 
@@ -485,7 +521,7 @@ public class GeminiPredictionService {
           .append("      \"year\": ").append(currentYear).append(",\n")
           .append("      \"age\": ").append(currentAge).append(",\n")
           .append("      \"activeDasaBhukthi\": \"(Running Dasa - Bhukthi)\",\n")
-          .append("      \"annualNarrative\": \"(Rich, complete story paragraph synthesizing career, wealth, health, marriage, kids, parents, and inner growth)\"\n")
+          .append("      \"annualNarrative\": \"(Dense 4-6 sentence astrological paragraph detailing Dasa-Bhukthi lordships, D10 career, D2 wealth, D30 health, D9 family, and Graha remedy)\"\n")
           .append("    }\n")
           .append("  ]\n")
           .append("}\n");
@@ -1204,6 +1240,53 @@ public class GeminiPredictionService {
 
         anchor.put("isLagnaLord", planetName.equalsIgnoreCase(lagnaLord));
         return anchor;
+    }
+
+    public static String getMutualRelationship(int dasaHouse, int bhukthiHouse) {
+        if (dasaHouse <= 0 || bhukthiHouse <= 0) return "Neutral";
+        int diff = ((bhukthiHouse - dasaHouse + 12) % 12) + 1;
+        return switch (diff) {
+            case 1 -> "1-1 Conjunction (Intense Mutual Alignment)";
+            case 2, 12 -> "2-12 Dwirdwadasa (Financial & Expenditure Fluctuation)";
+            case 3, 11 -> "3-11 Labha/Upachaya (Effort leading to Success & Gains)";
+            case 4, 10 -> "4-10 Kendra (Action, Status & Structural Manifestation)";
+            case 5, 9 -> "5-9 Trikona (Highly Auspicious Dharma & Fortune Alignment)";
+            case 6, 8 -> "6-8 Sashtashtaka (Karmic Friction, Obstacles & Health Caution)";
+            case 7 -> "1-7 Samasaptaka (Direct Mutual Aspect & Relational Manifestation)";
+            default -> "Neutral";
+        };
+    }
+
+    public static int getApproxSaturnSign(int year) {
+        double deltaYears = year - 2023;
+        int signOffset = (int) Math.floor(deltaYears / 2.45);
+        int sign = ((11 - 1 + signOffset) % 12) + 1;
+        if (sign < 1) sign += 12;
+        return sign;
+    }
+
+    public static int getApproxJupiterSign(int year) {
+        int deltaYears = year - 2024;
+        int sign = ((2 - 1 + deltaYears) % 12) + 1;
+        if (sign < 1) sign += 12;
+        return sign;
+    }
+
+    public static String getSaturnTransitSpecialTag(int houseFromMoon) {
+        return switch (houseFromMoon) {
+            case 12 -> " - Sade Sati 1st Phase (Viraya Sani)";
+            case 1 -> " - Sade Sati Peak Phase (Janma Sani)";
+            case 2 -> " - Sade Sati Final Phase (Padha Sani)";
+            case 4 -> " - Ardhastama Sani";
+            case 8 -> " - Ashtama Sani (Major Caution)";
+            case 7 -> " - Kantaka Sani";
+            case 3, 6, 11 -> " - Highly Favorable Sani Gocharam";
+            default -> "";
+        };
+    }
+
+    public static boolean isAuspiciousJupiterTransit(int houseFromMoon) {
+        return houseFromMoon == 2 || houseFromMoon == 5 || houseFromMoon == 7 || houseFromMoon == 9 || houseFromMoon == 11;
     }
 
     private String getTamilPastMilestoneTitle(int age) {
