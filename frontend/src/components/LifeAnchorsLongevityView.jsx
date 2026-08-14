@@ -855,10 +855,12 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
       res = res.replace(`${p} Digbala`, digbalaLabel);
     });
 
-    for (const [key, map] of Object.entries(DIRECTIONS_I18N)) {
-      if (res.startsWith(key)) {
-        res = res.replace(key, map[language] || map['en'] || key);
-        break;
+    // Sort directional keys by length descending to match composite directions first (e.g. "East / North-East" before "East")
+    const sortedDirKeys = Object.keys(DIRECTIONS_I18N).sort((a, b) => b.length - a.length);
+    for (const key of sortedDirKeys) {
+      if (res.includes(key)) {
+        const trans = DIRECTIONS_I18N[key][language] || DIRECTIONS_I18N[key]['en'] || key;
+        res = res.replace(key, trans);
       }
     }
     return res;
