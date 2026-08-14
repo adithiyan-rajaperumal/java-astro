@@ -427,6 +427,12 @@ export const translations = {
     yogasDetected: 'Yogas Detected',
   },
   ta: {
+    badhakaLord: 'பாதகாதிபதி & பாவகம்',
+    agniTitle: 'செரிமான & வளர்சிதை அக்னி தத்துவம்',
+    bodyBuildTitle: 'தேக பிரகிருதி & உடல்வாகு அமைப்பு',
+    primaryDhatuTitle: 'பிரதான சப்த தாது (உடல் திசு)',
+    rasayanaTitle: 'பரிந்துரைக்கப்படும் ரசாயன மூலிகைகள்',
+
 
 
 
@@ -848,6 +854,12 @@ export const translations = {
     yogasDetected: 'கண்டறியப்பட்ட யோகங்கள்',
   },
   hi: {
+    badhakaLord: 'बाधकेश एवं भाव',
+    agniTitle: 'पाचन एवं चयापचय अग्नि',
+    bodyBuildTitle: 'देह प्रकृति एवं शारीरिक गठन',
+    primaryDhatuTitle: 'प्रमुख सप्त धातु (शारीरिक ऊतक)',
+    rasayanaTitle: 'अनुशंसित रसायन औषधियां',
+
 
 
 
@@ -1269,6 +1281,12 @@ export const translations = {
     yogasDetected: 'पाए गए योग',
   },
   te: {
+    badhakaLord: 'బాధకాధిపతి & స్థానం',
+    agniTitle: 'జీర్ణ & జీవక్రియ అగ్ని తత్త్వం',
+    bodyBuildTitle: 'దేహ ప్రకృతి & శరీర నిర్మాణం',
+    primaryDhatuTitle: 'ప్రధాన సప్త ధాతువు (శరీర కణజాలం)',
+    rasayanaTitle: 'సిఫార్సు చేయబడిన రసాయన మూలికలు',
+
 
 
 
@@ -1690,6 +1708,12 @@ export const translations = {
     yogasDetected: 'కనుగొనబడిన యోగాలు',
   },
   kn: {
+    badhakaLord: 'ಬಾಧಕಾಧಿಪತಿ & ಮನೆ',
+    agniTitle: 'ಜೀರ್ಣ ಮತ್ತು ಚಯಾಪಚಯ ಅಗ್ನಿ ತತ್ವ',
+    bodyBuildTitle: 'ದೇಹ ಪ್ರಕೃತಿ ಮತ್ತು ಶಾರೀರಿಕ ರಚನೆ',
+    primaryDhatuTitle: 'ಪ್ರಮುಖ ಸಪ್ತ ಧಾತು (ದೇಹ ಅಂಗಾಂಶ)',
+    rasayanaTitle: 'ಶಿಫಾರಸು ಮಾಡಲಾದ ರಸಾಯನ ಗಿಡಮೂಲಿಕೆಗಳು',
+
 
 
 
@@ -2111,6 +2135,12 @@ export const translations = {
     yogasDetected: 'ಪತ್ತೆಯಾದ ಯೋಗಗಳು',
   },
   ml: {
+    badhakaLord: 'ബാധകാധിപൻ & ഭാവം',
+    agniTitle: 'ദഹന & ഉപാപചയ അഗ്നി തത്വം',
+    bodyBuildTitle: 'ദേഹ പ്രകൃതിയും ശാരീരിക ഘടനയും',
+    primaryDhatuTitle: 'പ്രധാന സപ്ത ധാതു (ശരീര കലകൾ)',
+    rasayanaTitle: 'ശുപാർശ ചെയ്യുന്ന രസായന ഔഷധങ്ങൾ',
+
 
 
 

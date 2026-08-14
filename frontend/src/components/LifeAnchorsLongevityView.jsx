@@ -1351,10 +1351,12 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     if (!m2 && !m7) return fallback || (language === 'ta' ? '2 & 7-ஆம் அதிபதிகள்' : '2nd & 7th Lords');
     const loc2 = I18N_TERMS[m2]?.[language] || m2;
     const loc7 = I18N_TERMS[m7]?.[language] || m7;
-    if (m2 && m7 && m2.equalsIgnoreCase && m2.equalsIgnoreCase(m7)) {
+    if (m2 && m7 && String(m2).trim().toLowerCase() === String(m7).trim().toLowerCase()) {
       return `${loc2} (${language === 'ta' ? '2 & 7-ஆம் அதிபதி' : language === 'hi' ? '2रे व 7वें भाव के स्वामी' : language === 'te' ? '2 & 7వ అధిపతి' : language === 'kn' ? '2 & 7ನೇ ಅಧಿಪತಿ' : language === 'ml' ? '2, 7 ഭാവങ്ങളുടെ അധിപൻ' : 'Lord of 2nd & 7th'})`;
     }
-    return `${loc2} (${language === 'ta' ? '2-ஆம் அதிபதி' : '2nd Lord'}) & ${loc7} (${language === 'ta' ? '7-ஆம் அதிபதி' : '7th Lord'})`;
+    const h2Label = language === 'ta' ? '2-ஆம் அதிபதி' : language === 'hi' ? '2रे भाव का स्वामी' : language === 'te' ? '2వ అధిపతి' : language === 'kn' ? '2ನೇ ಅಧಿಪತಿ' : language === 'ml' ? '2-ാം ഭാവധിപൻ' : '2nd Lord';
+    const h7Label = language === 'ta' ? '7-ஆம் அதிபதி' : language === 'hi' ? '7वें भाव का स्वामी' : language === 'te' ? '7వ అధిపతి' : language === 'kn' ? '7ನೇ ಅಧಿಪತಿ' : language === 'ml' ? '7-ാം ഭാവധിപൻ' : '7th Lord';
+    return `${loc2} (${h2Label}) & ${loc7} (${h7Label})`;
   };
 
   const formatBadhakaLord = (rawBadhaka) => {
@@ -1371,35 +1373,53 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                .replaceAll('7th House', '7-ஆம் பாவகம்')
                .replaceAll('CHARA Lagna', 'சர லக்னம்')
                .replaceAll('STHIRA Lagna', 'ஸ்திர லக்னம்')
-               .replaceAll('DWISVABHAVA Lagna', 'உபய லக்னம்');
+               .replaceAll('DWISVABHAVA Lagna', 'உபய லக்னம்')
+               .replaceAll('Chara Lagna', 'சர லக்னம்')
+               .replaceAll('Sthira Lagna', 'ஸ்திர லக்னம்')
+               .replaceAll('Dwisvabhava Lagna', 'உபய லக்னம்')
+               .replaceAll('Dual Lagna', 'உபய லக்னம்')
+               .replaceAll('Movable Lagna', 'சர லக்னம்')
+               .replaceAll('Fixed Lagna', 'ஸ்திர லக்னம்');
     } else if (language === 'hi') {
       res = res.replaceAll('11th House', '11वां भाव')
                .replaceAll('9th House', '9वां भाव')
                .replaceAll('7th House', '7वां भाव')
                .replaceAll('CHARA Lagna', 'चर लग्न')
                .replaceAll('STHIRA Lagna', 'स्थिर लग्न')
-               .replaceAll('DWISVABHAVA Lagna', 'द्विस्वभाव लग्न');
+               .replaceAll('DWISVABHAVA Lagna', 'द्विस्वभाव लग्न')
+               .replaceAll('Chara Lagna', 'चर लग्न')
+               .replaceAll('Sthira Lagna', 'स्थिर लग्न')
+               .replaceAll('Dwisvabhava Lagna', 'द्विस्वभाव लग्न');
     } else if (language === 'te') {
       res = res.replaceAll('11th House', '11వ స్థానం')
                .replaceAll('9th House', '9వ స్థానం')
                .replaceAll('7th House', '7వ స్థానం')
                .replaceAll('CHARA Lagna', 'చర లగ్నం')
                .replaceAll('STHIRA Lagna', 'స్థిర లగ్నం')
-               .replaceAll('DWISVABHAVA Lagna', 'ద్విస్వభావ లగ్నం');
+               .replaceAll('DWISVABHAVA Lagna', 'ద్విస్వభావ లగ్నం')
+               .replaceAll('Chara Lagna', 'చర లగ్నం')
+               .replaceAll('Sthira Lagna', 'స్థిర లగ్నం')
+               .replaceAll('Dwisvabhava Lagna', 'ద్విస్వభావ లగ్నం');
     } else if (language === 'kn') {
       res = res.replaceAll('11th House', '11ನೇ ಮನೆ')
                .replaceAll('9th House', '9ನೇ ಮನೆ')
                .replaceAll('7th House', '7ನೇ ಮನೆ')
                .replaceAll('CHARA Lagna', 'ಚರ ಲಗ್ನ')
                .replaceAll('STHIRA Lagna', 'ಸ್ಥಿರ ಲಗ್ನ')
-               .replaceAll('DWISVABHAVA Lagna', 'ದ್ವಿಸ್ವಭಾವ ಲಗ್ನ');
+               .replaceAll('DWISVABHAVA Lagna', 'ದ್ವಿಸ್ವಭಾವ ಲಗ್ನ')
+               .replaceAll('Chara Lagna', 'ಚರ ಲಗ್ನ')
+               .replaceAll('Sthira Lagna', 'ಸ್ಥಿರ ಲಗ್ನ')
+               .replaceAll('Dwisvabhava Lagna', 'ದ್ವಿಸ್ವಭಾವ ಲಗ್ನ');
     } else if (language === 'ml') {
       res = res.replaceAll('11th House', '11-ാം ഭാവം')
                .replaceAll('9th House', '9-ാം ഭാവം')
                .replaceAll('7th House', '7-ാം ഭാവം')
                .replaceAll('CHARA Lagna', 'ചര ലഗ്നം')
                .replaceAll('STHIRA Lagna', 'സ്ഥിര ലഗ്നം')
-               .replaceAll('DWISVABHAVA Lagna', 'ദ്വിസ്വഭാവ ലഗ്നം');
+               .replaceAll('DWISVABHAVA Lagna', 'ദ്വിസ്വഭാവ ലഗ്നം')
+               .replaceAll('Chara Lagna', 'ചര ലഗ്നം')
+               .replaceAll('Sthira Lagna', 'സ്ഥിര ലഗ്നം')
+               .replaceAll('Dwisvabhava Lagna', 'ദ്വിസ്വഭാവ ലഗ്നം');
     }
     return res;
   };
