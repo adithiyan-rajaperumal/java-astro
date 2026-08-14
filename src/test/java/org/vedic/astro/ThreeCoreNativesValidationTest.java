@@ -246,4 +246,55 @@ public class ThreeCoreNativesValidationTest {
         assertNotNull(anchors.structuralAnchors().arudhaLagna());
         assertEquals(4, anchors.numerology().radicalDriverNumber()); // 31 -> 3+1 = 4
     }
+
+    // Native 4: Deepanathan - 11-04-1969 02:50 AM Tiruvannamalai, TN
+    private final BirthDetailsDTO deepanathan = new BirthDetailsDTO(
+            "Deepanathan", 1969, 4, 11, 2, 50, 0, 12.2253, 79.0747, "LAHIRI"
+    );
+
+    @Test
+    @DisplayName("Validate Full Astrology & Longevity Engine for Native 4: Deepanathan (11-04-1969 02:50 AM Tiruvannamalai)")
+    public void testDeepanathanProfileValidation() {
+        ChartUiResponseDTO profile = calculateProfile(deepanathan);
+
+        // 1. Basic Chart & Panchangam Verification
+        assertNotNull(profile.getD1Chart());
+        assertNotNull(profile.getD9Chart());
+        var d1Map = toPlanetMap(profile.getD1Chart());
+
+        // Lagna is Capricorn (Makara - 10)
+        int lagnaSign = d1Map.get("LAGNA").getSignNumber();
+        assertEquals(10, lagnaSign, "Deepanathan Lagna should be Capricorn (Makara - 10)");
+
+        // Moon is in Capricorn / Shravana (Sign 10)
+        int moonSign = d1Map.get("MOON").getSignNumber();
+        assertEquals(10, moonSign, "Deepanathan Moon should be Capricorn (Makara - 10)");
+
+        // 2. Ayurdaya & Longevity Engine
+        var ayurdaya = profile.getAyurdayaProfile();
+        assertNotNull(ayurdaya);
+        assertEquals("Madhyayu", ayurdaya.longevityClassification(), "Deepanathan longevity classification must be Madhyayu");
+        assertTrue(ayurdaya.estimatedLifespanCeiling() >= 65 && ayurdaya.estimatedLifespanCeiling() <= 75,
+                "Lifespan ceiling should be in healthy Madhyayu range (65-75), got: " + ayurdaya.estimatedLifespanCeiling());
+        assertTrue(ayurdaya.lifespanRange().contains("Years"));
+
+        // Kakshya Vriddhi (Jupiter in 9th Trikona) & Neecha Bhanga for Saturn in Aries (Exaltation lord Venus is exalted in Pisces)
+        var adj = ayurdaya.kakshyaAdjustments();
+        assertNotNull(adj);
+        assertTrue(adj.stream().anyMatch(s -> s.contains("Kakshya Vriddhi")), "Should have Kakshya Vriddhi from Jupiter in 9th Trikona");
+        assertTrue(adj.stream().anyMatch(s -> s.contains("Neecha Bhanga")), "Should have Neecha Bhanga for Saturn in Aries");
+
+        // Critical Maraka Window in 60s-70s range (Mercury-Venus period)
+        assertNotNull(ayurdaya.criticalMarakaWindow());
+
+        // 3. Ayurvedic Health Profile
+        var health = profile.getAyurvedicHealth();
+        assertNotNull(health);
+        assertNotNull(health.dominantPrakriti());
+
+        // 4. Life Anchors
+        var anchors = profile.getLifeAnchors();
+        assertNotNull(anchors);
+        assertEquals(2, anchors.numerology().radicalDriverNumber()); // 11 -> 1+1 = 2
+    }
 }

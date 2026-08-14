@@ -207,20 +207,22 @@ public class AyurdayaCalculationUtils {
             default -> 72;
         };
 
-        // Kakshya Vriddhi (Longevity Expansion)
+        // Kakshya Vriddhi (Longevity Expansion - Jaimini Upadesha Sutras 2.1.26-30)
         // Factor A: Jupiter in Kendra (1,4,7,10), Trikona (5,9), or Exalted/Own Sign
         if (jupiterPos != null) {
             int jupHouse = ((jupiterPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
             boolean jupStrong = PlanetDignityUtils.isOwnSign("Jupiter", jupiterPos.getSignNumber()) ||
                     PlanetDignityUtils.isExalted("Jupiter", jupiterPos.getSignNumber());
             if (jupHouse == 1 || jupHouse == 4 || jupHouse == 7 || jupHouse == 10 || jupHouse == 5 || jupHouse == 9 || jupStrong) {
-                adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (+5 to +7 years).");
-                baseCeilingAge += 6;
+                adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (Longevity compartment elevation).");
                 if ("Alpayu".equals(baseSpan)) {
                     baseSpan = "Madhyayu";
-                    baseCeilingAge = Math.max(52, baseCeilingAge);
-                } else if ("Madhyayu".equals(baseSpan) && baseCeilingAge >= 74) {
+                    baseCeilingAge = 68;
+                } else if ("Madhyayu".equals(baseSpan)) {
                     baseSpan = "Poornayu";
+                    baseCeilingAge = 82;
+                } else {
+                    baseCeilingAge += 4;
                 }
             }
         }
@@ -243,12 +245,18 @@ public class AyurdayaCalculationUtils {
         }
 
         // Kakshya Hrasa (Longevity Reductions)
-        // Factor 1: Ayushkaraka Saturn in Debility (in Aries) without cancellation
+        // Factor 1: Ayushkaraka Saturn in Debility (in Aries)
         if (saturnPos != null && PlanetDignityUtils.isDebilitated("Saturn", saturnPos.getSignNumber())) {
-            adjustments.add("Ayushkaraka Saturn in debility applies Kakshya Hrasa reduction (-5 years).");
-            baseCeilingAge -= 5;
-            if ("Poornayu".equals(baseSpan) && baseCeilingAge < 74) baseSpan = "Madhyayu";
-            else if ("Madhyayu".equals(baseSpan) && baseCeilingAge <= 42) baseSpan = "Alpayu";
+            boolean saturnNeechaBhanga = hasNeechabhanga("Saturn", saturnPos.getSignNumber(), planetMap, lagnaSign, activeMoonSign);
+            if (saturnNeechaBhanga) {
+                adjustments.add("Ayushkaraka Saturn possesses Neecha Bhanga (cancellation of debility into longevity stability).");
+                baseCeilingAge += 2;
+            } else {
+                adjustments.add("Ayushkaraka Saturn in debility applies Kakshya Hrasa reduction (-5 years).");
+                baseCeilingAge -= 5;
+                if ("Poornayu".equals(baseSpan) && baseCeilingAge < 74) baseSpan = "Madhyayu";
+                else if ("Madhyayu".equals(baseSpan) && baseCeilingAge <= 42) baseSpan = "Alpayu";
+            }
         }
 
         // Factor 2: Lagna Lord in Dusthana (6/8/12) and Debilitated
@@ -679,5 +687,42 @@ public class AyurdayaCalculationUtils {
             case "ketu" -> "Maha Ganapati Homa/Puja, Ganesha Atharvashirsha Parayanam, and Meditation.";
             default -> "Maha Mrityunjaya Japa, Shiva Abhishekam, and Dhanvantari prayer";
         };
+    }
+
+    private static boolean hasNeechabhanga(
+            String planet,
+            int sign,
+            Map<String, ChartResponseDTO.PositionDetail> map,
+            int lagnaSign,
+            int moonSign) {
+        if (planet == null || !PlanetDignityUtils.isDebilitated(planet, sign)) return false;
+        String pKey = planet.toUpperCase();
+        String dispositor = PlanetDignityUtils.getSignLord(sign);
+        int exSign = PlanetDignityUtils.getExaltationSign(planet);
+        String exLord = PlanetDignityUtils.getSignLord(exSign);
+
+        var lordPos = map.get(dispositor.toUpperCase());
+        var exLordPos = map.get(exLord.toUpperCase());
+
+        // Law 1: Dispositor in Kendra from Lagna or Moon
+        if (lordPos != null) {
+            int hL = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), lagnaSign);
+            int hM = PlanetDignityUtils.getHouseFromLagna(lordPos.getSignNumber(), moonSign);
+            if (PlanetDignityUtils.isKendra(hL) || PlanetDignityUtils.isKendra(hM)) return true;
+        }
+        // Law 2: Exaltation lord in Kendra from Lagna or Moon, or Exalted
+        if (exLordPos != null) {
+            int hL = PlanetDignityUtils.getHouseFromLagna(exLordPos.getSignNumber(), lagnaSign);
+            int hM = PlanetDignityUtils.getHouseFromLagna(exLordPos.getSignNumber(), moonSign);
+            if (PlanetDignityUtils.isKendra(hL) || PlanetDignityUtils.isKendra(hM) || PlanetDignityUtils.isExalted(exLord, exLordPos.getSignNumber())) return true;
+        }
+        // Law 3: Exalted companion in same sign
+        for (var entry : map.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(pKey) || entry.getKey().equalsIgnoreCase("LAGNA")) continue;
+            if (entry.getValue().getSignNumber() == sign && PlanetDignityUtils.isExalted(entry.getKey(), entry.getValue().getSignNumber())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
