@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "pdf")
 public class PdfExportProperties {
-    private boolean includeLifeAnchors = false;
+    private boolean includeLifeAnchors = true;
+    private boolean includeAyurdaya = true;
     private boolean includeYogasDoshams = false;
 }

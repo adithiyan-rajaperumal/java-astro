@@ -634,26 +634,12 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
   const formatPairTitle = (key) => {
     switch (key) {
       case 'pair1_lagnaLord_and_8thLord':
-        return language === 'ta' ? '1. லக்னாதிபதி & 8-ஆம் அதிபதி' :
-               language === 'hi' ? '1. लग्नेश और अष्टमेश' :
-               language === 'te' ? '1. లగ్నాధిపతి & 8వ అధిపతి' :
-               language === 'kn' ? '1. ಲಗ್ನಾಧಿಪತಿ & 8ನೇ ಅಧಿಪತಿ' :
-               language === 'ml' ? '1. ലഗ്നാധിപനും 8-ാം അധിപനും' :
-               '1. Lagna Lord & 8th Lord';
+        return t('pair1Label', language);
       case 'pair2_moon_and_saturn':
-        return language === 'ta' ? '2. சந்திரன் & ஆயுள்காரகன் சனி' :
-               language === 'hi' ? '2. चन्द्र और आयुष्कारक शनि' :
-               language === 'te' ? '2. చంద్రుడు & ఆయుష్కారక శని' :
-               language === 'kn' ? '2. ಚಂದ್ರ & ಆಯುಷ್ಕಾರಕ ಶನಿ' :
-               language === 'ml' ? '2. ചന്ദ്രനും ആയുഷ്കാരകനായ ശനിയും' :
-               '2. Moon & Saturn (Ayushkaraka)';
+        return t('pair2Label', language);
+      case 'pair3_lagna_and_horaLagna':
       case 'pair3_lagna_and_moon':
-        return language === 'ta' ? '3. லக்னம் & சந்திரன்' :
-               language === 'hi' ? '3. लग्न और चन्द्र' :
-               language === 'te' ? '3. లగ్నం & చంద్రుడు' :
-               language === 'kn' ? '3. ಲಗ್ನ & ಚಂದ್ರ' :
-               language === 'ml' ? '3. ലഗ്നവും ചന്ദ്രനും' :
-               '3. Lagna & Moon';
+        return t('pair3Label', language);
       case 'majorityConsensus':
         return language === 'ta' ? 'பெரும்பான்மை முடிவு' :
                language === 'hi' ? 'बहुमत सर्वसम्मत निर्णय' :
@@ -1482,99 +1468,154 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
       {/* ========================================================================= */}
       {/* 5. AYURVEDIC HEALTH & CLASSICAL LONGEVITY (AYURDAYA)                       */}
       {/* ========================================================================= */}
-      <div className="card" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(212,175,55,0.04) 100%)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
-          <h3 style={{ margin: 0, color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🪐 {t('longevityTitle', language)}
-          </h3>
-          <span style={{
-            fontSize: '13px',
-            fontWeight: 'bold',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            background: longevityBadgeBg,
-            color: longevityBadgeColor,
-            border: `1px solid ${longevityBadgeBorder}`,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-          }}>
-            ✨ {classificationText}
-          </span>
-        </div>
+      {chartData?.ayurdayaEnabled !== false && ayurdaya && (
+        <div className="card" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(212,175,55,0.04) 100%)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+            <h3 style={{ margin: 0, color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              🪐 {t('longevityTitle', language)}
+            </h3>
+            <span style={{
+              fontSize: '13px',
+              fontWeight: 'bold',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              background: longevityBadgeBg,
+              color: longevityBadgeColor,
+              border: `1px solid ${longevityBadgeBorder}`,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+            }}>
+              ✨ {classificationText}
+            </span>
+          </div>
 
-        {/* Longevity Key Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginBottom: '18px' }}>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-              🎯 {t('longevityCeiling', language)}
+          {/* Longevity Key Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginBottom: '18px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                🎯 {t('longevityCeiling', language)}
+              </div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--accent-gold)' }}>
+                {ayurdaya?.estimatedLifespanCeiling ? `~${ayurdaya.estimatedLifespanCeiling} ${language === 'ta' ? 'வயது' : language === 'hi' ? 'वर्ष' : language === 'te' ? 'సంవత్సరాలు' : language === 'kn' ? 'ವರ್ಷಗಳು' : language === 'ml' ? 'വയസ്സ്' : 'Years'}` : '75 - 90+ Years'}
+              </div>
             </div>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--accent-gold)' }}>
-              {ayurdaya?.estimatedLifespanCeiling ? `~${ayurdaya.estimatedLifespanCeiling} ${language === 'ta' ? 'வயது' : language === 'hi' ? 'वर्ष' : language === 'te' ? 'సంవత్సరాలు' : language === 'kn' ? 'ವರ್ಷಗಳು' : language === 'ml' ? 'വയസ്സ്' : 'Years'}` : '75 - 90+ Years'}
+
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                📜 {t('classicalRationale', language)}
+              </div>
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                {translateLifespanText(ayurdaya?.lifespanRange) || 'Brihat Parashara & Jaimini Sutras'}
+              </div>
             </div>
           </div>
 
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-              📜 {t('classicalRationale', language)}
-            </div>
-            <div style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
-              {translateLifespanText(ayurdaya?.lifespanRange) || 'Brihat Parashara & Jaimini Sutras'}
-            </div>
-          </div>
-        </div>
+          {/* PRINCIPLE 1: 3-Pair Modality Table */}
+          {(ayurdaya?.jaiminiThreePairs || ayurdaya?.threePairsDetails) && (
+            <div style={{ marginBottom: '18px', background: 'rgba(255,255,255,0.015)', border: '1px solid var(--border)', borderRadius: '8px', padding: '14px' }}>
+              <h4 style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                📊 {t('jaimini3PairTitle', language) || t('threePairsTitle', language)}
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', marginBottom: '10px' }}>
+                {Object.entries(ayurdaya.jaiminiThreePairs || ayurdaya.threePairsDetails).map(([pairKey, detail], idx) => {
+                  const isObj = typeof detail === 'object' && detail !== null;
+                  const isConsensus = pairKey === 'majorityConsensus';
 
-        {/* 3-Pair Modality Table */}
-        {ayurdaya?.threePairsDetails && Object.keys(ayurdaya.threePairsDetails).length > 0 && (
-          <div style={{ marginBottom: '18px' }}>
-            <h4 style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              📊 {t('threePairsTitle', language)}
-            </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
-              {Object.entries(ayurdaya.threePairsDetails).map(([pairKey, detail], idx) => {
-                const isObj = typeof detail === 'object' && detail !== null;
-                const isConsensus = pairKey === 'majorityConsensus';
-
-                return (
-                  <div key={idx} style={{
-                    background: isConsensus ? 'rgba(212,175,55,0.06)' : 'rgba(255,255,255,0.02)',
-                    border: isConsensus ? '1px solid rgba(212,175,55,0.3)' : '1px solid var(--border)',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: '8px'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
-                      <strong style={{ color: 'var(--accent-gold)', fontSize: '12px' }}>
-                        {formatPairTitle(pairKey)}
-                      </strong>
-                      {isObj && detail.derivedSpan && renderSpanBadge(detail.derivedSpan)}
-                      {!isObj && renderSpanBadge(String(detail))}
-                    </div>
-                    {isObj && detail.planets && (
-                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                        🪐 <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{translateModality(detail.planets)}</span>
+                  return (
+                    <div key={idx} style={{
+                      background: isConsensus ? 'rgba(212,175,55,0.06)' : 'rgba(255,255,255,0.02)',
+                      border: isConsensus ? '1px solid rgba(212,175,55,0.3)' : '1px solid var(--border)',
+                      borderRadius: '8px',
+                      padding: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '8px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                        <strong style={{ color: 'var(--accent-gold)', fontSize: '12px' }}>
+                          {formatPairTitle(pairKey)}
+                        </strong>
+                        {isObj && detail.derivedSpan && renderSpanBadge(detail.derivedSpan)}
+                        {!isObj && renderSpanBadge(String(detail))}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+                      {isObj && detail.planets && (
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                          🪐 <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{translateModality(detail.planets)}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
 
-        {/* Maraka Caution Period */}
-        {ayurdaya?.criticalMarakaWindow && (
-          <div style={{ background: 'rgba(230, 126, 34, 0.08)', border: '1px solid rgba(230, 126, 34, 0.3)', borderRadius: '6px', padding: '10px' }}>
-            <strong style={{ fontSize: '12px', color: '#e67e22', display: 'block', marginBottom: '4px' }}>
-              ⚠️ {t('marakaPeriods', language)}:
-            </strong>
-            <p style={{ fontSize: '12px', margin: 0, color: 'var(--text-primary)', lineHeight: '1.4' }}>
-              {translateMarakaWindow(ayurdaya.criticalMarakaWindow)}
-            </p>
-          </div>
-        )}
-      </div>
+              {ayurdaya?.kakshyaAdjustments && ayurdaya.kakshyaAdjustments.length > 0 && (
+                <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(46, 204, 113, 0.08)', border: '1px solid rgba(46, 204, 113, 0.25)', borderRadius: '6px' }}>
+                  <strong style={{ fontSize: '11px', color: '#2ecc71', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                    ✨ {t('kakshyaVriddhi', language)}:
+                  </strong>
+                  <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)' }}>
+                    {ayurdaya.kakshyaAdjustments.map((adj, i) => (
+                      <li key={i}>{adj}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* PRINCIPLE 2: Parashara & Shadbala Ayur Bala */}
+          {ayurdaya?.parasharaAyurBala && (
+            <div style={{ marginBottom: '18px', background: 'rgba(255,255,255,0.015)', border: '1px solid var(--border)', borderRadius: '8px', padding: '14px' }}>
+              <h4 style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                💪 {t('parasharaBalaTitle', language)}
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    🧬 {t('vitalityScore', language)}
+                  </div>
+                  <strong style={{ fontSize: '13px', color: '#2ecc71' }}>
+                    {String(ayurdaya.parasharaAyurBala.vitalityScore || 'Balanced Vitality')}
+                  </strong>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    🏛️ {t('kendraBenefics', language)}
+                  </div>
+                  <strong style={{ fontSize: '13px', color: 'var(--accent-gold)' }}>
+                    {String(ayurdaya.parasharaAyurBala.kendraBeneficsCount ?? 1)}
+                  </strong>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    🛡️ Lagna Lord Dignity
+                  </div>
+                  <strong style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
+                    {String(ayurdaya.parasharaAyurBala.lagnaLordStrength || 'Dignified')}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* PRINCIPLE 3: Maraka & Badhaka Timeline */}
+          {ayurdaya?.criticalMarakaWindow && (
+            <div style={{ background: 'rgba(230, 126, 34, 0.08)', border: '1px solid rgba(230, 126, 34, 0.3)', borderRadius: '8px', padding: '14px' }}>
+              <strong style={{ fontSize: '13px', color: '#e67e22', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                ⚠️ {t('marakaTimelineTitle', language)}:
+              </strong>
+              <p style={{ fontSize: '12px', margin: '0 0 8px 0', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                {translateMarakaWindow(ayurdaya.criticalMarakaWindow)}
+              </p>
+              {ayurdaya?.marakaBadhakaTimeline?.recommendedRemedies && (
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', borderTop: '1px solid rgba(230, 126, 34, 0.2)', paddingTop: '6px' }}>
+                  🪔 <strong>{t('remediesRecommended', language)}:</strong> {ayurdaya.marakaBadhakaTimeline.recommendedRemedies}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Ayurvedic Constitution & Dosha Bars */}
       <div className="card">

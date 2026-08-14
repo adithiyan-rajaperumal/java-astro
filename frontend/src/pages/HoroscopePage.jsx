@@ -952,12 +952,14 @@ function HoroscopePage({ settings }) {
             >
               {t('diagnosticsTab', settings.language)}
             </button>
-            <button 
-              className={`tab-btn ${activeSubTab === 'health' ? 'active' : ''}`}
-              onClick={() => setActiveSubTab('health')}
-            >
-              {t('healthAndLongevityTab', settings.language)}
-            </button>
+            {report?.lifeAnchorsEnabled !== false && (
+              <button 
+                className={`tab-btn ${activeSubTab === 'health' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('health')}
+              >
+                {t('healthAndLongevityTab', settings.language)}
+              </button>
+            )}
             {lifeEnabled && (
               <button 
                 className={`tab-btn ${activeSubTab === 'predictions' ? 'active' : ''}`}
@@ -973,7 +975,7 @@ function HoroscopePage({ settings }) {
           {activeSubTab === 'dasa' && renderDasaTab()}
           {activeSubTab === 'shadbala' && renderShadbalaTab()}
           {activeSubTab === 'diagnostics' && renderDiagnosticsTab()}
-          {activeSubTab === 'health' && (
+          {report?.lifeAnchorsEnabled !== false && activeSubTab === 'health' && (
             <LifeAnchorsLongevityView
               chartData={report}
               language={settings.language}

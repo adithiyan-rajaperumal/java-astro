@@ -31,6 +31,12 @@ public class ChartOrchestrationService {
     private final TimezoneService timezoneService;
     private final org.vedic.astro.config.GeminiProperties geminiProperties;
 
+    @org.springframework.beans.factory.annotation.Value("${astro.features.life-anchors-enabled:true}")
+    private boolean lifeAnchorsEnabled;
+
+    @org.springframework.beans.factory.annotation.Value("${astro.features.ayurdaya-enabled:true}")
+    private boolean ayurdayaEnabled;
+
     public ChartUiResponseDTO convertToUiDashboardResponse(ChartResult res, BirthDetailsDTO pay) {
         PlanetaryPosition moon = res.getD1Positions().get("Moon");
         LocalDate dob = LocalDate.of(pay.year(), pay.month(), pay.day());
@@ -82,9 +88,13 @@ public class ChartOrchestrationService {
         int moonSignNum = d1.get("Moon") != null ? d1.get("Moon").getSignNumber() : 1;
 
         var healthProfile = org.vedic.astro.util.AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSignNum, moonSignNum, d1List);
-        var ayurdayaProfile = org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(lagnaSignNum, moonSignNum, d1List, dasas, pay.year());
+        var ayurdayaProfile = ayurdayaEnabled
+                ? org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(lagnaSignNum, moonSignNum, d1List, dasas, pay.year(), pay.hour(), pay.minute())
+                : null;
         var d9PosList = compileVargaList(9, res.getD1Positions(), null);
-        var lifeAnchorsProfile = buildLifeAnchorsProfile(lagnaSignNum, moonSignNum, d1, d9PosList, pay, res.getJulianDayUT());
+        var lifeAnchorsProfile = lifeAnchorsEnabled
+                ? buildLifeAnchorsProfile(lagnaSignNum, moonSignNum, d1, d9PosList, pay, res.getJulianDayUT())
+                : null;
 
         return ChartUiResponseDTO.builder().name(res.getName()).dateOfBirth(dob.toString())
                 .timeOfBirth(String.format("%02d:%02d:%02d", pay.hour(), pay.minute(), pay.second()))
@@ -107,6 +117,8 @@ public class ChartOrchestrationService {
                 .ayurvedicHealth(healthProfile)
                 .ayurdayaProfile(ayurdayaProfile)
                 .lifeAnchors(lifeAnchorsProfile)
+                .lifeAnchorsEnabled(lifeAnchorsEnabled)
+                .ayurdayaEnabled(ayurdayaEnabled)
                 .build();
     }
 
@@ -178,7 +190,7 @@ public class ChartOrchestrationService {
         int pdfMoonSign = d1.get("Moon") != null ? d1.get("Moon").getSignNumber() : 1;
 
         var pdfHealthProfile = org.vedic.astro.util.AyurvedicAstrologyUtils.calculateHealthProfile(pdfLagnaSign, pdfMoonSign, d1PosList);
-        var pdfAyurdayaProfile = org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(pdfLagnaSign, pdfMoonSign, d1PosList, pdfDasas, pay.year());
+        var pdfAyurdayaProfile = org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(pdfLagnaSign, pdfMoonSign, d1PosList, pdfDasas, pay.year(), pay.hour(), pay.minute());
         var pdfD9List = compileVargaList(9, d1, cusps);
         var pdfLifeAnchors = buildLifeAnchorsProfile(pdfLagnaSign, pdfMoonSign, d1, pdfD9List, pay, res.getJulianDayUT());
 

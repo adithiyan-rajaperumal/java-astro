@@ -46,6 +46,10 @@ public class ChartUiResponseDTO {
     // Personal Elements, Deities & Life Anchors Engine
     private LifeAnchorsProfile lifeAnchors;
 
+    // Feature Toggles
+    private boolean lifeAnchorsEnabled;
+    private boolean ayurdayaEnabled;
+
     // AI Prediction Capabilities
     private boolean aiPredictionsEnabled;
 }

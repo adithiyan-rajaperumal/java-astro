@@ -20,6 +20,8 @@ public class StructuralAnchorsUtilsTest {
         assertNotNull(result.directions().permanentVastuDirection());
         assertNotNull(result.structuralAnchors().arudhaLagna());
         assertNotNull(result.structuralAnchors().physicalVitalityAnchor());
-        assertNotNull(result.luckyDay().vedicWeekdayName());
+        assertNotNull(result.luckyDay().dayName());
+        assertNotNull(result.luckyDay().rulingPlanet());
+        assertNotNull(result.luckyDay().auspiciousActivities());
     }
 }

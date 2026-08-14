@@ -414,12 +414,12 @@ public class PdfExportService {
 
                 if (anchors.luckyDay() != null) {
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.lucky_day"), boldB, Element.ALIGN_LEFT));
-                    anchTab.addCell(buildTableCell(anchors.luckyDay().vedicWeekdayName() + " - " + anchors.luckyDay().luckySignifications(), bFont, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell(anchors.luckyDay().dayName() + " (" + anchors.luckyDay().rulingPlanet() + ") - " + anchors.luckyDay().auspiciousActivities(), bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.directions() != null) {
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.directions"), boldB, Element.ALIGN_LEFT));
-                    anchTab.addCell(buildTableCell("Vastu: " + anchors.directions().permanentVastuDirection() + " | Travel: " + anchors.directions().travelDirection(), bFont, Element.ALIGN_LEFT));
+                    anchTab.addCell(buildTableCell("Vastu: " + anchors.directions().permanentVastuDirection() + " | Travel: " + anchors.directions().travelProsperityDirection(), bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.structuralAnchors() != null) {
@@ -428,6 +428,47 @@ public class PdfExportService {
                 }
 
                 document.add(anchTab);
+            }
+
+            // =================================================================
+            // 6C. FOURTH: AYURDAYA LONGEVITY (IF ENABLED BY CONFIG FLAG)
+            // =================================================================
+            if (pdfExportProperties.isIncludeAyurdaya() && data.getAyurdayaProfile() != null) {
+                var ayu = data.getAyurdayaProfile();
+                document.newPage();
+                String ayurHeader = ts.getLabel("pdf.ayurdaya.title");
+                Paragraph ayuTitle = buildMixedParagraph(ayurHeader, tFont, engTFont);
+                ayuTitle.setAlignment(Element.ALIGN_CENTER);
+                ayuTitle.setSpacingAfter(12);
+                document.add(ayuTitle);
+
+                PdfPTable ayuTab = new PdfPTable(2);
+                ayuTab.setWidthPercentage(100);
+                ayuTab.setSpacingAfter(14);
+                ayuTab.setWidths(new float[]{35f, 65f});
+
+                PdfPCell h1 = buildTableCell(ts.getLabel("pdf.ayurdaya.hdr.principle"), boldB, Element.ALIGN_CENTER);
+                h1.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                ayuTab.addCell(h1);
+
+                PdfPCell h2 = buildTableCell(ts.getLabel("pdf.ayurdaya.hdr.determination"), boldB, Element.ALIGN_CENTER);
+                h2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
+                ayuTab.addCell(h2);
+
+                ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.classification"), boldB, Element.ALIGN_LEFT));
+                ayuTab.addCell(buildTableCell(ayu.longevityClassification() + " (" + ayu.lifespanRange() + ")", bFont, Element.ALIGN_LEFT));
+
+                if (ayu.criticalMarakaWindow() != null) {
+                    ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.maraka_timeline"), boldB, Element.ALIGN_LEFT));
+                    ayuTab.addCell(buildTableCell(ayu.criticalMarakaWindow(), bFont, Element.ALIGN_LEFT));
+                }
+
+                if (ayu.classicalRationale() != null) {
+                    ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.rationale"), boldB, Element.ALIGN_LEFT));
+                    ayuTab.addCell(buildTableCell(ayu.classicalRationale(), bFont, Element.ALIGN_LEFT));
+                }
+
+                document.add(ayuTab);
             }
 
             // =================================================================
