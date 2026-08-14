@@ -46,6 +46,6 @@ gemini:
   thinking-budget: ${GEMINI_THINKING_BUDGET:1024}
 
 pdf:
-  include-life-anchors: ${PDF_INCLUDE_LIFE_ANCHORS:true}
-  include-ayurdaya: ${PDF_INCLUDE_AYURDAYA:true}
+  include-life-anchors: ${PDF_INCLUDE_LIFE_ANCHORS:false}
+  include-ayurdaya: ${PDF_INCLUDE_AYURDAYA:false}
   include-yogas-doshams: ${PDF_INCLUDE_YOGAS_DOSHAMS:false}
