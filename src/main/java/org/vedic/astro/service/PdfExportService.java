@@ -419,7 +419,10 @@ public class PdfExportService {
 
                 if (anchors.directions() != null) {
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.directions"), boldB, Element.ALIGN_LEFT));
-                    anchTab.addCell(buildTableCell("Vastu: " + anchors.directions().permanentVastuDirection() + " | Travel: " + anchors.directions().travelProsperityDirection(), bFont, Element.ALIGN_LEFT));
+                    String dirStr = "Primary Vastu (Lagna): " + anchors.directions().primaryVastuDirection() +
+                            " | Secondary Vastu (Digbala): " + anchors.directions().secondaryVastuDirection() +
+                            " | Travel: " + anchors.directions().travelDirection();
+                    anchTab.addCell(buildTableCell(dirStr, bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.structuralAnchors() != null) {

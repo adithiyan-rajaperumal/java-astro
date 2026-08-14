@@ -22,8 +22,9 @@ public class StructuralAnchorsUtils {
     ) {}
 
     public record AuspiciousDirectionsResult(
-            String permanentVastuDirection,
-            String travelProsperityDirection,
+            String primaryVastuDirection,
+            String secondaryVastuDirection,
+            String travelDirection,
             String lagnaElementDirection,
             String moonElementDirection
     ) {}
@@ -58,11 +59,13 @@ public class StructuralAnchorsUtils {
         String lagnaLord = PlanetDignityUtils.getSignLord(lagnaSign);
         String lagnaLordDigbala = getPlanetaryDigbalaDirection(lagnaLord);
 
-        String permanentVastu = lagnaDir + " (" + lagnaLordDigbala + ")";
-        String travelDir = moonDir + " (North-East / East)";
+        String primaryVastu = lagnaDir;
+        String secondaryVastu = lagnaLordDigbala + " (" + lagnaLord + " Digbala)";
+        String travelDir = moonDir;
 
         AuspiciousDirectionsResult directions = new AuspiciousDirectionsResult(
-                permanentVastu,
+                primaryVastu,
+                secondaryVastu,
                 travelDir,
                 lagnaDir,
                 moonDir

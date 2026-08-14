@@ -868,13 +868,25 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
 
   const translateDirection = (dirStr) => {
     if (!dirStr) return '';
-    const cleanDir = dirStr.replace(/\s*\(.*?\)\s*/g, '').trim();
+    let res = dirStr;
+    if (res.includes('(Fire)')) res = res.replace('(Fire)', language === 'ta' ? '(நெருப்பு)' : language === 'hi' ? '(अग्नि)' : language === 'te' ? '(అగ్ని)' : language === 'kn' ? '(ಅಗ್ನಿ)' : language === 'ml' ? '(അഗ്നി)' : '(Fire)');
+    if (res.includes('(Earth)')) res = res.replace('(Earth)', language === 'ta' ? '(பூமி)' : language === 'hi' ? '(पृथ्वी)' : language === 'te' ? '(భూమి)' : language === 'kn' ? '(ಭೂಮಿ)' : language === 'ml' ? '(ഭൂമി)' : '(Earth)');
+    if (res.includes('(Air)')) res = res.replace('(Air)', language === 'ta' ? '(காற்று)' : language === 'hi' ? '(वायु)' : language === 'te' ? '(వాయు)' : language === 'kn' ? '(ವಾಯು)' : language === 'ml' ? '(വായു)' : '(Air)');
+    if (res.includes('(Water)')) res = res.replace('(Water)', language === 'ta' ? '(நீர்)' : language === 'hi' ? '(जल)' : language === 'te' ? '(నీరు)' : language === 'kn' ? '(ಜಲ)' : language === 'ml' ? '(ജലം)' : '(Water)');
+
+    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(p => {
+      const locP = I18N_TERMS[p]?.[language] || p;
+      const digbalaLabel = language === 'ta' ? `${locP} திக்பலம்` : language === 'hi' ? `${locP} दिग्बल` : language === 'te' ? `${locP} దిగ్బలం` : language === 'kn' ? `${locP} ದಿಗ್ಬಲ` : language === 'ml' ? `${locP} ദിഗ്ബലം` : `${p} Digbala`;
+      res = res.replace(`${p} Digbala`, digbalaLabel);
+    });
+
     for (const [key, map] of Object.entries(DIRECTIONS_I18N)) {
-      if (cleanDir.toLowerCase() === key.toLowerCase() || dirStr.startsWith(key)) {
-        return map[language] || map['en'] || dirStr;
+      if (res.startsWith(key)) {
+        res = res.replace(key, map[language] || map['en'] || key);
+        break;
       }
     }
-    return dirStr;
+    return res;
   };
 
   const translateDeityRationale = (englishRationale, tamilRationale) => {
@@ -1136,9 +1148,10 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
   const gemRationale = translateGemRationale(gemology?.rulingPlanet, gemology?.astrologicalRationale);
 
   // Localized Weekday & Directions
-  const localizedWeekday = translateWeekday(luckyDay?.vedicWeekdayName);
-  const permanentVastuDir = translateDirection(dir?.permanentVastuDirection);
-  const travelDir = translateDirection(dir?.travelDirection);
+  const localizedWeekday = translateWeekday(luckyDay?.dayName || luckyDay?.vedicWeekdayName);
+  const primaryVastuDir = translateDirection(dir?.primaryVastuDirection || dir?.permanentVastuDirection);
+  const secondaryVastuDir = translateDirection(dir?.secondaryVastuDirection);
+  const travelDir = translateDirection(dir?.travelDirection || dir?.travelProsperityDirection);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
@@ -1409,8 +1422,13 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               🧭 {t('auspiciousDirectionsTitle', language)}
             </div>
             <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
-              🏡 <strong>{t('permanentVastu', language)}:</strong> {permanentVastuDir}
+              🏡 <strong>{t('primaryVastu', language)}:</strong> {primaryVastuDir}
             </div>
+            {secondaryVastuDir && (
+              <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                🏢 <strong>{t('secondaryVastu', language)}:</strong> {secondaryVastuDir}
+              </div>
+            )}
             <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
               ✈️ <strong>{t('travelDirection', language)}:</strong> {travelDir}
             </div>

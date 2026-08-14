@@ -17,7 +17,9 @@ public class StructuralAnchorsUtilsTest {
         d1.put("Moon", PlanetaryPosition.builder().name("Moon").signNumber(4).build()); // Kataka (Water -> North)
 
         var result = StructuralAnchorsUtils.calculateStructuralAnchors(9, 4, d1, 2450290.5);
-        assertNotNull(result.directions().permanentVastuDirection());
+        assertNotNull(result.directions().primaryVastuDirection());
+        assertNotNull(result.directions().secondaryVastuDirection());
+        assertNotNull(result.directions().travelDirection());
         assertNotNull(result.structuralAnchors().arudhaLagna());
         assertNotNull(result.structuralAnchors().physicalVitalityAnchor());
         assertNotNull(result.luckyDay().dayName());
