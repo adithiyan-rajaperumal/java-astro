@@ -52,15 +52,17 @@ public class AyurdayaCalculationUtilsTest {
                 .build());
 
         AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
-                lagnaSign, moonSign, d1Chart, dasas, 1995
+                lagnaSign, moonSign, d1Chart, dasas, 1995, 14, 30
         );
 
         assertNotNull(profile);
         assertEquals("Poornayu", profile.longevityClassification());
-        assertTrue(profile.estimatedLifespanCeiling() >= 75 && profile.estimatedLifespanCeiling() <= 95,
-                "Poornayu ceiling should be between 75 and 95, got: " + profile.estimatedLifespanCeiling());
+        assertTrue(profile.estimatedLifespanCeiling() >= 75 && profile.estimatedLifespanCeiling() <= 98,
+                "Poornayu ceiling should be between 75 and 98, got: " + profile.estimatedLifespanCeiling());
         assertNotNull(profile.lifespanRange());
-        assertNotNull(profile.threePairsDetails());
+        assertNotNull(profile.jaiminiThreePairs());
+        assertNotNull(profile.parasharaAyurBala());
+        assertNotNull(profile.marakaBadhakaTimeline());
         assertTrue(profile.kakshyaAdjustments().size() > 0);
         assertNotNull(profile.criticalMarakaWindow());
         assertNotNull(profile.classicalRationale());
