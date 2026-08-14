@@ -531,14 +531,29 @@ public class GeminiPredictionService {
 
     public String constructDailySystemInstruction(String lang) {
         StringBuilder sb = new StringBuilder();
-        sb.append("You are an expert Vedic Astrologer specializing in Gochara (daily planetary transits) and Panchangam synthesis.\n")
-          .append("Analyze the native's natal Moon/Lagna matrix and today's planetary transit from the provided structured JSON data to generate a precise, actionable Daily Balan (இன்றைய ராசி பலன்) in language: '").append(lang).append("'.\n")
-          .append("Write 100% of all JSON text fields in the native script of '").append(lang).append("'. Output concise, practical, empowering guidance.\n")
-          .append("CRITICAL ASTROLOGICAL INTERPRETATION RULES:\n")
-          .append("- The input is provided in clean, structured JSON containing the native's details, natal planets and houses, today's transit Moon sign and nakshatra, Tarabalam score, and Gochara Moon house relative to Janma Rasi and Janma Lagna.\n")
-          .append("- 'Bhava' (House 1-12) refers to the HOUSE reckoned relative to Lagna (Ascendant = House 1).\n")
-          .append("- Strictly interpret transit Moon house positions relative to Janma Rasi and Janma Lagna as calculated in the input JSON.\n")
-          .append("- Return ONLY valid JSON matching the schema.\n");
+        sb.append("You are an expert, classical Vedic Astrologer specializing in Gochara (daily planetary transits), Panchangam, and Vimshottari Dasa synthesis.\n")
+          .append("Analyze the native's natal Moon/Lagna matrix, running Dasa-Bhukthi, and today's planetary transit (Gochara) from the provided structured JSON data to generate a precise, high-density Daily Balan (இன்றைய ராசி பலன்) in language: '").append(lang).append("'.\n\n")
+          .append("CRITICAL LANGUAGE & SCRIPT DIRECTIVES:\n")
+          .append("- You MUST write 100% of all JSON text fields in the native script of language code '").append(lang).append("':\n");
+        if ("ta".equalsIgnoreCase(lang)) {
+            sb.append("  * Language: Tamil (தமிழ்). Use authentic terminology: கோச்சார சந்திரன், தாராபலம், சந்திராஷ்டமம், விம்சோத்தரி திசா புக்தி பலன், காரிய சித்தி, தனவரவு, பரிகாரம்.\n");
+        } else if ("hi".equalsIgnoreCase(lang)) {
+            sb.append("  * Language: Hindi (हिन्दी). Use classical Vedic terms: गोचर चन्द्रमा, ताराबल, चन्द्राष्टम, दशा-अन्तर्दशा, कार्य सिद्धि, धन लाभ, वैदिक उपाय.\n");
+        } else if ("te".equalsIgnoreCase(lang)) {
+            sb.append("  * Language: Telugu (తెలుగు). Use authentic terms: గోచార చంద్రుడు, తారాబలం, చంద్రాష్టమం, దశ-అంతర్దశ, కార్య సిద్ధి, ధన లాభం, పరిహారం.\n");
+        } else if ("kn".equalsIgnoreCase(lang)) {
+            sb.append("  * Language: Kannada (ಕನ್ನಡ). Use authentic terms: ಗೋಚಾರ ಚಂದ್ರ, ತಾರಾಬಲ, ಚಂದ್ರಾಷ್ಟಮ, ದಶಾ-ಭುಕ್ತಿ, ಕಾರ್ಯ ಸಿದ್ಧಿ, ಪರಿಹಾರ.\n");
+        } else if ("ml".equalsIgnoreCase(lang)) {
+            sb.append("  * Language: Malayalam (മലയാളം). Use authentic terms: ഗോചാര ചന്ദ്രൻ, താരാബലം, ചന്ദ്രാഷ്ടമം, ദശാ ഫലം, കാര്യ സിദ്ധി, പരിഹാരം.\n");
+        } else {
+            sb.append("  * Language: English with classical Sanskrit astrological terms in parentheses.\n");
+        }
+        sb.append("- UNIFIED HIGH-DENSITY FORECAST PARAGRAPH (ZERO BOILERPLATE):\n")
+          .append("  * Generate ONE cohesive, dense, comprehensive paragraph of 4 to 6 substantial sentences for 'dailyNarrative'.\n")
+          .append("  * Systematically synthesize: (1) Today's transit Moon house relative to Janma Rasi/Lagna and Tarabalam energy, (2) Active Dasa-Bhukthi resonance, (3) Career, workplace opportunities, and decision-making, (4) Financial movement and expenditure cautions, (5) Physical stamina and vitality, and (6) Family & domestic harmony.\n")
+          .append("  * If Chandrashtama is active, explicitly provide clear, calm cautionary guidance (avoiding disputes, deferring major contracts, staying patient).\n")
+          .append("- PURE ASTROLOGICAL DEDUCTION: Strictly forbid novelistic empathy, generic filler, or repetitive fluff.\n")
+          .append("- Return ONLY valid JSON matching the exact schema specified in the prompt.\n");
         return sb.toString();
     }
 
@@ -639,16 +654,12 @@ public class GeminiPredictionService {
           .append(dailyJson).append("\n\n")
           .append("Return ONLY valid JSON matching this schema:\n")
           .append("{\n")
-          .append("  \"generalOutlook\": \"(1-2 sentence overall energy & mood for the day)\",\n")
-          .append("  \"careerWork\": \"(Career and workplace opportunities/cautions)\",\n")
-          .append("  \"financeWealth\": \"(Financial transactions, expenses, gains)\",\n")
-          .append("  \"healthVitality\": \"(Physical stamina and mental wellbeing)\",\n")
-          .append("  \"relationshipFamily\": \"(Family and relationship harmony)\",\n")
+          .append("  \"dailyNarrative\": \"(A single cohesive, content-dense paragraph of 4-6 sentences synthesizing Gochara Moon, Tarabalam, active Dasa, career, finance, health, and family)\",\n")
+          .append("  \"dailyRemedy\": \"(Simple actionable Graha mantra or Vedic spiritual prayer for the day)\",\n")
           .append("  \"luckyColor\": \"").append(anchors.luckyColor).append("\",\n")
           .append("  \"luckyNumber\": \"").append(anchors.luckyNumber).append("\",\n")
           .append("  \"favorableDirection\": \"").append(anchors.favorableDirection).append("\",\n")
-          .append("  \"bestTimeWindow\": \"").append(anchors.auspiciousTimeWindow).append("\",\n")
-          .append("  \"dailyRemedy\": \"(Simple actionable mantra or prayer for the day)\"\n")
+          .append("  \"bestTimeWindow\": \"").append(anchors.auspiciousTimeWindow).append("\"\n")
           .append("}\n");
 
         return sb.toString();
@@ -817,6 +828,28 @@ public class GeminiPredictionService {
                     parsed.setLuckyNumber(anchors.luckyNumber);
                     parsed.setFavorableDirection(anchors.favorableDirection);
                     parsed.setBestTimeWindow(anchors.auspiciousTimeWindow);
+
+                    // Automatic backward-compatible synthesis if legacy fields were returned
+                    if (parsed.getDailyNarrative() == null || parsed.getDailyNarrative().isBlank()) {
+                        StringBuilder synth = new StringBuilder();
+                        if (parsed.getGeneralOutlook() != null && !parsed.getGeneralOutlook().isBlank()) {
+                            synth.append(parsed.getGeneralOutlook().trim()).append(" ");
+                        }
+                        if (parsed.getCareerWork() != null && !parsed.getCareerWork().isBlank()) {
+                            synth.append(parsed.getCareerWork().trim()).append(" ");
+                        }
+                        if (parsed.getFinanceWealth() != null && !parsed.getFinanceWealth().isBlank()) {
+                            synth.append(parsed.getFinanceWealth().trim()).append(" ");
+                        }
+                        if (parsed.getHealthVitality() != null && !parsed.getHealthVitality().isBlank()) {
+                            synth.append(parsed.getHealthVitality().trim()).append(" ");
+                        }
+                        if (parsed.getRelationshipFamily() != null && !parsed.getRelationshipFamily().isBlank()) {
+                            synth.append(parsed.getRelationshipFamily().trim());
+                        }
+                        parsed.setDailyNarrative(synth.toString().trim());
+                    }
+
                     parsed.setMessage("Daily Balan synthesized successfully via Google Gemini.");
                     return parsed;
                 }
@@ -879,53 +912,53 @@ public class GeminiPredictionService {
 
         return switch (day) {
             case SUNDAY -> DeterministicDailyAnchors.builder()
-                    .varaLord(isTa ? "சூரியன் (Sun)" : "Sun")
-                    .luckyColor(isTa ? "தாமரை சிவப்பு / ஆரஞ்சு (Ruby Red)" : (isHi ? "माणिक्य लाल / नारंगी" : (isTe ? "కెంపు ఎరుపు / నారింజ" : (isKn ? "ಮಾಣಿಕ್ಯ ಕೆಂಪು" : (isMl ? "മാണിക്യ ചുവപ്പ്" : "Ruby Red / Deep Orange")))))
+                    .varaLord(isTa ? "சூரியன் (Sun)" : (isHi ? "सूर्य (Sun)" : (isTe ? "సూర్యుడు (Sun)" : (isKn ? "ಸೂರ್ಯ (Sun)" : (isMl ? "സൂര്യൻ (Sun)" : "Sun")))))
+                    .luckyColor(isTa ? "தாமரை சிவப்பு / ஆரஞ்சு (Ruby Red)" : (isHi ? "माणिक्य लाल / नारंगी" : (isTe ? "కెంపు ఎరుపు / నారింజ" : (isKn ? "ಮಾಣಿಕ್ಯ ಕೆಂಪು / ಕಿತ್ತಳೆ" : (isMl ? "മാണിക്യ ചുവപ്പ് / ഓറഞ്ച്" : "Ruby Red / Deep Orange")))))
                     .luckyNumber("1 & 4")
                     .favorableDirection(isTa ? "கிழக்கு (East)" : (isHi ? "पूर्व (East)" : (isTe ? "తూర్పు (East)" : (isKn ? "ಪೂರ್ವ (East)" : (isMl ? "കിഴക്ക് (East)" : "East")))))
-                    .auspiciousTimeWindow(isTa ? "காலை 07:30 - 09:00 (உத்தம நேரம்)" : "07:30 AM - 09:00 AM")
+                    .auspiciousTimeWindow(isTa ? "காலை 07:30 - 09:00 (உத்தம நேரம்)" : (isHi ? "प्रातः 07:30 - 09:00 (शुभ मुहूर्त)" : (isTe ? "ఉదయం 07:30 - 09:00 (శుభ సమయం)" : (isKn ? "ಬೆಳಿಗ್ಗೆ 07:30 - 09:00 (ಶುಭ ಕಾಲ)" : (isMl ? "രാവിലെ 07:30 - 09:00 (ശുഭ സമയം)" : "07:30 AM - 09:00 AM (Auspicious)")))))
                     .build();
             case MONDAY -> DeterministicDailyAnchors.builder()
-                    .varaLord(isTa ? "சந்திரன் (Moon)" : "Moon")
-                    .luckyColor(isTa ? "முத்து வெள்ளை / வெள்ளி (Pearl White)" : (isHi ? "मोती सफेद / चांदी" : (isTe ? "ముత్యపు తెలుపు / వెండి" : (isKn ? "ಮುತ್ತಿನ ಬಿಳಿ" : (isMl ? "മുത്ത് വെളുപ്പ്" : "Pearl White / Silver")))))
+                    .varaLord(isTa ? "சந்திரன் (Moon)" : (isHi ? "चन्द्र (Moon)" : (isTe ? "చంద్రుడు (Moon)" : (isKn ? "ಚಂದ್ರ (Moon)" : (isMl ? "ചന്ദ്രൻ (Moon)" : "Moon")))))
+                    .luckyColor(isTa ? "முத்து வெள்ளை / வெள்ளி (Pearl White)" : (isHi ? "मोती सफेद / चांदी" : (isTe ? "ముత్యపు తెలుపు / వెండి" : (isKn ? "ಮುತ್ತಿನ ಬಿಳಿ / ಬೆಳ್ಳಿ" : (isMl ? "മുത്ത് വെളുപ്പ് / വെള്ളി" : "Pearl White / Silver")))))
                     .luckyNumber("2 & 7")
                     .favorableDirection(isTa ? "வடமேற்கு (North-West)" : (isHi ? "उत्तर-पश्चिम (North-West)" : (isTe ? "వాయవ్య (North-West)" : (isKn ? "ವಾಯುವ್ಯ (North-West)" : (isMl ? "വടക്കുപടിഞ്ഞാറ് (North-West)" : "North-West")))))
-                    .auspiciousTimeWindow(isTa ? "காலை 06:00 - 07:30 (உத்தம நேரம்)" : "06:00 AM - 07:30 AM")
+                    .auspiciousTimeWindow(isTa ? "காலை 06:00 - 07:30 (உத்தம நேரம்)" : (isHi ? "प्रातः 06:00 - 07:30 (शुभ मुहूर्त)" : (isTe ? "ఉదయం 06:00 - 07:30 (శుభ సమయం)" : (isKn ? "ಬೆಳಿಗ್ಗೆ 06:00 - 07:30 (ಶುಭ ಕಾಲ)" : (isMl ? "രാവിലെ 06:00 - 07:30 (ശുഭ സമയം)" : "06:00 AM - 07:30 AM (Auspicious)")))))
                     .build();
             case TUESDAY -> DeterministicDailyAnchors.builder()
-                    .varaLord(isTa ? "செவ்வாய் (Mars)" : "Mars")
+                    .varaLord(isTa ? "செவ்வாய் (Mars)" : (isHi ? "मंगल (Mars)" : (isTe ? "కుజుడు (Mars)" : (isKn ? "ಮಂಗಳ (Mars)" : (isMl ? "ചൊവ്വ (Mars)" : "Mars")))))
                     .luckyColor(isTa ? "பவள சிவப்பு / அடர் சிவப்பு (Coral Red)" : (isHi ? "मूंगा लाल / सिंदूरी" : (isTe ? "పగడపు ఎరుపు" : (isKn ? "ಹವಳದ ಕೆಂಪು" : (isMl ? "പവിഴ ചുവപ്പ്" : "Coral Red / Crimson")))))
                     .luckyNumber("9 & 1")
                     .favorableDirection(isTa ? "தெற்கு (South)" : (isHi ? "दक्षिण (South)" : (isTe ? "దక్షిణం (South)" : (isKn ? "ದಕ್ಷಿಣ (South)" : (isMl ? "തെക്ക് (South)" : "South")))))
-                    .auspiciousTimeWindow(isTa ? "காலை 10:30 - 12:00 (உத்தம நேரம்)" : "10:30 AM - 12:00 PM")
+                    .auspiciousTimeWindow(isTa ? "காலை 10:30 - 12:00 (உத்தம நேரம்)" : (isHi ? "प्रातः 10:30 - 12:00 (शुभ मुहूर्त)" : (isTe ? "ఉదయం 10:30 - 12:00 (శుభ సమయం)" : (isKn ? "ಬೆಳಿಗ್ಗೆ 10:30 - 12:00 (ಶುಭ ಕಾಲ)" : (isMl ? "രാവിലെ 10:30 - 12:00 (ശുഭ സമയം)" : "10:30 AM - 12:00 PM (Auspicious)")))))
                     .build();
             case WEDNESDAY -> DeterministicDailyAnchors.builder()
-                    .varaLord(isTa ? "புதன் (Mercury)" : "Mercury")
+                    .varaLord(isTa ? "புதன் (Mercury)" : (isHi ? "बुध (Mercury)" : (isTe ? "బుధుడు (Mercury)" : (isKn ? "ಬುಧ (Mercury)" : (isMl ? "ബുധൻ (Mercury)" : "Mercury")))))
                     .luckyColor(isTa ? "மரகத பச்சை / புல் பச்சை (Emerald Green)" : (isHi ? "पन्ना हरा / तोतिया" : (isTe ? "మరకత పచ్చ" : (isKn ? "ಪಚ್ಚೆ ಹಸಿರು" : (isMl ? "മരതക പച്ച" : "Emerald Green / Light Green")))))
                     .luckyNumber("5 & 6")
                     .favorableDirection(isTa ? "வடக்கு (North)" : (isHi ? "उत्तर (North)" : (isTe ? "ఉత్తరం (North)" : (isKn ? "ಉತ್ತರ (North)" : (isMl ? "വടക്ക് (North)" : "North")))))
-                    .auspiciousTimeWindow(isTa ? "காலை 09:00 - 10:30 (உத்தம நேரம்)" : "09:00 AM - 10:30 AM")
+                    .auspiciousTimeWindow(isTa ? "காலை 09:00 - 10:30 (உத்தம நேரம்)" : (isHi ? "प्रातः 09:00 - 10:30 (शुभ मुहूर्त)" : (isTe ? "ఉదయం 09:00 - 10:30 (శుభ సమయం)" : (isKn ? "ಬೆಳಿಗ್ಗೆ 09:00 - 10:30 (ಶುಭ ಕಾಲ)" : (isMl ? "രാവിലെ 09:00 - 10:30 (ശുഭ സമയം)" : "09:00 AM - 10:30 AM (Auspicious)")))))
                     .build();
             case THURSDAY -> DeterministicDailyAnchors.builder()
-                    .varaLord(isTa ? "குரு (Jupiter)" : "Jupiter")
+                    .varaLord(isTa ? "குரு (Jupiter)" : (isHi ? "गुरु / बृहस्पति (Jupiter)" : (isTe ? "గురువు (Jupiter)" : (isKn ? "ಗುರು (Jupiter)" : (isMl ? "ഗുരു (Jupiter)" : "Jupiter")))))
                     .luckyColor(isTa ? "பொன் மஞ்சள் / தங்கம் (Golden Yellow)" : (isHi ? "पुखराज पीला / स्वर्णिम" : (isTe ? "బంగారు పసుపు" : (isKn ? "ಚಿನ್ನದ ಹಳದಿ" : (isMl ? "സ്വർണ്ണ മഞ്ഞ" : "Golden Yellow / Amber")))))
                     .luckyNumber("3 & 9")
                     .favorableDirection(isTa ? "வடகிழக்கு (North-East)" : (isHi ? "ईशान / उत्तर-पूर्व (North-East)" : (isTe ? "ఈశాన్యం (North-East)" : (isKn ? "ಈಶಾನ್ಯ (North-East)" : (isMl ? "വടക്കുകിഴക്ക് (North-East)" : "North-East")))))
-                    .auspiciousTimeWindow(isTa ? "காலை 09:15 - 10:45 (உத்தம நேரம்)" : "09:15 AM - 10:45 AM")
+                    .auspiciousTimeWindow(isTa ? "காலை 09:15 - 10:45 (உத்தம நேரம்)" : (isHi ? "प्रातः 09:15 - 10:45 (शुभ मुहूर्त)" : (isTe ? "ఉదయం 09:15 - 10:45 (శుభ సమయం)" : (isKn ? "ಬೆಳಿಗ್ಗೆ 09:15 - 10:45 (ಶುಭ ಕಾಲ)" : (isMl ? "രാവിലെ 09:15 - 10:45 (ശുഭ സമയം)" : "09:15 AM - 10:45 AM (Auspicious)")))))
                     .build();
             case FRIDAY -> DeterministicDailyAnchors.builder()
-                    .varaLord(isTa ? "சுக்கிரன் (Venus)" : "Venus")
-                    .luckyColor(isTa ? "பட்டு வெள்ளை / கிரீம் (Silk White)" : (isHi ? "चमकीला सफेद / क्रीम" : (isTe ? "పట్టు తెలుపు / క్రీమ్" : (isKn ? "ರೇಷ್ಮೆ ಬಿಳಿ" : (isMl ? "പട്ട് വെളുപ്പ്" : "Silk White / Cream")))))
+                    .varaLord(isTa ? "சுக்கிரன் (Venus)" : (isHi ? "शुक्र (Venus)" : (isTe ? "శుక్రుడు (Venus)" : (isKn ? "ಶುಕ್ರ (Venus)" : (isMl ? "ശുക്രൻ (Venus)" : "Venus")))))
+                    .luckyColor(isTa ? "பட்டு வெள்ளை / கிரீம் (Silk White)" : (isHi ? "चमकीला सफेद / क्रीम" : (isTe ? "పట్టు తెలుపు / క్రీమ్" : (isKn ? "ರೇಷ್ಮೆ ಬಿಳಿ / ಕ್ರೀಮ್" : (isMl ? "പട്ട് വെളുപ്പ് / ക്രീം" : "Silk White / Cream")))))
                     .luckyNumber("6 & 5")
                     .favorableDirection(isTa ? "தென்கிழக்கு (South-East)" : (isHi ? "आग्नेय / दक्षिण-पूर्व (South-East)" : (isTe ? "ఆగ్నేయం (South-East)" : (isKn ? "ಆಗ್ನೇಯ (South-East)" : (isMl ? "തെക്കുകിഴക്ക് (South-East)" : "South-East")))))
-                    .auspiciousTimeWindow(isTa ? "காலை 06:30 - 08:00 (உத்தம நேரம்)" : "06:30 AM - 08:00 AM")
+                    .auspiciousTimeWindow(isTa ? "காலை 06:30 - 08:00 (உத்தம நேரம்)" : (isHi ? "प्रातः 06:30 - 08:00 (शुभ मुहूर्त)" : (isTe ? "ఉదయం 06:30 - 08:00 (శుభ సమయం)" : (isKn ? "ಬೆಳಿಗ್ಗೆ 06:30 - 08:00 (ಶುಭ ಕಾಲ)" : (isMl ? "രാവിലെ 06:30 - 08:00 (ശുഭ സമയം)" : "06:30 AM - 08:00 AM (Auspicious)")))))
                     .build();
             case SATURDAY -> DeterministicDailyAnchors.builder()
-                    .varaLord(isTa ? "சனி (Saturn)" : "Saturn")
+                    .varaLord(isTa ? "சனி (Saturn)" : (isHi ? "शनि (Saturn)" : (isTe ? "శని (Saturn)" : (isKn ? "ಶನಿ (Saturn)" : (isMl ? "ശനി (Saturn)" : "Saturn")))))
                     .luckyColor(isTa ? "நீலம் / கருநீலம் (Navy Blue)" : (isHi ? "नीलम नीला / गहरा नीला" : (isTe ? "నీలం / ముదురు నీలం" : (isKn ? "ನೀಲಿ / ಕಡು ನೀಲಿ" : (isMl ? "നീല / കടും നീല" : "Navy Blue / Dark Blue")))))
                     .luckyNumber("8 & 4")
                     .favorableDirection(isTa ? "மேற்கு (West)" : (isHi ? "पश्चिम (West)" : (isTe ? "పడమర (West)" : (isKn ? "ಪಶ್ಚಿಮ (West)" : (isMl ? "പടിഞ്ഞാറ് (West)" : "West")))))
-                    .auspiciousTimeWindow(isTa ? "காலை 07:30 - 09:00 (உத்தம நேரம்)" : "07:30 AM - 09:00 AM")
+                    .auspiciousTimeWindow(isTa ? "காலை 07:30 - 09:00 (உத்தம நேரம்)" : (isHi ? "प्रातः 07:30 - 09:00 (शुभ मुहूर्त)" : (isTe ? "ఉదయం 07:30 - 09:00 (శుభ సమయం)" : (isKn ? "ಬೆಳಿಗ್ಗೆ 07:30 - 09:00 (ಶುಭ ಕಾಲ)" : (isMl ? "രാവിലെ 07:30 - 09:00 (ശുഭ സമയം)" : "07:30 AM - 09:00 AM (Auspicious)")))))
                     .build();
         };
     }
@@ -1139,6 +1172,16 @@ public class GeminiPredictionService {
         boolean chandrashtama = panchangam != null && panchangam.chandrastamamNakshatras() != null
                 && panchangam.chandrastamamNakshatras().contains(nakshatra);
 
+        DeterministicDailyAnchors anchors = calculateDeterministicAnchors(targetDate, lang);
+
+        String dailyNarrative = isTa
+                ? (chandrashtama
+                    ? "இன்று உங்கள் ராசிக்கு சந்திராஷ்டம தினமாகும். பணியிடத்தில் நிதானமும், புதிய முடிவுகளில் விழிப்புணர்வும் தேவை. தனவரவு சுமாராக இருந்தாலும் வீண் விரயங்களைத் தவிர்ப்பது நல்லது. உடல் ஆரோக்கியத்தில் சீரான ஓய்வும், குடும்பத்தினரிடம் அமைதியான அணுகுமுறையும் நன்மை தரும்."
+                    : "இன்றைய கோச்சார சந்திரன் உங்களுக்கு உற்சாகத்தையும் காரிய சித்தியையும் தருகிறார். பணியிடத்தில் உங்கள் உழைப்புக்கு மேலதிகாரிகளின் பாராட்டும், புதிய வாய்ப்புகளும் கிட்டும். எதிர்பார்த்த தனவரவு கைக்கு வந்து சேரும். குடும்பத்தில் அமைதியும், மனமகிழ்ச்சியும் நிலவும் நன்னாள்.")
+                : (chandrashtama
+                    ? "Today is a Chandrashtama day for your Janma Rasi. Exercise mindfulness in communication and avoid initiating high-risk ventures. Maintain prudent financial control and adequate rest for vitality."
+                    : "Today brings favorable Gochara planetary support conferring clarity, vitality, and progress. Workplace duties advance smoothly with support from peers. Financial inflows remain steady and family interactions bring harmony.");
+
         return DailyBalanDTO.builder()
                 .enabled(true)
                 .targetDate(targetDate.toString())
@@ -1146,28 +1189,21 @@ public class GeminiPredictionService {
                 .nakshatra(nakshatra)
                 .runningDasaBhukthi(runningDasa)
                 .chandrashtama(chandrashtama)
+                .dailyNarrative(dailyNarrative)
                 .generalOutlook(isTa
-                        ? (chandrashtama ? "இன்று சந்திராஷ்டம நாள். அமைதியும் விழிப்புணர்வும் தேவை. புதிய முயற்சிகளைத் தவிர்க்கவும்." : "இன்று உற்சாகமும் காரிய சித்தியும் தரும் இனிய நாள். எடுத்த காரியங்கள் வெற்றியாகும்.")
-                        : (chandrashtama ? "Chandrashtama day. Exercise patience, avoid disputes, and defer major new starts." : "Auspicious, energetic day with favorable transit support for planned tasks."))
-                .careerWork(isTa
-                        ? "பணியிடத்தில் உங்கள் யோசனைகளுக்கு நல்ல வரவேற்பு இருக்கும். மேலதிகாரிகளின் பாராட்டு கிட்டும்."
-                        : "Productive workday. Clear communication and supportive colleagues facilitate swift execution.")
-                .financeWealth(isTa
-                        ? "எதிர்பார்த்த தனவரவு உண்டு. வீண் செலவுகளைக் குறைப்பது நல்லது."
-                        : "Favorable cashflow. Prudent spending ensures financial stability.")
-                .healthVitality(isTa
-                        ? "உடல் நலம் நன்று. போதுமான ஓய்வும் நீர் அருந்துதலும் புத்துணர்ச்சி தரும்."
-                        : "Good vitality. Maintain hydration and take short mindful breaks.")
-                .relationshipFamily(isTa
-                        ? "குடும்பத்தினருடன் மனமகிழ்ச்சி தரும் உரையாடல்கள் அமையும்."
-                        : "Pleasant interactions and domestic harmony with loved ones.")
-                .luckyColor(isTa ? "மஞ்சள் / பொன்னிறம் (Yellow/Gold)" : "Gold / Yellow")
-                .luckyNumber("3 & 7")
-                .favorableDirection(isTa ? "வடகிழக்கு (North-East)" : "North-East")
-                .bestTimeWindow(isTa ? "காலை 09:15 - 10:30 (உத்தம நேரம்)" : "09:15 AM - 10:30 AM (Auspicious)")
+                        ? (chandrashtama ? "இன்று சந்திராஷ்டம நாள். அமைதியும் விழிப்புணர்வும் தேவை." : "இன்று உற்சாகமும் காரிய சித்தியும் தரும் இனிய நாள்.")
+                        : (chandrashtama ? "Chandrashtama day. Exercise patience." : "Auspicious day with favorable transit support."))
+                .careerWork(isTa ? "பணியிடத்தில் நல்ல முன்னேற்றம் உண்டு." : "Productive workday with progressive opportunities.")
+                .financeWealth(isTa ? "தனவரவு சீராக இருக்கும்." : "Steady financial inflows and balanced expenses.")
+                .healthVitality(isTa ? "உடல் நலம் சிறக்கும்." : "Good energy and vitality throughout the day.")
+                .relationshipFamily(isTa ? "குடும்பத்தில் மனமகிழ்ச்சி நிலவும்." : "Harmonious domestic interactions.")
+                .luckyColor(anchors.getLuckyColor())
+                .luckyNumber(anchors.getLuckyNumber())
+                .favorableDirection(anchors.getFavorableDirection())
+                .bestTimeWindow(anchors.getAuspiciousTimeWindow())
                 .dailyRemedy(isTa
-                        ? "ஸ்ரீ விநாயகர் வழிபாடு செய்து தீபம் ஏற்றுவது காரிய தடையை நீக்கும்."
-                        : "Offer prayers to Lord Ganesha and chant Om Gam Ganapataye Namaha.")
+                        ? "ஸ்ரீ விநாயகர் அல்லது இஷ்ட தெய்வ வழிபாடு செய்து காரியங்களைத் தொடங்கவும்."
+                        : "Offer prayers to Lord Ganesha or your Ishta Devata before starting important tasks.")
                 .message("Generated using Vedic Gochara Rule Synthesizer.")
                 .build();
     }

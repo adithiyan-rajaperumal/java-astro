@@ -255,6 +255,57 @@ public class GeminiPredictionServiceTest {
         assertTrue(parsedDaily.getTokenUsage().getEstimatedCostInr() > 0);
         assertTrue(parsedDaily.getLuckyColor().contains("வெள்ளை"));
         assertEquals("2 & 7", parsedDaily.getLuckyNumber());
+        assertTrue(parsedDaily.getDailyNarrative().contains("இன்று நல்ல நாள்"));
+    }
+
+    @Test
+    public void testDailyBalanUnifiedPromptAndDirectDailyNarrativeParsing() {
+        DailyBalanRequestDTO req = DailyBalanRequestDTO.builder()
+                .birthDetails(new BirthDetailsDTO("Adithiyan", 1995, 7, 19, 13, 10, 0, 12.9165, 79.1325, "LAHIRI"))
+                .chartData(ChartUiResponseDTO.builder()
+                        .birthProfile(ChartResponseDTO.BirthProfile.builder()
+                                .lagna("Tula")
+                                .rashi("Mesha")
+                                .nakshatra("Bharani")
+                                .build())
+                        .build())
+                .language("ta")
+                .build();
+
+        String dailyPrompt = predictionService.constructDailyAstrologicalPrompt(req, null, LocalDate.of(2026, 8, 15));
+        assertNotNull(dailyPrompt);
+        assertTrue(dailyPrompt.contains("dailyNarrative"));
+        assertTrue(dailyPrompt.contains("dailyRemedy"));
+
+        String mockDirectJson = """
+                {
+                  "candidates": [
+                    {
+                      "content": {
+                        "parts": [
+                          {
+                            "text": "{\\"dailyNarrative\\":\\"இன்றைய கோச்சார சந்திரன் தொழில் மற்றும் பொருளாதாரத்தில் மிகுந்த நன்மைகளைத் தருவார். மேலதிகாரிகளின் ஆதரவும் புதிய திட்டங்களும் கைகூடும்.\\",\\"dailyRemedy\\":\\"ஓம் நம சிவாய மந்திரத்தை 11 முறை ஜபிக்கவும்.\\"}"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "usageMetadata": {
+                    "promptTokenCount": 500,
+                    "candidatesTokenCount": 150,
+                    "totalTokenCount": 650
+                  }
+                }
+                """;
+
+        DailyBalanDTO parsed = predictionService.parseDailyGeminiResponse(mockDirectJson, req, null, "2026-08-15");
+        assertNotNull(parsed);
+        assertTrue(parsed.isEnabled());
+        assertEquals("2026-08-15", parsed.getTargetDate());
+        assertEquals("இன்றைய கோச்சார சந்திரன் தொழில் மற்றும் பொருளாதாரத்தில் மிகுந்த நன்மைகளைத் தருவார். மேலதிகாரிகளின் ஆதரவும் புதிய திட்டங்களும் கைகூடும்.", parsed.getDailyNarrative());
+        assertEquals("ஓம் நம சிவாய மந்திரத்தை 11 முறை ஜபிக்கவும்.", parsed.getDailyRemedy());
+        assertNotNull(parsed.getLuckyColor());
+        assertNotNull(parsed.getLuckyNumber());
     }
 
     @Test
