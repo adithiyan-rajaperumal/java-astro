@@ -9,7 +9,7 @@ const I18N_TERMS = {
   // Rashis
   'Mesha': { en: 'Mesha / Aries', ta: 'மேஷம்', hi: 'मेष', te: 'మేషం', kn: 'ಮೇಷ', ml: 'മേടം' },
   'Vrishabha': { en: 'Vrishabha / Taurus', ta: 'ரிஷபம்', hi: 'वृषभ', te: 'వృషభం', kn: 'ವೃಷಭ', ml: 'ഇടവം' },
-  'Mithuna': { en: 'Mithuna / Gemini', ta: 'மிதுனம்', hi: 'मिथुन', te: 'మిథునం', kn: 'ಮಿಥುನ', ml: 'ಮಿഥുനം' },
+  'Mithuna': { en: 'Mithuna / Gemini', ta: 'மிதுனம்', hi: 'मिथुन', te: 'మిథునం', kn: 'ಮಿಥುನ', ml: 'മിഥുനം' },
   'Kataka': { en: 'Kataka / Cancer', ta: 'கடகம்', hi: 'कर्क', te: 'కర్కాటకం', kn: 'ಕರ್ಕಾಟಕ', ml: 'കർക്കടകം' },
   'Simha': { en: 'Simha / Leo', ta: 'சிம்மம்', hi: 'सिंह', te: 'సింహం', kn: 'ಸಿಂಹ', ml: 'ചിങ്ങം' },
   'Kanya': { en: 'Kanya / Virgo', ta: 'கன்னி', hi: 'कन्या', te: 'కన్య', kn: 'ಕನ್ಯಾ', ml: 'കന്നി' },
@@ -23,7 +23,7 @@ const I18N_TERMS = {
   // Planets
   'Sun': { en: 'Sun', ta: 'சூரியன்', hi: 'सूर्य', te: 'సూర్యుడు', kn: 'ಸೂರ್ಯ', ml: 'സൂര്യൻ' },
   'Moon': { en: 'Moon', ta: 'சந்திரன்', hi: 'चन्द्र', te: 'చంద్రుడు', kn: 'ಚಂದ್ರ', ml: 'ചന്ദ്രൻ' },
-  'Mars': { en: 'Mars', ta: 'செவ்வாய்', hi: 'मंगल', te: 'కుజుడు / మంగళ', kn: 'ಮಂಗಳ', ml: 'ചൊവ്വ' },
+  'Mars': { en: 'Mars', ta: 'செவ்வாய்', hi: 'मंगल', te: 'కుజుడు', kn: 'ಮಂಗಳ', ml: 'ചൊവ്വ' },
   'Mercury': { en: 'Mercury', ta: 'புதன்', hi: 'बुध', te: 'బుధుడు', kn: 'ಬುಧ', ml: 'ബുധൻ' },
   'Jupiter': { en: 'Jupiter', ta: 'குரு', hi: 'गुरु / बृहस्पति', te: 'గురుడు', kn: 'ಗುರು', ml: 'വ്യാഴം / ഗുരു' },
   'Venus': { en: 'Venus', ta: 'சுக்கிரன்', hi: 'शुक्र', te: 'శుక్రుడు', kn: 'ಶುಕ್ರ', ml: 'ശുക്രൻ' },
@@ -69,18 +69,254 @@ const I18N_TERMS = {
   // Modalities
   'CHARA': { en: 'Movable (Chara)', ta: 'சர', hi: 'चर', te: 'చర', kn: 'ಚರ', ml: 'ചര' },
   'STHIRA': { en: 'Fixed (Sthira)', ta: 'ஸ்திர', hi: 'स्थिर', te: 'స్థిర', kn: 'ಸ್ಥಿರ', ml: 'സ്ഥിര' },
-  'DWISVABHAVA': { en: 'Dual (Dwisvabhava)', ta: 'உபய', hi: 'द्विस्वभाव', te: 'ద్విస్వభావ', kn: 'ದ್ವಿಸ್ವಭಾವ', ml: 'ദ്വിസ്വഭാവ' },
+  'DWISVABHAVA': { en: 'Dual (Dwisvabhava)', ta: 'உபய', hi: 'দ্বিस्वभाव', te: 'ద్విస్వభావ', kn: 'ದ್ವಿಸ್ವಭಾವ', ml: 'ദ്വിസ്വഭാവ' },
 
   // Prakritis
   'Vata-Pitta': { en: 'Vata-Pitta', ta: 'வாத-பித்தம் (Vata-Pitta)', hi: 'वात-पित्त (Vata-Pitta)', te: 'వాత-పిత్తం (Vata-Pitta)', kn: 'ವಾತ-ಪಿತ್ತ (Vata-Pitta)', ml: 'വാത-പിത്തം (Vata-Pitta)' },
   'Pitta-Vata': { en: 'Pitta-Vata', ta: 'பித்த-வாதம் (Pitta-Vata)', hi: 'पित्त-वात (Pitta-Vata)', te: 'పిత్త-వాతం (Pitta-Vata)', kn: 'ಪಿತ್ತ-ವಾತ (Pitta-Vata)', ml: 'പിത്ത-വാതം (Pitta-Vata)' },
   'Kapha-Pitta': { en: 'Kapha-Pitta', ta: 'கப-பித்தம் (Kapha-Pitta)', hi: 'कफ-पित्त (Kapha-Pitta)', te: 'కఫ-పిత్తం (Kapha-Pitta)', kn: 'ಕಫ-ಪಿತ್ತ (Kapha-Pitta)', ml: 'കഫ-പിത്തം (Kapha-Pitta)' },
-  'Pitta-Kapha': { en: 'Pitta-Kapha', ta: 'பித்த-கபம் (Pitta-Kapha)', hi: 'पित्त-कफ (Pitta-Kapha)', te: 'పిత్త-కఫం (Pitta-Kapha)', kn: 'ಪಿತ್ತ-ಕಫ (Pitta-Kapha)', ml: 'ಪಿത്ത-കഫം (Pitta-Kapha)' },
+  'Pitta-Kapha': { en: 'Pitta-Kapha', ta: 'பித்த-கபம் (Pitta-Kapha)', hi: 'पित्त-कफ (Pitta-Kapha)', te: 'పిత్త-కఫం (Pitta-Kapha)', kn: 'ಪಿತ್ತ-ಕಫ (Pitta-Kapha)', ml: 'പിത്ത-കഫം (Pitta-Kapha)' },
   'Vata-Kapha': { en: 'Vata-Kapha', ta: 'வாத-கபம் (Vata-Kapha)', hi: 'वात-कफ (Vata-Kapha)', te: 'వాత-కఫం (Vata-Kapha)', kn: 'ವಾತ-ಕಫ (Vata-Kapha)', ml: 'വാത-കഫം (Vata-Kapha)' },
   'Kapha-Vata': { en: 'Kapha-Vata', ta: 'கப-வாதம் (Kapha-Vata)', hi: 'कफ-वात (Kapha-Vata)', te: 'కఫ-వాతం (Kapha-Vata)', kn: 'ಕಫ-ವಾತ (Kapha-Vata)', ml: 'കഫ-വാതം (Kapha-Vata)' },
   'Pitta Dominant': { en: 'Pitta Dominant', ta: 'பித்த பிரதானம் (Pitta)', hi: 'पित्त प्रधान (Pitta)', te: 'పిత్త ప్రధానం (Pitta)', kn: 'ಪಿತ್ತ ಪ್ರಧಾನ (Pitta)', ml: 'പിത്ത പ്രധാനം (Pitta)' },
-  'Vata Dominant': { en: 'Vata Dominant', ta: 'வாத பிரதானம் (Vata)', hi: 'वात प्रधान (Vata)', te: 'వాత ప్రధానం (Vata)', kn: 'ವಾತ ಪ್ರಧಾನ (Vata)', ml: 'വാತ പ്രധാനം (Vata)' },
-  'Kapha Dominant': { en: 'Kapha Dominant', ta: 'கப பிரதானம் (Kapha)', hi: 'कफ प्रधान (Kapha)', te: 'ಕಫ ಪ್ರಧಾನ (Kapha)', ml: 'കഫ പ്രധാനം (Kapha)' }
+  'Vata Dominant': { en: 'Vata Dominant', ta: 'வாத பிரதானம் (Vata)', hi: 'वात प्रधान (Vata)', te: 'వాత ప్రధానం (Vata)', kn: 'ವಾತ ಪ್ರಧಾನ (Vata)', ml: 'വാത പ്രധാനം (Vata)' },
+  'Kapha Dominant': { en: 'Kapha Dominant', ta: 'கப பிரதானம் (Kapha)', hi: 'कफ प्रधान (Kapha)', te: 'కఫ ప్రధానం (Kapha)', kn: 'ಕಫ ಪ್ರಧಾನ (Kapha)', ml: 'കഫ പ്രധാനം (Kapha)' }
+};
+
+const DEITY_NAMES_I18N = {
+  'Lord Shiva / Lord Rama': {
+    en: 'Lord Shiva / Lord Rama',
+    ta: 'ஸ்ரீ சிவன் / ராமர்',
+    hi: 'भगवान शिव / श्री राम',
+    te: 'శివుడు / శ్రీరాముడు',
+    kn: 'ಶಿವ / ಶ್ರೀ ರಾಮ',
+    ml: 'ശിവൻ / ശ്രീരാമൻ'
+  },
+  'Goddess Parvati / Gauri / Krishna': {
+    en: 'Goddess Parvati / Gauri / Krishna',
+    ta: 'ஸ்ரீ பார்வதி / கௌரி / கிருஷ்ணர்',
+    hi: 'माँ पार्वती / गौरी / श्री कृष्ण',
+    te: 'పార్వతీ దేవి / గౌరి / శ్రీకృష్ణుడు',
+    kn: 'ಪಾರ್ವತಿ / ಗೌರಿ / ಶ್ರೀಕೃಷ್ಣ',
+    ml: 'പാർവ്വതി / ഗൗരി / ശ്രീകൃഷ്ണൻ'
+  },
+  'Lord Muruga / Subramanya / Kartikeya': {
+    en: 'Lord Muruga / Subramanya / Kartikeya',
+    ta: 'ஸ்ரீ முருகப்பெருமான் / சுப்பிரமணியர்',
+    hi: 'भगवान कार्तिकेय / मुरुगन / स्कंद',
+    te: 'సుబ్రహ్మణ్య స్వామి / మురుగన్',
+    kn: 'ಸುಬ್ರಹ್ಮಣ್ಯ / ಕಾರ್ತಿಕೇಯ / ಮುರುಗ',
+    ml: 'മുരുകൻ / സുബ്രഹ്മണ്യൻ / കാർത്തികേയൻ'
+  },
+  'Lord Vishnu / Lord Venkateshwara': {
+    en: 'Lord Vishnu / Lord Venkateshwara',
+    ta: 'ஸ்ரீ மகாவிஷ்ணு / வேங்கடாஜலபதி',
+    hi: 'भगवान विष्णु / श्री वेंकटेश्वर',
+    te: 'మహావిష్ణువు / శ్రీ వేంకటేశ్వర స్వామి',
+    kn: 'ಮಹಾವಿಷ್ಣು / ಶ್ರೀ ವೆಂಕಟೇಶ್ವರ',
+    ml: 'മഹാവിഷ്ണു / ശ്രീ വെങ്കിടേശ്വരൻ'
+  },
+  'Lord Dakshinamurthy / Brihaspati / Hayagriva': {
+    en: 'Lord Dakshinamurthy / Brihaspati / Hayagriva',
+    ta: 'ஸ்ரீ தட்சிணாமூர்த்தி / ஹயக்ரீவர் / பிரகஸ்பதி',
+    hi: 'भगवान दक्षिणामूर्ति / हयग्रीव / बृहस्पति',
+    te: 'దక్షిణామూర్తి / హయగ్రీవుడు / బృహస్పతి',
+    kn: 'ದಕ್ಷಿಣಾಮೂರ್ತಿ / ಹಯಗ್ರೀವ / ಬೃಹಸ್ಪತಿ',
+    ml: 'ദക്ഷിണാമൂർത്തി / ഹയഗ്രീവൻ / ബൃഹസ്പതി'
+  },
+  'Goddess Mahalakshmi / Sri Radha / Annapoorni': {
+    en: 'Goddess Mahalakshmi / Sri Radha / Annapoorni',
+    ta: 'ஸ்ரீ மகாலட்சுமி / ராதா / அன்னபூரணி',
+    hi: 'माँ महालक्ष्मी / श्री राधा / अन्नपूर्णा',
+    te: 'మహాలక్ష్మి / రాధా దేవి / అన్నపూర్ణ',
+    kn: 'ಮಹಾಲಕ್ಷ್ಮಿ / ರಾಧಾ / ಅನ್ನಪೂರ್ಣ',
+    ml: 'മഹാലക്ഷ്മി / രാധാദേവി / അന്നപൂർണ്ണ'
+  },
+  'Lord Hanuman / Shani Deva / Lord Ayyappan': {
+    en: 'Lord Hanuman / Shani Deva / Lord Ayyappan',
+    ta: 'ஸ்ரீ அனுமன் / சனி பகவான் / அய்யப்பன்',
+    hi: 'भगवान हनुमान / शनि देव / अय्यप्पा',
+    te: 'హనుమంతుడు / శని దేవుడు / అయ్యప్ప స్వామి',
+    kn: 'ಹನುಮಂತ / ಶನಿ ದೇವ / ಅಯ್ಯಪ್ಪ ಸ್ವಾಮಿ',
+    ml: 'ഹനുമാൻ / ശനീശ്വരൻ / അയ്യപ്പൻ'
+  },
+  'Goddess Durga / Rahu / Chhinnamasta': {
+    en: 'Goddess Durga / Rahu / Chhinnamasta',
+    ta: 'ஸ்ரீ துர்க்கை அம்மன் / காளி / சின்னமஸ்தா',
+    hi: 'माँ दुर्गा / काली / छिन्नमस्ता',
+    te: 'దుర్గా దేవి / కాళిక / ఛిన్నమస్తా',
+    kn: 'ದುರ್ಗಾ ದೇವಿ / ಕಾಳಿ / ಛಿನ್ನಮಸ್ತಾ',
+    ml: 'ദുർഗ്ഗാ ദേവി / കാളി / ഛിന്നമസ്ത'
+  },
+  'Lord Ganesha / Ketu (Kaivalya)': {
+    en: 'Lord Ganesha / Ketu (Kaivalya)',
+    ta: 'ஸ்ரீ விநாயகர் / கேது (ஞான மோக்ஷம்)',
+    hi: 'भगवान गणेश / केतु (कैवल्य मोक्ष)',
+    te: 'గణపతి / కేతువు (మోక్ష కారకుడు)',
+    kn: 'ಗಣೇಶ / ಕೇತು (ಕೈವಲ್ಯ ಮೋಕ್ಷ)',
+    ml: 'ഗണപതി / കേതു (മോക്ഷ കാരകൻ)'
+  }
+};
+
+const KULA_DEVATA_MESSAGES = {
+  BLESSED: {
+    en: 'Full grace of Kula Devata and ancestral Pitru blessings. Brings family harmony, longevity, and lineage prosperity.',
+    ta: 'குலதெய்வ அருளும் பித்ரு ஆசிகளும் பரிபூரணமாக உள்ளது. குடும்பத்தில் ஒற்றுமையும் சந்தான விருத்தியும் தழைக்கும்.',
+    hi: 'कुलदेवता की पूर्ण कृपा और पितृ आशीर्वाद प्राप्त है। परिवार में सुख-शांति और वंश वृद्धि होगी।',
+    te: 'కులదైవ సంపూర్ణ అనుగ్రహం మరియు పితృ ఆశీస్సులు ఉన్నాయి. కుటుంబంలో ఐక్యత మరియు వంశాభివృద్ధి కలుగుతుంది.',
+    kn: 'ಕುಲದೇವತೆಯ ಪರಿಪೂರ್ಣ ಅನುಗ್ರಹ ಮತ್ತು ಪಿತೃ ಆಶೀರ್ವಾದವಿದೆ. ಕುಟುಂಬದಲ್ಲಿ ಶಾಂತಿ ಮತ್ತು ವಂಶಾಭಿವೃದ್ಧಿ ಉಂಟಾಗುವುದು.',
+    ml: 'കുലദേവതയുടെ പൂർണ്ണ അനുഗ്രഹവും പിതൃ ആശീർവാദവുമുണ്ട്. കുടുംബത്തിൽ ഐക്യവും വംശവർദ്ധനവും ഉണ്ടാകും.'
+  },
+  AFFLICTED: {
+    en: 'Regular prayers and ghee lamps at your Kula Devata temple on New Moon / Full Moon days, along with Pitru Tarpanam, is highly recommended.',
+    ta: 'பௌர்ணமி/அமாவாசை தினங்களில் குலதெய்வக் கோயிலுக்குச் சென்று நெய்தீபம் ஏற்றி வழிபடுதல் மற்றும் எள் தீபம் ஏற்றி பித்ரு தர்ப்பணம் செய்தல் நலம் பயக்கும்.',
+    hi: 'पूर्णिमा या अमावस्या पर कुलदेवता के मंदिर जाकर घी का दीपक जलाएं और पितृ तर्पण करें।',
+    te: 'పౌర్ణమి లేదా అమావాస్య రోజులలో కులదైవ ఆలయానికి వెళ్లి నెయ్యి దీపం వెలిగించి, పితృ తర్పణం చేయడం శ్రేయస్కరం.',
+    kn: 'ಹುಣ್ಣಿಮೆ ಅಥವಾ ಅಮಾವಾಸ್ಯೆಯಂದು ಕುಲದೇವಸ್ಥಾನಕ್ಕೆ ತೆರಳಿ ತುಪ್ಪದ ದೀಪ ಹಚ್ಚಿ ಪಿತೃ ತರ್ಪಣ ನೀಡುವುದು ಉತ್ತಮ.',
+    ml: 'പൗർണ്ണമി അല്ലെങ്കിൽ അമാവാസി ദിവസങ്ങളിൽ കുലദേവതാ ക്ഷേത്രത്തിൽ നെയ്‌വിളക്ക് കൊളുത്തുകയും പിതൃ തർപ്പണം നടത്തുകയും ചെയ്യുക.'
+  }
+};
+
+const GEMOLOGY_I18N = {
+  gems: {
+    'Diamond': { en: 'Diamond', ta: 'வைரம் (Diamond)', hi: 'हीरा (Diamond)', te: 'వజ్రం (Diamond)', kn: 'ವಜ್ರ (Diamond)', ml: 'വൈരം (Diamond)' },
+    'Ruby': { en: 'Ruby', ta: 'மாணிக்கம் (Ruby)', hi: 'माणिक्य (Ruby)', te: 'మాణిక్యం (Ruby)', kn: 'ಮಾಣಿಕ್ಯ (Ruby)', ml: 'മാണിക്യം (Ruby)' },
+    'Natural Pearl': { en: 'Natural Pearl', ta: 'இயற்கை முத்து (Pearl)', hi: 'सच्चा मोती (Pearl)', te: 'సహజ ముత్యం (Pearl)', kn: 'ನೈಸರ್ಗಿಕ ಮುತ್ತು (Pearl)', ml: 'സ്വാഭാവിക മുത്ത് (Pearl)' },
+    'Pearl': { en: 'Pearl', ta: 'முத்து (Pearl)', hi: 'मोती (Pearl)', te: 'ముత్యం (Pearl)', kn: 'ಮುತ್ತು (Pearl)', ml: 'മുത്ത് (Pearl)' },
+    'Red Coral': { en: 'Red Coral', ta: 'செம்பவளம் (Red Coral)', hi: 'लाल मूंगा (Red Coral)', te: 'పగడం (Red Coral)', kn: 'ಹವಳ (Red Coral)', ml: 'പവിഴം (Red Coral)' },
+    'Emerald': { en: 'Emerald', ta: 'மரகதம் (Emerald)', hi: 'पन्ना (Emerald)', te: 'మరకతం (Emerald)', kn: 'ಪಚ್ಚೆ (Emerald)', ml: 'മരതകം (Emerald)' },
+    'Yellow Sapphire': { en: 'Yellow Sapphire', ta: 'புஷ்பராகம் (Yellow Sapphire)', hi: 'पुखराज (Yellow Sapphire)', te: 'పుష్యరాగం (Yellow Sapphire)', kn: 'ಪುಷ್ಯರಾಗ (Yellow Sapphire)', ml: 'പുഷ്യരാഗം (Yellow Sapphire)' },
+    'Blue Sapphire': { en: 'Blue Sapphire', ta: 'நீலக்கல் (Blue Sapphire)', hi: 'नीलम (Blue Sapphire)', te: 'నీలం (Blue Sapphire)', kn: 'ನೀಲಂ (Blue Sapphire)', ml: 'ഇന്ദ്രനീലക്കല്ല് (Blue Sapphire)' },
+    'Hessonite': { en: 'Hessonite (Gomed)', ta: 'கோமேதகம் (Hessonite)', hi: 'गोमेद (Hessonite)', te: 'గోమేధికం (Hessonite)', kn: 'ಗೋಮೇಧಿಕ (Hessonite)', ml: 'ഗോമേദകം (Hessonite)' },
+    'Cat\'s Eye': { en: 'Cat\'s Eye (Vaidurya)', ta: 'வைடூரியம் (Cat\'s Eye)', hi: 'लहसुनिया (Cat\'s Eye)', te: 'వైడూర్యం (Cat\'s Eye)', kn: 'ವೈಡೂರ್ಯ (Cat\'s Eye)', ml: 'വൈഡൂര്യം (Cat\'s Eye)' }
+  },
+  substitutes: {
+    'White Sapphire / Zircon': { en: 'White Sapphire / Zircon', ta: 'வெள்ளை சபையர் / ஜிர்கான்', hi: 'सफेद पुखराज / जिरकॉन', te: 'తెల్ల పుష్యరాగం / జిర్కాన్', kn: 'ಬಿಳಿ ಪುಷ್ಯರಾಗ / ಜಿರ್ಕಾನ್', ml: 'വെള്ള പുഷ്യരാഗം / സിർക്കോൺ' },
+    'Red Garnet / Spinel': { en: 'Red Garnet / Spinel', ta: 'சிவப்பு கார்னெட் / ஸ்பைனல்', hi: 'लाल गारनेट / स्पिनेल', te: 'ఎరుపు గార్నెట్ / స్పినెల్', kn: 'ಕೆಂಪು ಗಾರ್ನೆಟ್ / ಸ್ಪಿನೆಲ್', ml: 'ചുവപ്പ് ഗാർനെറ്റ് / സ്പൈനൽ' },
+    'Moonstone': { en: 'Moonstone', ta: 'சந்திரகாந்த கல் (Moonstone)', hi: 'चंद्रकांत मणि (Moonstone)', te: 'చంద్రకాంత రాయి (Moonstone)', kn: 'ಚಂದ್ರಕಾಂತ ಮಣಿ (Moonstone)', ml: 'ചന്ദ്രകാന്തക്കല്ല് (Moonstone)' },
+    'Carnelian': { en: 'Carnelian', ta: 'கார்னீலியன்', hi: 'कार्नेलियन', te: 'కార్నెలియన్', kn: 'ಕಾರ್ನೆಲಿಯನ್', ml: 'കാർണേലിയൻ' },
+    'Peridot / Green Tourmaline': { en: 'Peridot / Green Tourmaline', ta: 'பெரிடாட் / பச்சை டூர்மலைன்', hi: 'पेरिडॉट / हरा टूरमैलीन', te: 'పెరిడాట్ / పచ్చ టూర్మలైన్', kn: 'ಪೆರಿಡಾಟ್ / ಹಸಿರು ಟೂರ್ಮಲೀನ್', ml: 'പെരിഡോട്ട് / പച്ച ടൂർമലൈൻ' },
+    'Yellow Topaz / Citrine': { en: 'Yellow Topaz / Citrine', ta: 'மஞ்சள் டோபாஸ் / சிட்ரின்', hi: 'पीला टोपाज / सिट्रीन', te: 'పసుపు టోపాజ్ / సిట్రిన్', kn: 'ಹಳದಿ ಟೋಪಾಜ್ / ಸಿಟ್ರಿನ್', ml: 'മഞ്ഞ ടോപ്പാസ് / സിട്രിൻ' },
+    'Amethyst / Blue Topaz': { en: 'Amethyst / Blue Topaz', ta: 'அமெதிஸ்ட் / நீல டோபாஸ்', hi: 'जमुनिया (Amethyst) / नीला टोपाज', te: 'అమెథిస్ట్ / నీలి టోపాజ్', kn: 'ಅಮೆಥಿಸ್ಟ್ / ನೀಲಿ ಟೋಪಾಜ್', ml: 'അമേത്തിസ്റ്റ് / നീല ടോപ്പാസ്' }
+  },
+  metals: {
+    'Platinum / Silver / White Gold': { en: 'Platinum / Silver / White Gold', ta: 'பிளாட்டினம் / வெள்ளி / வெள்ளை தங்கம்', hi: 'प्लैटिनम / चांदी / सफेद सोना', te: 'ప్లాటినం / వెండి / తెల్ల బంగారం', kn: 'ಪ್ಲಾಟಿನಂ / ಬೆಳ್ಳಿ / ಬಿಳಿ ಚಿನ್ನ', ml: 'പ്ലാറ്റിനം / വെള്ളി / വെള്ള സ്വർണ്ണം' },
+    'Gold / Copper': { en: 'Gold / Copper', ta: 'தங்கம் / தாமிரம்', hi: 'सोना / तांबा', te: 'బంగారం / రాగి', kn: 'ಚಿನ್ನ / ತಾಮ್ರ', ml: 'സ്വർണ്ണം / ചെമ്പ്' },
+    'Silver': { en: 'Silver', ta: 'வெள்ளி', hi: 'चांदी', te: 'వెండి', kn: 'ಬೆಳ್ಳಿ', ml: 'വെള്ളി' },
+    'Gold / Silver': { en: 'Gold / Silver', ta: 'தங்கம் / வெள்ளி', hi: 'सोना / चांदी', te: 'బంగారం / వెండి', kn: 'ಚಿನ್ನ / ಬೆಳ್ಳಿ', ml: 'സ്വർണ്ണം / വെള്ളി' },
+    'Gold / Brass': { en: 'Gold / Brass', ta: 'தங்கம் / பித்தளை', hi: 'सोना / पीतल', te: 'బంగారం / ఇత్తడి', kn: 'ಚಿನ್ನ / ಹಿತ್ತಾಳೆ', ml: 'സ്വർണ്ണം / പിച്ചള' },
+    'Iron / Silver / Panchaloha': { en: 'Iron / Silver / Panchaloha', ta: 'இரும்பு / வெள்ளி / பஞ்சலோகம்', hi: 'लोहा / चांदी / पंचधातु', te: 'ఇనుము / వెండి / పంచలోహం', kn: 'ಕಬ್ಬಿಣ / ಬೆಳ್ಳಿ / ಪಂಚಲೋಹ', ml: 'ഇരുമ്പ് / വെള്ളി / പഞ്ചലോഹം' },
+    'Silver / Ashtadhatu': { en: 'Silver / Ashtadhatu', ta: 'வெள்ளி / அஷ்டதாது', hi: 'चांदी / अष्टधातु', te: 'వెండి / అష్టధాతువు', kn: 'ಬೆಳ್ಳಿ / ಅಷ್ಟಧಾತು', ml: 'വെള്ളി / അഷ്ടധാതു' }
+  },
+  fingers: {
+    'Middle / Little Finger': { en: 'Middle / Little Finger', ta: 'நடுவிரல் / சுண்டு விரல்', hi: 'मध्यमा / कनिष्ठिका अंगुली', te: 'మధ్య / చిటికెన వేలు', kn: 'ಮಧ್ಯದ / ಕಿರುಬೆರಳು', ml: 'നടുവിരൽ / ചെറുവിരൽ' },
+    'Ring Finger': { en: 'Ring Finger', ta: 'மோதிர விரல் (Ring Finger)', hi: 'अनामिका अंगुली (Ring Finger)', te: 'ఉంగరపు వేలు (Ring Finger)', kn: 'ಉಂಗುರದ ಬೆರಳು (Ring Finger)', ml: 'മോതിരവിരൽ (Ring Finger)' },
+    'Little Finger': { en: 'Little Finger', ta: 'சுண்டு விரல் (Little Finger)', hi: 'कनिष्ठिका अंगुली (Little Finger)', te: 'చిటికెన వేలు (Little Finger)', kn: 'ಕಿರುಬೆರಳು (Little Finger)', ml: 'ചെറുവിരൽ (Little Finger)' },
+    'Index / Ring Finger': { en: 'Index / Ring Finger', ta: 'ஆள்காட்டி / மோதிர விரல்', hi: 'तर्जनी / अनामिका अंगुली', te: 'చూపుడు / ఉంగరపు వేలు', kn: 'ತೋರ್ಬೆರಳು / ಉಂಗುರದ ಬೆರಳು', ml: 'ചൂണ്ടുവിരൽ / മോതിരവിരൽ' },
+    'Index Finger': { en: 'Index Finger', ta: 'ஆள்காட்டி விரல் (Index Finger)', hi: 'तर्जनी अंगुली (Index Finger)', te: 'చూపుడు వేలు (Index Finger)', kn: 'ತೋರ್ಬೆರಳು (Index Finger)', ml: 'ചൂണ്ടുവിരൽ (Index Finger)' },
+    'Middle Finger': { en: 'Middle Finger', ta: 'நடுவிரல் (Middle Finger)', hi: 'मध्यमा अंगुली (Middle Finger)', te: 'మధ్య వేలు (Middle Finger)', kn: 'ಮಧ್ಯದ ಬೆರಳು (Middle Finger)', ml: 'നടുവിരൽ (Middle Finger)' }
+  },
+  timings: {
+    'Friday Sunrise': { en: 'Friday Sunrise', ta: 'வெள்ளிக்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'शुक्रवार सूर्योदय', te: 'శుక్రవారం సూర్యోదయం', kn: 'ಶುಕ್ರವಾರ ಸೂರ್ಯೋದಯ', ml: 'വെള്ളിയാഴ്ച സൂര്യോദയം' },
+    'Sunday Sunrise': { en: 'Sunday Sunrise', ta: 'ஞாயிற்றுக்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'रविवार सूर्योदय', te: 'ఆదివారం సూర్యోదయం', kn: 'ಭಾನುವಾರ ಸೂರ್ಯೋದಯ', ml: 'ഞായറാഴ്ച സൂര്യോദയം' },
+    'Monday Sunrise': { en: 'Monday Sunrise', ta: 'திங்கட்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'सोमवार सूर्योदय', te: 'సోమవారం సూర్యోదయం', kn: 'ಸೋಮವಾರ ಸೂರ್ಯೋದಯ', ml: 'തിങ്കളാഴ്ച സൂര്യോദയം' },
+    'Tuesday Sunrise': { en: 'Tuesday Sunrise', ta: 'செவ்வாய்க்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'मंगलवार सूर्योदय', te: 'మంగళవారం సూర్యోదయం', kn: 'ಮಂಗಳವಾರ ಸೂರ್ಯೋದಯ', ml: 'ചൊവ്വാഴ്ച സൂര്യോദയം' },
+    'Wednesday Sunrise': { en: 'Wednesday Sunrise', ta: 'புதன்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'बुधवार सूर्योदय', te: 'బుధవారం సూర్యోదయం', kn: 'ಬುಧವಾರ ಸೂರ್ಯೋದಯ', ml: 'ബുധനാഴ്ച സൂര്യോദയം' },
+    'Thursday Sunrise': { en: 'Thursday Sunrise', ta: 'வியாழக்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'गुरुवार सूर्योदय', te: 'గురువారం సూర్యోదయం', kn: 'ಗುರುವಾರ ಸೂರ್ಯೋದಯ', ml: 'വ്യാഴാഴ്ച സൂര്യോദയം' },
+    'Saturday Sunset': { en: 'Saturday Sunset / Evening', ta: 'சனிக்கிழமை மாலை (சூரிய அஸ்தமனம்)', hi: 'शनिवार सूर्यास्त / संध्या', te: 'శనివారం సూర్యాస్తమయం', kn: 'ಶನಿವಾರ ಸೂರ್ಯಾಸ್ತ', ml: 'ശനിയാഴ്ച സൂര്യാസ്തമയം' }
+  }
+};
+
+const WEEKDAY_I18N = {
+  'Sunday': {
+    name: { en: 'Sunday', ta: 'ஞாயிற்றுக்கிழமை', hi: 'रविवार', te: 'ఆదివారం', kn: 'ಭಾನುವಾರ', ml: 'ഞായറാഴ്ച' },
+    sig: {
+      en: 'Leadership, government affairs, executive decisions, new beginnings',
+      ta: 'ஆளுமை, அரசு உதவிகள், தலைமைப் பொறுப்புகள், புதிய தொடக்கங்கள்',
+      hi: 'नेतृत्व, सरकारी कार्य, प्रशासनिक निर्णय, नए शुभ आरंभ',
+      te: 'నాయకత్వం, ప్రభుత్వ పనులు, పరిపాలనా నిర్ణయాలు, నూతన ప్రారంభాలు',
+      kn: 'ನಾಯಕತ್ವ, ಸರ್ಕಾರಿ ಕೆಲಸಗಳು, ಆಡಳಿತ ನಿರ್ಧಾರಗಳು, ಹೊಸ ಆರಂಭಗಳು',
+      ml: 'നേതൃത്വം, സർക്കാർ കാര്യങ്ങൾ, ഭരണപരമായ തീരുമാനങ്ങൾ, പുതിയ തുടക്കങ്ങൾ'
+    }
+  },
+  'Monday': {
+    name: { en: 'Monday', ta: 'திங்கட்கிழமை', hi: 'सोमवार', te: 'సోమవారం', kn: 'ಸೋಮವಾರ', ml: 'തിങ്കളാഴ്ച' },
+    sig: {
+      en: 'Mental clarity, creative arts, public relations, general commerce',
+      ta: 'மனத்தெளிவு, கலை ஈடுபாடு, மக்கள் தொடர்பு, பொது வர்த்தகம்',
+      hi: 'मानसिक स्पष्टता, कलात्मक कार्य, जनसंपर्क, सामान्य व्यापार',
+      te: 'మానసిక ప్రశాంతత, కళలు, ప్రజా సంబంధాలు, సాధారణ వ్యాపారం',
+      kn: 'ಮಾನಸಿಕ ಸ್ಪಷ್ಟತೆ, ಕಲಾತ್ಮಕ ಚಟುವಟಿಕೆಗಳು, ಸಾರ್ವಜನಿಕ ಸಂಪರ್ಕ, ವ್ಯಾಪಾರ',
+      ml: 'മാനസിക വ്യക്തത, കലകൾ, ജനസമ്പർക്കം, വ്യാപാരം'
+    }
+  },
+  'Tuesday': {
+    name: { en: 'Tuesday', ta: 'செவ்வாய்க்கிழமை', hi: 'मंगलवार', te: 'మంగళవారం', kn: 'ಮಂಗಳವಾರ', ml: 'ചൊവ്വാഴ്ച' },
+    sig: {
+      en: 'Courage, technical pursuits, property and real estate ventures',
+      ta: 'வீரியம், தைரிய முயற்சிகள், பூமி/சொத்து ஒப்பந்தங்கள், தொழில்நுட்பம்',
+      hi: 'साहस, तकनीकी कार्य, भूमि व संपत्ति सौदे, नई ऊर्जावान पहल',
+      te: 'ధైర్యం, సాంకేతిక పనులు, భూమి మరియు ఆస్తి ఒప్పందాలు',
+      kn: 'ಧೈರ್ಯ, ತಾಂತ್ರಿಕ ಕಾರ್ಯಗಳು, ಭೂಮಿ ಮತ್ತು ಆಸ್ತಿ ವ್ಯವಹಾರಗಳು',
+      ml: 'ധൈര്യം, സാങ്കേതിക കാര്യങ്ങൾ, ഭൂമി/സ്വത്ത് ഇടപാടുകൾ'
+    }
+  },
+  'Wednesday': {
+    name: { en: 'Wednesday', ta: 'புதன்கிழமை', hi: 'बुधवार', te: 'బుధవారం', kn: 'ಬುಧವಾರ', ml: 'ബുധനാഴ്ച' },
+    sig: {
+      en: 'Education, commerce, analytical studies, communication, investments',
+      ta: 'கல்வி, வணிகம், தகவல் தொடர்பு, ஆவணங்கள், முதலீடுகள்',
+      hi: 'शिक्षा, व्यापार, विश्लेषण, संचार, दस्तावेज एवं निवेश',
+      te: 'విద్య, వ్యాపారం, విశ్లేషణ, సమాచార మార్పిడి, పెట్టుబడులు',
+      kn: 'ಶಿಕ್ಷಣ, ವ್ಯಾಪಾರ, ಸಂವಹನ, ದಾಖಲಾತಿಗಳು, ಹೂಡಿಕೆಗಳು',
+      ml: 'വിദ്യാഭ്യാസം, വ്യാപാരം, ആശയവിനിമയം, നിക്ഷേപങ്ങൾ'
+    }
+  },
+  'Thursday': {
+    name: { en: 'Thursday', ta: 'வியாழக்கிழமை', hi: 'गुरुवार', te: 'గురువారం', kn: 'ಗುರುವಾರ', ml: 'വ്യാഴാഴ്ച' },
+    sig: {
+      en: 'Auspicious events, spiritual pursuits, blessings of elders, financial expansion',
+      ta: 'சுப காரியங்கள், ஆன்மீகம், பெரியோர் ஆசிகள், நிதி விரிவாக்கம்',
+      hi: 'मांगलिक कार्य, आध्यात्मिक साधना, बड़ों का आशीर्वाद, वित्तीय विस्तार',
+      te: 'శుభకార్యాలు, ఆధ్యాత్మిక సాధన, పెద్దల ఆశీస్సులు, ఆర్థిక వృద్ధి',
+      kn: 'ಶುಭ ಕಾರ್ಯಗಳು, ಆಧ್ಯಾತ್ಮಿಕತೆ, ಹಿರಿಯರ ಆಶೀರ್ವಾದ, ಆರ್ಥಿಕ ವಿಸ್ತರಣೆ',
+      ml: 'ശുഭകാര്യങ്ങൾ, ആത്മീയത, മുതിർന്നവരുടെ അനുഗ്രഹം, സാമ്പത്തിക വളർച്ച'
+    }
+  },
+  'Friday': {
+    name: { en: 'Friday', ta: 'வெள்ளிக்கிழமை', hi: 'शुक्रवार', te: 'శుక్రవారం', kn: 'ಶುಕ್ರವಾರ', ml: 'വെള്ളിയാഴ്ച' },
+    sig: {
+      en: 'Luxury items, artistic expression, vehicles, relationships, celebration',
+      ta: 'ஆடம்பரப் பொருட்கள், கலை, வாகனம், உறவுகள், மங்கலப் பணிகள்',
+      hi: 'सुख-सुविधाएं, कला, वाहन क्रय, संबंध, मांगलिक उत्सव',
+      te: 'విలాస వస్తువులు, కళలు, వాహనాలు, సంబంధాలు, వేడుకలు',
+      kn: 'ಐಷಾರಾಮಿ ವಸ್ತುಗಳು, ಕಲೆ, ವಾಹನ, ಸಂಬಂಧಗಳು, ಶುಭ ಆಚರಣೆಗಳು',
+      ml: 'ആഡംബര വസ്തുക്കൾ, കല, വാഹനം, ബന്ധങ്ങൾ, ആഘോഷങ്ങൾ'
+    }
+  },
+  'Saturday': {
+    name: { en: 'Saturday', ta: 'சனிக்கிழமை', hi: 'शनिवार', te: 'శనివారం', kn: 'ಶನಿವಾರ', ml: 'ശനിയാഴ്ച' },
+    sig: {
+      en: 'Long-term planning, meditation, discipline, philanthropy, grounding',
+      ta: 'நீண்ட காலத் திட்டங்கள், அமைதி, தியானம், தொண்டுப் பணிகள்',
+      hi: 'दीर्घकालिक योजनाएं, ध्यान, आत्मसंयम, परोपकार, सेवा कार्य',
+      te: 'దీర్ఘకాలిక ప్రణాళికలు, ధ్యానం, క్రమశిక్షణ, సేవా కార్యక్రమాలు',
+      kn: 'ದೀರ್ಘಕಾಲೀನ ಯೋಜನೆಗಳು, ಧ್ಯಾನ, ಶಿಸ್ತು, ಸಮಾಜ ಸೇವೆ',
+      ml: 'ദീർഘകാല പദ്ധതികൾ, ധ്യാനം, അച്ചടക്കം, സേവന പ്രവർത്തനങ്ങൾ'
+    }
+  }
+};
+
+const DIRECTIONS_I18N = {
+  'East': { en: 'East', ta: 'கிழக்கு (East)', hi: 'पूर्व (East)', te: 'తూర్పు (East)', kn: 'ಪೂರ್ವ (East)', ml: 'കിഴക്ക് (East)' },
+  'South': { en: 'South', ta: 'தெற்கு (South)', hi: 'दक्षिण (South)', te: 'దక్షిణం (South)', kn: 'ದಕ್ಷಿಣ (South)', ml: 'തെക്ക് (South)' },
+  'West': { en: 'West', ta: 'மேற்கு (West)', hi: 'पश्चिम (West)', te: 'పడమర (West)', kn: 'ಪಶ್ಚಿಮ (West)', ml: 'പടിഞ്ഞാറ് (West)' },
+  'North': { en: 'North', ta: 'வடக்கு (North)', hi: 'उत्तर (North)', te: 'ఉత్తరం (North)', kn: 'ಉತ್ತರ (North)', ml: 'വടക്ക് (North)' },
+  'North-East': { en: 'North-East', ta: 'வடகிழக்கு (ஈசானியம்)', hi: 'उत्तर-पूर्व (ईशान)', te: 'ఈశాన్యం', kn: 'ಈಶಾನ್ಯ', ml: 'വടക്കുകിഴക്ക് (ഈശാന)' },
+  'South-East': { en: 'South-East', ta: 'தென்கிழக்கு (ஆக்னேயம்)', hi: 'दक्षिण-पूर्व (आग्नेय)', te: 'ఆగ్నేయం', kn: 'ಆಗ್ನೇಯ', ml: 'തെക്കുകിഴക്ക് (ആഗ്നേയം)' },
+  'South-West': { en: 'South-West', ta: 'தென்மேற்கு (நைருதி)', hi: 'दक्षिण-पश्चिम (नैऋत्य)', te: 'నైరుతి', kn: 'ನೈಋತ್ಯ', ml: 'തെക്കുപടിഞ്ഞാറ് (നൈരൃതി)' },
+  'North-West': { en: 'North-West', ta: 'வடமேற்கு (வாயுவியம்)', hi: 'उत्तर-पश्चिम (वायव्य)', te: 'వాయువ్యం', kn: 'ವಾಯುವ್ಯ', ml: 'വടക്കുപടിഞ്ഞാറ് (വായവ്യ)' },
+  'East / North-East': { en: 'East / North-East', ta: 'கிழக்கு / வடகிழக்கு', hi: 'पूर्व / उत्तर-पूर्व (ईशान)', te: 'తూర్పు / ఈశాన్యం', kn: 'ಪೂರ್ವ / ಈಶಾನ್ಯ', ml: 'കിഴക്ക് / വടക്കുകിഴക്ക്' }
 };
 
 const ORGAN_VULNERABILITIES_I18N = {
@@ -374,7 +610,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
   };
 
   const translateModality = (text) => {
-    if (!text || language === 'en') return text;
+    if (!text) return '';
     let res = text;
     ['CHARA', 'STHIRA', 'DWISVABHAVA'].forEach(m => {
       if (I18N_TERMS[m]?.[language]) {
@@ -444,7 +680,13 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     if (!sign) return '';
     const localizedSign = I18N_TERMS[sign]?.[language] || sign;
     const localizedLord = I18N_TERMS[lord]?.[language] || lord || '';
-    return `${localizedSign} (${localizedLord})`;
+    const houseLabel = language === 'ta' ? '6-ஆம் பாவகம்' :
+                       language === 'hi' ? 'षष्ठ भाव' :
+                       language === 'te' ? '6వ స్థానం' :
+                       language === 'kn' ? '6ನೇ ಮನೆ' :
+                       language === 'ml' ? '6-ാം ഭാവം' :
+                       'House 6';
+    return `${localizedSign} (${houseLabel}) (${localizedLord})`;
   };
 
   const translateOrganVulnerability = (text) => {
@@ -477,6 +719,324 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     return text;
   };
 
+  const translateDeityName = (name) => {
+    if (!name) return '';
+    for (const [key, map] of Object.entries(DEITY_NAMES_I18N)) {
+      if (name.includes(key) || key.includes(name)) {
+        return map[language] || map['en'] || name;
+      }
+    }
+    return name;
+  };
+
+  const translateGemName = (name) => {
+    if (!name) return '';
+    const cleanName = name.replace(/\s*\(.*?\)\s*/g, '').trim();
+    for (const [key, map] of Object.entries(GEMOLOGY_I18N.gems)) {
+      if (cleanName.toLowerCase() === key.toLowerCase() || name.includes(key)) {
+        return map[language] || map['en'] || name;
+      }
+    }
+    return name;
+  };
+
+  const translateSubstitute = (sub) => {
+    if (!sub) return '';
+    const cleanSub = sub.replace(/\s*\(.*?\)\s*/g, '').trim();
+    for (const [key, map] of Object.entries(GEMOLOGY_I18N.substitutes)) {
+      if (cleanSub.toLowerCase() === key.toLowerCase() || sub.includes(key)) {
+        return map[language] || map['en'] || sub;
+      }
+    }
+    return sub;
+  };
+
+  const translateMetal = (metal) => {
+    if (!metal) return '';
+    const cleanMetal = metal.replace(/\s*\(.*?\)\s*/g, '').trim();
+    for (const [key, map] of Object.entries(GEMOLOGY_I18N.metals)) {
+      if (cleanMetal.toLowerCase() === key.toLowerCase() || metal.includes(key)) {
+        return map[language] || map['en'] || metal;
+      }
+    }
+    return metal;
+  };
+
+  const translateFinger = (finger) => {
+    if (!finger) return '';
+    const cleanFinger = finger.replace(/\s*\(.*?\)\s*/g, '').trim();
+    for (const [key, map] of Object.entries(GEMOLOGY_I18N.fingers)) {
+      if (cleanFinger.toLowerCase() === key.toLowerCase() || finger.includes(key)) {
+        return map[language] || map['en'] || finger;
+      }
+    }
+    return finger;
+  };
+
+  const translateTiming = (timing) => {
+    if (!timing) return '';
+    const cleanTiming = timing.replace(/\s*\(.*?\)\s*/g, '').trim();
+    for (const [key, map] of Object.entries(GEMOLOGY_I18N.timings)) {
+      if (cleanTiming.toLowerCase() === key.toLowerCase() || timing.includes(key)) {
+        return map[language] || map['en'] || timing;
+      }
+    }
+    return timing;
+  };
+
+  const translateGemRationale = (planet, rationale) => {
+    if (!planet) return rationale || '';
+    const localizedPlanet = I18N_TERMS[planet]?.[language] || planet;
+    if (language === 'ta') {
+      return `${localizedPlanet} திரிகோணாதிபதியாக (1, 5, 9) கேந்திர-திரிகோண சுப ஸ்தானத்தில் அமர்ந்துள்ளதால் யோககாரக ரத்தினமாக பரிந்துரைக்கப்படுகிறது.`;
+    }
+    if (language === 'hi') {
+      return `${localizedPlanet} त्रिकोणाधिपति (1, 5, 9) होकर केंद्र-त्रिकोण शुभ भाव में स्थित होने से योगकारक रत्न के रूप में अनुशंसित है।`;
+    }
+    if (language === 'te') {
+      return `${localizedPlanet} త్రికోణాధిపతిగా (1, 5, 9) కేంద్ర-త్రికోణ శుభ స్థానంలో ఉన్నందున యోగకారక రత్నంగా సిఫార్సు చేయబడింది.`;
+    }
+    if (language === 'kn') {
+      return `${localizedPlanet} ತ್ರಿಕೋಣಾಧಿಪತಿಯಾಗಿ (1, 5, 9) ಕೇಂದ್ರ-ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಲ್ಲಿ ಇರುವುದರಿಂದ ಯೋಗಕಾರಕ ರತ್ನವಾಗಿ ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ.`;
+    }
+    if (language === 'ml') {
+      return `${localizedPlanet} ത്രികോണാധിപനായി (1, 5, 9) കേന്ദ്ര-ത്രികോണ ശുഭ സ്ഥാനത്ത് നിൽക്കുന്നതിനാൽ യോഗകാരക രത്നമായി ശുപാർശ ചെയ്യുന്നു.`;
+    }
+    return `${localizedPlanet} placed in an auspicious Kendra/Trikona house as a Trikona lord (1, 5, 9), hence strongly recommended as a Yogakaraka gemstone.`;
+  };
+
+  const translateWeekday = (rawDay) => {
+    if (!rawDay) return { name: '', sig: '' };
+    const dayKey = rawDay.replace(/\s*\(.*?\)\s*/g, '').trim();
+    for (const [key, map] of Object.entries(WEEKDAY_I18N)) {
+      if (dayKey.toLowerCase() === key.toLowerCase() || rawDay.includes(key)) {
+        return {
+          name: map.name[language] || map.name['en'] || rawDay,
+          sig: map.sig[language] || map.sig['en'] || ''
+        };
+      }
+    }
+    return { name: rawDay, sig: '' };
+  };
+
+  const translateDirection = (dirStr) => {
+    if (!dirStr) return '';
+    const cleanDir = dirStr.replace(/\s*\(.*?\)\s*/g, '').trim();
+    for (const [key, map] of Object.entries(DIRECTIONS_I18N)) {
+      if (cleanDir.toLowerCase() === key.toLowerCase() || dirStr.startsWith(key)) {
+        return map[language] || map['en'] || dirStr;
+      }
+    }
+    return dirStr;
+  };
+
+  const translateDeityRationale = (englishRationale, tamilRationale) => {
+    if (language === 'ta' && tamilRationale) return tamilRationale;
+    if (language === 'en' && englishRationale) return englishRationale;
+    if (!englishRationale) return '';
+
+    // Localize Jaimini Sutra rationale dynamically for hi, te, kn, ml
+    let text = englishRationale;
+    // Replace Planets
+    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(p => {
+      if (I18N_TERMS[p]?.[language]) {
+        text = text.replaceAll(p, I18N_TERMS[p][language]);
+      }
+    });
+    // Replace Signs
+    ['Mesha', 'Vrishabha', 'Mithuna', 'Kataka', 'Simha', 'Kanya', 'Tula', 'Vrishchika', 'Dhanus', 'Makara', 'Kumbha', 'Meena'].forEach(r => {
+      if (I18N_TERMS[r]?.[language]) {
+        text = text.replaceAll(r, I18N_TERMS[r][language]);
+      }
+    });
+
+    if (language === 'hi') {
+      text = text.replaceAll('According to Jaimini Sutras,', 'जैमिनी सूत्रों के अनुसार,')
+                 .replaceAll('since the 9th house (Dharma Sthana)', 'चूंकि 9वां भाव (धर्म स्थान)')
+                 .replaceAll('since the 12th house (Moksha Sthana)', 'चूंकि 12वां भाव (मोक्ष स्थान)')
+                 .replaceAll('from Karakamsa', 'कारकांश से')
+                 .replaceAll('in D9 Navamsa is unoccupied, it is governed by its sign lord', 'D9 नवांश में रिक्त है, अतः इसके राशि स्वामी')
+                 .replaceAll('is governed by', 'द्वारा निर्धारित है')
+                 .replaceAll('governed by dominant planet', 'प्रधान ग्रह')
+                 .replaceAll('among multiple occupants', 'की युति में')
+                 .replaceAll('in the 12th house (Moksha Sthana)', '12वें भाव (मोक्ष स्थान) में')
+                 .replaceAll('in the 9th house (Dharma Sthana)', '9वें भाव (धर्म स्थान) में')
+                 .replaceAll('(Sign lord:', '(राशि स्वामी:')
+                 .replaceAll('Lord', 'स्वामी');
+    } else if (language === 'te') {
+      text = text.replaceAll('According to Jaimini Sutras,', 'జైమిని సూత్రాల ప్రకారం,')
+                 .replaceAll('since the 9th house (Dharma Sthana)', '9వ స్థానం (ధర్మ స్థానం)')
+                 .replaceAll('since the 12th house (Moksha Sthana)', '12వ స్థానం (మోక్ష స్థానం)')
+                 .replaceAll('from Karakamsa', 'కారకాంశం నుండి')
+                 .replaceAll('in D9 Navamsa is unoccupied, it is governed by its sign lord', 'D9 నవాంశలో గ్రహాలు లేనందున, రాశ్యాధిపతి')
+                 .replaceAll('governed by dominant planet', 'ప్రధాన గ్రహం')
+                 .replaceAll('in the 12th house (Moksha Sthana)', '12వ స్థానంలో (మోక్ష స్థానం)')
+                 .replaceAll('in the 9th house (Dharma Sthana)', '9వ స్థానంలో (ధర్మ స్థానం)')
+                 .replaceAll('(Sign lord:', '(రాశ్యాధిపతి:');
+    } else if (language === 'kn') {
+      text = text.replaceAll('According to Jaimini Sutras,', 'ಜೈಮಿನಿ ಸೂತ್ರಗಳ ಪ್ರಕಾರ,')
+                 .replaceAll('since the 9th house (Dharma Sthana)', '9ನೇ ಮನೆ (ಧರ್ಮ ಸ್ಥಾನ)')
+                 .replaceAll('since the 12th house (Moksha Sthana)', '12ನೇ ಮನೆ (ಮೋಕ್ಷ ಸ್ಥಾನ)')
+                 .replaceAll('from Karakamsa', 'ಕಾರಕಾಂಶದಿಂದ')
+                 .replaceAll('in D9 Navamsa is unoccupied, it is governed by its sign lord', 'D9 ನವಾಂಶದಲ್ಲಿ ಗ್ರಹಗಳಿಲ್ಲದ ಕಾರಣ, ರಾಶ್ಯಾಧಿಪತಿ')
+                 .replaceAll('governed by dominant planet', 'ಪ್ರಧಾನ ಗ್ರಹ')
+                 .replaceAll('in the 12th house (Moksha Sthana)', '12ನೇ ಮನೆಯಲ್ಲಿ (ಮೋಕ್ಷ ಸ್ಥಾನ)')
+                 .replaceAll('in the 9th house (Dharma Sthana)', '9ನೇ ಮನೆಯಲ್ಲಿ (ಧರ್ಮ ಸ್ಥಾನ)')
+                 .replaceAll('(Sign lord:', '(ರಾಶ್ಯಾಧಿಪತಿ:');
+    } else if (language === 'ml') {
+      text = text.replaceAll('According to Jaimini Sutras,', 'ജൈമിനി സൂത്രങ്ങൾ അനുസരിച്ച്,')
+                 .replaceAll('since the 9th house (Dharma Sthana)', '9-ാം ഭാവം (ധർമ്മ സ്ഥാനം)')
+                 .replaceAll('since the 12th house (Moksha Sthana)', '12-ാം ഭാവം (മോക്ഷ സ്ഥാനം)')
+                 .replaceAll('from Karakamsa', 'കാരകാംശത്തിൽ നിന്ന്')
+                 .replaceAll('in D9 Navamsa is unoccupied, it is governed by its sign lord', 'D9 നവാംശത്തിൽ ഗ്രഹങ്ങളില്ലാത്തതിനാൽ, രാശ്യാധിപൻ')
+                 .replaceAll('governed by dominant planet', 'പ്രധാന ഗ്രഹം')
+                 .replaceAll('in the 12th house (Moksha Sthana)', '12-ാം ഭാവത്തിൽ (മോക്ഷ സ്ഥാനം)')
+                 .replaceAll('in the 9th house (Dharma Sthana)', '9-ാം ഭാവത്തിൽ (ധർമ്മ സ്ഥാനം)')
+                 .replaceAll('(Sign lord:', '(രാശ്യാധിപൻ:');
+    }
+    return text;
+  };
+
+  const translateLifespanText = (rawLifespan) => {
+    if (!rawLifespan) return '';
+    let res = rawLifespan;
+    if (language === 'ta') {
+      res = res.replaceAll('Years', 'வயது').replaceAll('वर्ष', 'வயது');
+    } else if (language === 'hi') {
+      res = res.replaceAll('வயது', 'वर्ष').replaceAll('Years', 'वर्ष');
+    } else if (language === 'te') {
+      res = res.replaceAll('வயது', 'సంవత్సరాలు').replaceAll('Years', 'సంవత్సరాలు').replaceAll('वर्ष', 'సంవత్సరాలు');
+    } else if (language === 'kn') {
+      res = res.replaceAll('வயது', 'ವರ್ಷಗಳು').replaceAll('Years', 'ವರ್ಷಗಳು').replaceAll('वर्ष', 'ವರ್ಷಗಳು');
+    } else if (language === 'ml') {
+      res = res.replaceAll('வயது', 'വയസ്സ്').replaceAll('Years', 'വയസ്സ്').replaceAll('वर्ष', 'വയസ്സ്');
+    } else {
+      res = res.replaceAll('வயது', 'Years').replaceAll('वर्ष', 'Years');
+    }
+    return res;
+  };
+
+  const translateMarakaWindow = (rawMaraka) => {
+    if (!rawMaraka) return '';
+    // Format: Rahu திசா காலத்தில் (சுமார் 58 - 62 வயது) ஆயுள் சவால்கள்.
+    const planetMatch = rawMaraka.match(/(Sun|Moon|Mars|Mercury|Jupiter|Venus|Saturn|Rahu|Ketu|சூரியன்|சந்திரன்|செவ்வாய்|புதன்|குரு|சுக்கிரன்|சனி|ராகு|கேது)/i);
+    const planetKey = planetMatch ? planetMatch[0] : 'Rahu';
+    const localizedPlanet = I18N_TERMS[planetKey]?.[language] || planetKey;
+
+    const ageMatch = rawMaraka.match(/(\d+\s*-\s*\d+)/);
+    const ageStr = ageMatch ? ageMatch[0] : '58 - 62';
+
+    if (language === 'ta') {
+      return `${localizedPlanet} திசா காலத்தில் (சுமார் ${ageStr} வயது) ஆயுள் சவால்கள் மற்றும் உடல்நலப் பாதுகாப்பு தேவை.`;
+    }
+    if (language === 'hi') {
+      return `${localizedPlanet} महादशा काल (लगभग ${ageStr} वर्ष की आयु) में स्वास्थ्य सतर्कता एवं सुरक्षा आवश्यक।`;
+    }
+    if (language === 'te') {
+      return `${localizedPlanet} దశ కాలంలో (సుమారు ${ageStr} సం. వయస్సు) ఆరోగ్య జాగ్రత్త అవసరం.`;
+    }
+    if (language === 'kn') {
+      return `${localizedPlanet} ದಶಾ ಕಾಲದಲ್ಲಿ (ಸುಮಾರು ${ageStr} ವರ್ಷ ವಯಸ್ಸಿನಲ್ಲಿ) ಆರೋಗ್ಯ ಜಾಗರೂಕತೆ ಅಗತ್ಯ.`;
+    }
+    if (language === 'ml') {
+      return `${localizedPlanet} ദശാ കാലത്ത് (ഏകദേശം ${ageStr} വയസ്സിൽ) ആരോഗ്യ ജാഗ്രത ആവശ്യം.`;
+    }
+    return `Vitality challenges and health caution during ${localizedPlanet} Dasa period (around age ${ageStr}).`;
+  };
+
+  const translateStructuralAnchor = (type, rawText) => {
+    if (!rawText) return '';
+    if (language === 'en') return rawText;
+
+    // Replace Rashis and Planets
+    let res = rawText;
+    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(p => {
+      if (I18N_TERMS[p]?.[language]) {
+        res = res.replaceAll(p, I18N_TERMS[p][language]);
+      }
+    });
+    ['Mesha', 'Vrishabha', 'Mithuna', 'Kataka', 'Simha', 'Kanya', 'Tula', 'Vrishchika', 'Dhanus', 'Makara', 'Kumbha', 'Meena'].forEach(r => {
+      if (I18N_TERMS[r]?.[language]) {
+        res = res.replaceAll(r, I18N_TERMS[r][language]);
+      }
+    });
+
+    if (type === 'vitality') {
+      if (language === 'hi') {
+        res = res.replaceAll('லக்னம்:', 'लग्न:')
+                 .replaceAll('பாக லக்னம் (லக்னாதிபதி அமர்ந்த ராசி):', 'पाक लग्न (लग्नेश की राशि):')
+                 .replaceAll('-ஆம் பாவகம்).', 'वां भाव)।')
+                 .replaceAll('சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று (Strong Vitality).', 'उत्कृष्ट शारीरिक जीवन शक्ति एवं रोग प्रतिरोधक क्षमता (Strong Vitality)।')
+                 .replaceAll('உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.', 'स्वास्थ्य में नियमित सतर्कता आवश्यक।');
+      } else if (language === 'te') {
+        res = res.replaceAll('லக்னம்:', 'లగ్నం:')
+                 .replaceAll('பாக லக்னம் (லக்னாதிபதி அமர்ந்த ராசி):', 'పాక లగ్నం (లగ్నాధిపతి ఉన్న రాశి):')
+                 .replaceAll('-ஆம் பாவகம்).', 'వ స్థానం).')
+                 .replaceAll('சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று (Strong Vitality).', 'మంచి శారీరక బలం మరియు రోగనిరోధక శక్తి (Strong Vitality).')
+                 .replaceAll('உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.', 'ఆరోగ్యంపై శ్రద్ధ అవసరం.');
+      } else if (language === 'kn') {
+        res = res.replaceAll('லக்னம்:', 'ಲಗ್ನ:')
+                 .replaceAll('பாக லக்னம் (லக்னாதிபதி அமர்ந்த ராசி):', 'ಪಾಕ ಲಗ್ನ (ಲಗ್ನಾಧಿಪತಿ ಇರುವ ರಾಶಿ):')
+                 .replaceAll('-ஆம் பாவகம்).', 'ನೇ ಮನೆ).')
+                 .replaceAll('சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று (Strong Vitality).', 'ಉತ್ತಮ ಶಾರೀರಿಕ ಬಲ ಮತ್ತು ರೋಗನಿರೋಧಕ ಶಕ್ತಿ (Strong Vitality).')
+                 .replaceAll('உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.', 'ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಕಾಳಜಿ ಅಗತ್ಯ.');
+      } else if (language === 'ml') {
+        res = res.replaceAll('லக்னம்:', 'ലഗ്നം:')
+                 .replaceAll('பாக லக்னம் (லக்னாதிபதி அமர்ந்த ராசி):', 'പാക ലഗ്നം (ലഗ്നാധിപൻ നിൽക്കുന്ന രാശി):')
+                 .replaceAll('-ஆம் பாவகம்).', '-ാം ഭാവം).')
+                 .replaceAll('சரீர பலமும் நோய் எதிர்ப்பு ஆற்றலும் மிக நன்று (Strong Vitality).', 'മികച്ച ശാരീരിക ബലവും പ്രതിരോധശേഷിയും (Strong Vitality).')
+                 .replaceAll('உடல்நலத்தில் சீரான விழிப்புணர்வு தேவை.', 'ആരോഗ്യത്തിൽ ശ്രദ്ധ ആവശ്യം.');
+      }
+    } else if (type === 'arudha') {
+      if (language === 'hi') {
+        res = res.replaceAll('-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி நங்கூரம் (Arudha Lagna - AL)', 'वां भाव) - सामाजिक प्रतिष्ठा एवं कार्यक्षेत्र सफलता आधार (Arudha Lagna - AL)');
+      } else if (language === 'te') {
+        res = res.replaceAll('-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி நங்கூரம் (Arudha Lagna - AL)', 'వ స్థానం) - సామాజిక హోదా & వృత్తి విజయ ఆధారం (Arudha Lagna - AL)');
+      } else if (language === 'kn') {
+        res = res.replaceAll('-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி நங்கூரம் (Arudha Lagna - AL)', 'ನೇ ಮನೆ) - ಸಾಮಾಜಿಕ ಪ್ರತಿಷ್ಠೆ & ವೃತ್ತಿ ಯಶಸ್ಸಿನ ಆಧಾರ (Arudha Lagna - AL)');
+      } else if (language === 'ml') {
+        res = res.replaceAll('-ஆம் பாவகம்) - சமூக அந்தஸ்து & தொழில் வெற்றி நங்கூரம் (Arudha Lagna - AL)', '-ാം ഭാവം) - സാമൂഹിക പദവിയും തൊഴിൽ വിജയവും (Arudha Lagna - AL)');
+      }
+    } else if (type === 'mind') {
+      if (language === 'hi') {
+        res = res.replaceAll('ராசிநாதன்', 'चन्द्र राशि स्वामी')
+                 .replaceAll('-ஆம் பாவகம்) - மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம் (High Resilience).', 'वां भाव) - मानसिक दृढ़ता एवं उच्च लचीलापन (High Resilience)।')
+                 .replaceAll('-ஆம் பாவகம்) - தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.', 'वां भाव) - ध्यान एवं पूजा द्वारा मानसिक शांति बनाए रखें।');
+      } else if (language === 'te') {
+        res = res.replaceAll('ராசிநாதன்', 'చంద్ర రాశ్యాధిపతి')
+                 .replaceAll('-ஆம் பாவகம்) - மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம் (High Resilience).', 'వ స్థానం) - మానసిక స్థైర్యం మరియు ధైర్యం (High Resilience).')
+                 .replaceAll('-ஆம் பாவகம்) - தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.', 'వ స్థానం) - ధ్యానం ద్వారా మనశ్శాంతిని పొందండి.');
+      } else if (language === 'kn') {
+        res = res.replaceAll('ராசிநாதன்', 'ಚಂದ್ರ ರಾಶ್ಯಾಧಿಪತಿ')
+                 .replaceAll('-ஆம் பாவகம்) - மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம் (High Resilience).', 'ನೇ ಮನೆ) - ಮಾನಸಿಕ ಸ್ಥೈರ್ಯ ಮತ್ತು ಧೈರ್ಯ (High Resilience).')
+                 .replaceAll('-ஆம் பாவகம்) - தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.', 'ನೇ ಮನೆ) - ಧ್ಯಾನದಿಂದ ಮನಶ್ಶಾಂತಿ ಪಡೆಯಿರಿ.');
+      } else if (language === 'ml') {
+        res = res.replaceAll('ராசிநாதன்', 'ചന്ദ്ര രാശ്യാധിപൻ')
+                 .replaceAll('-ஆம் பாவகம்) - மன உறுதி மற்றும் சவால்களை வெல்லும் மனோபலம் (High Resilience).', '-ാം ഭാവം) - മാനസിക സ്ഥിരതയും ധൈര്യവും (High Resilience).')
+                 .replaceAll('-ஆம் பாவகம்) - தியானம் மற்றும் வழிபாட்டின் மூலம் மன அமைதி காக்கவும்.', '-ാം ഭാവം) - ധ്യാനത്തിലൂടെ മനഃസമാധാനം നേടുക.');
+      }
+    } else if (type === 'karma') {
+      if (language === 'hi') {
+        res = res.replaceAll('10-ஆம் பாவகமான', '10वां भाव')
+                 .replaceAll('(அதிபதி', '(स्वामी')
+                 .replaceAll('& 11-ஆம் லாப பாவகம் - தொழில் & பொருளாதார யோக நங்கூரம் (SAV Karma Anchor).', 'एवं 11वां लाभ भाव - कर्म एवं समृद्धि आधार (SAV Karma Anchor)।');
+      } else if (language === 'te') {
+        res = res.replaceAll('10-ஆம் பாவகமான', '10వ స్థానం')
+                 .replaceAll('(அதிபதி', '(అధిపతి')
+                 .replaceAll('& 11-ஆம் லாப பாவகம் - தொழில் & பொருளாதார யோக நங்கூரம் (SAV Karma Anchor).', '& 11వ లాభ స్థానం - కర్మ & సంపద ఆధారం (SAV Karma Anchor).');
+      } else if (language === 'kn') {
+        res = res.replaceAll('10-ஆம் பாவகமான', '10ನೇ ಮನೆ')
+                 .replaceAll('(அதிபதி', '(ಅಧಿಪತಿ')
+                 .replaceAll('& 11-ஆம் லாப பாவகம் - தொழில் & பொருளாதார யோக நங்கூரம் (SAV Karma Anchor).', '& 11ನೇ ಲಾಭದ ಮನೆ - ಕರ್ಮ ಮತ್ತು ಸಮೃದ್ಧಿ ಆಧಾರ (SAV Karma Anchor).');
+      } else if (language === 'ml') {
+        res = res.replaceAll('10-ஆம் பாவகமான', '10-ാം ഭാവം')
+                 .replaceAll('(அதிபதி', '(അധിപൻ')
+                 .replaceAll('& 11-ஆம் லாப பாவகம் - தொழில் & பொருளாதார யோக நங்கூரம் (SAV Karma Anchor).', '& 11-ാം ലാഭ ഭാവം - തൊഴിലും സമൃദ്ധിയും (SAV Karma Anchor).');
+      }
+    }
+    return res;
+  };
+
   const num = anchors?.numerology;
   const deities = anchors?.deities;
   const gemology = anchors?.gemology;
@@ -485,14 +1045,26 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
   const luckyDay = anchors?.luckyDay;
   const luckyDates = anchors?.luckyDates;
 
-  // Localized Deity Rationale
-  const ishtaRationale = language === 'ta'
-    ? (deities?.ishtaDevataRationaleTamil || deities?.ishtaDevataRationale)
-    : (deities?.ishtaDevataRationaleEnglish || deities?.ishtaDevataRationale);
+  // Localized Deity Elements
+  const ishtaName = translateDeityName(deities?.ishtaDevata);
+  const dharmaName = translateDeityName(deities?.dharmaDevata);
+  const ishtaRationale = translateDeityRationale(deities?.ishtaDevataRationaleEnglish, deities?.ishtaDevataRationaleTamil);
+  const dharmaRationale = translateDeityRationale(deities?.dharmaDevataRationaleEnglish, deities?.dharmaDevataRationaleTamil);
+  const kulaStatus = deities?.kulaDevataBlessingStatus === 'BLESSED' ? 'BLESSED' : 'AFFLICTED';
+  const kulaMessage = KULA_DEVATA_MESSAGES[kulaStatus][language] || KULA_DEVATA_MESSAGES[kulaStatus]['en'];
 
-  const dharmaRationale = language === 'ta'
-    ? (deities?.dharmaDevataRationaleTamil || deities?.dharmaDevataRationale)
-    : (deities?.dharmaDevataRationaleEnglish || deities?.dharmaDevataRationale || t('dharmaDevataDefaultDesc', language));
+  // Localized Gemology Elements
+  const primaryGem = translateGemName(gemology?.primaryGemstone);
+  const secondarySubstitute = translateSubstitute(gemology?.secondarySubstitute);
+  const recommendedMetal = translateMetal(gemology?.recommendedMetal);
+  const recommendedFinger = translateFinger(gemology?.recommendedFinger);
+  const activationTiming = translateTiming(gemology?.activationDayAndTiming);
+  const gemRationale = translateGemRationale(gemology?.rulingPlanet, gemology?.astrologicalRationale);
+
+  // Localized Weekday & Directions
+  const localizedWeekday = translateWeekday(luckyDay?.vedicWeekdayName);
+  const permanentVastuDir = translateDirection(dir?.permanentVastuDirection);
+  const travelDir = translateDirection(dir?.travelDirection);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
@@ -517,7 +1089,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               🙏 {t('ishtaDevataHeader', language)}
             </div>
             <div style={{ fontSize: '17px', fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '6px' }}>
-              {language === 'ta' ? deities?.ishtaDevataTamil : deities?.ishtaDevata}
+              {ishtaName}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
               {ishtaRationale}
@@ -543,7 +1115,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               </span>
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
-              {deities?.kulaDevataRemedy}
+              {kulaMessage}
             </div>
           </div>
 
@@ -553,7 +1125,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               ⚖️ {t('dharmaDevataHeader', language)}
             </div>
             <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#3498db', marginBottom: '4px' }}>
-              {language === 'ta' ? deities?.dharmaDevataTamil : deities?.dharmaDevata}
+              {dharmaName}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
               {dharmaRationale}
@@ -576,10 +1148,10 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               👑 {t('primaryGem', language)}
             </div>
             <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '4px' }}>
-              {language === 'ta' ? (gemology?.primaryGemstoneTamil || gemology?.primaryGemstone) : gemology?.primaryGemstone}
+              {primaryGem}
             </div>
             <div style={{ fontSize: '12px', color: '#3498db' }}>
-              {t('substitute', language)}: {gemology?.secondarySubstitute}
+              {t('substitute', language)}: {secondarySubstitute}
             </div>
           </div>
 
@@ -588,10 +1160,10 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               💍 {t('metalAndFinger', language)}
             </div>
             <div style={{ fontSize: '13px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '4px' }}>
-              {gemology?.recommendedMetal}
+              {recommendedMetal}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-              👉 {gemology?.recommendedFinger}
+              👉 {recommendedFinger}
             </div>
           </div>
 
@@ -600,10 +1172,10 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               ⏰ {t('activationTimingDay', language)}
             </div>
             <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#2ecc71', marginBottom: '4px' }}>
-              {gemology?.activationDayAndTiming}
+              {activationTiming}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-              {gemology?.astrologicalRationale}
+              {gemRationale}
             </div>
           </div>
         </div>
@@ -624,7 +1196,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                   color: '#e74c3c',
                   border: '1px solid rgba(231, 76, 60, 0.3)'
                 }}>
-                  ⛔ {gem}
+                  ⛔ {translateGemName(gem)}
                 </span>
               ))}
             </div>
@@ -709,15 +1281,6 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
           </div>
         </div>
 
-        {/* Conflict Resolution Notes */}
-        {num?.conflictResolutionNotes && (
-          <div style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.3)', borderRadius: '8px', padding: '12px', marginBottom: '18px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--accent-gold)', lineHeight: '1.4' }}>
-              🌉 {num.conflictResolutionNotes}
-            </div>
-          </div>
-        )}
-
         {/* Monthly Lucky Dates Matrix */}
         <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '14px', marginBottom: '16px' }}>
           <h4 style={{ margin: '0 0 10px 0', fontSize: '13px', color: 'var(--accent-gold)' }}>
@@ -751,12 +1314,6 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               </span>
             </div>
           </div>
-
-          {luckyDates?.transitCautionNotes && (
-            <div style={{ marginTop: '10px', fontSize: '11px', color: '#e67e22' }}>
-              ⚠️ {luckyDates.transitCautionNotes}
-            </div>
-          )}
         </div>
 
         {/* Lucky Weekday & Auspicious Directions */}
@@ -766,10 +1323,10 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               ☀️ {t('luckyWeekdayTitle', language)}
             </div>
             <div style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '4px' }}>
-              {luckyDay?.vedicWeekdayName}
+              {localizedWeekday.name}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-              {luckyDay?.luckySignifications}
+              {localizedWeekday.sig}
             </div>
           </div>
 
@@ -778,10 +1335,10 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               🧭 {t('auspiciousDirectionsTitle', language)}
             </div>
             <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>
-              🏡 <strong>{t('permanentVastu', language)}:</strong> {dir?.permanentVastuDirection}
+              🏡 <strong>{t('permanentVastu', language)}:</strong> {permanentVastuDir}
             </div>
             <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
-              ✈️ <strong>{t('travelDirection', language)}:</strong> {dir?.travelDirection}
+              ✈️ <strong>{t('travelDirection', language)}:</strong> {travelDir}
             </div>
           </div>
         </div>
@@ -801,7 +1358,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               💪 {t('physicalVitalityAnchor', language)}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
-              {struct?.physicalVitalityAnchor}
+              {translateStructuralAnchor('vitality', struct?.physicalVitalityAnchor)}
             </div>
           </div>
 
@@ -810,7 +1367,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               🌟 {t('socialStatusAnchor', language)}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
-              {struct?.arudhaLagna}
+              {translateStructuralAnchor('arudha', struct?.arudhaLagna)}
             </div>
           </div>
 
@@ -819,7 +1376,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               🧠 {t('mindResilienceAnchor', language)}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
-              {struct?.mindAnchorResilience}
+              {translateStructuralAnchor('mind', struct?.mindAnchorResilience)}
             </div>
           </div>
 
@@ -828,7 +1385,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               💰 {t('karmaAnchor', language)}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
-              {struct?.karmaAnchorHouse}
+              {translateStructuralAnchor('karma', struct?.karmaAnchorHouse)}
             </div>
           </div>
         </div>
@@ -872,7 +1429,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               📜 {t('classicalRationale', language)}
             </div>
             <div style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
-              {ayurdaya?.lifespanRange || 'Brihat Parashara & Jaimini Sutras'}
+              {translateLifespanText(ayurdaya?.lifespanRange) || 'Brihat Parashara & Jaimini Sutras'}
             </div>
           </div>
         </div>
@@ -918,20 +1475,6 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
           </div>
         )}
 
-        {/* Kakshya Vriddhi Adjustments */}
-        {ayurdaya?.kakshyaAdjustments && ayurdaya.kakshyaAdjustments.length > 0 && (
-          <div style={{ marginBottom: '14px' }}>
-            <h4 style={{ fontSize: '12px', color: 'var(--accent-gold)', marginBottom: '6px' }}>
-              ✨ {t('kakshyaAdjustments', language)}:
-            </h4>
-            <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
-              {ayurdaya.kakshyaAdjustments.map((adj, i) => (
-                <li key={i} style={{ marginBottom: '4px' }}>{adj}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         {/* Maraka Caution Period */}
         {ayurdaya?.criticalMarakaWindow && (
           <div style={{ background: 'rgba(230, 126, 34, 0.08)', border: '1px solid rgba(230, 126, 34, 0.3)', borderRadius: '6px', padding: '10px' }}>
@@ -939,7 +1482,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               ⚠️ {t('marakaPeriods', language)}:
             </strong>
             <p style={{ fontSize: '12px', margin: 0, color: 'var(--text-primary)', lineHeight: '1.4' }}>
-              {ayurdaya.criticalMarakaWindow}
+              {translateMarakaWindow(ayurdaya.criticalMarakaWindow)}
             </p>
           </div>
         )}

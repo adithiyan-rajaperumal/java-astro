@@ -488,7 +488,7 @@ public class AstrologyDiagnosticsService {
         if (detected) {
             if (mHouse == 3 || mHouse == 6 || mHouse == 11) {
                 nullified = true;
-                reason = "Upachaya House 3/6/11 Shatru Jaya Conversion (உபசய ஸ்தானத்தில் அமைந்ததால் சத்ரு ஜெய யோகமாக மாற்றம்)";
+                reason = ts.getLabel("nullification.angarak.upachaya");
             } else if (d1Map.get("Jupiter") != null && PlanetDignityUtils.isAspecting("Jupiter", d1Map.get("Jupiter").getSignNumber(), mSign)) {
                 nullified = true;
                 reason = ts.getLabel("nullification.sevvai.jupiter_aspect");
@@ -802,7 +802,7 @@ public class AstrologyDiagnosticsService {
 
                 if (PlanetDignityUtils.isUpachaya(bHouse)) {
                     nullified = true;
-                    reason = "Bhadhaka in Upachaya House Cancellation (உபசய ஸ்தானத்தில் அமர்ந்து தோஷ நிவர்த்தி)";
+                    reason = ts.getLabel("nullification.bhadhakadhipati.upachaya");
                 } else if (d1Map.get("Jupiter") != null) {
                     PlanetaryPosition jup = d1Map.get("Jupiter");
                     if (jup.getSignNumber() == bPos.getSignNumber() || PlanetDignityUtils.isAspecting("Jupiter", jup.getSignNumber(), bPos.getSignNumber())) {
