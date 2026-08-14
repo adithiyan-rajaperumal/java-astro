@@ -244,8 +244,36 @@ public class AyurdayaCalculationUtilsTest {
                 lagnaSign, moonSign, d1Chart, List.of(), 1990, 10, 0, null
         );
 
+        // Pair 2 (Poornayu) and Pair 3 (Poornayu) agree -> Poornayu
+        assertEquals("Poornayu", profile.longevityClassification());
+        assertTrue(profile.estimatedLifespanCeiling() >= 75);
+    }
+
+    @Test
+    public void testDistinctThreeSpansMoonIn7thTieBreaker() {
+        // Taurus Lagna (Sign 2 - Fixed)
+        int lagnaSign = 2;
+        // Moon in Scorpio (Sign 8 - Fixed, in 7th house)
+        int moonSign = 8;
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(2).rashiName("Vrishabha").degreeInSign(15.0).build());
+        // Pair 1: LL Venus in Dual (Gemini 3) & 8L Jupiter in Dual (Virgo 6) -> Madhyayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").displayName("Venus").signNumber(3).rashiName("Mithuna").degreeInSign(10.0).build());
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").displayName("Jupiter").signNumber(6).rashiName("Kanya").degreeInSign(12.0).build());
+        // Pair 2: Moon in Fixed (Scorpio 8) & Saturn in Dual (Pisces 12) -> Poornayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(8).rashiName("Vrishchika").degreeInSign(5.0).build());
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(12).rashiName("Meena").degreeInSign(18.0).build());
+        // Pair 3: Lagna (Fixed 2) & HL (Fixed: Scorpio 8) -> Fixed + Fixed = Alpayu!
+        // Sun in Leo (Sign 5) at 10 deg, birth at 6:00 AM (0 hours) -> HL at 130 deg = Leo (Fixed) -> Fixed + Fixed = Alpayu!
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SUN").displayName("Sun").signNumber(5).rashiName("Simha").degreeInSign(10.0).build());
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, List.of(), 1990, 6, 0, null
+        );
+
         assertNotNull(profile);
-        // Moon is in 7th house -> Pair 2 (Moon & Saturn = Fixed + Dual = Poornayu) takes precedence
+        // All 3 pairs are distinct (Madhyayu, Poornayu, Alpayu) -> Moon in 7th house decides tie -> Poornayu!
         assertEquals("Poornayu", profile.longevityClassification());
         assertTrue(profile.kakshyaAdjustments().stream().anyMatch(a -> a.contains("Moon in 7th house")));
     }
@@ -277,5 +305,32 @@ public class AyurdayaCalculationUtilsTest {
         // Verify Kakshya Hrasa adjustments triggered
         assertTrue(profile.kakshyaAdjustments().stream().anyMatch(a -> a.contains("Saturn in debility")));
         assertTrue(profile.kakshyaAdjustments().stream().anyMatch(a -> a.contains("Papakarthari Yoga")));
+    }
+
+    @Test
+    public void testTwoPairsAgreePrevailsOverSingleDiscordantPair() {
+        // Libra Lagna (Sign 7 - Movable)
+        int lagnaSign = 7;
+        // Moon in Aries (Sign 1 - Movable, in 7th house)
+        int moonSign = 1;
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(7).rashiName("Tula").degreeInSign(15.0).build());
+        // Lagna Lord Venus in Virgo (Dual) & 8th Lord Venus in Virgo (Dual) -> Pair 1: Dual + Dual = Madhyayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").displayName("Venus").signNumber(6).rashiName("Kanya").degreeInSign(10.0).build());
+        // Moon in Aries (Movable) & Saturn in Pisces (Dual) -> Pair 2: Movable + Dual = Alpayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(1).rashiName("Mesha").degreeInSign(5.0).build());
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(12).rashiName("Meena").degreeInSign(18.0).build());
+        // Hora Lagna in Taurus (Fixed) -> Pair 3: Lagna (Movable) + HL (Fixed) = Madhyayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SUN").displayName("Sun").signNumber(5).rashiName("Simha").degreeInSign(10.0).build());
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, List.of(), 1995, 12, 0, null
+        );
+
+        assertNotNull(profile);
+        // Pair 1 (Madhyayu) and Pair 3 (Madhyayu) both agree (2 out of 3 votes) -> Majority Consensus is Madhyayu!
+        assertEquals("Madhyayu", profile.longevityClassification());
+        assertTrue(profile.estimatedLifespanCeiling() >= 62, "Madhyayu should have ceiling >= 62, got: " + profile.estimatedLifespanCeiling());
     }
 }

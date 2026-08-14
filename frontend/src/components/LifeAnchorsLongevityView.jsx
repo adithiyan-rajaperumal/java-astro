@@ -1243,32 +1243,122 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     return res;
   };
 
+  const formatMarakaLords = (m2, m7, fallback) => {
+    if (!m2 && !m7) return fallback || (language === 'ta' ? '2 & 7-ஆம் அதிபதிகள்' : '2nd & 7th Lords');
+    const loc2 = I18N_TERMS[m2]?.[language] || m2;
+    const loc7 = I18N_TERMS[m7]?.[language] || m7;
+    if (m2 && m7 && m2.equalsIgnoreCase && m2.equalsIgnoreCase(m7)) {
+      return `${loc2} (${language === 'ta' ? '2 & 7-ஆம் அதிபதி' : language === 'hi' ? '2रे व 7वें भाव के स्वामी' : language === 'te' ? '2 & 7వ అధిపతి' : language === 'kn' ? '2 & 7ನೇ ಅಧಿಪತಿ' : language === 'ml' ? '2, 7 ഭാവങ്ങളുടെ അധിപൻ' : 'Lord of 2nd & 7th'})`;
+    }
+    return `${loc2} (${language === 'ta' ? '2-ஆம் அதிபதி' : '2nd Lord'}) & ${loc7} (${language === 'ta' ? '7-ஆம் அதிபதி' : '7th Lord'})`;
+  };
+
+  const formatBadhakaLord = (rawBadhaka) => {
+    if (!rawBadhaka) return '—';
+    let res = rawBadhaka;
+    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(p => {
+      if (I18N_TERMS[p]?.[language]) {
+        res = res.replaceAll(p, I18N_TERMS[p][language]);
+      }
+    });
+    if (language === 'ta') {
+      res = res.replaceAll('11th House', '11-ஆம் பாவகம்')
+               .replaceAll('9th House', '9-ஆம் பாவகம்')
+               .replaceAll('7th House', '7-ஆம் பாவகம்')
+               .replaceAll('CHARA Lagna', 'சர லக்னம்')
+               .replaceAll('STHIRA Lagna', 'ஸ்திர லக்னம்')
+               .replaceAll('DWISVABHAVA Lagna', 'உபய லக்னம்');
+    } else if (language === 'hi') {
+      res = res.replaceAll('11th House', '11वां भाव')
+               .replaceAll('9th House', '9वां भाव')
+               .replaceAll('7th House', '7वां भाव')
+               .replaceAll('CHARA Lagna', 'चर लग्न')
+               .replaceAll('STHIRA Lagna', 'स्थिर लग्न')
+               .replaceAll('DWISVABHAVA Lagna', 'द्विस्वभाव लग्न');
+    } else if (language === 'te') {
+      res = res.replaceAll('11th House', '11వ స్థానం')
+               .replaceAll('9th House', '9వ స్థానం')
+               .replaceAll('7th House', '7వ స్థానం')
+               .replaceAll('CHARA Lagna', 'చర లగ్నం')
+               .replaceAll('STHIRA Lagna', 'స్థిర లగ్నం')
+               .replaceAll('DWISVABHAVA Lagna', 'ద్విస్వభావ లగ్నం');
+    } else if (language === 'kn') {
+      res = res.replaceAll('11th House', '11ನೇ ಮನೆ')
+               .replaceAll('9th House', '9ನೇ ಮನೆ')
+               .replaceAll('7th House', '7ನೇ ಮನೆ')
+               .replaceAll('CHARA Lagna', 'ಚರ ಲಗ್ನ')
+               .replaceAll('STHIRA Lagna', 'ಸ್ಥಿರ ಲಗ್ನ')
+               .replaceAll('DWISVABHAVA Lagna', 'ದ್ವಿಸ್ವಭಾವ ಲಗ್ನ');
+    } else if (language === 'ml') {
+      res = res.replaceAll('11th House', '11-ാം ഭാവം')
+               .replaceAll('9th House', '9-ാം ഭാവം')
+               .replaceAll('7th House', '7-ാം ഭാവം')
+               .replaceAll('CHARA Lagna', 'ചര ലഗ്നം')
+               .replaceAll('STHIRA Lagna', 'സ്ഥിര ലഗ്നം')
+               .replaceAll('DWISVABHAVA Lagna', 'ദ്വിസ്വഭാവ ലഗ്നം');
+    }
+    return res;
+  };
+
+  const formatKhareshaLord = (rawKharesha) => {
+    if (!rawKharesha) return '—';
+    let res = rawKharesha;
+    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(p => {
+      if (I18N_TERMS[p]?.[language]) {
+        res = res.replaceAll(p, I18N_TERMS[p][language]);
+      }
+    });
+    if (language === 'ta') {
+      res = res.replaceAll('22nd Drekkana Lord', '22-ஆம் திரேக்காணாதிபதி (கரேசன்)');
+    } else if (language === 'hi') {
+      res = res.replaceAll('22nd Drekkana Lord', '22वां द्रेष्काण स्वामी (खरेश)');
+    } else if (language === 'te') {
+      res = res.replaceAll('22nd Drekkana Lord', '22వ ద్రేక్కాణాధిపతి (ఖరేశుడు)');
+    } else if (language === 'kn') {
+      res = res.replaceAll('22nd Drekkana Lord', '22ನೇ ದ್ರೇಕ್ಕಾಣಾಧಿಪತಿ (ಖರೇಶ)');
+    } else if (language === 'ml') {
+      res = res.replaceAll('22nd Drekkana Lord', '22-ാം ദ്രേക്കാണാധിപൻ (ഖരേശൻ)');
+    }
+    return res;
+  };
+
   const translateMarakaWindow = (rawMaraka) => {
     if (!rawMaraka) return '';
-    // Format: Rahu திசா காலத்தில் (சுமார் 58 - 62 வயது) ஆயுள் சவால்கள்.
     const planetMatch = rawMaraka.match(/(Sun|Moon|Mars|Mercury|Jupiter|Venus|Saturn|Rahu|Ketu|சூரியன்|சந்திரன்|செவ்வாய்|புதன்|குரு|சுக்கிரன்|சனி|ராகு|கேது)/i);
     const planetKey = planetMatch ? planetMatch[0] : 'Rahu';
     const localizedPlanet = I18N_TERMS[planetKey]?.[language] || planetKey;
 
-    const ageMatch = rawMaraka.match(/(\d+\s*-\s*\d+)/);
-    const ageStr = ageMatch ? ageMatch[0] : '58 - 62';
+    // Extract exact age range: look for "~Age 32-34" or "around age 65 - 71"
+    const ageMatch = rawMaraka.match(/Age\s*(\d+\s*-\s*\d+)/i) || rawMaraka.match(/age\s*(\d+\s*-\s*\d+)/i);
+    const ageStr = ageMatch ? ageMatch[1] : '';
+
+    // Extract date range: look for "(YYYY-MM to YYYY-MM)"
+    const dateRangeMatch = rawMaraka.match(/(\d{4}-\d{2}\s+to\s+\d{4}-\d{2})/);
+    const dateRangeStr = dateRangeMatch ? ` (${dateRangeMatch[1]})` : '';
+
+    const ageLabel = ageStr ? (language === 'ta' ? ` (சுமார் ${ageStr} வயது${dateRangeStr})` :
+                               language === 'hi' ? ` (लगभग ${ageStr} वर्ष की आयु${dateRangeStr})` :
+                               language === 'te' ? ` (సుమారు ${ageStr} సం. వయస్సు${dateRangeStr})` :
+                               language === 'kn' ? ` (ಸುಮಾರು ${ageStr} ವರ್ಷ ವಯಸ್ಸಿನಲ್ಲಿ${dateRangeStr})` :
+                               language === 'ml' ? ` (ഏകദേശം ${ageStr} വയസ്സിൽ${dateRangeStr})` :
+                               ` (around age ${ageStr}${dateRangeStr})`) : dateRangeStr;
 
     if (language === 'ta') {
-      return `${localizedPlanet} திசா காலத்தில் (சுமார் ${ageStr} வயது) ஆயுள் சவால்கள் மற்றும் உடல்நலப் பாதுகாப்பு தேவை.`;
+      return `${localizedPlanet} திசா காலத்தில்${ageLabel} ஆயுள் சவால்கள் மற்றும் உடல்நலப் பாதுகாப்பு தேவை.`;
     }
     if (language === 'hi') {
-      return `${localizedPlanet} महादशा काल (लगभग ${ageStr} वर्ष की आयु) में स्वास्थ्य सतर्कता एवं सुरक्षा आवश्यक।`;
+      return `${localizedPlanet} महादशा काल${ageLabel} में स्वास्थ्य सतर्कता एवं सुरक्षा आवश्यक।`;
     }
     if (language === 'te') {
-      return `${localizedPlanet} దశ కాలంలో (సుమారు ${ageStr} సం. వయస్సు) ఆరోగ్య జాగ్రత్త అవసరం.`;
+      return `${localizedPlanet} దశ కాలంలో${ageLabel} ఆరోగ్య జాగ్రత్త అవసరం.`;
     }
     if (language === 'kn') {
-      return `${localizedPlanet} ದಶಾ ಕಾಲದಲ್ಲಿ (ಸುಮಾರು ${ageStr} ವರ್ಷ ವಯಸ್ಸಿನಲ್ಲಿ) ಆರೋಗ್ಯ ಜಾಗರೂಕತೆ ಅಗತ್ಯ.`;
+      return `${localizedPlanet} ದಶಾ ಕಾಲದಲ್ಲಿ${ageLabel} ಆರೋಗ್ಯ ಜಾಗರೂಕತೆ ಅಗತ್ಯ.`;
     }
     if (language === 'ml') {
-      return `${localizedPlanet} ദശാ കാലത്ത് (ഏകദേശം ${ageStr} വയസ്സിൽ) ആരോഗ്യ ജാഗ്രത ആവശ്യം.`;
+      return `${localizedPlanet} ദശാ കാലത്ത്${ageLabel} ആരോഗ്യ ജാഗ്രത ആവശ്യം.`;
     }
-    return `Vitality challenges and health caution during ${localizedPlanet} Dasa period (around age ${ageStr}).`;
+    return `Vitality challenges and health caution during ${localizedPlanet} Dasa period${ageLabel}.`;
   };
 
   const translateKakshyaAdjustment = (adj) => {
@@ -2126,11 +2216,11 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                     ⚔️ {t('marakaPeriods', language)}:
                   </div>
                   <strong style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
-                    {ayurdaya.marakaBadhakaTimeline?.marakaLords ?? '2nd & 7th Lords'}
+                    {formatMarakaLords(ayurdaya.marakaBadhakaTimeline?.marakaLord2, ayurdaya.marakaBadhakaTimeline?.marakaLord7, ayurdaya.marakaBadhakaTimeline?.marakaLords)}
                   </strong>
                   {(ayurdaya.marakaBadhakaTimeline?.marakaOccupants2?.length > 0 || ayurdaya.marakaBadhakaTimeline?.marakaOccupants7?.length > 0) && (
                     <div style={{ fontSize: '10px', color: '#e67e22', marginTop: '4px' }}>
-                      {t('marakaOccupantsLabel', language)}: {[...(ayurdaya.marakaBadhakaTimeline?.marakaOccupants2 || []).map(p => `${p} (H2)`), ...(ayurdaya.marakaBadhakaTimeline?.marakaOccupants7 || []).map(p => `${p} (H7)`)].join(', ')}
+                      {t('marakaOccupantsLabel', language)}: {[...(ayurdaya.marakaBadhakaTimeline?.marakaOccupants2 || []).map(p => `${I18N_TERMS[p]?.[language] || p} (H2)`), ...(ayurdaya.marakaBadhakaTimeline?.marakaOccupants7 || []).map(p => `${I18N_TERMS[p]?.[language] || p} (H7)`)].join(', ')}
                     </div>
                   )}
                 </div>
@@ -2138,14 +2228,14 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                 {/* Badhaka Lord + Occupants */}
                 <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '10px' }}>
                   <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                    🚩 {t('badhakaLord', language) || 'Badhaka Lord'}:
+                    🚩 {t('badhakaLord', language)}:
                   </div>
                   <strong style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
-                    {ayurdaya.marakaBadhakaTimeline?.badhakaLord ?? '—'}
+                    {formatBadhakaLord(ayurdaya.marakaBadhakaTimeline?.badhakaLord)}
                   </strong>
                   {ayurdaya.marakaBadhakaTimeline?.badhakaOccupants?.length > 0 && (
                     <div style={{ fontSize: '10px', color: '#f39c12', marginTop: '4px' }}>
-                      {t('badhakaOccupantsLabel', language)}: {ayurdaya.marakaBadhakaTimeline.badhakaOccupants.join(', ')}
+                      {t('badhakaOccupantsLabel', language)}: {ayurdaya.marakaBadhakaTimeline.badhakaOccupants.map(p => I18N_TERMS[p]?.[language] || p).join(', ')}
                     </div>
                   )}
                 </div>
@@ -2156,7 +2246,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                     🔮 {t('khareshaLabel', language)}:
                   </div>
                   <strong style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
-                    {ayurdaya.marakaBadhakaTimeline?.khareshaLord ?? '—'}
+                    {formatKhareshaLord(ayurdaya.marakaBadhakaTimeline?.khareshaLord)}
                   </strong>
                 </div>
 

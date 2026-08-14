@@ -172,24 +172,31 @@ public class AyurdayaCalculationUtils {
         String baseSpan;
         List<String> adjustments = new ArrayList<>();
 
-        // Classical Exception A: Moon in 1st or 7th House (Jaimini Upadesha Sutra 2.1.23)
         int moonHouse = ((activeMoonSign - lagnaSign + 12) % 12) + 1;
-        if (moonHouse == 1 || moonHouse == 7) {
-            baseSpan = span2; // Pair 2 (Moon & Saturn) is paramount
-            adjustments.add("Moon in " + (moonHouse == 1 ? "Lagna (1st)" : "7th house") + ": Moon-Saturn pair (Pair 2) serves as the primary decisive anchor (Jaimini Sutra 2.1.23).");
-        } else if (votes.get("Poornayu") >= 2) {
+
+        // Classical Jaimini Resolution Priority (BPHS Ch 45 & JUS 2.1.15-25):
+        // 1. Primary Rule (Dwi-Samvada): If 2 or 3 pairs agree on the same span, that majority consensus prevails.
+        if (votes.get("Poornayu") >= 2) {
             baseSpan = "Poornayu";
         } else if (votes.get("Madhyayu") >= 2) {
             baseSpan = "Madhyayu";
         } else if (votes.get("Alpayu") >= 2) {
             baseSpan = "Alpayu";
         } else {
-            // Classical Exception B: All 3 pairs give 3 distinct spans (Poornayu, Madhyayu, Alpayu)
-            boolean isOddLagna = (lagnaSign % 2 != 0);
-            baseSpan = isOddLagna ? span3 : span1;
-            adjustments.add("All 3 pairs indicate distinct spans: " +
-                    (isOddLagna ? "Odd Lagna gives precedence to Lagna-Hora Lagna (Pair 3)."
-                            : "Even Lagna gives precedence to Lagna Lord-8th Lord (Pair 1)."));
+            // 2. Ambiguity Tie-Breaker (All 3 pairs give 3 distinct spans: Poorna, Madhya, Alpa)
+            if (moonHouse == 1 || moonHouse == 7) {
+                // Classical Exception: Moon in 1st or 7th House decides tie (Jaimini Upadesha Sutra 2.1.23)
+                baseSpan = span2;
+                adjustments.add("All 3 pairs distinct with Moon in " + (moonHouse == 1 ? "Lagna (1st)" : "7th house") +
+                        ": Moon-Saturn pair (Pair 2) decides tie-breaker (Jaimini Sutra 2.1.23).");
+            } else {
+                // Odd vs Even Lagna Tie-Breaker (Jaimini Sutra 2.1.24)
+                boolean isOddLagna = (lagnaSign % 2 != 0);
+                baseSpan = isOddLagna ? span3 : span1;
+                adjustments.add("All 3 pairs indicate distinct spans: " +
+                        (isOddLagna ? "Odd Lagna gives precedence to Lagna-Hora Lagna (Pair 3)."
+                                : "Even Lagna gives precedence to Lagna Lord-8th Lord (Pair 1)."));
+            }
         }
 
         // Classical Ayurdaya Baseline Compartments (Alpayu: 0-36, Madhyayu: 36-72, Poornayu: 72-108)
