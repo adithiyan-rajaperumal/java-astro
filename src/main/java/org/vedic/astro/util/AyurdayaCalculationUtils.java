@@ -217,14 +217,16 @@ public class AyurdayaCalculationUtils {
             boolean jupStrong = PlanetDignityUtils.isOwnSign("Jupiter", jupiterPos.getSignNumber()) ||
                     PlanetDignityUtils.isExalted("Jupiter", jupiterPos.getSignNumber());
             if (jupHouse == 1 || jupHouse == 4 || jupHouse == 7 || jupHouse == 10 || jupHouse == 5 || jupHouse == 9 || jupStrong) {
-                adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (Longevity compartment elevation).");
                 if ("Alpayu".equals(baseSpan)) {
+                    adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (elevating longevity compartment from Alpayu to Madhyayu baseline ~68 yrs).");
                     baseSpan = "Madhyayu";
                     baseCeilingAge = 68;
                 } else if ("Madhyayu".equals(baseSpan)) {
+                    adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (elevating longevity compartment from Madhyayu to Poornayu baseline ~82 yrs).");
                     baseSpan = "Poornayu";
                     baseCeilingAge = 82;
                 } else {
+                    adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (+4 years).");
                     baseCeilingAge += 4;
                 }
             }

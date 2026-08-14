@@ -1496,12 +1496,26 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
       if (language === 'kn') return 'ಚಂದ್ರ 1 ಅಥವಾ 7ನೇ ಮನೆಯಲ್ಲಿರುವ ಕಾರಣ: ಚಂದ್ರ-ಶನಿ ಜೋಡಿ (Pair 2) ಪ್ರಮುಖ ನಿರ್ಣಾಯಕ (ಜೈಮಿನಿ ಸೂತ್ರ 2.1.23).';
       if (language === 'ml') return 'ചന്ദ്രൻ 1 അല്ലെങ്കിൽ 7-ാം ഭാവത്തിൽ സ്ഥിതിചെയ്യുന്നതിനാൽ: ചന്ദ്ര-ശനി ജോടി (Pair 2) പ്രധാന നിർണ്ണായകമാകുന്നു (ജൈമിനി സൂത്രം 2.1.23).';
     }
+        if (adj.includes('Alpayu to Madhyayu')) {
+      if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் கக்ஷ்ய விருத்தி ஏற்பட்டு அல்பாயுளிலிருந்து மத்தியாயுள் பிரிவுக்கு உயர்த்தப்படுகிறது (அடிப்படை: ~68 வயது).';
+      if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से कक्ष्या वृद्धि होकर अल्पायु से मध्यायु वर्ग में पदोन्नति (आधार: ~68 वर्ष)।';
+      if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల కక్ష్యా వృద్ధి కలిగి అల్పాయుష్షు నుండి మధ్యాయుష్షు వర్గానికి పెరుగుతుంది (ఆధారం: ~68 సం.)।';
+      if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ ಲಭಿಸಿ ಅಲ್ಪಾಯುಷ್ಯದಿಂದ ಮಧ್ಯಾಯುಷ್ಯ ವಿಭಾಗಕ್ಕೆ ಏರಿಕೆ (ಆಧಾರ: ~68 ವರ್ಷ).';
+      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രികോണ ശുഭ സ്ഥാനം മൂലം കക്ഷ്യാ വൃദ്ധി ലഭിച്ച് അല്പായുസ്സിൽ നിന്ന് മദ്ധ്യായുസ്സിലേക്ക് ഉയർത്തപ്പെടുന്നു (അടിസ്ഥാനം: ~68 വയസ്സ്).';
+    }
+    if (adj.includes('Madhyayu to Poornayu')) {
+      if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் கக்ஷ்ய விருத்தி ஏற்பட்டு மத்தியாயுளிலிருந்து பூர்ணாயுள் பிரிவுக்கு உயர்த்தப்படுகிறது (அடிப்படை: ~82 வயது).';
+      if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से कक्ष्या वृद्धि होकर मध्यायु से पूर्णायु वर्ग में पदोन्नति (आधार: ~82 वर्ष)।';
+      if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల కక్ష్యా వృద్ధి కలిగి మధ్యాయుష్షు నుండి పూర్ణాయుష్షు వర్గానికి పెరుగుతుంది (ఆధారం: ~82 సం.)।';
+      if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ ಲಭಿಸಿ ಮಧ್ಯಾಯುಷ್ಯದಿಂದ ಪೂರ್ಣಾಯುಷ್ಯ ವಿಭಾಗಕ್ಕೆ ಏರಿಕೆ (ಆಧಾರ: ~82 ವರ್ಷ).';
+      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രികോണ ശുഭ സ്ഥാനം മൂലം കക്ഷ്യാ വൃദ്ധി ലഭിച്ച് മദ്ധ്യായുസ്സിൽ നിന്ന് പൂർണ്ണായുസ്സിലേക്ക് ഉയർത്തപ്പെടുന്നു (അടിസ്ഥാനം: ~82 വയസ്സ്).';
+    }
     if (adj.includes('Jupiter') || adj.includes('Kakshya Vriddhi')) {
-      if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் ஆயுள் கக்ஷ்ய விருத்தி அடைகிறது (+5 முதல் +7 ஆண்டுகள்).';
-      if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से आयु में कक्ष्या वृद्धि (+5 से +7 वर्ष)।';
-      if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల ఆయుష్షు కక్ష్యా వృద్ధి (+5 నుండి +7 సంవత్సరాలు).';
-      if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಆಯುಷ್ಯದಲ್ಲಿ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ (+5 ರಿಂದ +7 ವರ್ಷಗಳು).';
-      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രിಕೋಣ ശുഭ സ്ഥാനം മൂലം ആയുസ്സിൽ കക്യാ വൃദ്ധി (+5 മുതൽ +7 വർഷം വരെ).';
+      if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் ஆயுள் கக்ஷ்ய விருத்தி அடைகிறது (+4 முதல் +7 ஆண்டுகள்).';
+      if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से आयु में कक्ष्या वृद्धि (+4 से +7 वर्ष)।';
+      if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల ఆయుష్షు కక్ష్యా వృద్ధి (+4 నుండి +7 సంవత్సరాలు).';
+      if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಆಯುಷ್ಯದಲ್ಲಿ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ (+4 ರಿಂದ +7 ವರ್ಷಗಳು).';
+      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രികോണ ശുഭ സ്ഥാനം മൂലം ആയുസ്സിൽ കക്യാ വൃദ്ധി (+4 മുതൽ +7 വർഷം വരെ).';
     }
     if (adj.includes('Ayushkaraka Saturn in Own/Exalted') || (adj.includes('Saturn') && adj.includes('Own/Exalted'))) {
       if (language === 'ta') return 'ஆயுள்காரகன் சனி பகவான் ஆட்சி/உச்ச பலத்தால் ஆயுள் நீட்டிப்பு கூடுகிறது (+4 ஆண்டுகள்).';
@@ -2268,15 +2282,27 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               </div>
 
               {ayurdaya?.kakshyaAdjustments && ayurdaya.kakshyaAdjustments.length > 0 && (
-                <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(46, 204, 113, 0.08)', border: '1px solid rgba(46, 204, 113, 0.25)', borderRadius: '6px' }}>
-                  <strong style={{ fontSize: '11px', color: '#2ecc71', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                <div style={{ marginTop: '10px', padding: '10px 14px', background: 'rgba(46, 204, 113, 0.08)', border: '1px solid rgba(46, 204, 113, 0.25)', borderRadius: '8px' }}>
+                  <strong style={{ fontSize: '12px', color: '#2ecc71', display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
                     ✨ {t('kakshyaVriddhi', language)}:
                   </strong>
-                  <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)' }}>
+                  <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
                     {ayurdaya.kakshyaAdjustments.map((adj, i) => (
                       <li key={i}>{translateKakshyaAdjustment(adj)}</li>
                     ))}
                   </ul>
+                  
+                  {/* Step-by-Step Longevity Synthesis & Justification */}
+                  <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed rgba(46, 204, 113, 0.3)', fontSize: '11px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <span style={{ fontWeight: 'bold', color: 'var(--accent-gold)' }}>
+                      💡 {t('longevitySynthesisLabel', language)}:
+                    </span>
+                    <span>
+                      {t('step1Consensus', language)} ({renderSpanBadge(ayurdaya.threePairsDetails?.majorityConsensus || 'Alpayu')}) 
+                      ➔ {t('step2Elevation', language)} 
+                      ➔ <strong style={{ color: 'var(--accent-gold)' }}>~{ayurdaya.estimatedLifespanCeiling} {language === 'ta' ? 'வயது' : language === 'hi' ? 'वर्ष' : language === 'te' ? 'సంవత్సరాలు' : language === 'kn' ? 'ವರ್ಷಗಳು' : language === 'ml' ? 'വയസ്സ്' : 'Years'} ({classificationText})</strong>
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
