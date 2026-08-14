@@ -1006,6 +1006,187 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     return `Vitality challenges and health caution during ${localizedPlanet} Dasa period (around age ${ageStr}).`;
   };
 
+  const translateKakshyaAdjustment = (adj) => {
+    if (!adj) return '';
+    if (language === 'en') return adj;
+
+    if (adj.includes('Jupiter') || adj.includes('Kakshya Vriddhi')) {
+      if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் ஆயுள் கக்ஷ்ய விருத்தி அடைகிறது (+5 முதல் +7 ஆண்டுகள்).';
+      if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से आयु में कक्ष्या वृद्धि (+5 से +7 वर्ष)।';
+      if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల ఆయుష్షు కక్ష్యా వృద్ధి (+5 నుండి +7 సంవత్సరాలు).';
+      if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಆಯುಷ್ಯದಲ್ಲಿ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ (+5 ರಿಂದ +7 ವರ್ಷಗಳು).';
+      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രികോണ ശുഭ സ്ഥാനം മൂലം ആയുസ്സിൽ കക്യാ വൃദ്ധി (+5 മുതൽ +7 വർഷം വരെ).';
+    }
+    if (adj.includes('Saturn') || adj.includes('Ayushkaraka')) {
+      if (language === 'ta') return 'ஆயுள்காரகன் சனி பகவான் ஆட்சி/உச்ச பலத்தால் ஆயுள் நீட்டிப்பு கூடுகிறது (+4 ஆண்டுகள்).';
+      if (language === 'hi') return 'आयुष्कारक शनि के स्वराशि/उच्च स्थिति से दीर्घायु बल प्राप्त होता है (+4 वर्ष)।';
+      if (language === 'te') return 'ఆయుష్కారక శని స్వక్షేత్ర/ఉచ్ఛ స్థితి వల్ల ఆయుష్షు పెరుగుతుంది (+4 సంవత్సరాలు).';
+      if (language === 'kn') return 'ಆಯುಷ್ಕಾರಕ ಶನಿಯ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಛ ಸ್ಥಾನದಿಂದ ದೀರ್ಘಾಯುಷ್ಯ ಬಲ (+4 ವರ್ಷಗಳು).';
+      if (language === 'ml') return 'ആയുഷ്കാരകനായ ശനിയുടെ സ്വക്ഷേത്ര/ഉച്ച സ്ഥിതിയാൽ ദീർഘായുസ്സ് ലഭിക്കുന്നു (+4 വർഷം).';
+    }
+    if (adj.includes('Lagna Lord') || adj.includes('vitality')) {
+      if (language === 'ta') return 'லக்னாதிபதி ஆட்சி/உச்ச/கேந்திர சுப பலத்தால் சரீர நோய் எதிர்ப்பு ஆற்றல் மற்றும் ஆயுள் பலம் கூடுகிறது (+4 ஆண்டுகள்).';
+      if (language === 'hi') return 'लग्नेश के स्वराशि/उच्च/केंद्र शुभ बल से शारीरिक रोग प्रतिरोधक क्षमता एवं आयु वृद्धि (+4 वर्ष)।';
+      if (language === 'te') return 'లగ్నాధిపతి స్వక్షేత్ర/ఉచ్ఛ/కేంద్ర శుభ బలం వల్ల శారీరక రోగనిరోధక శక్తి మరియు ఆయుర్బలం పెరుగుతుంది (+4 సంవత్సరాలు).';
+      if (language === 'kn') return 'ಲಗ್ನಾಧಿಪತಿಯ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಛ/ಕೇಂದ್ರ ಶುಭ ಬಲದಿಂದ ಶಾರೀರಿಕ ರೋಗನಿರೋಧಕ ಶಕ್ತಿ ಮತ್ತು ಆಯುರ್ಬಲ ವೃದ್ಧಿ (+4 ವರ್ಷಗಳು).';
+      if (language === 'ml') return 'ലഗ്നാധിപന്റെ സ്വക്ഷേത്ര/ഉച്ച/കേന്ദ്ര ശുഭ ബലത്താൽ ശാരീരിക പ്രതിരോധശേഷിയും ആയുർബലവും വർദ്ധിക്കുന്നു (+4 വർഷം).';
+    }
+    return adj;
+  };
+
+  const translateVitalityScore = (score) => {
+    if (!score) return '';
+    if (language === 'en') return score;
+    if (score.includes('High Resilience') || score.includes('Deerghayu')) {
+      if (language === 'ta') return 'உயர்ந்த சரீர பலம் & தீர்க்காயுள் யோகம்';
+      if (language === 'hi') return 'उत्कृष्ट शारीरिक जीवन शक्ति एवं दीर्घायु योग';
+      if (language === 'te') return 'ఉన్నత శారీరక బలం & దీర్ఘాయుష్షు యోగం';
+      if (language === 'kn') return 'ಉನ್ನತ ಶಾರೀರಿಕ ಬಲ & ದೀರ್ಘಾಯುಷ್ಯ ಯೋಗ';
+      if (language === 'ml') return 'ഉയർന്ന ശാരീരിക ബലവും ദീർഘായുസ്സ് യോഗവും';
+    }
+    if (score.includes('Balanced')) {
+      if (language === 'ta') return 'சீரான சரீர ஜீவ பலம்';
+      if (language === 'hi') return 'संतुलित शारीरिक जीवन शक्ति';
+      if (language === 'te') return 'సమతుల్య శారీరక జీవ బలం';
+      if (language === 'kn') return 'ಸಮತೋಲಿತ ಶಾರೀರಿಕ ಜೀವ ಬಲ';
+      if (language === 'ml') return 'സന്തുലിത ശാരീരിക ജീവ ബലം';
+    }
+    if (score.includes('Cautious') || score.includes('Health-Cautious')) {
+      if (language === 'ta') return 'ஆரோக்கிய விழிப்புணர்வு தேவைப்படும் சரீர பலம்';
+      if (language === 'hi') return 'स्वास्थ्य सतर्कता आवश्यक जीवन शक्ति';
+      if (language === 'te') return 'ఆరోగ్య జాగ్రత్త అవసరమైన జీవ బలం';
+      if (language === 'kn') return 'ಆರೋಗ್ಯ ಜಾಗರೂಕತೆ ಅಗತ್ಯವಿರುವ ಜೀವ ಬಲ';
+      if (language === 'ml') return 'ആരോഗ്യ ജാഗ്രത ആവശ്യമുള്ള ജീവ ബലം';
+    }
+    return score;
+  };
+
+  const translateLagnaLordDignity = (dignity) => {
+    if (!dignity) return '';
+    if (language === 'en') return dignity;
+    if (dignity.toLowerCase().includes('strong') || dignity.toLowerCase().includes('dignified')) {
+      if (language === 'ta') return 'ஆட்சி / உச்ச சுப பலம்';
+      if (language === 'hi') return 'सुदृढ़ / प्रतिष्ठित बल';
+      if (language === 'te') return 'సుదృఢ / శుభ బలం';
+      if (language === 'kn') return 'ಸುದೃಢ / ಶುಭ ಬಲ';
+      if (language === 'ml') return 'സുദൃഢ / ശുഭ ബലം';
+    }
+    if (dignity.toLowerCase().includes('moderate')) {
+      if (language === 'ta') return 'சாதாரண பலம்';
+      if (language === 'hi') return 'सामान्य बल';
+      if (language === 'te') return 'సాధారణ బలం';
+      if (language === 'kn') return 'ಸಾಮಾನ್ಯ ಬಲ';
+      if (language === 'ml') return 'സാധാരണ ബലം';
+    }
+    return dignity;
+  };
+
+  const REMEDIES_I18N = {
+    Sun: {
+      en: 'Lord Shiva Puja, Aditya Hridaya Stotram, and Maha Mrityunjaya Mantra Japa.',
+      ta: 'ஸ்ரீ சிவ பெருமான் வழிபாடு, ஆதித்ய ஹிருதய ஸ்தோத்திரம் மற்றும் மகா மிருத்யுஞ்ஜய ஜபம்.',
+      hi: 'भगवान शिव की आराधना, आदित्य हृदय स्तोत्र एवं महामृत्युंजय जप।',
+      te: 'శివారాధన, ఆదిత్య హృదయ స్తోత్రం మరియు మహా మృత్యుంజయ జపం.',
+      kn: 'ಶಿವಾರಾಧನೆ, ಆದಿತ್ಯ ಹೃದಯ ಸ್ತೋತ್ರ ಮತ್ತು ಮಹಾ ಮೃತ್ಯುಂಜಯ ಜಪ.',
+      ml: 'ശിവ ആരാധന, ആദിത്യ ഹൃദയ സ്തോത്രം, മഹാ മൃത്യുഞ്ജയ ജപം.'
+    },
+    Moon: {
+      en: 'Goddess Parvati & Shiva Puja, Chandra Kavacham, and Amriteshwara Prayer.',
+      ta: 'ஸ்ரீ பார்வதி சமேத சிவ வழிபாடு, சந்திர கவசம் மற்றும் அமிர்தேஸ்வரர் பிரார்த்தனை.',
+      hi: 'माँ पार्वती एवं शिव जी की पूजा, चन्द्र कवच एवं अमृतेश्वर प्रार्थना।',
+      te: 'పార్వతీ సమేత శివారాధన, చంద్ర కవచం మరియు అమృతేశ్వర ప్రార్థన.',
+      kn: 'ಪಾರ್ವತಿ ಸಮೇತ ಶಿವ ಪೂಜೆ, ಚಂದ್ರ ಕವಚ ಮತ್ತು ಅಮೃತೇಶ್ವರ ಪ್ರಾರ್ಥನೆ.',
+      ml: 'പാർവ്വതീ സമേത ശിവപൂജ, ചന്ദ്ര കവചം, അമൃതേശ്വര പ്രാർത്ഥന.'
+    },
+    Mars: {
+      en: 'Lord Subramanya / Kartikeya Puja, Dhanvantari Stotram, and Rudra Abhishekam.',
+      ta: 'ஸ்ரீ முருகப்பெருமான் / சுப்பிரமணியர் வழிபாடு, தன்வந்திரி ஸ்தோத்திரம் மற்றும் ருத்ர அபிஷேகம்.',
+      hi: 'भगवान मुरुगन / कार्तिकेय आराधना, धन्वंतरि स्तोत्र एवं रुद्राभिषेक।',
+      te: 'సుబ్రహ్మణ్య స్వామి ఆరాధన, ధన్వంతరి స్తోత్రం మరియు రుద్రాభిషేకం.',
+      kn: 'ಸುಬ್ರಹ್ಮಣ್ಯ ಆರಾಧನೆ, ಧನ್ವಂತರಿ ಸ್ತೋತ್ರ ಮತ್ತು ರುದ್ರಾಭಿಷೇಕ.',
+      ml: 'സുബ്രഹ്മണ്യ സ്വാമി പൂജ, ധന്വന്തരി സ്തോത്രം, രുദ്രാഭിഷേകം.'
+    },
+    Mercury: {
+      en: 'Sri Vishnu Sahasranama Parayanam, Sudarshana Ashtakam, and Tulasi Archana.',
+      ta: 'ஸ்ரீ மகாவிஷ்ணு சகஸ்ரநாம பாராயணம், சுதர்சன அஷ்டகம் மற்றும் துளசி அர்ச்சனை.',
+      hi: 'विष्णु सहस्रनाम पाठ, सुदर्शन अष्टकम एवं तुलसी पूजा।',
+      te: 'విష్ణు సహస్రనామ పారాయణం, సుదర్శన అష్టకం మరియు తులసి పూజ.',
+      kn: 'ವಿಷ್ಣು ಸಹಸ್ರನಾಮ ಪಠಣ, ಸುದರ್ಶನ ಅಷ್ಟಕ ಮತ್ತು ತುಳಸಿ ಪೂಜೆ.',
+      ml: 'വിഷ്ണു സഹസ്രനാമ പാരായണം, സുദർശന അഷ്ടകം, തുളസി പൂജ.'
+    },
+    Jupiter: {
+      en: 'Lord Dakshinamurthy Puja, Guru Gayatri Japa, and Annadanam (food charity).',
+      ta: 'ஸ்ரீ தட்சிணாமூர்த்தி வழிபாடு, குரு காயத்ரி ஜபம், மற்றும் அன்னதானம்.',
+      hi: 'भगवान दक्षिणामूर्ति पूजा, गुरु गायत्री जप एवं अन्नदान।',
+      te: 'దక్షిణామూర్తి పూజ, గురు గాయత్రి జపం మరియు అన్నదానం.',
+      kn: 'ದಕ್ಷಿಣಾಮೂರ್ತಿ ಪೂಜೆ, ಗುರು ಗಾಯತ್ರಿ ಜಪ ಮತ್ತು ಅನ್ನದಾನ.',
+      ml: 'ദക്ഷിണാമൂർത്തി പൂജ, ഗുരു ഗായത്രി ജപം, അന്നദാനം.'
+    },
+    Venus: {
+      en: 'Sri Maha Lakshmi Ashtakam, Sri Suktam Parayanam, and Gho (Cow) Puja.',
+      ta: 'ஸ்ரீ மகா லட்சுமி அஷ்டகம், ஸ்ரீ சூக்த பாராயணம் மற்றும் கோபூஜை (பசு வழிபாடு).',
+      hi: 'माँ महालक्ष्मी अष्टकम, श्री सूक्त पाठ एवं गौ सेवा।',
+      te: 'మహాలక్ష్మి అష్టకం, శ్రీ సూక్త పారాయణం మరియు గోపూజ.',
+      kn: 'ಮಹಾಲಕ್ಷ್ಮಿ ಅಷ್ಟಕ, ಶ್ರೀ ಸೂಕ್ತ ಪಠಣ ಮತ್ತು ಗೋಪೂಜೆ.',
+      ml: 'മഹಾಲಕ್ಷ്മി അಷ್ಟಕ, ശ്രീ സൂക്ത പാരായണം, ഗോപൂജ.'
+    },
+    Saturn: {
+      en: 'Maha Mrityunjaya Japa, Lord Shiva Milk & Til Abhishekam, and Hanuman Chalisa.',
+      ta: 'மகா மிருத்யுஞ்ஜய ஜபம், சிவ பெருமானுக்கு எள் தீபம் & பால் அபிஷேகம், மற்றும் அனுமன் சாலீசா பாராயணம்.',
+      hi: 'महामृत्युंजय जप, भगवान शिव का दुग्धाभिषेक, तिल तेल का दीपक एवं हनुमान चालीसा।',
+      te: 'మహా మృత్యుంజయ జపం, శివాభిషేకం, నువ్వుల నూనె దీపం మరియు హనుమాన్ చాలీసా.',
+      kn: 'ಮಹಾ ಮೃತ್ಯುಂಜಯ ಜಪ, ಶಿವಾಭಿಷೇಕ, ಎಳ್ಳೆಣ್ಣೆ ದೀಪ ಮತ್ತು ಹನುಮಾನ್ ಚಾಲೀಸಾ.',
+      ml: 'മഹാ മൃത്യുഞ്ജയ ജപം, ശിവാഭിഷേകം, എള്ളെണ്ണ വിളക്ക്, ഹനുമാൻ ചാലീസ.'
+    },
+    Rahu: {
+      en: 'Goddess Durga Puja, Rahu Kalam Ghee Lamp, and Maha Mrityunjaya Japa.',
+      ta: 'ஸ்ரீ துர்க்கை அம்மன் வழிபாடு, ராகு கால எலுமிச்சை தீபம் மற்றும் மகா மிருத்யுஞ்ஜய ஜபம்.',
+      hi: 'माँ दुर्गा आराधना, राहु काल में दीप प्रज्वलन एवं महामृत्युंजय जप।',
+      te: 'దుర్గా దేవి పూజ, రాహు కాల దీపారాధన మరియు మహా మృత్యుంజయ జపం.',
+      kn: 'ದುರ್ಗಾ ದೇವಿ ಪೂಜೆ, ರಾಹು ಕಾಲದ ದೀಪ ಮತ್ತು ಮಹಾ ಮೃತ್ಯುಂಜಯ ಜಪ.',
+      ml: 'ദുർഗ്ഗാ ദേവി പൂജ, രാഹു കാല ദീപം, മഹാ മൃത്യുഞ്ജയ ജപം.'
+    },
+    Ketu: {
+      en: 'Maha Ganapati Homa/Puja, Ganesha Atharvashirsha Parayanam, and Meditation.',
+      ta: 'ஸ்ரீ மகா கணபதி ஹோமம்/வழிபாடு, விநாயகர் அகவல் பாராயணம் மற்றும் தியானம்.',
+      hi: 'महा गणपति होम/पूजा, गणपति अथर्वशीर्ष पाठ एवं आध्यात्मिक ध्यान।',
+      te: 'గణపతి హోమం/పూజ, సంకటనాశన గణేశ స్తోత్రం మరియు ధ్యానం.',
+      kn: 'ಗಣಪತಿ ಹೋಮ/ಪೂಜೆ, ಸಂಕಷ್ಟಹರ ಗಣಪತಿ ಸ್ತೋತ್ರ ಮತ್ತು ಧ್ಯಾನ.',
+      ml: 'ഗണപതി ഹോമം/പൂജ, ഗണേശ സ്തോത്ര പാരായണം, ധ്യാനം.'
+    }
+  };
+
+  const translateRemedies = (remedyStr, activePlanet) => {
+    let planet = activePlanet;
+    if (!planet && remedyStr) {
+      const match = remedyStr.match(/(Sun|Moon|Mars|Mercury|Jupiter|Venus|Saturn|Rahu|Ketu)/i);
+      if (match) planet = match[1];
+    }
+    if (planet) {
+      const norm = planet.charAt(0).toUpperCase() + planet.slice(1).toLowerCase();
+      if (REMEDIES_I18N[norm]) {
+        return REMEDIES_I18N[norm][language] || REMEDIES_I18N[norm]['en'];
+      }
+    }
+    if (language === 'ta') {
+      return 'மகா மிருத்யுஞ்ஜய ஜபம், சிவ பெருமானுக்கு எள் தீபம் & பால் அபிஷேகம், மற்றும் தன்வந்திரி பிரார்த்தனை.';
+    }
+    if (language === 'hi') {
+      return 'महामृत्युंजय जप, भगवान शिव का अभिषेक एवं धन्वंतरि स्वास्थ्य प्रार्थना।';
+    }
+    if (language === 'te') {
+      return 'మహా మృత్యుంజయ జపం, శివాభిషేకం మరియు ధన్వంతరి ప్రార్థన.';
+    }
+    if (language === 'kn') {
+      return 'ಮಹಾ ಮೃತ್ಯುಂಜಯ ಜಪ, ಶಿವಾಭಿಷೇಕ ಮತ್ತು ಧನ್ವಂತರಿ ಪ್ರಾರ್ಥನೆ.';
+    }
+    if (language === 'ml') {
+      return 'മഹാ മൃത്യുഞ്ജയ ജപം, ശിവാഭിഷേകം, ധന്വന്തരി പ്രാർത്ഥന.';
+    }
+    return remedyStr || 'Maha Mrityunjaya Japa, Shiva Abhishekam, and Dhanvantari prayer.';
+  };
+
+
     const translateStructuralAnchor = (type, rawText) => {
     if (!rawText) return '';
     if (language === 'en') return rawText;
@@ -1567,7 +1748,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                   </strong>
                   <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)' }}>
                     {ayurdaya.kakshyaAdjustments.map((adj, i) => (
-                      <li key={i}>{adj}</li>
+                      <li key={i}>{translateKakshyaAdjustment(adj)}</li>
                     ))}
                   </ul>
                 </div>
@@ -1587,7 +1768,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                     🧬 {t('vitalityScore', language)}
                   </div>
                   <strong style={{ fontSize: '13px', color: '#2ecc71' }}>
-                    {String(ayurdaya.parasharaAyurBala.vitalityScore || 'Balanced Vitality')}
+                    {translateVitalityScore(ayurdaya.parasharaAyurBala.vitalityScore)}
                   </strong>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px' }}>
@@ -1600,10 +1781,10 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px' }}>
                   <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                    🛡️ Lagna Lord Dignity
+                    🛡️ {t('lagnaLordDignity', language)}
                   </div>
                   <strong style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
-                    {String(ayurdaya.parasharaAyurBala.lagnaLordStrength || 'Dignified')}
+                    {translateLagnaLordDignity(ayurdaya.parasharaAyurBala.lagnaLordStrength)}
                   </strong>
                 </div>
               </div>
@@ -1621,7 +1802,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
               </p>
               {ayurdaya?.marakaBadhakaTimeline?.recommendedRemedies && (
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)', borderTop: '1px solid rgba(230, 126, 34, 0.2)', paddingTop: '6px' }}>
-                  🪔 <strong>{t('remediesRecommended', language)}:</strong> {ayurdaya.marakaBadhakaTimeline.recommendedRemedies}
+                  🪔 <strong>{t('remediesRecommended', language)}:</strong> {translateRemedies(ayurdaya.marakaBadhakaTimeline.recommendedRemedies, ayurdaya.marakaBadhakaTimeline.activeMarakaPlanet)}
                 </div>
               )}
             </div>

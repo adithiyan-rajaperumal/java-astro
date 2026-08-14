@@ -244,11 +244,13 @@ public class AyurdayaCalculationUtils {
         String activeMarakaDasaInfo = "Ages " + (baseCeilingAge - 3) + " to " + (baseCeilingAge + 3) +
                 " (~" + (targetYear - 3) + " - " + (targetYear + 3) + ") Maraka / Badhaka / Ashtamadhipati Dasa-Bhukti caution period.";
 
+        String activeMarakaPlanet = marakaLord2;
         if (dasaTimeline != null && !dasaTimeline.isEmpty()) {
             LocalDate targetDate = LocalDate.of(Math.max(1900, targetYear), 6, 15);
             for (DasaPeriod d : dasaTimeline) {
                 if (d.getStartDate() != null && d.getEndDate() != null
                         && !targetDate.isBefore(d.getStartDate()) && !targetDate.isAfter(d.getEndDate())) {
+                    activeMarakaPlanet = d.getPlanetName();
                     activeMarakaDasaInfo = d.getPlanetName() + " Mahadasa period (around age " + (baseCeilingAge - 3) +
                             " - " + (baseCeilingAge + 3) + ") calls for health caution and mindful care.";
                     break;
@@ -256,11 +258,14 @@ public class AyurdayaCalculationUtils {
             }
         }
 
+        String tailoredRemedy = getPlanetSpecificRemedy(activeMarakaPlanet);
+
         Map<String, Object> marakaTimelineMap = new LinkedHashMap<>();
         marakaTimelineMap.put("marakaLords", marakaLord2 + " (2nd) & " + marakaLord7 + " (7th)");
         marakaTimelineMap.put("badhakaLord", badhakaLord + " (" + getModality(lagnaSign) + " Lagna)");
+        marakaTimelineMap.put("activeMarakaPlanet", activeMarakaPlanet);
         marakaTimelineMap.put("criticalDasaWindow", activeMarakaDasaInfo);
-        marakaTimelineMap.put("recommendedRemedies", "Maha Mrityunjaya Japa, Shiva Abhishekam, and Dhanvantari prayer");
+        marakaTimelineMap.put("recommendedRemedies", tailoredRemedy);
 
         String lifespanRangeStr = (baseCeilingAge - 4) + " - " + (baseCeilingAge + 4) + " Years (~" + (targetYear - 4) + " - " + (targetYear + 4) + ")";
 
@@ -296,5 +301,21 @@ public class AyurdayaCalculationUtils {
                 activeMarakaDasaInfo,
                 rationale
         );
+    }
+
+    public static String getPlanetSpecificRemedy(String planet) {
+        if (planet == null) return "Maha Mrityunjaya Japa, Shiva Abhishekam, and Dhanvantari prayer";
+        return switch (planet.trim().toLowerCase()) {
+            case "sun", "surya" -> "Lord Shiva Puja, Aditya Hridaya Stotram, and Maha Mrityunjaya Mantra Japa.";
+            case "moon", "chandra" -> "Goddess Parvati & Shiva Puja, Chandra Kavacham, and Amriteshwara Prayer.";
+            case "mars", "kuja", "sevvai", "mangal" -> "Lord Subramanya / Kartikeya Puja, Dhanvantari Stotram, and Rudra Abhishekam.";
+            case "mercury", "budha" -> "Sri Vishnu Sahasranama Parayanam, Sudarshana Ashtakam, and Tulasi Archana.";
+            case "jupiter", "guru" -> "Lord Dakshinamurthy Puja, Guru Gayatri Japa, and Annadanam (food charity).";
+            case "venus", "shukra" -> "Sri Maha Lakshmi Ashtakam, Sri Suktam Parayanam, and Gho (Cow) Puja.";
+            case "saturn", "shani" -> "Maha Mrityunjaya Japa, Lord Shiva Milk & Til Abhishekam, and Hanuman Chalisa.";
+            case "rahu" -> "Goddess Durga Puja, Rahu Kalam Ghee Lamp, and Maha Mrityunjaya Japa.";
+            case "ketu" -> "Maha Ganapati Homa/Puja, Ganesha Atharvashirsha Parayanam, and Meditation.";
+            default -> "Maha Mrityunjaya Japa, Shiva Abhishekam, and Dhanvantari prayer";
+        };
     }
 }
