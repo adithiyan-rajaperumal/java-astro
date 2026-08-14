@@ -12,8 +12,8 @@ function AiPredictionsView({
 }) {
   if (!predictions && !loading) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '40px 20px' }}>
-        <h3 style={{ color: 'var(--accent-gold)', marginBottom: '12px' }}>
+      <div className="card" style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--bg-card)' }}>
+        <h3 style={{ color: 'var(--accent-saffron)', marginBottom: '12px' }}>
           ✨ {t('aiBalanTab', language)}
         </h3>
         <p style={{ maxWidth: '680px', margin: '0 auto 25px', color: 'var(--text-secondary)', lineHeight: '1.6', fontSize: '14px' }}>
@@ -31,14 +31,7 @@ function AiPredictionsView({
               fontSize: '16px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '10px',
-              background: 'linear-gradient(135deg, #f1c40f, #d4ac0d)',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              color: '#1a1a1a',
-              fontWeight: '700',
-              boxShadow: '0 4px 15px rgba(241, 196, 15, 0.3)'
+              gap: '10px'
             }}
           >
             ✨ {t('generateAiBalan', language) || 'Generate AI Life Predictions'}
@@ -50,9 +43,9 @@ function AiPredictionsView({
 
   if (loading) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '50px 20px' }}>
+      <div className="card" style={{ textAlign: 'center', padding: '50px 20px', background: 'var(--bg-card)' }}>
         <div className="spinner" style={{ margin: '0 auto 20px' }}></div>
-        <h4 style={{ color: 'var(--accent-gold)', marginBottom: '8px' }}>{t('generatingAiBalan', language)}</h4>
+        <h4 style={{ color: 'var(--accent-saffron)', marginBottom: '8px' }}>{t('generatingAiBalan', language)}</h4>
         <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
           {t('horoscopeCalculating', language)}
         </p>
@@ -62,7 +55,7 @@ function AiPredictionsView({
 
   if (error) {
     return (
-      <div className="card" style={{ borderLeft: '4px solid var(--danger)', background: 'rgba(231, 76, 60, 0.08)' }}>
+      <div className="card" style={{ borderLeft: '4px solid var(--danger)', background: 'rgba(231, 76, 60, 0.06)' }}>
         <h4 style={{ color: 'var(--danger)', margin: '0 0 8px' }}>
           ⚠️ {t('calculationFaulted', language)}
         </h4>
@@ -76,8 +69,8 @@ function AiPredictionsView({
 
   if (predictions && predictions.enabled === false) {
     return (
-      <div className="card" style={{ borderLeft: '4px solid #e74c3c', background: 'rgba(231, 76, 60, 0.08)' }}>
-        <h4 style={{ color: '#e74c3c', margin: '0 0 8px' }}>
+      <div className="card" style={{ borderLeft: '4px solid var(--danger)', background: 'rgba(231, 76, 60, 0.06)' }}>
+        <h4 style={{ color: 'var(--danger)', margin: '0 0 8px' }}>
           ⚠️ {t('calculationFaulted', language)}
         </h4>
         <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>
@@ -97,7 +90,7 @@ function AiPredictionsView({
   const is10Year = predictions?.forecastMode === 'TEN_YEARS' || yearlyList.length <= 15;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Top Status & Generation Bar */}
       <div style={{
         display: 'flex',
@@ -105,12 +98,13 @@ function AiPredictionsView({
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '12px',
-        background: 'rgba(255, 215, 0, 0.05)',
-        border: '1px solid rgba(255, 215, 0, 0.25)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: '10px',
         padding: '12px 18px',
         fontSize: '13px',
-        color: 'var(--text-secondary)'
+        color: 'var(--text-secondary)',
+        boxShadow: 'var(--shadow)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <span style={{
@@ -118,20 +112,20 @@ function AiPredictionsView({
             fontWeight: 'bold',
             padding: '3px 10px',
             borderRadius: '12px',
-            background: is10Year ? 'rgba(52, 152, 219, 0.2)' : 'rgba(155, 89, 182, 0.2)',
-            color: is10Year ? '#3498db' : '#9b59b6',
-            border: `1px solid ${is10Year ? 'rgba(52, 152, 219, 0.4)' : 'rgba(155, 89, 182, 0.4)'}`
+            background: 'rgba(255, 107, 0, 0.08)',
+            color: 'var(--accent-warm)',
+            border: '1px solid var(--accent-gold)'
           }}>
             {is10Year ? '⚡ ' + t('tenYearMode', language) : '🪐 ' + t('lifetimeMode', language)}
           </span>
-          <span>💾 <strong style={{ color: 'var(--accent-gold)' }}>{t('cachedNotice30Days', language)}</strong></span>
+          <span>💾 <strong style={{ color: 'var(--accent-warm)' }}>{t('cachedNotice30Days', language)}</strong></span>
           {predictions?.tokenUsage && (
             <>
               <span>⚡ <strong>{predictions.tokenUsage.totalTokens?.toLocaleString()}</strong> {t('tokensCount', language) || 'tokens'}</span>
               {(predictions.tokenUsage.estimatedCostUsd > 0 || predictions.tokenUsage.estimatedCostInr > 0) && (
                 <span>💵 <strong>${predictions.tokenUsage.estimatedCostUsd?.toFixed(4)} / ₹{predictions.tokenUsage.estimatedCostInr?.toFixed(2)}</strong></span>
               )}
-              <span>🤖 <code style={{ color: 'var(--text-primary)' }}>{predictions.tokenUsage.modelUsed}</code></span>
+              <span>🤖 <code style={{ color: 'var(--accent-saffron)' }}>{predictions.tokenUsage.modelUsed}</code></span>
             </>
           )}
         </div>
@@ -142,13 +136,7 @@ function AiPredictionsView({
             className="btn-primary"
             style={{
               padding: '8px 18px',
-              fontSize: '13px',
-              background: 'rgba(255, 215, 0, 0.1)',
-              border: '1px solid var(--accent-gold)',
-              color: 'var(--accent-gold)',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: '600'
+              fontSize: '13px'
             }}
           >
             ✨ {t('regenerateAiBalan', language)}
@@ -159,12 +147,12 @@ function AiPredictionsView({
       {/* 1. Personality & Behavioral Profile Card */}
       {personality?.coreTemperament && (
         <div className="card" style={{
-          background: 'linear-gradient(135deg, rgba(255,215,0,0.06), rgba(20,20,30,0.7))',
-          border: '1px solid rgba(255,215,0,0.3)',
+          borderLeft: '4px solid var(--accent-saffron)',
           borderRadius: '10px',
-          padding: '20px'
+          padding: '20px',
+          background: 'var(--bg-card)'
         }}>
-          <h3 style={{ margin: '0 0 12px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
+          <h3 style={{ margin: '0 0 12px', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
             🧠 {t('aiPersonalityBehaviorTitle', language)}
           </h3>
           <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--text-primary)', margin: 0 }}>
@@ -175,8 +163,8 @@ function AiPredictionsView({
 
       {/* 2. Retrospective Past Milestones Card */}
       {milestones.length > 0 && (
-        <div className="card" style={{ borderRadius: '10px', padding: '20px' }}>
-          <h3 style={{ margin: '0 0 16px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
+        <div className="card" style={{ borderRadius: '10px', padding: '20px', background: 'var(--bg-card)' }}>
+          <h3 style={{ margin: '0 0 16px', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
             🕰️ {t('retrospectiveMilestonesTitle', language)}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '14px' }}>
@@ -184,7 +172,7 @@ function AiPredictionsView({
               <div
                 key={idx}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--bg-primary)',
                   borderLeft: '4px solid var(--accent-gold)',
                   borderTop: '1px solid var(--border)',
                   borderRight: '1px solid var(--border)',
@@ -194,11 +182,11 @@ function AiPredictionsView({
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
-                  <strong style={{ color: 'var(--accent-gold)', fontSize: '14px' }}>
+                  <strong style={{ color: 'var(--accent-warm)', fontSize: '14px' }}>
                     {m.milestoneTitle}
                   </strong>
                   {m.approxPeriod && (
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.06)', padding: '2px 8px', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255, 107, 0, 0.08)', border: '1px solid rgba(255, 107, 0, 0.2)', padding: '2px 8px', borderRadius: '4px', fontWeight: '500' }}>
                       📅 {m.approxPeriod}
                     </span>
                   )}
@@ -215,13 +203,13 @@ function AiPredictionsView({
       {/* 3. AI Shastric Longevity & Active Yogas Analysis Card */}
       {longevity && (
         <div className="card" style={{
-          background: 'linear-gradient(135deg, rgba(20,20,35,0.9), rgba(30,30,50,0.7))',
-          border: '1px solid rgba(255, 215, 0, 0.35)',
+          borderLeft: '4px solid var(--accent-gold)',
           borderRadius: '10px',
-          padding: '20px'
+          padding: '20px',
+          background: 'var(--bg-card)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
-            <h3 style={{ margin: 0, color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
+            <h3 style={{ margin: 0, color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
               ⏳ {t('aiLongevityAnalysisTitle', language)}
             </h3>
 
@@ -232,8 +220,8 @@ function AiPredictionsView({
                   fontWeight: 'bold',
                   padding: '4px 14px',
                   borderRadius: '16px',
-                  background: 'rgba(255, 215, 0, 0.15)',
-                  color: 'var(--accent-gold)',
+                  background: 'rgba(255, 107, 0, 0.1)',
+                  color: 'var(--accent-warm)',
                   border: '1px solid var(--accent-gold)'
                 }}>
                   🎯 {t('aiCalculatedAyulCeiling', language)}: {longevity.calculatedAyulCeiling} {t('yearsSuffix', language)} ({longevity.classification || 'Poornayu'})
@@ -244,14 +232,14 @@ function AiPredictionsView({
 
           {longevity.primarySpanRationale && (
             <div style={{
-              background: 'rgba(255, 255, 255, 0.03)',
+              background: 'var(--bg-primary)',
               border: '1px solid var(--border)',
               borderRadius: '8px',
               padding: '12px 16px',
               marginBottom: '16px'
             }}>
               <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
-                📜 <strong>{language === 'ta' ? 'சாஸ்திர ஆயுள் விளக்கம்:' : 'Classical Longevity Rationale:'}</strong> {longevity.primarySpanRationale}
+                📜 <strong>{t('classicalLongevityRationale', language)}:</strong> {longevity.primarySpanRationale}
               </p>
             </div>
           )}
@@ -261,18 +249,18 @@ function AiPredictionsView({
             {/* Active Auspicious Yogas */}
             {longevity.activeYogasIdentified && longevity.activeYogasIdentified.length > 0 && (
               <div style={{
-                background: 'rgba(46, 204, 113, 0.04)',
-                border: '1px solid rgba(46, 204, 113, 0.25)',
+                background: 'rgba(46, 125, 50, 0.04)',
+                border: '1px solid rgba(46, 125, 50, 0.25)',
                 borderRadius: '8px',
                 padding: '14px'
               }}>
-                <h4 style={{ margin: '0 0 10px', color: '#2ecc71', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h4 style={{ margin: '0 0 10px', color: 'var(--success)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   ✨ {t('activeYogasIdentified', language)}
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {longevity.activeYogasIdentified.map((y, idx) => (
-                    <div key={idx} style={{ background: 'rgba(255,255,255,0.02)', padding: '8px 10px', borderRadius: '6px' }}>
-                      <strong style={{ color: 'var(--accent-gold)', fontSize: '13px', display: 'block', marginBottom: '2px' }}>
+                    <div key={idx} style={{ background: '#ffffff', border: '1px solid rgba(46, 125, 50, 0.15)', padding: '8px 10px', borderRadius: '6px' }}>
+                      <strong style={{ color: 'var(--accent-saffron)', fontSize: '13px', display: 'block', marginBottom: '2px' }}>
                         {y.yogaName}
                       </strong>
                       <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
@@ -287,18 +275,18 @@ function AiPredictionsView({
             {/* Active Doshas & Remedial Guidance */}
             {longevity.activeDoshasIdentified && longevity.activeDoshasIdentified.length > 0 && (
               <div style={{
-                background: 'rgba(230, 126, 34, 0.04)',
-                border: '1px solid rgba(230, 126, 34, 0.25)',
+                background: 'rgba(232, 93, 4, 0.04)',
+                border: '1px solid rgba(232, 93, 4, 0.25)',
                 borderRadius: '8px',
                 padding: '14px'
               }}>
-                <h4 style={{ margin: '0 0 10px', color: '#e67e22', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h4 style={{ margin: '0 0 10px', color: 'var(--accent-warm)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   🛡️ {t('activeDoshasIdentified', language)}
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {longevity.activeDoshasIdentified.map((d, idx) => (
-                    <div key={idx} style={{ background: 'rgba(255,255,255,0.02)', padding: '8px 10px', borderRadius: '6px' }}>
-                      <strong style={{ color: '#e74c3c', fontSize: '13px', display: 'block', marginBottom: '2px' }}>
+                    <div key={idx} style={{ background: '#ffffff', border: '1px solid rgba(232, 93, 4, 0.15)', padding: '8px 10px', borderRadius: '6px' }}>
+                      <strong style={{ color: 'var(--danger)', fontSize: '13px', display: 'block', marginBottom: '2px' }}>
                         {d.doshaName}
                       </strong>
                       <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
@@ -322,9 +310,9 @@ function AiPredictionsView({
         const yearRangeText = sYr && eYr ? ` (${sYr} – ${eYr}${sAge !== undefined && eAge !== undefined ? ` • ${language === 'ta' ? `வயது ${sAge} - ${eAge}` : `Age ${sAge} to ${eAge}`}` : ''})` : '';
 
         return (
-          <div className="card" style={{ borderRadius: '10px', padding: '20px' }}>
+          <div className="card" style={{ borderRadius: '10px', padding: '20px', background: 'var(--bg-card)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
-              <h3 style={{ margin: 0, color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
+              <h3 style={{ margin: 0, color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
                 📜 {t('yearlyPredictionsStreamTitle', language)}{yearRangeText}
               </h3>
               <span style={{
@@ -332,9 +320,9 @@ function AiPredictionsView({
                 fontWeight: 'bold',
                 padding: '4px 12px',
                 borderRadius: '12px',
-                background: is10Year ? 'rgba(52, 152, 219, 0.15)' : 'rgba(155, 89, 182, 0.15)',
-                color: is10Year ? '#3498db' : '#9b59b6',
-                border: `1px solid ${is10Year ? 'rgba(52, 152, 219, 0.3)' : 'rgba(155, 89, 182, 0.3)'}`
+                background: 'rgba(255, 107, 0, 0.08)',
+                color: 'var(--accent-warm)',
+                border: '1px solid var(--accent-gold)'
               }}>
                 {is10Year ? `⚡ ${t('tenYearMode', language)}` : `🪐 ${t('lifetimeMode', language)} (${yearlyList.length} ${t('yearsSuffix', language)})`}
               </span>
@@ -355,7 +343,7 @@ function AiPredictionsView({
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '12px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                      boxShadow: 'var(--shadow)'
                     }}
                   >
                     {/* Header */}
@@ -363,20 +351,20 @@ function AiPredictionsView({
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      borderBottom: '1px solid rgba(255,255,255,0.06)',
+                      borderBottom: '1px solid var(--border)',
                       paddingBottom: '8px',
                       flexWrap: 'wrap',
                       gap: '6px'
                     }}>
-                      <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--accent-gold)' }}>
+                      <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--accent-saffron)' }}>
                         🌟 {yp.year} ({t('yearAge', language)}: {yp.age})
                       </span>
                       {yp.dasaBhukthi && (
                         <span style={{
                           fontSize: '12px',
                           color: 'var(--text-secondary)',
-                          background: 'rgba(255,215,0,0.08)',
-                          border: '1px solid rgba(255,215,0,0.2)',
+                          background: 'rgba(255, 107, 0, 0.06)',
+                          border: '1px solid rgba(255, 107, 0, 0.2)',
                           padding: '2px 8px',
                           borderRadius: '4px',
                           fontWeight: '500'
@@ -389,8 +377,8 @@ function AiPredictionsView({
                     {/* Uncapped Rich Narrative */}
                     {narrative && (
                       <div style={{
-                        background: 'rgba(255, 255, 255, 0.02)',
-                        border: '1px solid rgba(255,255,255,0.04)',
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border)',
                         borderRadius: '6px',
                         padding: '12px'
                       }}>
