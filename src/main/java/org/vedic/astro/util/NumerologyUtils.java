@@ -79,8 +79,8 @@ public class NumerologyUtils {
 
         String conflictNotes = null;
         if (enemies.contains(conductor)) {
-            conflictNotes = "ஓட்டுநர் எண் " + driver + " (" + driverPlanet + ") மற்றும் நடத்துனர் எண் " + conductor + " (" + conductorPlanet +
-                    ") பகையாக அமைவதால் நடுநிலை பால எண்களான 5 (புதன்) அல்லது 6 (சுக்கிரன்) பயன்படுத்தவும்.";
+            conflictNotes = "Driver number " + driver + " (" + driverPlanet + ") and Destiny conductor number " + conductor + " (" + conductorPlanet +
+                    ") are inimical. Use neutral bridge numbers like 5 (Mercury) or 6 (Venus) for balanced harmony.";
         }
 
         return new NumerologyResult(
@@ -179,7 +179,7 @@ public class NumerologyUtils {
         };
 
         List<Integer> chandraDays = chandrashtamaDays != null ? chandrashtamaDays : Collections.emptyList();
-        String caution = chandraDays.isEmpty() ? null : "சந்திராஷ்டம தினங்களில் புதிய முதலீடுகள் மற்றும் முக்கிய பயணங்களைத் தவிர்க்கவும்.";
+        String caution = chandraDays.isEmpty() ? null : "Exercise caution for major investments and critical travel on Chandrashtama days.";
 
         return new LuckyDatesResult(
                 primary,

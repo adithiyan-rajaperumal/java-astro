@@ -134,8 +134,8 @@ public class SpiritualDeityUtils {
 
         String kulaStatus = fifthAfflicted ? "BLOCKED_ANCESTRAL_DOSHA" : "BLESSED";
         String kulaRemedy = fifthAfflicted ?
-                "குலதெய்வ வழிபாட்டில் குறை அல்லது பித்ரு தோஷ தாக்கம் தென்படுவதால், பௌர்ணமி/அமாவாசை தினங்களில் குலதெய்வக் கோயிலுக்குச் சென்று நெய்தீபம் ஏற்றி வழிபடுதல் மற்றும் எள் தீபம் ஏற்றி பித்ரு தர்ப்பணம் செய்தல் நலம் பயக்கும்." :
-                "குலதெய்வ அருளும் பித்ரு ஆசிகளும் பரிபூரணமாக உள்ளது. குடும்பத்தில் ஒற்றுமையும் சந்தான விருத்தியும் தழைக்கும்.";
+                "Ancestral blessings require attention. Lighting a ghee lamp at the Kula Devata temple and offering Pitru Tarpanam on Amavasya/Purnima is recommended." :
+                "Kula Devata and ancestral blessings are strongly protective, promoting family harmony and progeny wellbeing.";
 
         return new SpiritualDeitiesResult(
                 atmakaraka,
