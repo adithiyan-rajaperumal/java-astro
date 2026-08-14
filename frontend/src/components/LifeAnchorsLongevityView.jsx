@@ -181,6 +181,14 @@ const DEITY_NAMES_I18N = {
 };
 
 const KULA_DEVATA_MESSAGES = {
+  KULA_VRIDDHI_BLESSED: {
+    en: 'Supreme grace of Kula Devata and divine Pitru blessings with Kula Vriddhi yoga. Ensures extraordinary family prosperity, auspicious progeny, and spiritual protection.',
+    ta: 'குலவிருத்தி யோகத்துடன் கூடிய பரிபூரண குலதெய்வ அருளும் பித்ரு ஆசிகளும் நிறைந்துள்ளது. குடும்பத்தில் சீரான சுபிட்சம், நன்மக்கட்பேறு மற்றும் தெய்வீகப் பாதுகாப்பு நிலைத்திருக்கும்.',
+    hi: 'कुलवृद्धि योग के साथ कुलदेवता एवं पितरों का परम आशीर्वाद प्राप्त है। परिवार में उत्कृष्ट समृद्धि, सुयोग्य संतान एवं आध्यात्मिक सुरक्षा बनी रहेगी।',
+    te: 'కులవృద్ధి యోగంతో కూడిన సంపూర్ణ కులదైవ మరియు పితృ ఆశీస్సులు ఉన్నాయి. కుటుంబంలో అపారమైన సమృద్ధి, సంతాన సౌభాగ్యం మరియు దైవిక రక్షణ కలుగుతాయి.',
+    kn: 'ಕುಲವೃದ್ಧಿ ಯೋಗದೊಂದಿಗೆ ಕುಲದೇವತೆ ಮತ್ತು ಪಿತೃಗಳ ಪರಮಾನುಗ್ರಹವಿದೆ. ಕುಟುಂಬದಲ್ಲಿ ಅದ್ಭುತ ಸಮೃದ್ಧಿ, ಸತ್ಸಂತಾನ ಮತ್ತು ದೈವಿಕ ರಕ್ಷಣೆ ಸದಾ ಇರುವುದು.',
+    ml: 'കുലവൃദ്ധി യോഗത്തോടുകൂടിയ കുലദേവതയുടെയും പിതൃക്കളുടെയും പരമമായ അനുഗ്രഹം. കുടുംബത്തിൽ ഐശ്വര്യവും സത്സന്താന സൗഭാഗ്യവും ദീർഘകാല സംരക്ഷണവും ഉണ്ടാകും.'
+  },
   BLESSED: {
     en: 'Full grace of Kula Devata and ancestral Pitru blessings. Brings family harmony, longevity, and lineage prosperity.',
     ta: 'குலதெய்வ அருளும் பித்ரு ஆசிகளும் பரிபூரணமாக உள்ளது. குடும்பத்தில் ஒற்றுமையும் சந்தான விருத்தியும் தழைக்கும்.',
@@ -1603,8 +1611,13 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
   const dharmaName = translateDeityName(deities?.dharmaDevata);
   const ishtaRationale = translateDeityRationale(deities?.ishtaDevataRationaleEnglish, deities?.ishtaDevataRationaleTamil);
   const dharmaRationale = translateDeityRationale(deities?.dharmaDevataRationaleEnglish, deities?.dharmaDevataRationaleTamil);
-  const kulaStatus = deities?.kulaDevataBlessingStatus === 'BLESSED' ? 'BLESSED' : 'AFFLICTED';
-  const kulaMessage = KULA_DEVATA_MESSAGES[kulaStatus][language] || KULA_DEVATA_MESSAGES[kulaStatus]['en'];
+  const rawKulaStatus = deities?.kulaDevataBlessingStatus;
+  const kulaStatus = rawKulaStatus === 'KULA_VRIDDHI_BLESSED' ? 'KULA_VRIDDHI_BLESSED' : (rawKulaStatus === 'BLESSED' ? 'BLESSED' : 'AFFLICTED');
+  const kulaMessage = KULA_DEVATA_MESSAGES[kulaStatus]?.[language] || KULA_DEVATA_MESSAGES[kulaStatus]?.['en'] || KULA_DEVATA_MESSAGES.BLESSED['en'];
+  const isKulaBlessed = kulaStatus === 'BLESSED' || kulaStatus === 'KULA_VRIDDHI_BLESSED';
+  const kulaBadgeLabel = kulaStatus === 'KULA_VRIDDHI_BLESSED' ?
+    (language === 'ta' ? 'குலவிருத்தி யோகம் ✓' : language === 'hi' ? 'कुलवृद्धि योग ✓' : language === 'te' ? 'కులవృద్ధి యోగం ✓' : language === 'kn' ? 'ಕುಲವೃದ್ಧಿ ಯೋಗ ✓' : language === 'ml' ? 'കുലവൃദ്ധി യോഗം ✓' : 'Kula Vriddhi ✓') :
+    (isKulaBlessed ? t('blessedStatus', language) : t('remedyAdvised', language));
 
   // Localized Gemology Elements
   const primaryGem = translateGemName(gemology?.primaryGemstone);
@@ -1661,11 +1674,11 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                 fontWeight: 'bold',
                 padding: '2px 8px',
                 borderRadius: '10px',
-                background: deities?.kulaDevataBlessingStatus === 'BLESSED' ? 'rgba(46, 204, 113, 0.15)' : 'rgba(231, 76, 60, 0.15)',
-                color: deities?.kulaDevataBlessingStatus === 'BLESSED' ? '#2ecc71' : '#e74c3c',
-                border: deities?.kulaDevataBlessingStatus === 'BLESSED' ? '1px solid rgba(46, 204, 113, 0.3)' : '1px solid rgba(231, 76, 60, 0.3)'
+                background: isKulaBlessed ? 'rgba(46, 204, 113, 0.15)' : 'rgba(231, 76, 60, 0.15)',
+                color: isKulaBlessed ? '#2ecc71' : '#e74c3c',
+                border: isKulaBlessed ? '1px solid rgba(46, 204, 113, 0.3)' : '1px solid rgba(231, 76, 60, 0.3)'
               }}>
-                {deities?.kulaDevataBlessingStatus === 'BLESSED' ? t('blessedStatus', language) : t('remedyAdvised', language)}
+                {kulaBadgeLabel}
               </span>
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>

@@ -21,6 +21,15 @@ public class GemologyEngineUtils {
             String astrologicalRationale
     ) {}
 
+    public static String getYogakarakaPlanet(int lagnaSign) {
+        return switch (lagnaSign) {
+            case 2, 7 -> "Saturn"; // Taurus (9 & 10), Libra (4 & 5)
+            case 4, 5 -> "Mars";   // Cancer (5 & 10), Leo (4 & 9)
+            case 10, 11 -> "Venus"; // Capricorn (5 & 10), Aquarius (4 & 9)
+            default -> null;
+        };
+    }
+
     public static GemologyResult calculateGemologyRecommendation(int lagnaSign, Map<String, PlanetaryPosition> d1) {
         if (d1 == null || d1.isEmpty()) {
             return defaultGemologyResult();
@@ -34,10 +43,16 @@ public class GemologyEngineUtils {
         String lord1 = PlanetDignityUtils.getSignLord(firstSign);
         String lord5 = PlanetDignityUtils.getSignLord(fifthSign);
         String lord9 = PlanetDignityUtils.getSignLord(ninthSign);
+        String yogakaraka = getYogakarakaPlanet(lagnaSign);
 
-        List<String> candidates = List.of(lord1, lord9, lord5);
+        List<String> candidates = new ArrayList<>();
+        if (yogakaraka != null) candidates.add(yogakaraka);
+        if (!candidates.contains(lord1)) candidates.add(lord1);
+        if (!candidates.contains(lord9)) candidates.add(lord9);
+        if (!candidates.contains(lord5)) candidates.add(lord5);
+
         String selectedPlanet = lord1;
-        String selectionRationale = "Lagna Lord strengthened as primary gemstone.";
+        String selectionRationale = lord1 + " (Lagna Lord) strengthened as foundational primary gemstone.";
 
         for (String planet : candidates) {
             PlanetaryPosition pos = d1.get(planet);
@@ -52,7 +67,11 @@ public class GemologyEngineUtils {
                     continue;
                 }
                 selectedPlanet = planet;
-                selectionRationale = planet + " placed in Kendra-Trikona auspicious house as Trikona Lord (1, 5, 9) and recommended as Yogakaraka gemstone.";
+                if (planet.equalsIgnoreCase(yogakaraka)) {
+                    selectionRationale = planet + " is the supreme Yogakaraka (governing Kendra & Trikona simultaneously), placed auspiciously in House " + house + ", recommended as the most potent life-enhancing gemstone.";
+                } else {
+                    selectionRationale = planet + " placed in auspicious House " + house + " as Trikona Lord (1, 5, 9) and recommended as primary beneficial gemstone.";
+                }
                 break;
             }
         }

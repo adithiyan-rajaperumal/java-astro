@@ -179,12 +179,24 @@ public class NumerologyUtils {
         };
 
         List<Integer> chandraDays = chandrashtamaDays != null ? chandrashtamaDays : Collections.emptyList();
-        String caution = chandraDays.isEmpty() ? null : "Exercise caution for major investments and critical travel on Chandrashtama days.";
+        List<Integer> filteredPrimary = new ArrayList<>();
+        List<Integer> dynamicAvoid = new ArrayList<>(avoid);
+
+        for (Integer d : primary) {
+            if (chandraDays.contains(d)) {
+                if (!dynamicAvoid.contains(d)) dynamicAvoid.add(d);
+            } else {
+                filteredPrimary.add(d);
+            }
+        }
+        Collections.sort(dynamicAvoid);
+
+        String caution = chandraDays.isEmpty() ? null : "Dates cross-referenced with transit Moon Chandrashtama. Avoid major investments, vital signing, and critical journeys on Chandrashtama days.";
 
         return new LuckyDatesResult(
-                primary,
+                filteredPrimary.isEmpty() ? primary : filteredPrimary,
                 secondary,
-                avoid,
+                dynamicAvoid,
                 chandraDays,
                 caution
         );

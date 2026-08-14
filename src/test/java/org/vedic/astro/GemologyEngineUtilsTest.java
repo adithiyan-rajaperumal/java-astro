@@ -40,4 +40,18 @@ public class GemologyEngineUtilsTest {
         assertNotNull(gem.primaryGemstone());
         assertNotNull(gem.astrologicalRationale());
     }
+
+    @Test
+    public void testYogakarakaPriorityForCancerLagna() {
+        Map<String, PlanetaryPosition> d1 = new HashMap<>();
+        // Kataka Lagna (4): 1st Lord Moon (in 4th/Kataka), Yogakaraka Mars (rules 5 & 10, in 10th/Mesha)
+        d1.put("Lagna", PlanetaryPosition.builder().name("Lagna").signNumber(4).build());
+        d1.put("Moon", PlanetaryPosition.builder().name("Moon").signNumber(4).build());
+        d1.put("Mars", PlanetaryPosition.builder().name("Mars").signNumber(1).build()); // Exalted in 10th house
+        d1.put("Jupiter", PlanetaryPosition.builder().name("Jupiter").signNumber(9).build());
+
+        var gem = GemologyEngineUtils.calculateGemologyRecommendation(4, d1);
+        assertEquals("Red Coral", gem.primaryGemstone());
+        assertTrue(gem.astrologicalRationale().contains("Yogakaraka"));
+    }
 }

@@ -33,6 +33,19 @@ public class SpiritualDeityUtilsTest {
         assertNotNull(deities.ishtaDevata());
         assertNotNull(deities.ishtaDevataTamil());
         assertTrue(deities.ishtaDevataRationaleTamil().contains("அமர்ந்துள்ள கிரகம்"));
+        assertEquals("KULA_VRIDDHI_BLESSED", deities.kulaDevataBlessingStatus());
+    }
+
+    @Test
+    public void testKulaVriddhiAndBeneficRescueScenario() {
+        Map<String, PlanetaryPosition> d1 = new HashMap<>();
+        d1.put("Lagna", PlanetaryPosition.builder().name("Lagna").signNumber(1).degreeInSign(10.0).build()); // 5th house is Simha (5)
+        d1.put("Sun", PlanetaryPosition.builder().name("Sun").signNumber(5).degreeInSign(15.0).build());
+        d1.put("Rahu", PlanetaryPosition.builder().name("Rahu").signNumber(5).degreeInSign(14.0).build()); // Rahu in 5th house
+        d1.put("Jupiter", PlanetaryPosition.builder().name("Jupiter").signNumber(1).degreeInSign(10.0).build()); // Jupiter in Lagna aspects 5th house (5th aspect)
+
+        var deities = SpiritualDeityUtils.calculateSpiritualDeities(d1, Collections.emptyList());
+        // Benefic rescue neutralizes Rahu affliction -> BLESSED
         assertEquals("BLESSED", deities.kulaDevataBlessingStatus());
     }
 

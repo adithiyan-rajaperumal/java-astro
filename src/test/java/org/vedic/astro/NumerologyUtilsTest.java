@@ -3,6 +3,8 @@ package org.vedic.astro;
 import org.junit.jupiter.api.Test;
 import org.vedic.astro.util.NumerologyUtils;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NumerologyUtilsTest {
@@ -38,5 +40,16 @@ public class NumerologyUtilsTest {
         assertTrue(dates.primaryLuckyDates().contains(16));
         assertTrue(dates.primaryLuckyDates().contains(25));
         assertTrue(dates.datesToAvoid().contains(8));
+    }
+
+    @Test
+    public void testDynamicChandrashtamaFiltering() {
+        // Driver 1 (Primary: 1, 10, 19, 28)
+        // Chandrashtama days: [10, 11] -> 10 should be moved to avoid dates!
+        var dates = NumerologyUtils.calculateLuckyDates(1, 1, List.of(10, 11));
+        assertFalse(dates.primaryLuckyDates().contains(10));
+        assertTrue(dates.datesToAvoid().contains(10));
+        assertNotNull(dates.transitCautionNotes());
+        assertTrue(dates.transitCautionNotes().contains("Chandrashtama"));
     }
 }

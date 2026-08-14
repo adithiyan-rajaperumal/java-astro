@@ -83,14 +83,15 @@ public class StructuralAnchorsUtils {
         String vitalityStatus = "Lagna: " + lagnaSignName + " | Paka Lagna (Lagna Lord sign): " + pakaLagnaName + " (House " + llHouse + "). " +
                 (llStrong ? "Strong physical vitality and immune resilience." : "Consistent health awareness and routine care recommended.");
 
-        // Arudha Lagna (AL)
+        // Arudha Lagna (AL) - Jaimini Upadesha Sutras 1.1.30-31
         int dist = ((pakaLagnaSign - lagnaSign + 12) % 12);
         int rawAl = ((pakaLagnaSign + dist - 1) % 12) + 1;
         int alHouseFromLagna = ((rawAl - lagnaSign + 12) % 12) + 1;
 
         int finalAlSign = rawAl;
-        // Jaimini exception rules: If AL falls in 1st or 7th, or 4th or 10th from Lagna, jump 10 houses forward
-        if (alHouseFromLagna == 1 || alHouseFromLagna == 7 || alHouseFromLagna == 4 || alHouseFromLagna == 10) {
+        // Jaimini exception rule: If raw Arudha falls in 1st or 7th house from Lagna,
+        // it jumps 10 houses forward from raw Arudha (10th from Lagna if 1st, or 4th from Lagna if 7th)
+        if (alHouseFromLagna == 1 || alHouseFromLagna == 7) {
             finalAlSign = ((rawAl + 10 - 1 - 1) % 12) + 1;
         }
         String alSignName = RASHIS[finalAlSign - 1];

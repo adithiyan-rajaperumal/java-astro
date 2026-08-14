@@ -111,7 +111,7 @@ public class SpiritualDeityUtils {
         String dharmaDevata = mapPlanetToIshtaDevata(dharmaAnalysis.dominantPlanet(), false);
         String dharmaDevataTa = mapPlanetToIshtaDevata(dharmaAnalysis.dominantPlanet(), true);
 
-        // 5. Kula Devata Status: 5th House & 5th Lord in D1
+        // 5. Kula Devata Status: 5th House & 5th Lord in D1 (with Benefic Drishti & Kula Vriddhi rules)
         int lagnaSign = d1.get("Lagna") != null ? d1.get("Lagna").getSignNumber() : 1;
         int fifthSign = ((lagnaSign - 1 + 4) % 12) + 1;
         String fifthLord = PlanetDignityUtils.getSignLord(fifthSign);
@@ -132,10 +132,39 @@ public class SpiritualDeityUtils {
             if (ketuPos != null && ketuPos.getSignNumber() == flSign) fifthAfflicted = true;
         }
 
-        String kulaStatus = fifthAfflicted ? "BLOCKED_ANCESTRAL_DOSHA" : "BLESSED";
-        String kulaRemedy = fifthAfflicted ?
-                "Ancestral blessings require attention. Lighting a ghee lamp at the Kula Devata temple and offering Pitru Tarpanam on Amavasya/Purnima is recommended." :
-                "Kula Devata and ancestral blessings are strongly protective, promoting family harmony and progeny wellbeing.";
+        // Benefic rescue: Check Jupiter (Guru) or Venus (Shukra) placement/aspect on 5th house
+        boolean hasBeneficGrace = false;
+        PlanetaryPosition jupPos = d1.get("Jupiter");
+        if (jupPos != null) {
+            int jupSign = jupPos.getSignNumber();
+            int jupHouse = ((jupSign - lagnaSign + 12) % 12) + 1;
+            // Jupiter in 5th, or aspecting 5th (from 1st - 5th aspect, from 9th - 9th aspect, from 11th - 7th aspect)
+            if (jupHouse == 5 || jupHouse == 1 || jupHouse == 9 || jupHouse == 11) {
+                hasBeneficGrace = true;
+            }
+        }
+        PlanetaryPosition venPos = d1.get("Venus");
+        if (venPos != null) {
+            int venSign = venPos.getSignNumber();
+            int venHouse = ((venSign - lagnaSign + 12) % 12) + 1;
+            if (venHouse == 5 || venHouse == 11) {
+                hasBeneficGrace = true;
+            }
+        }
+
+        String kulaStatus;
+        String kulaRemedy;
+
+        if (fifthAfflicted && !hasBeneficGrace) {
+            kulaStatus = "BLOCKED_ANCESTRAL_DOSHA";
+            kulaRemedy = "Ancestral blessings require attention. Lighting a ghee lamp at the Kula Devata temple and offering Pitru Tarpanam on Amavasya is recommended.";
+        } else if (hasBeneficGrace && !fifthAfflicted) {
+            kulaStatus = "KULA_VRIDDHI_BLESSED";
+            kulaRemedy = "Supreme Kula Devata blessings and Kula Vriddhi (lineage prosperity) bestowed by divine benefic association on 5th house/lord.";
+        } else {
+            kulaStatus = "BLESSED";
+            kulaRemedy = "Kula Devata and ancestral blessings are protective, promoting family harmony, peace, and progeny wellbeing.";
+        }
 
         return new SpiritualDeitiesResult(
                 atmakaraka,
