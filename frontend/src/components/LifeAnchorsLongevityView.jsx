@@ -69,7 +69,7 @@ const I18N_TERMS = {
   // Modalities
   'CHARA': { en: 'Movable (Chara)', ta: 'சர', hi: 'चर', te: 'చర', kn: 'ಚರ', ml: 'ചര' },
   'STHIRA': { en: 'Fixed (Sthira)', ta: 'ஸ்திர', hi: 'स्थिर', te: 'స్థిర', kn: 'ಸ್ಥಿರ', ml: 'സ്ഥിര' },
-  'DWISVABHAVA': { en: 'Dual (Dwisvabhava)', ta: 'உபய', hi: 'দ্বিस्वभाव', te: 'ద్విస్వభావ', kn: 'ದ್ವಿಸ್ವಭಾವ', ml: 'ദ്വിസ്വഭാവ' },
+  'DWISVABHAVA': { en: 'Dual (Dwisvabhava)', ta: 'உபய', hi: 'द्विस्वभाव', te: 'ద్విస్వభావ', kn: 'ದ್ವಿಸ್ವಭಾವ', ml: 'ദ്വിസ്വഭാവ' },
 
   // Prakritis
   'Vata-Pitta': { en: 'Vata-Pitta', ta: 'வாத-பித்தம் (Vata-Pitta)', hi: 'वात-पित्त (Vata-Pitta)', te: 'వాత-పిత్తం (Vata-Pitta)', kn: 'ವಾತ-ಪಿತ್ತ (Vata-Pitta)', ml: 'വാത-പിത്തം (Vata-Pitta)' },
@@ -92,6 +92,14 @@ const DEITY_NAMES_I18N = {
     kn: 'ಶಿವ / ಶ್ರೀ ರಾಮ',
     ml: 'ശിവൻ / ശ്രീരാമൻ'
   },
+  'Goddess Parvati / Goddess Gauri / Lord Krishna': {
+    en: 'Goddess Parvati / Goddess Gauri / Lord Krishna',
+    ta: 'ஸ்ரீ பார்வதி / கௌரி / கிருஷ்ணர்',
+    hi: 'माँ पार्वती / गौरी / श्री कृष्ण',
+    te: 'పార్వతీ దేవి / గౌరి / శ్రీకృష్ణుడు',
+    kn: 'ಪಾರ್ವತಿ / ಗೌರಿ / ಶ್ರೀಕೃಷ್ಣ',
+    ml: 'പാർവ്വതി / ഗൗരി / ശ്രീകൃഷ്ണൻ'
+  },
   'Goddess Parvati / Gauri / Krishna': {
     en: 'Goddess Parvati / Gauri / Krishna',
     ta: 'ஸ்ரீ பார்வதி / கௌரி / கிருஷ்ணர்',
@@ -100,45 +108,77 @@ const DEITY_NAMES_I18N = {
     kn: 'ಪಾರ್ವತಿ / ಗೌರಿ / ಶ್ರೀಕೃಷ್ಣ',
     ml: 'പാർവ്വതി / ഗൗരി / ശ്രീകൃഷ്ണൻ'
   },
+  'Lord Murugan / Lord Narasimha / Kartikeya': {
+    en: 'Lord Murugan / Lord Narasimha / Kartikeya',
+    ta: 'ஸ்ரீ முருகப்பெருமான் / நரசிம்மர் / சுப்பிரமணியர்',
+    hi: 'भगवान मुरुगन / नृसिंह / कार्तिकेय',
+    te: 'సుబ్రహ్మణ్య స్వామి / నరసింహ స్వామి / మురుగన్',
+    kn: 'ಸುಬ್ರಹ್ಮಣ್ಯ / ನರಸಿಂಹ / ಕಾರ್ತಿಕೇಯ',
+    ml: 'മുരുകൻ / നരസിംഹം / കാർത്തികേയൻ'
+  },
   'Lord Muruga / Subramanya / Kartikeya': {
     en: 'Lord Muruga / Subramanya / Kartikeya',
     ta: 'ஸ்ரீ முருகப்பெருமான் / சுப்பிரமணியர்',
-    hi: 'भगवान कार्तिकेय / मुरुगन / स्कंद',
+    hi: 'भगवान मुरुगन / नृसिंह / कार्तिकेय',
     te: 'సుబ్రహ్మణ్య స్వామి / మురుగన్',
     kn: 'ಸುಬ್ರಹ್ಮಣ್ಯ / ಕಾರ್ತಿಕೇಯ / ಮುರುಗ',
     ml: 'മുരുകൻ / സുബ്രഹ്മണ്യൻ / കാർത്തികേയൻ'
   },
   'Lord Vishnu / Lord Venkateshwara': {
     en: 'Lord Vishnu / Lord Venkateshwara',
-    ta: 'ஸ்ரீ மகாவிஷ்ணு / வேங்கடாஜலபதி',
+    ta: 'ஸ்ரீ மகாவிஷ்ணு / வேங்கடாஜலபதி / பெருமாள்',
     hi: 'भगवान विष्णु / श्री वेंकटेश्वर',
     te: 'మహావిష్ణువు / శ్రీ వేంకటేశ్వర స్వామి',
     kn: 'ಮಹಾವಿಷ್ಣು / ಶ್ರೀ ವೆಂಕಟೇಶ್ವರ',
     ml: 'മഹാവിഷ്ണു / ശ്രീ വെങ്കിടേശ്വരൻ'
   },
-  'Lord Dakshinamurthy / Brihaspati / Hayagriva': {
-    en: 'Lord Dakshinamurthy / Brihaspati / Hayagriva',
+  'Lord Dakshinamurthy / Lord Hayagriva': {
+    en: 'Lord Dakshinamurthy / Lord Hayagriva',
     ta: 'ஸ்ரீ தட்சிணாமூர்த்தி / ஹயக்ரீவர் / பிரகஸ்பதி',
-    hi: 'भगवान दक्षिणामूर्ति / हयग्रीव / बृहस्पति',
+    hi: 'भगवान दक्षिणामूर्ति / श्री हयग्रीव / बृहस्पति',
     te: 'దక్షిణామూర్తి / హయగ్రీవుడు / బృహస్పతి',
     kn: 'ದಕ್ಷಿಣಾಮೂರ್ತಿ / ಹಯಗ್ರೀವ / ಬೃಹಸ್ಪತಿ',
     ml: 'ദക്ഷിണാമൂർത്തി / ഹയഗ്രീവൻ / ബൃഹസ്പതി'
   },
+  'Lord Dakshinamurthy / Brihaspati / Hayagriva': {
+    en: 'Lord Dakshinamurthy / Brihaspati / Hayagriva',
+    ta: 'ஸ்ரீ தட்சிணாமூர்த்தி / ஹயக்ரீவர் / பிரகஸ்பதி',
+    hi: 'भगवान दक्षिणामूर्ति / श्री हयग्रीव / बृहस्पति',
+    te: 'దక్షిణామూర్తి / హయగ్రీవుడు / బృహస్పతి',
+    kn: 'ದಕ್ಷಿಣಾಮೂರ್ತಿ / ಹಯಗ್ರೀವ / ಬೃಹಸ್ಪತಿ',
+    ml: 'ദക്ഷിണാമൂർത്തി / ഹയഗ്രീവൻ / ബൃഹസ്പതി'
+  },
+  'Goddess Maha Lakshmi / Annapoorneshwari': {
+    en: 'Goddess Maha Lakshmi / Annapoorneshwari',
+    ta: 'ஸ்ரீ மகாலட்சுமி / அன்னபூரணி / ஸ்ரீ வித்யா',
+    hi: 'माँ महालक्ष्मी / अन्नपूर्णा / श्री विद्या',
+    te: 'మహాలక్ష్మి / అన్నపూర్ణ / శ్రీ విద్య',
+    kn: 'ಮಹಾಲಕ್ಷ್ಮಿ / ಅನ್ನಪೂರ್ಣ / ಶ್ರೀ ವಿದ್ಯಾ',
+    ml: 'മഹാലക്ഷ്മി / അന്നപൂർണ്ണ / ശ്രീ വിദ്യ'
+  },
   'Goddess Mahalakshmi / Sri Radha / Annapoorni': {
     en: 'Goddess Mahalakshmi / Sri Radha / Annapoorni',
     ta: 'ஸ்ரீ மகாலட்சுமி / ராதா / அன்னபூரணி',
-    hi: 'माँ महालक्ष्मी / श्री राधा / अन्नपूर्णा',
+    hi: 'माँ महालक्ष्मी / श्री Radha / अन्नपूर्णा',
     te: 'మహాలక్ష్మి / రాధా దేవి / అన్నపూర్ణ',
     kn: 'ಮಹಾಲಕ್ಷ್ಮಿ / ರಾಧಾ / ಅನ್ನಪೂರ್ಣ',
     ml: 'മഹാലക്ഷ്മി / രാധാദേവി / അന്നപൂർണ്ണ'
   },
   'Lord Hanuman / Shani Deva / Lord Ayyappan': {
     en: 'Lord Hanuman / Shani Deva / Lord Ayyappan',
-    ta: 'ஸ்ரீ அனுமன் / சனி பகவான் / அய்யப்பன்',
+    ta: 'ஸ்ரீ அனுமன் / சனி பகவான் / கருப்பணசுவாமி / சாஸ்தா',
     hi: 'भगवान हनुमान / शनि देव / अय्यप्पा',
     te: 'హనుమంతుడు / శని దేవుడు / అయ్యప్ప స్వామి',
     kn: 'ಹನುಮಂತ / ಶನಿ ದೇವ / ಅಯ್ಯಪ್ಪ ಸ್ವಾಮಿ',
     ml: 'ഹനുമാൻ / ശനീശ്വരൻ / അയ്യപ്പൻ'
+  },
+  'Goddess Durga / Goddess Varahi / Bhadrakali': {
+    en: 'Goddess Durga / Goddess Varahi / Bhadrakali',
+    ta: 'ஸ்ரீ துர்க்கை / வாராஹி அம்மன் / பத்ரகாளி',
+    hi: 'माँ दुर्गा / वाराही / भद्रकाली',
+    te: 'దుర్గా దేవి / వారాహి / భద్రకాళి',
+    kn: 'ದುರ್ಗಾ ದೇವಿ / ವಾರಾಹಿ / ಭದ್ರಕಾಳಿ',
+    ml: 'ദുർഗ്ഗാ ദേവി / വാരാഹി / ഭദ്രകാളി'
   },
   'Goddess Durga / Rahu / Chhinnamasta': {
     en: 'Goddess Durga / Rahu / Chhinnamasta',
@@ -147,6 +187,14 @@ const DEITY_NAMES_I18N = {
     te: 'దుర్గా దేవి / కాళిక / ఛిన్నమస్తా',
     kn: 'ದುರ್ಗಾ ದೇವಿ / ಕಾಳಿ / ಛಿನ್ನಮಸ್ತಾ',
     ml: 'ദുർഗ്ഗാ ദേവി / കാളി / ഛിന്നമസ്ത'
+  },
+  'Lord Ganesha (Maha Ganapati)': {
+    en: 'Lord Ganesha (Maha Ganapati)',
+    ta: 'ஸ்ரீ விநாயகர் (மகா கணபதி) / ஞான காரகன்',
+    hi: 'भगवान गणेश (महा गणपति) / ज्ञान मोक्ष कारक',
+    te: 'గణపతి (మహా గణపతి) / జ్ఞాన మోక్ష కారకుడు',
+    kn: 'ಗಣೇಶ (ಮಹಾ ಗಣಪತಿ) / ಜ್ಞಾನ ಮೋಕ್ಷ ಕಾರಕ',
+    ml: 'ഗണപതി (മഹാ ഗണപതി) / ജ്ഞാന മോക്ഷ കാരകൻ'
   },
   'Lord Ganesha / Ketu (Kaivalya)': {
     en: 'Lord Ganesha / Ketu (Kaivalya)',
@@ -185,10 +233,11 @@ const GEMOLOGY_I18N = {
     'Pearl': { en: 'Pearl', ta: 'முத்து (Pearl)', hi: 'मोती (Pearl)', te: 'ముత్యం (Pearl)', kn: 'ಮುತ್ತು (Pearl)', ml: 'മുത്ത് (Pearl)' },
     'Red Coral': { en: 'Red Coral', ta: 'செம்பவளம் (Red Coral)', hi: 'लाल मूंगा (Red Coral)', te: 'పగడం (Red Coral)', kn: 'ಹವಳ (Red Coral)', ml: 'പവിഴം (Red Coral)' },
     'Emerald': { en: 'Emerald', ta: 'மரகதம் (Emerald)', hi: 'पन्ना (Emerald)', te: 'మరకతం (Emerald)', kn: 'ಪಚ್ಚೆ (Emerald)', ml: 'മരതകം (Emerald)' },
-    'Yellow Sapphire': { en: 'Yellow Sapphire', ta: 'புஷ்பராகம் (Yellow Sapphire)', hi: 'पुखराज (Yellow Sapphire)', te: 'పుష్యరాగం (Yellow Sapphire)', kn: 'ಪುಷ್ಯರಾಗ (Yellow Sapphire)', ml: 'പുഷ്യരാഗം (Yellow Sapphire)' },
+    'Yellow Sapphire': { en: 'Yellow Sapphire', ta: 'புஷ்பராகம் (Yellow Sapphire)', hi: 'पुखराज (Yellow Sapphire)', te: 'పుష్యరాగం (Yellow Sapphire)', kn: 'ಪುಷ್ಯರಾಗ (Yellow Sapphire)', ml: 'ಪುಷ್ಯരാഗം (Yellow Sapphire)' },
     'Blue Sapphire': { en: 'Blue Sapphire', ta: 'நீலக்கல் (Blue Sapphire)', hi: 'नीलम (Blue Sapphire)', te: 'నీలం (Blue Sapphire)', kn: 'ನೀಲಂ (Blue Sapphire)', ml: 'ഇന്ദ്രനീലക്കല്ല് (Blue Sapphire)' },
-    'Hessonite': { en: 'Hessonite (Gomed)', ta: 'கோமேதகம் (Hessonite)', hi: 'गोमेद (Hessonite)', te: 'గోమేధికం (Hessonite)', kn: 'ಗೋಮೇಧಿಕ (Hessonite)', ml: 'ഗോമേദകം (Hessonite)' },
-    'Cat\'s Eye': { en: 'Cat\'s Eye (Vaidurya)', ta: 'வைடூரியம் (Cat\'s Eye)', hi: 'लहसुनिया (Cat\'s Eye)', te: 'వైడూర్యం (Cat\'s Eye)', kn: 'ವೈಡೂರ್ಯ (Cat\'s Eye)', ml: 'വൈഡൂര്യം (Cat\'s Eye)' }
+    'Hessonite Garnet': { en: 'Hessonite (Gomed)', ta: 'கோமேதகம் (Hessonite)', hi: 'गोमेद (Hessonite)', te: 'గోమేధికం (Hessonite)', kn: 'ಗೋಮೇಧಿಕ (Hessonite)', ml: 'ಗೋമേದകം (Hessonite)' },
+    'Hessonite': { en: 'Hessonite (Gomed)', ta: 'கோமேதகம் (Hessonite)', hi: 'गोमेद (Hessonite)', te: 'గోమేధికం (Hessonite)', kn: 'ಗೋಮೇಧಿಕ (Hessonite)', ml: 'ಗೋമേದകം (Hessonite)' },
+    "Cat's Eye": { en: "Cat's Eye (Vaidurya)", ta: "வைடூரியம் (Cat's Eye)", hi: "लहसुनिया (Cat's Eye)", te: "వైడూర్యం (Cat's Eye)", kn: "ವೈಡೂರ್ಯ (Cat's Eye)", ml: "വൈഡൂര്യം (Cat's Eye)" }
   },
   substitutes: {
     'White Sapphire / Zircon': { en: 'White Sapphire / Zircon', ta: 'வெள்ளை சபையர் / ஜிர்கான்', hi: 'सफेद पुखराज / जिरकॉन', te: 'తెల్ల పుష్యరాగం / జిర్కాన్', kn: 'ಬಿಳಿ ಪುಷ್ಯರಾಗ / ಜಿರ್ಕಾನ್', ml: 'വെള്ള പുഷ്യരാഗം / സിർക്കോൺ' },
@@ -197,16 +246,21 @@ const GEMOLOGY_I18N = {
     'Carnelian': { en: 'Carnelian', ta: 'கார்னீலியன்', hi: 'कार्नेलियन', te: 'కార్నెలియన్', kn: 'ಕಾರ್ನೆಲಿಯನ್', ml: 'കാർണേലിയൻ' },
     'Peridot / Green Tourmaline': { en: 'Peridot / Green Tourmaline', ta: 'பெரிடாட் / பச்சை டூர்மலைன்', hi: 'पेरिडॉट / हरा टूरमैलीन', te: 'పెరిడాట్ / పచ్చ టూర్మలైన్', kn: 'ಪೆರಿಡಾಟ್ / ಹಸಿರು ಟೂರ್ಮಲೀನ್', ml: 'പെരിഡോട്ട് / പച്ച ടൂർമലൈൻ' },
     'Yellow Topaz / Citrine': { en: 'Yellow Topaz / Citrine', ta: 'மஞ்சள் டோபாஸ் / சிட்ரின்', hi: 'पीला टोपाज / सिट्रीन', te: 'పసుపు టోపాజ్ / సిట్రిన్', kn: 'ಹಳದಿ ಟೋಪಾಜ್ / ಸಿಟ್ರಿನ್', ml: 'മഞ്ഞ ടോപ്പാസ് / സിട്രിൻ' },
-    'Amethyst / Blue Topaz': { en: 'Amethyst / Blue Topaz', ta: 'அமெதிஸ்ட் / நீல டோபாஸ்', hi: 'जमुनिया (Amethyst) / नीला टोपाज', te: 'అమెథిస్ట్ / నీలి టోపాజ్', kn: 'ಅಮೆಥಿಸ್ಟ್ / ನೀಲಿ ಟೋಪಾಜ್', ml: 'അമേത്തിസ്റ്റ് / നീല ടോപ്പാസ്' }
+    'Amethyst / Iolite': { en: 'Amethyst / Iolite', ta: 'அமெதிஸ்ட் / காக்கைப் பொன் (Iolite)', hi: 'जमुनिया (Amethyst) / नीली (Iolite)', te: 'అమెథిస్ట్ / అయోలైట్', kn: 'ಅಮೆಥಿಸ್ಟ್ / ಐಯೊಲೈಟ್', ml: 'അമേത്തിസ്റ്റ് / അയോലൈറ്റ്' },
+    'Amethyst / Blue Topaz': { en: 'Amethyst / Blue Topaz', ta: 'அமெதிஸ்ட் / நீல டோபாஸ்', hi: 'जमुनिया (Amethyst) / नीला टोपाज', te: 'అమెథిస్ట్ / నీలి టోపాజ్', kn: 'ಅಮೆಥಿಸ್ಟ್ / ನೀಲಿ ಟೋಪಾಜ್', ml: 'അമേത്തിസ്റ്റ് / നീല ടോപ്പാസ്' },
+    'Spessartite': { en: 'Spessartite Garnet', ta: 'ஸ்பெஸ்ஸார்டைட் கார்னெட்', hi: 'स्पेसरटाइट गारनेट', te: 'స్పెసర్టైట్ గార్నెట్', kn: 'ಸ್ಪೆಸಾರ್ಟೈಟ್ ಗಾರ್ನೆಟ್', ml: 'സ്പെസ്സാർട്ടൈറ്റ് ഗാർനെറ്റ്' },
+    'Chrysoberyl': { en: 'Chrysoberyl', ta: 'கிரைசோபெரில்', hi: 'क्राइसोबेरिल', te: 'క్రైసోబెరిల్', kn: 'ಕ್ರೈಸೊಬೆರಿಲ್', ml: 'ക്രൈസോബെറിൽ' }
   },
   metals: {
     'Platinum / Silver / White Gold': { en: 'Platinum / Silver / White Gold', ta: 'பிளாட்டினம் / வெள்ளி / வெள்ளை தங்கம்', hi: 'प्लैटिनम / चांदी / सफेद सोना', te: 'ప్లాటినం / వెండి / తెల్ల బంగారం', kn: 'ಪ್ಲಾಟಿನಂ / ಬೆಳ್ಳಿ / ಬಿಳಿ ಚಿನ್ನ', ml: 'പ്ലാറ്റിനം / വെള്ളി / വെള്ള സ്വർണ്ണം' },
     'Gold / Copper': { en: 'Gold / Copper', ta: 'தங்கம் / தாமிரம்', hi: 'सोना / तांबा', te: 'బంగారం / రాగి', kn: 'ಚಿನ್ನ / ತಾಮ್ರ', ml: 'സ്വർണ്ണം / ചെമ്പ്' },
     'Silver': { en: 'Silver', ta: 'வெள்ளி', hi: 'चांदी', te: 'వెండి', kn: 'ಬೆಳ್ಳಿ', ml: 'വെള്ളി' },
-    'Gold / Silver': { en: 'Gold / Silver', ta: 'தங்கம் / வெள்ளி', hi: 'सोना / चांदी', te: 'బంగారం / వెండి', kn: 'ಚಿನ್ನ / ಬೆಳ್ಳಿ', ml: 'സ്വർണ്ണം / വെള്ളി' },
+    'Silver / Iron': { en: 'Silver / Iron', ta: 'வெள்ளி / இரும்பு', hi: 'चांदी / लोहा', te: 'వెండి / ఇనుము', kn: 'ಬೆಳ್ಳಿ / ಕಬ್ಬಿಣ', ml: 'വെള്ളി / ഇരുമ്പ്' },
+    'Gold / Silver': { en: 'Gold / Silver', ta: 'தங்கம் / வெள்ளி', hi: 'सोना / चांदी', te: 'బంగారం / వెండి', kn: 'ಚಿನ್ನ / ಬೆಳ್ಳಿ', ml: 'സ്വർണ്ണം / వెള്ളി' },
     'Gold / Brass': { en: 'Gold / Brass', ta: 'தங்கம் / பித்தளை', hi: 'सोना / पीतल', te: 'బంగారం / ఇత్తడి', kn: 'ಚಿನ್ನ / ಹಿತ್ತಾಳೆ', ml: 'സ്വർണ്ണം / പിച്ചള' },
+    'Gold': { en: 'Gold', ta: 'தங்கம்', hi: 'सोना', te: 'బంగారం', kn: 'ಚಿನ್ನ', ml: 'സ്വർണ്ണം' },
     'Iron / Silver / Panchaloha': { en: 'Iron / Silver / Panchaloha', ta: 'இரும்பு / வெள்ளி / பஞ்சலோகம்', hi: 'लोहा / चांदी / पंचधातु', te: 'ఇనుము / వెండి / పంచలోహం', kn: 'ಕಬ್ಬಿಣ / ಬೆಳ್ಳಿ / ಪಂಚಲೋಹ', ml: 'ഇരുമ്പ് / വെള്ളി / പഞ്ചലോഹം' },
-    'Silver / Ashtadhatu': { en: 'Silver / Ashtadhatu', ta: 'வெள்ளி / அஷ்டதாது', hi: 'चांदी / अष्टधातु', te: 'వెండి / అష్టధాతువు', kn: 'ಬೆಳ್ಳಿ / ಅಷ್ಟಧಾತು', ml: 'വെള്ളി / അഷ്ടധാതു' }
+    'Silver / Ashtadhatu': { en: 'Silver / Ashtadhatu', ta: 'வெள்ளி / அஷ்டதாது', hi: 'चांदी / अष्टधातु', te: 'వెండి / అష్టధాతువు', kn: 'ಬೆಳ್ಳಿ / ಅಷ್ಟಧಾತು', ml: 'വെള്ളി / ಅಷ್ಟധാതു' }
   },
   fingers: {
     'Middle / Little Finger': { en: 'Middle / Little Finger', ta: 'நடுவிரல் / சுண்டு விரல்', hi: 'मध्यमा / कनिष्ठिका अंगुली', te: 'మధ్య / చిటికెన వేలు', kn: 'ಮಧ್ಯದ / ಕಿರುಬೆರಳು', ml: 'നടുവിരൽ / ചെറുവിരൽ' },
@@ -221,9 +275,12 @@ const GEMOLOGY_I18N = {
     'Sunday Sunrise': { en: 'Sunday Sunrise', ta: 'ஞாயிற்றுக்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'रविवार सूर्योदय', te: 'ఆదివారం సూర్యోదయం', kn: 'ಭಾನುವಾರ ಸೂರ್ಯೋದಯ', ml: 'ഞായറാഴ്ച സൂര്യോദയം' },
     'Monday Sunrise': { en: 'Monday Sunrise', ta: 'திங்கட்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'सोमवार सूर्योदय', te: 'సోమవారం సూర్యోదయం', kn: 'ಸೋಮವಾರ ಸೂರ್ಯೋದಯ', ml: 'തിങ്കളാഴ്ച സൂര്യോദയം' },
     'Tuesday Sunrise': { en: 'Tuesday Sunrise', ta: 'செவ்வாய்க்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'मंगलवार सूर्योदय', te: 'మంగళవారం సూర్యోదయం', kn: 'ಮಂಗಳವಾರ ಸೂರ್ಯೋದಯ', ml: 'ചൊവ്വാഴ്ച സൂര്യോദയം' },
-    'Wednesday Sunrise': { en: 'Wednesday Sunrise', ta: 'புதன்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'बुधवार सूर्योदय', te: 'బుధవారం సూర్యోదయం', kn: 'ಬುಧವಾರ ಸೂರ್ಯೋದಯ', ml: 'ബുധനാഴ്ച സൂര്യോദയം' },
+    'Wednesday Sunrise': { en: 'Wednesday Sunrise', ta: 'புதன்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'बुधवार सूर्योदय', te: 'బుధవారం సూర్యోదయం', kn: 'ಬುಧವಾರ ಸೂರ್ಯೋದಯ', ml: 'ബുಧനാഴ്ച സൂര്യോദയം' },
     'Thursday Sunrise': { en: 'Thursday Sunrise', ta: 'வியாழக்கிழமை அதிகாலை (சூரிய உதயம்)', hi: 'गुरुवार सूर्योदय', te: 'గురువారం సూర్యోదయం', kn: 'ಗುರುವಾರ ಸೂರ್ಯೋದಯ', ml: 'വ്യാഴാഴ്ച സൂര്യോദയം' },
-    'Saturday Sunset': { en: 'Saturday Sunset / Evening', ta: 'சனிக்கிழமை மாலை (சூரிய அஸ்தமனம்)', hi: 'शनिवार सूर्यास्त / संध्या', te: 'శనివారం సూర్యాస్తమయం', kn: 'ಶನಿವಾರ ಸೂರ್ಯಾಸ್ತ', ml: 'ശനിയാഴ്ച സൂര്യാസ്തമയം' }
+    'Saturday Sunset': { en: 'Saturday Sunset / Evening', ta: 'சனிக்கிழமை மாலை (சூரிய அஸ்தமனம்)', hi: 'शनिवार सूर्यास्त / संध्या', te: 'శనివారం సూర్యాస్తమయం', kn: 'ಶನಿವಾರ ಸೂರ್ಯಾಸ್ತ', ml: 'ശനിയാഴ്ച സൂര್ಯಾസ്തമയം' },
+    'Saturday Evening': { en: 'Saturday Evening (Sunset)', ta: 'சனிக்கிழமை மாலை (சூரிய அஸ்தமனம்)', hi: 'शनिवार शाम (संध्या काल)', te: 'శనివారం సాయంత్రం (సూర్యాస్తమయం)', kn: 'ಶನಿವಾರ ಸಂಜೆ (ಸೂರ್ಯಾಸ್ತ)', ml: 'ശനിയാഴ്ച വൈകുന്നേരം (സൂര്യാസ്തമയം)' },
+    'Saturday Night / Rahu Kalam': { en: 'Saturday Night / Rahu Kalam', ta: 'சனிக்கிழமை இரவு / ராகு காலம்', hi: 'शनिवार रात्रि / राहु काल', te: 'శనివారం రాత్రి / రాహు కాలం', kn: 'ಶನಿವಾರ ರಾತ್ರಿ / ರಾಹು ಕಾಲ', ml: 'ശനിയാഴ്ച രാത്രി / രാഹു കാലം' },
+    'Tuesday Evening': { en: 'Tuesday Evening (Sunset)', ta: 'செவ்வாய்க்கிழமை மாலை', hi: 'मंगलवार संध्या काल', te: 'మంగళవారం సాయంత్రం', kn: 'ಮಂಗಳವಾರ ಸಂಜೆ', ml: 'ചൊവ്വാഴ്ച വൈകുന്നേരം' }
   }
 };
 
@@ -676,9 +733,10 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     return res;
   };
 
-  const translateRogaSthana = (sign, lord) => {
+    const translateRogaSthana = (sign, lord) => {
     if (!sign) return '';
-    const localizedSign = I18N_TERMS[sign]?.[language] || sign;
+    const cleanSign = sign.replace(/\s*\(.*?\)\s*/g, '').trim();
+    const localizedSign = I18N_TERMS[cleanSign]?.[language] || cleanSign;
     const localizedLord = I18N_TERMS[lord]?.[language] || lord || '';
     const houseLabel = language === 'ta' ? '6-ஆம் பாவகம்' :
                        language === 'hi' ? 'षष्ठ भाव' :
@@ -697,14 +755,17 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
       }
     }
     if (text.includes('Longevity resilience & chronic vitality maintenance governed by 8th Lord')) {
-      let lordMatch = text.replace(/Longevity resilience & chronic vitality maintenance governed by 8th Lord /g, '');
-      lordMatch = translateLagnaElement(translateModality(lordMatch));
-      if (language === 'ta') return `8-ஆம் அதிபதி ${lordMatch} அமைப்பால் நீண்ட ஆயுள் மற்றும் நோய் எதிர்ப்பு ஆற்றல் பராமரிப்பு`;
-      if (language === 'hi') return `अष्टमेश ${lordMatch} व्यवस्था द्वारा दीर्घायु एवं रोग प्रतिरोधक शक्ति का संतुलन`;
-      if (language === 'te') return `8వ అధిపతి ${lordMatch} ద్వారా దీర్ఘాయుష్షు మరియు రోగనిరోధక శక్తి నిర్వహణ`;
-      if (language === 'kn') return `8ನೇ ಅಧಿಪತಿ ${lordMatch} ಪ್ರಭಾವದಿಂದ ದೀರ್ಘಾಯುಷ್ಯ ಮತ್ತು ರೋಗನಿರೋಧಕ ಶಕ್ತಿ ಸಂರಕ್ಷಣೆ`;
-      if (language === 'ml') return `8-ാം അധിപൻ ${lordMatch} വഴിയുള്ള ദീർഘായുസ്സും പ്രതിരോധശേഷി സംരക്ഷണവും`;
-      return `Longevity resilience & chronic vitality maintenance governed by 8th Lord ${lordMatch}`;
+      let lordMatch = text.replace(/Longevity resilience & chronic vitality maintenance governed by 8th Lord\s*/g, '').trim();
+      const parts = lordMatch.split(/\s+in\s+/i);
+      let planetPart = parts[0] ? (I18N_TERMS[parts[0].trim()]?.[language] || parts[0].trim()) : '';
+      let signPart = parts[1] ? (I18N_TERMS[parts[1].trim()]?.[language] || parts[1].trim()) : '';
+
+      if (language === 'ta') return `8-ஆம் அதிபதி ${planetPart} ${signPart}-ல் உள்ள அமைப்பால் நீண்ட ஆயுள் மற்றும் நோய் எதிர்ப்பு ஆற்றல் பராமரிப்பு`;
+      if (language === 'hi') return `अष्टमेश ${planetPart} ${signPart} राशि व्यवस्था द्वारा दीर्घायु एवं रोग प्रतिरोधक शक्ति का संतुलन`;
+      if (language === 'te') return `8వ అధిపతి ${planetPart} ${signPart}లో ఉన్నందున దీర్ఘాయుష్షు మరియు రోగనిరోధక శక్తి నిర్వహణ`;
+      if (language === 'kn') return `8ನೇ ಅಧಿಪತಿ ${planetPart} ${signPart}ದಲ್ಲಿರುವ ಪ್ರಭಾವದಿಂದ ದೀರ್ಘಾಯುಷ್ಯ ಮತ್ತು ರೋಗನಿರೋಧಕ ಶಕ್ತಿ ಸಂರಕ್ಷಣೆ`;
+      if (language === 'ml') return `8-ാം അധിപൻ ${planetPart} ${signPart}-ൽ നിൽക്കുന്ന വഴിയുള്ള ദീർഘായുസ്സും പ്രതിരോധശേഷി സംരക്ഷണവും`;
+      return `Longevity resilience & chronic vitality maintenance governed by 8th Lord ${planetPart} in ${signPart}`;
     }
     return text;
   };
@@ -835,66 +896,93 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     if (language === 'en' && englishRationale) return englishRationale;
     if (!englishRationale) return '';
 
-    // Localize Jaimini Sutra rationale dynamically for hi, te, kn, ml
-    let text = englishRationale;
-    // Replace Planets
-    ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].forEach(p => {
-      if (I18N_TERMS[p]?.[language]) {
-        text = text.replaceAll(p, I18N_TERMS[p][language]);
-      }
-    });
-    // Replace Signs
-    ['Mesha', 'Vrishabha', 'Mithuna', 'Kataka', 'Simha', 'Kanya', 'Tula', 'Vrishchika', 'Dhanus', 'Makara', 'Kumbha', 'Meena'].forEach(r => {
-      if (I18N_TERMS[r]?.[language]) {
-        text = text.replaceAll(r, I18N_TERMS[r][language]);
-      }
-    });
+    const is12th = englishRationale.includes('12th house') || englishRationale.includes('Moksha Sthana');
+    const isUnoccupied = englishRationale.includes('unoccupied');
+    const hasMultiple = englishRationale.includes('among multiple occupants');
+    const hasKetuSpecial = englishRationale.includes('Ketu as Moksha Karaka');
 
-    if (language === 'hi') {
-      text = text.replaceAll('According to Jaimini Sutras,', 'जैमिनी सूत्रों के अनुसार,')
-                 .replaceAll('since the 9th house (Dharma Sthana)', 'चूंकि 9वां भाव (धर्म स्थान)')
-                 .replaceAll('since the 12th house (Moksha Sthana)', 'चूंकि 12वां भाव (मोक्ष स्थान)')
-                 .replaceAll('from Karakamsa', 'कारकांश से')
-                 .replaceAll('in D9 Navamsa is unoccupied, it is governed by its sign lord', 'D9 नवांश में रिक्त है, अतः इसके राशि स्वामी')
-                 .replaceAll('is governed by', 'द्वारा निर्धारित है')
-                 .replaceAll('governed by dominant planet', 'प्रधान ग्रह')
-                 .replaceAll('among multiple occupants', 'की युति में')
-                 .replaceAll('in the 12th house (Moksha Sthana)', '12वें भाव (मोक्ष स्थान) में')
-                 .replaceAll('in the 9th house (Dharma Sthana)', '9वें भाव (धर्म स्थान) में')
-                 .replaceAll('(Sign lord:', '(राशि स्वामी:')
-                 .replaceAll('Lord', 'स्वामी');
-    } else if (language === 'te') {
-      text = text.replaceAll('According to Jaimini Sutras,', 'జైమిని సూత్రాల ప్రకారం,')
-                 .replaceAll('since the 9th house (Dharma Sthana)', '9వ స్థానం (ధర్మ స్థానం)')
-                 .replaceAll('since the 12th house (Moksha Sthana)', '12వ స్థానం (మోక్ష స్థానం)')
-                 .replaceAll('from Karakamsa', 'కారకాంశం నుండి')
-                 .replaceAll('in D9 Navamsa is unoccupied, it is governed by its sign lord', 'D9 నవాంశలో గ్రహాలు లేనందున, రాశ్యాధిపతి')
-                 .replaceAll('governed by dominant planet', 'ప్రధాన గ్రహం')
-                 .replaceAll('in the 12th house (Moksha Sthana)', '12వ స్థానంలో (మోక్ష స్థానం)')
-                 .replaceAll('in the 9th house (Dharma Sthana)', '9వ స్థానంలో (ధర్మ స్థానం)')
-                 .replaceAll('(Sign lord:', '(రాశ్యాధిపతి:');
-    } else if (language === 'kn') {
-      text = text.replaceAll('According to Jaimini Sutras,', 'ಜೈಮಿನಿ ಸೂತ್ರಗಳ ಪ್ರಕಾರ,')
-                 .replaceAll('since the 9th house (Dharma Sthana)', '9ನೇ ಮನೆ (ಧರ್ಮ ಸ್ಥಾನ)')
-                 .replaceAll('since the 12th house (Moksha Sthana)', '12ನೇ ಮನೆ (ಮೋಕ್ಷ ಸ್ಥಾನ)')
-                 .replaceAll('from Karakamsa', 'ಕಾರಕಾಂಶದಿಂದ')
-                 .replaceAll('in D9 Navamsa is unoccupied, it is governed by its sign lord', 'D9 ನವಾಂಶದಲ್ಲಿ ಗ್ರಹಗಳಿಲ್ಲದ ಕಾರಣ, ರಾಶ್ಯಾಧಿಪತಿ')
-                 .replaceAll('governed by dominant planet', 'ಪ್ರಧಾನ ಗ್ರಹ')
-                 .replaceAll('in the 12th house (Moksha Sthana)', '12ನೇ ಮನೆಯಲ್ಲಿ (ಮೋಕ್ಷ ಸ್ಥಾನ)')
-                 .replaceAll('in the 9th house (Dharma Sthana)', '9ನೇ ಮನೆಯಲ್ಲಿ (ಧರ್ಮ ಸ್ಥಾನ)')
-                 .replaceAll('(Sign lord:', '(ರಾಶ್ಯಾಧಿಪತಿ:');
-    } else if (language === 'ml') {
-      text = text.replaceAll('According to Jaimini Sutras,', 'ജൈമിനി സൂത്രങ്ങൾ അനുസരിച്ച്,')
-                 .replaceAll('since the 9th house (Dharma Sthana)', '9-ാം ഭാവം (ധർമ്മ സ്ഥാനം)')
-                 .replaceAll('since the 12th house (Moksha Sthana)', '12-ാം ഭാവം (മോക്ഷ സ്ഥാനം)')
-                 .replaceAll('from Karakamsa', 'കാരകാംശത്തിൽ നിന്ന്')
-                 .replaceAll('in D9 Navamsa is unoccupied, it is governed by its sign lord', 'D9 നവാംശത്തിൽ ഗ്രഹങ്ങളില്ലാത്തതിനാൽ, രാശ്യാധിപൻ')
-                 .replaceAll('governed by dominant planet', 'പ്രധാന ഗ്രഹം')
-                 .replaceAll('in the 12th house (Moksha Sthana)', '12-ാം ഭാവത്തിൽ (മോക്ഷ സ്ഥാനം)')
-                 .replaceAll('in the 9th house (Dharma Sthana)', '9-ാം ഭാവത്തിൽ (ധർമ്മ സ്ഥാനം)')
-                 .replaceAll('(Sign lord:', '(രാശ്യാധിപൻ:');
+    // Extract karakamsa: "from Karakamsa (Makara)"
+    const karakamsaMatch = englishRationale.match(/from Karakamsa \((.*?)\)/i);
+    const rawKarakamsa = karakamsaMatch ? karakamsaMatch[1] : '';
+    const karakamsa = I18N_TERMS[rawKarakamsa]?.[language] || rawKarakamsa;
+
+    // Extract sign lord: "(Sign lord: Mercury)" or "sign lord Jupiter"
+    const signLordMatch = englishRationale.match(/Sign lord:\s*([^)]+)/i) || englishRationale.match(/sign lord\s*([a-zA-Z]+)/i);
+    const rawSignLord = signLordMatch ? signLordMatch[1].trim() : '';
+    const signLord = I18N_TERMS[rawSignLord]?.[language] || rawSignLord;
+
+    // Extract target sign name: "Dharma Sthana) Kanya" or "Moksha Sthana) Dhanus"
+    const signMatch = englishRationale.match(/(?:Dharma|Moksha) Sthana\)\s*([A-Za-z]+)/i);
+    const rawSign = signMatch ? signMatch[1].trim() : '';
+    const sign = I18N_TERMS[rawSign]?.[language] || rawSign;
+
+    const houseLabel = is12th
+      ? (language === 'ta' ? '12-ஆம் பாவகம் (மோக்ஷ ஸ்தானம்)' : language === 'hi' ? '12वें भाव (मोक्ष स्थान)' : language === 'te' ? '12వ స్థానం (మోక్ష స్థానం)' : language === 'kn' ? '12ನೇ ಮನೆ (ಮೋಕ್ಷ ಸ್ಥಾನ)' : language === 'ml' ? '12-ാം ഭാവം (മോക്ഷ സ്ഥാനം)' : '12th house (Moksha Sthana)')
+      : (language === 'ta' ? '9-ஆம் பாவகம் (தர்ம ஸ்தானம்)' : language === 'hi' ? '9वें भाव (धर्म स्थान)' : language === 'te' ? '9వ స్థానం (ధర్మ స్థానం)' : language === 'kn' ? '9ನೇ ಮನೆ (ಧರ್ಮ ಸ್ಥಾನ)' : language === 'ml' ? '9-ാം ഭാവം (ധർമ്മ സ്ഥാനം)' : '9th house (Dharma Sthana)');
+
+    const ketuNote = hasKetuSpecial
+      ? (language === 'ta' ? ' (மோக்ஷ காரகரான கேது பகவான் நின்றதால் ஞான முக்தி அருள் கிட்டும்)' :
+         language === 'hi' ? ' (मोक्ष कारक केतु आध्यात्मिक मुक्ति / कैवल्य प्रदान करते हैं)' :
+         language === 'te' ? ' (మోక్ష కారక కేతువు ఆధ్యాత్మిక ముక్తిని ప్రసాదిస్తాడు)' :
+         language === 'kn' ? ' (ಮೋಕ್ಷ ಕಾರಕ ಕೇತು ಆಧ್ಯಾತ್ಮಿಕ ಮುಕ್ತಿಯನ್ನು ನೀಡುತ್ತಾನೆ)' :
+         language === 'ml' ? ' (മോക്ഷ കാരകനായ കേതു ആത്മീയ മുക്തി നൽകുന്നു)' :
+         ' (Ketu as Moksha Karaka grants spiritual liberation/Kaivalya)')
+      : '';
+
+    if (isUnoccupied) {
+      if (language === 'hi') {
+        return `जैमिनी सूत्रों के अनुसार, चूंकि D9 नवांश में कारकांश (${karakamsa}) से ${houseLabel} ${sign} रिक्त है, अतः इसके राशि स्वामी ${signLord} द्वारा निर्धारित।`;
+      }
+      if (language === 'te') {
+        return `జైమిని సూత్రాల ప్రకారం, D9 నవాంశలో కారకాంశం (${karakamsa}) నుండి ${houseLabel} ${sign}లో గ్రహాలు లేనందున, రాశ్యాధిపతి ${signLord} ద్వారా నిర్ణయించబడింది.`;
+      }
+      if (language === 'kn') {
+        return `ಜೈಮಿನಿ ಸೂತ್ರಗಳ ಪ್ರಕಾರ, D9 ನವಾಂಶದಲ್ಲಿ ಕಾರಕಾಂಶದಿಂದ (${karakamsa}) ${houseLabel} ${sign}ದಲ್ಲಿ ಗ್ರಹಗಳಿಲ್ಲದ ಕಾರಣ, ರಾಶ್ಯಾಧಿಪತಿ ${signLord} ಮೂಲಕ ನಿರ್ಧರಿಸಲಾಗಿದೆ.`;
+      }
+      if (language === 'ml') {
+        return `ജൈമിനി സൂത്രങ്ങൾ അനുസരിച്ച്, D9 നവാംശത്തിൽ കാരകാംശത്തിൽ നിന്ന് (${karakamsa}) ${houseLabel} ${sign}-ൽ ഗ്രഹങ്ങളില്ലാത്തതിനാൽ, രാശ്യാധിപൻ ${signLord} വഴിയുള്ള നിർണ്ണയം.`;
+      }
+    } else if (hasMultiple) {
+      const domMatch = englishRationale.match(/governed by dominant planet\s*([a-zA-Z]+)/i);
+      const rawDom = domMatch ? domMatch[1].trim() : '';
+      const dominant = I18N_TERMS[rawDom]?.[language] || rawDom;
+
+      const occMatch = englishRationale.match(/multiple occupants \(([^)]+)\)/i);
+      const rawOccs = occMatch ? occMatch[1].split(',').map(s => s.trim()) : [];
+      const occs = rawOccs.map(o => I18N_TERMS[o]?.[language] || o).join(', ');
+
+      if (language === 'hi') {
+        return `जैमिनी सूत्रों के अनुसार, D9 नवांश में कारकांश (${karakamsa}) से ${houseLabel} ${sign} में स्थित अनेक ग्रहों (${occs}) में प्रधान ग्रह ${dominant} द्वारा निर्धारित (राशि स्वामी: ${signLord})।`;
+      }
+      if (language === 'te') {
+        return `జైమిని సూత్రాల ప్రకారం, D9 నవాంశలో కారకాంశం (${karakamsa}) నుండి ${houseLabel} ${sign}లో ఉన్న పలు గ్రహాలలో (${occs}) ప్రధాన గ్రహం ${dominant} ద్వారా నిర్ణయించబడింది (రాశ్యాధిపతి: ${signLord}).`;
+      }
+      if (language === 'kn') {
+        return `ಜೈಮಿನಿ ಸೂತ್ರಗಳ ಪ್ರಕಾರ, D9 ನವಾಂಶದಲ್ಲಿ ಕಾರಕಾಂಶದಿಂದ (${karakamsa}) ${houseLabel} ${sign}ದಲ್ಲಿರುವ ಅನೇಕ ಗ್ರಹಗಳಲ್ಲಿ (${occs}) ಪ್ರಧಾನ ಗ್ರಹ ${dominant} ಮೂಲಕ ನಿರ್ಧರಿಸಲಾಗಿದೆ (ರಾಶ್ಯಾಧಿಪತಿ: ${signLord}).`;
+      }
+      if (language === 'ml') {
+        return `ജൈമിനി സൂത്രങ്ങൾ അനുസരിച്ച്, D9 നവാംശത്തിൽ കാരകാംശത്തിൽ നിന്ന് (${karakamsa}) ${houseLabel} ${sign}-ൽ ഉള്ള ഗ്രഹങ്ങളിൽ (${occs}) പ്രധാന ഗ്രഹം ${dominant} വഴിയുള്ള നിർണ്ണയം (രാശ്യാധിപൻ: ${signLord}).`;
+      }
+    } else {
+      const occMatch = englishRationale.match(/governed by\s*([a-zA-Z]+)\s*occupying/i);
+      const rawOcc = occMatch ? occMatch[1].trim() : '';
+      const occ = I18N_TERMS[rawOcc]?.[language] || rawOcc;
+
+      if (language === 'hi') {
+        return `जैमिनी सूत्रों के अनुसार, D9 नवांश में कारकांश (${karakamsa}) से ${houseLabel} ${sign} में स्थित ${occ} द्वारा निर्धारित (राशि स्वामी: ${signLord})।${ketuNote}`;
+      }
+      if (language === 'te') {
+        return `జైమిని సూత్రాల ప్రకారం, D9 నవాంశలో కారకాంశం (${karakamsa}) నుండి ${houseLabel} ${sign}లో ఉన్న ${occ} ద్వారా నిర్ణయించబడింది (రాశ్యాధిపతి: ${signLord}).${ketuNote}`;
+      }
+      if (language === 'kn') {
+        return `ಜೈಮಿನಿ ಸೂತ್ರಗಳ ಪ್ರಕಾರ, D9 ನವಾಂಶದಲ್ಲಿ ಕಾರಕಾಂಶದಿಂದ (${karakamsa}) ${houseLabel} ${sign}ದಲ್ಲಿರುವ ${occ} ಮೂಲಕ ನಿರ್ಧರಿಸಲಾಗಿದೆ (ರಾಶ್ಯಾಧಿಪತಿ: ${signLord}).${ketuNote}`;
+      }
+      if (language === 'ml') {
+        return `ജൈമിനി സൂത്രങ്ങൾ അനുസരിച്ച്, D9 നവാംശത്തിൽ കാരകാംശത്തിൽ നിന്ന് (${karakamsa}) ${houseLabel} ${sign}-ൽ നിൽക്കുന്ന ${occ} വഴിയുള്ള നിർണ്ണയം (രാശ്യാധിപൻ: ${signLord}).${ketuNote}`;
+      }
     }
-    return text;
+
+    return englishRationale;
   };
 
   const translateLifespanText = (rawLifespan) => {
