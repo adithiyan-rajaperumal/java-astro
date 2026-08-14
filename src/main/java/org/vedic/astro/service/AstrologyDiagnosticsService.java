@@ -76,12 +76,12 @@ public class AstrologyDiagnosticsService {
             // 1. Cancer & Leo Lagna Yogakaraka Exemption
             if (lagnaSign == 4 || lagnaSign == 5) {
                 nullified = true;
-                reason = "Cancer/Leo Yogakaraka Mars Exemption (கடக/சிம்ம லக்ன யோககாரகன் செவ்வாய் விலக்கு)";
+                reason = ts.getLabel("nullification.sevvai.cancer_leo");
             }
             // 2. 11th House Upachaya placement exemption
             else if (marsFromLagna == 11) {
                 nullified = true;
-                reason = "11th House Upachaya Exemption (11-ஆம் இட லாப செவ்வாய் விலக்கு)";
+                reason = ts.getLabel("nullification.sevvai.eleventh");
             }
             // 3. Own sign / Exalted / Debilitated in Cancer
             else if (PlanetDignityUtils.isOwnSign("Mars", mSign) || PlanetDignityUtils.isExalted("Mars", mSign) || mSign == 4) {
@@ -402,7 +402,7 @@ public class AstrologyDiagnosticsService {
         if (detected) {
             if (PlanetDignityUtils.isOwnSign("Saturn", satSign) || PlanetDignityUtils.isExalted("Saturn", satSign)) {
                 nullified = true;
-                reason = "Sasa Yoga / Exalted Saturn Cancellation (சச யோக / உச்ச சுவக்ஷேத்திர பலம்)";
+                reason = ts.getLabel("nullification.shani.sasa");
             } else if (lagnaSign == 2 || lagnaSign == 7) { // Yogakaraka for Taurus and Libra
                 nullified = true;
                 reason = ts.getLabel("nullification.shani.yogakaraka");
@@ -448,10 +448,10 @@ public class AstrologyDiagnosticsService {
         if (detected) {
             if (PlanetDignityUtils.isOwnSign("Jupiter", jSign) || PlanetDignityUtils.isExalted("Jupiter", jSign)) {
                 nullified = true;
-                reason = "Jupiter Exalted/Own Sign Cancellation (குரு உச்சம்/ஆட்சி பெற்றதால் சுப யோகமாக மாறுதல்)";
+                reason = ts.getLabel("nullification.guru.exalted");
             } else if (jHouse == 5 || jHouse == 9) {
                 nullified = true;
-                reason = "5th/9th Trikona Gyan Yoga Conversion (திரிகோண ஸ்தானத்தில் அமைந்ததால் ஞான யோகமாக மாற்றம்)";
+                reason = ts.getLabel("nullification.guru.trikona");
             }
         }
 
@@ -562,7 +562,7 @@ public class AstrologyDiagnosticsService {
             // Nullified if benefic sits in Lagna
             if (isBeneficInSign(d1Map, lagnaSign)) {
                 nullified = true;
-                reason = "Benefic in Lagna Cancellation (லக்னத்தில் சுபகிரகம் அமர்ந்துள்ளதால் பாபகர்த்தாரி பங்கமடைந்தது)";
+                reason = ts.getLabel("nullification.papakartari.lagna_benefic");
             }
         }
 
@@ -642,7 +642,7 @@ public class AstrologyDiagnosticsService {
                 detected = true;
                 if (PlanetDignityUtils.isExalted(lord11, p11.getSignNumber())) {
                     nullified = true;
-                    reason = "11th Lord Exalted Cancellation (11-ஆம் அதிபதி உச்சம் பெற்று தோஷம் நீங்கியது)";
+                    reason = ts.getLabel("nullification.eleventh_lord.exalted");
                 } else if (d1Map.get("Jupiter") != null && PlanetDignityUtils.isAspecting("Jupiter", d1Map.get("Jupiter").getSignNumber(), p11.getSignNumber())) {
                     nullified = true;
                     reason = ts.getLabel("nullification.sevvai.jupiter_aspect");
@@ -681,10 +681,10 @@ public class AstrologyDiagnosticsService {
                 String lagnaLord = PlanetDignityUtils.getSignLord(lagnaSign);
                 if (PlanetDignityUtils.isOwnSign(lord10, p10.getSignNumber())) {
                     nullified = true;
-                    reason = "10th Lord Swakshetra Cancellation (10-ஆம் அதிபதி ஆட்சி பலம்)";
+                    reason = ts.getLabel("nullification.tenth_lord.swakshetra");
                 } else if (d1Map.containsKey(lagnaLord) && d1Map.get(lagnaLord).getSignNumber() == p10.getSignNumber()) {
                     nullified = true;
-                    reason = "Conjunction with Lagna Lord Cancellation (லக்னாதிபதி சேர்க்கை)";
+                    reason = ts.getLabel("nullification.lagna_lord.conjunct");
                 }
             }
         }
@@ -754,12 +754,12 @@ public class AstrologyDiagnosticsService {
                     int pHouse = PlanetDignityUtils.getHouseFromLagna(p.getSignNumber(), lagnaSign);
                     if (pHouse == 5 || pHouse == 9) {
                         nullified = true;
-                        reason = "Placed in 5th/9th Trikona House Cancellation (திரிகோண ஸ்தானத்தில் அமர்ந்து தோஷம் நீங்கியது)";
+                        reason = ts.getLabel("nullification.kendradhipatya.trikona");
                         break;
                     }
                     if (isMaleficInSign(d1Map, p.getSignNumber())) {
                         nullified = true;
-                        reason = "Conjunction with Natural Malefic Cancellation (பாப கிரக சேர்க்கையால் தோஷம் நீங்கியது)";
+                        reason = ts.getLabel("nullification.kendradhipatya.malefic");
                         break;
                     }
                 }
