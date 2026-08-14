@@ -297,4 +297,60 @@ public class ThreeCoreNativesValidationTest {
         assertNotNull(anchors);
         assertEquals(2, anchors.numerology().radicalDriverNumber()); // 11 -> 1+1 = 2
     }
+
+    // Native 5: Mahaveer - 18-04-2024 06:37 AM Vellore, TN
+    private final BirthDetailsDTO mahaveer = new BirthDetailsDTO(
+            "Mahaveer", 2024, 4, 18, 6, 37, 0, 12.9165, 79.1325, "LAHIRI"
+    );
+
+    @Test
+    @DisplayName("Validate Full Astrology & Longevity Engine for Native 5: Mahaveer (18-04-2024 06:37 AM Vellore)")
+    public void testMahaveerProfileValidation() {
+        ChartUiResponseDTO profile = calculateProfile(mahaveer);
+
+        // 1. Basic Chart & Panchangam Verification
+        assertNotNull(profile.getD1Chart());
+        assertNotNull(profile.getD9Chart());
+        var d1Map = toPlanetMap(profile.getD1Chart());
+
+        // Lagna is Aries (Mesha - 1)
+        int lagnaSign = d1Map.get("LAGNA").getSignNumber();
+        assertEquals(1, lagnaSign, "Mahaveer Lagna should be Aries (Mesha - 1)");
+
+        // Moon is in Cancer (Karka - 4)
+        int moonSign = d1Map.get("MOON").getSignNumber();
+        assertEquals(4, moonSign, "Mahaveer Moon should be Cancer (Karka - 4)");
+
+        // Sun is Exalted in Aries (Sign 1)
+        int sunSign = d1Map.get("SUN").getSignNumber();
+        assertEquals(1, sunSign, "Mahaveer Sun should be exalted in Aries (Sign 1)");
+
+        // 2. Ayurdaya & Longevity Engine (Poornayu - 3-Way Tie resolved by Odd Lagna Pair 3 + Strong Saturn/Jupiter)
+        var ayurdaya = profile.getAyurdayaProfile();
+        assertNotNull(ayurdaya);
+        assertEquals("Poornayu", ayurdaya.longevityClassification(), "Mahaveer longevity classification must be Poornayu");
+        assertTrue(ayurdaya.estimatedLifespanCeiling() >= 85 && ayurdaya.estimatedLifespanCeiling() <= 100,
+                "Lifespan ceiling should be in strong Poornayu range (85-100), got: " + ayurdaya.estimatedLifespanCeiling());
+        assertTrue(ayurdaya.lifespanRange().contains("Years"));
+
+        // Kakshya Adjustments (Odd Lagna tie-breaker, Jupiter in Kendra/Trikona, Saturn in own sign)
+        var adj = ayurdaya.kakshyaAdjustments();
+        assertNotNull(adj);
+        assertTrue(adj.stream().anyMatch(s -> s.contains("Odd Lagna")), "Should have Odd Lagna tie-breaker");
+        assertTrue(adj.stream().anyMatch(s -> s.contains("Kakshya Vriddhi")), "Should have Kakshya Vriddhi from Jupiter in Lagna");
+
+        // 3. Ayurvedic Health Profile
+        var health = profile.getAyurvedicHealth();
+        assertNotNull(health);
+        assertEquals("Pitta Dominant", health.dominantPrakriti());
+        assertNotNull(health.agniType());
+        assertNotNull(health.bodyBuild());
+
+        // 4. Life Anchors
+        var anchors = profile.getLifeAnchors();
+        assertNotNull(anchors);
+        assertEquals(9, anchors.numerology().radicalDriverNumber()); // 18 -> 1+8 = 9
+        assertEquals(3, anchors.numerology().destinyConductorNumber()); // 18+4+2024 -> 21 -> 3
+        assertEquals("Red Coral", anchors.gemology().primaryGemstone());
+    }
 }
