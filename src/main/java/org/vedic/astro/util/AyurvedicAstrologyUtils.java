@@ -391,7 +391,8 @@ public class AyurvedicAstrologyUtils {
             for (ChartResponseDTO.PositionDetail p : d1Chart) {
                 if ("LAGNA".equalsIgnoreCase(p.getPlanetKey())) continue;
                 int sign = p.getSignNumber();
-                String name = p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey();
+                String rawName = p.getPlanetKey() != null ? p.getPlanetKey() : p.getDisplayName();
+                String name = normalizePlanetName(rawName);
 
                 if (sign == rogaSign) {
                     vulnerabilities.add(getDusthanaPlanetPathology(name, 6));
@@ -408,6 +409,21 @@ public class AyurvedicAstrologyUtils {
         vulnerabilities.add("Longevity resilience & chronic vitality maintenance governed by 8th Lord " + eighthLord + " in " + RASHIS[eighthSign - 1]);
 
         return vulnerabilities;
+    }
+
+    private static String normalizePlanetName(String name) {
+        if (name == null) return "Unknown";
+        String s = name.trim().toLowerCase();
+        if (s.contains("sun") || s.contains("surya") || s.contains("சூரி") || s.contains("சூரியன்")) return "Sun";
+        if (s.contains("moon") || s.contains("chandra") || s.contains("சந்") || s.contains("சந்திரன்")) return "Moon";
+        if (s.contains("mars") || s.contains("kuja") || s.contains("sevvai") || s.contains("செவ்") || s.contains("செவ்வாய்") || s.contains("mangal")) return "Mars";
+        if (s.contains("mercury") || s.contains("budha") || s.contains("புத") || s.contains("புதன்")) return "Mercury";
+        if (s.contains("jupiter") || s.contains("guru") || s.contains("குரு") || s.contains("வியாழன்")) return "Jupiter";
+        if (s.contains("venus") || s.contains("shukra") || s.contains("சுக்") || s.contains("சுக்கிரன்")) return "Venus";
+        if (s.contains("saturn") || s.contains("shani") || s.contains("சனி")) return "Saturn";
+        if (s.contains("rahu") || s.contains("ராகு")) return "Rahu";
+        if (s.contains("ketu") || s.contains("கேது")) return "Ketu";
+        return name;
     }
 
     private static String getDusthanaPlanetPathology(String planet, int house) {

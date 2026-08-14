@@ -583,7 +583,87 @@ const ORGAN_VULNERABILITIES_I18N = {
     te: 'కీళ్ళ కదలిక, పొడిబారడం నివారణ మరియు స్నాయువుల వశ్యత (శని - రోగాధిపతి)',
     kn: 'ಕೀಲುಗಳ ಚಲನಶೀಲತೆ, ಶುಷ್ಕತೆ ತಡೆಗಟ್ಟುವಿಕೆ ಮತ್ತು ಅಸ್ಥಿರಜ್ಜುಗಳ ನಮ್ಯತೆ (ಶನಿ - ರೋಗಾಧಿಪತಿ)',
     ml: 'സന്ധി ചലനാത്മകത, വരൾച്ച തടയൽ, ലിഗമെന്റ് വഴക്കം (ശനി - രോഗാധിപൻ)'
-  }
+  },
+  'Acute inflammatory spikes, muscular strain & bile heat sensitivity': {
+    en: 'Acute inflammatory spikes, muscular strain & bile heat sensitivity',
+    ta: 'கடுமையான அழற்சி/சூடு, தசை வலிமை அழுத்தம் மற்றும் பித்த உஷ்ணம்',
+    hi: 'तीव्र सूजन, मांसपेशियों में खिंचाव एवं पित्त उष्मा संवेदनशीलता',
+    te: 'తీవ్రమైన మంట/వేడి, కండరాల ఒత్తిడి మరియు పిత్త సున్నితత్వం',
+    kn: 'ತೀವ್ರ ಉರಿಯೂತ, ಸ್ನಾಯುಗಳ ಸೆಳೆತ ಮತ್ತು ಪಿತ್ತ ಉಷ್ಣ ಸಂವೇದನೆ',
+    ml: 'തീവ്രമായ വീക്കം, പേശി ആയാസം, പിത്ത ചൂട് സംവേദനക്ഷമത'
+  },
+  'Joint stiffness, chronic dryness, sciatica or tendon fatigue': {
+    en: 'Joint stiffness, chronic dryness, sciatica or tendon fatigue',
+    ta: 'மூட்டு விறைப்பு, நாள்பட்ட வறட்சி, நரம்பு அல்லது தசைநார் சோர்வு',
+    hi: 'जोड़ों की जकड़न, पुराना सूखापन, सायटिका या स्नायु थकान',
+    te: 'కీళ్ళ బిగుతు, దీర్ఘకాలిక పొడిబారడం మరియు నాడీ అలసట',
+    kn: 'ಕೀಲುಗಳ ಬಿಗಿತ, ದೀರ್ಘಕಾಲದ ಶುಷ್ಕತೆ ಮತ್ತು ಸ್ನಾಯುರಜ್ಜು ಆಯಾಸ',
+    ml: 'സന്ധി കാഠിന്യം, വിട്ടുമാറാത്ത വരൾച്ച, സയാറ്റിക്ക, സ്നായു ക്ഷീണം'
+  },
+  'Environmental allergies, food sensitivities & psychosomatic sleep disturbances': {
+    en: 'Environmental allergies, food sensitivities & psychosomatic sleep disturbances',
+    ta: 'சுற்றுச்சூழல் ஒவ்வாமை, உணவு உணர்திறன் மற்றும் தூக்க சமநிலையின்மை',
+    hi: 'पर्यावरणीय एलर्जी, भोजन संवेदनशीलता एवं मनोदैहिक निद्रा विकार',
+    te: 'పర్యావరణ అలెర్జీలు, ఆహార సున్నితత్వం మరియు నిద్రలేమి',
+    kn: 'ಪರಿಸರ ಅಲರ್ಜಿಗಳು, ಆಹಾರ ಸೂಕ್ಷ್ಮತೆ ಮತ್ತು ನಿದ್ರಾಹೀನತೆ',
+    ml: 'പരിസ്ഥിതി അലർജികൾ, ഭക്ഷണ സംവേദനക്ഷമത, ഉറക്ക അസ്വസ്ഥതകൾ'
+  },
+  'Sharp intestinal heat, unexpected digestive hypersensitivity & subtle energy depletion': {
+    en: 'Sharp intestinal heat, unexpected digestive hypersensitivity & subtle energy depletion',
+    ta: 'குடல் சூடு, திடீர் செரிமான உணர்திறன் மற்றும் ஆற்றல் குறைவு',
+    hi: 'तीव्र आंतों की गर्मी, अप्रत्याशित पाचन संवेदनशीलता एवं ऊर्जा ह्रास',
+    te: 'పేగులలో తీవ్ర వేడి, అకస్మాత్తుగా జీర్ణ సున్నితత్వం మరియు శక్తి క్షీణత',
+    kn: 'ಕರುಳಿನ ತೀವ್ರ ಉಷ್ಣತೆ, ಅನಿರೀಕ್ಷಿತ ಜೀರ್ಣ ಸೂಕ್ಷ್ಮತೆ ಮತ್ತು ಶಕ್ತಿ ಕುಂಠಿತ',
+    ml: 'കുടലിലെ ചൂട്, ദഹന സംവേദനക്ഷമത, ഊർജ്ജക്ഷയം'
+  },
+  'Cardiovascular stamina under stress, eyesight sensitivity & bone calcium absorption': {
+    en: 'Cardiovascular stamina under stress, eyesight sensitivity & bone calcium absorption',
+    ta: 'இதய ஆற்றல், பார்வை நரம்பு உணர்திறன் மற்றும் எலும்பு கால்சியம் சமநிலை',
+    hi: 'हृदय सहनशक्ति, दृष्टि संवेदनशीलता एवं अस्थि कैल्शियम अवशोषण',
+    te: 'గుండె సామర్థ్యం, దృష్టి సున్నితత్వం మరియు ఎముకల కాల్షియం శోషణ',
+    kn: 'ಹೃದಯದ ಸಾಮರ್ಥ್ಯ, ದೃಷ್ಟಿ ಸೂಕ್ಷ್ಮತೆ ಮತ್ತು ಮೂಳೆಗಳ ಕ್ಯಾಲ್ಸಿಯಂ ಹೀರಿಕೊಳ್ಳುವಿಕೆ',
+    ml: 'ഹൃദയ ക്ഷമത, കാഴ്ച സംവേദനക്ഷമത, അസ്ഥി കാൽസ്യം ആഗിരണം'
+  },
+  'Lymphatic sluggishness, fluid retention & emotional psychosomatic digestion': {
+    en: 'Lymphatic sluggishness, fluid retention & emotional psychosomatic digestion',
+    ta: 'நிணநீர் மந்தநிலை, உடல் நீர் சமநிலையின்மை மற்றும் மன அழுத்த செரிமானம்',
+    hi: 'लसिका सुस्ती, तरल प्रतिधारण एवं भावनात्मक मनोदैहिक पाचन',
+    te: 'శోషరస మందగమనం, శరీర ద్రవాల నిలుపుదల మరియు మానసిక జీర్ణ సమస్యలు',
+    kn: 'ದುಗ್ಧರಸ ಮಂದಗತಿ, ದೇಹದ ದ್ರವ ಧಾರಣೆ ಮತ್ತು ಭಾವನಾತ್ಮಕ ಜೀರ್ಣ ಸಮಸ್ಯೆಗಳು',
+    ml: 'ലിംഫാറ്റിക് മന്ദത, ശരീരത്തിൽ ദ്രാവകം കെട്ടിക്കിടക്കൽ, വൈകാരിക ദഹനം'
+  },
+  'Renal hydration balance, endocrine equilibrium & urinary tract health': {
+    en: 'Renal hydration balance, endocrine equilibrium & urinary tract health',
+    ta: 'சிறுநீரக நீரேற்றம், நாளமில்லா சுரப்பி சமநிலை மற்றும் சிறுநீரக நலன்',
+    hi: 'वृक्क जलयोजन संतुलन, अंतःस्रावी संतुलन एवं मूत्र मार्ग स्वास्थ्य',
+    te: 'మూత్రపిండాల హైడ్రేషన్, హార్మోన్ల సమతుల్యత మరియు మూత్ర వ్యవస్థ ఆరోగ్యం',
+    kn: 'ಮೂತ್ರಪಿಂಡದ ಜಲಸಮತೋಲನ, ಅಂತಃಸ್ರಾವಕ ಸಮತೋಲನ ಮತ್ತು ಮೂತ್ರನಾಳದ ಕ್ಷೇಮ',
+    ml: 'വൃക്ക ജലാംശ സന്തുലനം, എൻഡോക്രൈൻ സന്തുലിതാവസ്ഥ, മൂത്രാശയ ആരോഗ്യം'
+  },
+  'Hepatic liver metabolism, lipid balance & arterial circulation': {
+    en: 'Hepatic liver metabolism, lipid balance & arterial circulation',
+    ta: 'கல்லீரல் வளர்சிதை மாற்றம், கொழுப்பு சமநிலை மற்றும் தமனி ரத்த ஓட்டம்',
+    hi: 'यकृत चयापचय, लिपिड संतुलन एवं धमनी परिसंचरण',
+    te: 'కాలేయ జీవక్రియ, కొవ్వు సమతుల్యత మరియు ధమని రక్త ప్రసరణ',
+    kn: 'ಯಕೃತ್ತಿನ ಚಯಾಪಚಯ, ಲಿಪಿಡ್ ಸಮತೋಲನ ಮತ್ತು ಅಪಧಮನಿ ರಕ್ತ ಪರಿಚಲನೆ',
+    ml: 'കരൾ ഉപാപചയം, കൊഴുപ്പ് സന്തുലനം, ധമനി രക്തചംക്രമണം'
+  },
+  'Enteric nervous system, skin barrier resilience & respiratory bronchial reactivity': {
+    en: 'Enteric nervous system, skin barrier resilience & respiratory bronchial reactivity',
+    ta: 'குடல் நரம்பு மண்டலம், சரும பாதுகாப்பு அரண் மற்றும் சுவாச மூச்சுக்குழாய் நலன்',
+    hi: 'आंत्र तंत्रिका तंत्र, त्वचा अवरोधक क्षमता एवं श्वसन ब्रोंकियल प्रतिक्रिया',
+    te: 'జీర్ణ నాడీ వ్యవస్థ, చర్మ రక్షణ మరియు శ్వాసనాళాల సున్నితత్వం',
+    kn: 'ಜೀರ್ಣ ನರಮಂಡಲ, ಚರ್ಮದ ರಕ್ಷಣೆ ಮತ್ತು ಶ್ವಾಸಕೋಶದ ಸೂಕ್ಷ್ಮತೆ',
+    ml: 'ദഹന നാഡീവ്യൂഹം, ചർമ്മ സംരക്ഷണം, ശ്വാസകോശ പ്രതികരണം'
+  },
+  'Metabolic sensitivity and immune caution': {
+    en: 'Metabolic sensitivity and immune caution',
+    ta: 'வளர்சிதை மாற்ற உணர்திறன் மற்றும் நோய் எதிர்ப்பு விழிப்புணர்வு',
+    hi: 'चयापचय संवेदनशीलता एवं प्रतिरक्षा सतर्कता',
+    te: 'జీవక్రియ సున్నితత్వం మరియు రోగనిరోధక జాగ్రత్త',
+    kn: 'ಚಯಾಪಚಯ ಸೂಕ್ಷ್ಮತೆ ಮತ್ತು ರೋಗನಿರೋಧಕ ಜಾಗರೂಕತೆ',
+    ml: 'ഉപാപചയ സംവേദനക്ഷമതയും പ്രതിരോധ ജാഗ്രതയും'
+  },
 };
 
 const LIFESTYLE_DIRECTIVES_I18N = {
@@ -973,11 +1053,35 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
 
   const translateOrganVulnerability = (text) => {
     if (!text) return '';
+    let localizedMain = null;
     for (const [key, map] of Object.entries(ORGAN_VULNERABILITIES_I18N)) {
       if (text.includes(key)) {
-        return map[language] || map['en'] || text;
+        localizedMain = map[language] || map['en'] || key;
+        break;
       }
     }
+
+    // Check for Dusthana occupant suffix e.g. "(Mars in House 12)" or "(Saturn in House 6)"
+    const houseOccupantMatch = text.match(/\(([^)]+)\s+in\s+House\s+(\d+)\)/i);
+    if (houseOccupantMatch) {
+      const rawPlanet = houseOccupantMatch[1].trim();
+      const houseNum = houseOccupantMatch[2].trim();
+      const locPlanet = I18N_TERMS[rawPlanet]?.[language] || rawPlanet;
+      let suffix = '';
+      if (language === 'ta') suffix = ` (${houseNum}-ஆம் வீட்டில் ${locPlanet})`;
+      else if (language === 'hi') suffix = ` (${houseNum}वें भाव में ${locPlanet})`;
+      else if (language === 'te') suffix = ` (${houseNum}వ స్థానంలో ${locPlanet})`;
+      else if (language === 'kn') suffix = ` (${houseNum}ನೇ ಮನೆಯಲ್ಲಿ ${locPlanet})`;
+      else if (language === 'ml') suffix = ` (${houseNum}-ാം ഭാവത്തിൽ ${locPlanet})`;
+      else suffix = ` (${locPlanet} in House ${houseNum})`;
+
+      if (localizedMain) {
+        return `${localizedMain}${suffix}`;
+      }
+    }
+
+    if (localizedMain) return localizedMain;
+
     if (text.includes('Longevity resilience & chronic vitality maintenance governed by 8th Lord')) {
       let lordMatch = text.replace(/Longevity resilience & chronic vitality maintenance governed by 8th Lord\s*/g, '').trim();
       const parts = lordMatch.split(/\s+in\s+/i);

@@ -1,5 +1,6 @@
 export const translations = {
   en: {
+
     badhakaLord: 'Badhaka Lord & House',
 
     agniTitle: 'Digestive & Metabolic Agni',
@@ -428,6 +429,7 @@ export const translations = {
   ta: {
 
 
+
     abhijitMuhurtham: 'அபிஜித் முகூர்த்தம்',
     aboutText: 'திரிக்வேதிக் சுவிஸ் எபிமெரிஸ் மூலம் கணக்கிடப்பட்ட துல்லியமான வானியல் நிலைகளை பாரம்பரிய வேதக் கோட்பாடுகளுடன் இணைத்து துல்லியமான பஞ்சாங்கம், ஜாதகப் பொருத்தம் மற்றும் தோஷ/யோகக் கணிப்புகளை வழங்குகிறது.',
     aboutTitle: 'திரிக்வேதிக் பற்றி',
@@ -846,6 +848,7 @@ export const translations = {
     yogasDetected: 'கண்டறியப்பட்ட யோகங்கள்',
   },
   hi: {
+
 
 
     abhijitMuhurtham: 'अभिजित मुहूर्त',
@@ -1268,6 +1271,7 @@ export const translations = {
   te: {
 
 
+
     abhijitMuhurtham: 'అభిజిత్ ముహూర్తం',
     aboutText: 'దృక్వేదిక్ స్విస్ ఎఫెమెరిస్ ద్వారా లెక్కించబడిన ఖగోళ స్థానాలను సాంప్రదాయ వైదిక సూత్రాలతో అనుసంధానించి ఖచ్చితమైన పంచాంగం, జాతక పొంతన, మరియు దోష/యోగ విశ్లేషణలను అందిస్తుంది.',
     aboutTitle: 'దృక్వేదిక్ గురించి',
@@ -1688,6 +1692,7 @@ export const translations = {
   kn: {
 
 
+
     abhijitMuhurtham: 'ಅಭಿಜಿತ್ ಮುಹೂರ್ತ',
     aboutText: 'ದೃಕ್ವೇದಿಕ್ ಸ್ವಿಸ್ ಎಫೆಮರಿಸ್ ಮೂಲಕ ಲೆಕ್ಕಹಾಕಿದ ನಿಖರವಾದ ಖಗೋಳ ಸ್ಥಿತಿಗಳನ್ನು ಸಾಂಪ್ರದಾಯಿಕ ವೈದಿಕ ತತ್ವಗಳೊಂದಿಗೆ ಸಂಯೋಜಿಸಿ ನಿಖರವಾದ ಪಂಚಾಂಗ, ಜಾತಕ ಹೊಂದಾಣಿಕೆ ಮತ್ತು ದೋಷ/ಯೋಗ ರೋಗನಿರ್ಣಯಗಳನ್ನು ಒದಗಿಸುತ್ತದೆ.',
     aboutTitle: 'ದೃಕ್ವೇದಿಕ್ ಬಗ್ಗೆ',
@@ -2106,6 +2111,7 @@ export const translations = {
     yogasDetected: 'ಪತ್ತೆಯಾದ ಯೋಗಗಳು',
   },
   ml: {
+
 
 
     abhijitMuhurtham: 'അഭിജിത് മുഹൂർത്തം',
