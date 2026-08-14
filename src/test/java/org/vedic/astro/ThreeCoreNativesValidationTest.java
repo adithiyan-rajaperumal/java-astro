@@ -11,6 +11,7 @@ import org.vedic.astro.panchangam.PanchangamFactory;
 import org.vedic.astro.panchangam.PanchangamType;
 import org.vedic.astro.service.ChartOrchestrationService;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -352,5 +353,75 @@ public class ThreeCoreNativesValidationTest {
         assertEquals(9, anchors.numerology().radicalDriverNumber()); // 18 -> 1+8 = 9
         assertEquals(3, anchors.numerology().destinyConductorNumber()); // 18+4+2024 -> 21 -> 3
         assertEquals("Red Coral", anchors.gemology().primaryGemstone());
+    }
+
+    @Test
+    @DisplayName("Cross-Verify All 5 Benchmark Natives under B.V. Raman Ayanamsa vs Lahiri")
+    public void testAllFiveNativesUnderBVRamanAyanamsa() {
+        List<BirthDetailsDTO> lahiriNatives = List.of(adithiyan, uthayasri, padmasri, deepanathan, mahaveer);
+
+        System.out.println("==================================================================");
+        System.out.println("  B.V. RAMAN AYANAMSA vs LAHIRI COMPARATIVE CROSS-VERIFICATION   ");
+        System.out.println("==================================================================");
+
+        for (BirthDetailsDTO nativeLahiri : lahiriNatives) {
+            BirthDetailsDTO nativeRaman = new BirthDetailsDTO(
+                    nativeLahiri.getName(),
+                    nativeLahiri.getYear(),
+                    nativeLahiri.getMonth(),
+                    nativeLahiri.getDay(),
+                    nativeLahiri.getHour(),
+                    nativeLahiri.getMinute(),
+                    nativeLahiri.getSecond(),
+                    nativeLahiri.getLatitude(),
+                    nativeLahiri.getLongitude(),
+                    "RAMAN"
+            );
+
+            ChartUiResponseDTO lahiriProfile = calculateProfile(nativeLahiri);
+            ChartUiResponseDTO ramanProfile = calculateProfile(nativeRaman);
+
+            assertNotNull(ramanProfile);
+            assertNotNull(ramanProfile.getD1Chart());
+            assertNotNull(ramanProfile.getAyurdayaProfile());
+            assertNotNull(ramanProfile.getAyurvedicHealth());
+            assertNotNull(ramanProfile.getLifeAnchors());
+
+            var d1Lahiri = toPlanetMap(lahiriProfile.getD1Chart());
+            var d1Raman = toPlanetMap(ramanProfile.getD1Chart());
+
+            System.out.println("\n-------------------------------------------------------------");
+            System.out.println("NATIVE: " + nativeLahiri.getName().toUpperCase());
+            System.out.println("-------------------------------------------------------------");
+            System.out.printf("%-10s | %-22s | %-22s\n", "PLANET", "LAHIRI (D1)", "B.V. RAMAN (D1)");
+            System.out.println("-----------+------------------------+------------------------");
+
+            for (String pKey : List.of("LAGNA", "SUN", "MOON", "MARS", "MERCURY", "JUPITER", "VENUS", "SATURN", "RAHU", "KETU")) {
+                var pLah = d1Lahiri.get(pKey);
+                var pRam = d1Raman.get(pKey);
+                if (pLah != null && pRam != null) {
+                    String lahStr = String.format("%s (%d) %s", pLah.getRashiName(), pLah.getSignNumber(), pLah.getFormattedDegree());
+                    String ramStr = String.format("%s (%d) %s", pRam.getRashiName(), pRam.getSignNumber(), pRam.getFormattedDegree());
+                    System.out.printf("%-10s | %-22s | %-22s\n", pKey, lahStr, ramStr);
+                }
+            }
+
+            var ayuLah = lahiriProfile.getAyurdayaProfile();
+            var ayuRam = ramanProfile.getAyurdayaProfile();
+
+            System.out.println("\n[AYURDAYA / LONGEVITY COMPARISON]");
+            System.out.println("  LAHIRI     : " + ayuLah.longevityClassification() + " (Ceiling: ~" + ayuLah.estimatedLifespanCeiling() + " yrs, Range: " + ayuLah.lifespanRange() + ")");
+            System.out.println("  B.V. RAMAN : " + ayuRam.longevityClassification() + " (Ceiling: ~" + ayuRam.estimatedLifespanCeiling() + " yrs, Range: " + ayuRam.lifespanRange() + ")");
+            System.out.println("  RAMAN Pairs: " + ayuRam.jaiminiThreePairs());
+            System.out.println("  RAMAN Adj  : " + ayuRam.kakshyaAdjustments());
+            System.out.println("  RAMAN Maraka: " + ayuRam.criticalMarakaWindow());
+
+            var hLah = lahiriProfile.getAyurvedicHealth();
+            var hRam = ramanProfile.getAyurvedicHealth();
+            System.out.println("\n[AYURVEDA & LIFE ANCHORS COMPARISON]");
+            System.out.println("  LAHIRI Prakriti: " + hLah.dominantPrakriti() + " | Agni: " + hLah.agniType() + " | Gem: " + lahiriProfile.getLifeAnchors().gemology().primaryGemstone());
+            System.out.println("  RAMAN  Prakriti: " + hRam.dominantPrakriti() + " | Agni: " + hRam.agniType() + " | Gem: " + ramanProfile.getLifeAnchors().gemology().primaryGemstone());
+        }
+        System.out.println("\n==================================================================");
     }
 }
