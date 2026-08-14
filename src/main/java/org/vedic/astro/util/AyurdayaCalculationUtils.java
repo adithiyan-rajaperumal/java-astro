@@ -199,6 +199,9 @@ public class AyurdayaCalculationUtils {
             }
         }
 
+        // The raw consensus derived purely from Jaimini 3-pair method (before Kakshya modifications)
+        String rawConsensusSpan = baseSpan;
+
         // Classical Ayurdaya Baseline Compartments (Alpayu: 0-36, Madhyayu: 36-72, Poornayu: 72-108)
         int baseCeilingAge = switch (baseSpan) {
             case "Poornayu" -> 84;
@@ -619,7 +622,7 @@ public class AyurdayaCalculationUtils {
                 "planets", "Lagna (" + mLagna + ") & Hora Lagna (" + mHL + ")",
                 "derivedSpan", span3
         ));
-        threePairsMap.put("majorityConsensus", baseSpan);
+        threePairsMap.put("majorityConsensus", rawConsensusSpan);
 
         String rationale = "Determined via Parashara & Jaimini Ayurdaya based on Lagna Lord (" + lagnaLord +
                 "), 8th Lord (" + eighthLord + "), Moon, Saturn, and Hora Lagna modalities, refined with Kakshya Vriddhi and Shadbala life-force: " +
