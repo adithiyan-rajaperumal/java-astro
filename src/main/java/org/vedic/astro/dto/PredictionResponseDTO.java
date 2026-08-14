@@ -15,18 +15,22 @@ import java.util.List;
 public class PredictionResponseDTO {
     private boolean enabled;
     private String message;
-    private String overallSummary;
     private TokenUsage tokenUsage;
-    private NativePersonality nativePersonality;
-    private HealthAnalysis healthAnalysis;
-    private AuspiciousAnchors auspiciousAnchors;
-    private List<AiYoga> aiYogas;
-    private List<AiDosham> aiDoshams;
-    private List<PastKeyPhase> pastKeyPhases;
-    private List<PastMilestone> pastMilestones;
-    private List<YearlyPrediction> futurePredictions;
-    private List<YearlyPrediction> lifetimePredictions;
-    private String forecastMode;
+
+    // 1. Core Psychological & Behavioral Profile
+    private PersonalityAndBehavior personalityAndBehavior;
+
+    // 2. Retrospective Past Life Turning Points Till Date (2-3 milestones)
+    private List<RetrospectivePastMilestone> retrospectivePastMilestones;
+
+    // 3. Autonomous AI Longevity & Active Yogas Analysis
+    private AiLongevityAnalysis aiLongevityAnalysis;
+
+    // 4. Single Unified Year-by-Year Narrative Stream
+    private List<YearlyPrediction> yearlyPredictions;
+
+    // Metadata
+    private String forecastMode; // "TEN_YEARS" or "LIFETIME"
     private int startYear;
     private int endYear;
     private int startAge;
@@ -38,23 +42,8 @@ public class PredictionResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class PastKeyPhase {
-        private String periodOrAge;
-        private String dasaBhukthi;
-        private String phaseTitle;
-        private String livedExperience;
-        private String astrologicalBasis;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class NativePersonality {
+    public static class PersonalityAndBehavior {
         private String coreTemperament;
-        private List<String> keyStrengths;
-        private List<String> vulnerabilitiesAndKarmicLessons;
     }
 
     @Data
@@ -62,11 +51,55 @@ public class PredictionResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class HealthAnalysis {
-        private String ayurvedicConstitution;
-        private List<String> organVulnerabilities;
-        private String longevityVitalitySummary;
-        private List<String> recommendedDietAndLifestyle;
+    public static class RetrospectivePastMilestone {
+        private String approxPeriod;
+        private String milestoneTitle;
+        private String eventNarrative;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AiLongevityAnalysis {
+        private int calculatedAyulCeiling;
+        private String classification; // Poornayu / Madhyayu / Alpayu
+        private String primarySpanRationale;
+        private List<AiYogaItem> activeYogasIdentified;
+        private List<AiDoshaItem> activeDoshasIdentified;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AiYogaItem {
+        private String yogaName;
+        private String effect;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AiDoshaItem {
+        private String doshaName;
+        private String remedialAdvice;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class YearlyPrediction {
+        private int year;
+        private int age;
+        private String dasaBhukthi;
+        private String annualNarrative;
     }
 
     @Data
@@ -81,85 +114,5 @@ public class PredictionResponseDTO {
         private double estimatedCostUsd;
         private double estimatedCostInr;
         private String modelUsed;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class AiYoga {
-        private String name;
-        private String formingPlanets;
-        private String impact;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class AiDosham {
-        private String name;
-        private String status;
-        private String nullificationFactor;
-        private String remedy;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class PastMilestone {
-        private int year;
-        private int age;
-        private String dasaBhukthi;
-        private String milestoneTitle;
-        private String nature; // POSITIVE, CHALLENGING, NEUTRAL
-        private String description;
-        private String astrologicalFactor;
-        private boolean verified;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class YearlyPrediction {
-        private int year;
-        private int age;
-        private String dasaBhukthi;
-        private String yearlyTheme;
-        private String detailedPrediction;
-        private String astrologicalBasis;
-        private String careerAndFinance;
-        private String healthAndFamily;
-        private String cautionsAndRemedies;
-        private String personalMindset;
-        private String careerProfession;
-        private String careerFinance; // Backwards compatibility
-        private String wealthFinance;
-        private String healthVitality;
-        private String marriageFamily;
-        private String familyMarriage; // Backwards compatibility
-        private String parentsKids;
-        private String favorableVsCaution;
-        private String remediesGuidance;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class AuspiciousAnchors {
-        private String lifeGemstone;
-        private String favorableColors;
-        private String luckyNumbers;
-        private String favorableDays;
-        private String ishtaDevata;
-        private String favorableDirections;
     }
 }

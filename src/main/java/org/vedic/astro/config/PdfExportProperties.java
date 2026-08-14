@@ -11,4 +11,5 @@ public class PdfExportProperties {
     private boolean includeLifeAnchors = true;
     private boolean includeAyurdaya = true;
     private boolean includeYogasDoshams = false;
+    private boolean includeAiPredictions = true;
 }

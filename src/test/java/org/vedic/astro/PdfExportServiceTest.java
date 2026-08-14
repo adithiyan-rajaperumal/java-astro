@@ -21,71 +21,46 @@ public class PdfExportServiceTest {
     public void testTamilPdfGenerationWithAiBalanAndAuspiciousAnchors() {
         LocaleContextHolder.setLocale(new Locale("ta"));
 
-        PredictionResponseDTO.AuspiciousAnchors anchors = PredictionResponseDTO.AuspiciousAnchors.builder()
-                .lifeGemstone("செம்பவளம் (Red Coral)")
-                .favorableColors("பவள சிவப்பு, ஆரஞ்சு")
-                .luckyNumbers("9, 1, 3")
-                .favorableDays("செவ்வாய் & வியாழன்")
-                .ishtaDevata("ஸ்ரீ முருகப்பெருமான்")
-                .favorableDirections("தெற்கு (South)")
-                .build();
-
         PredictionResponseDTO aiPredictions = PredictionResponseDTO.builder()
                 .enabled(true)
-                .overallSummary("ஜாதகரின் வாழ்க்கை சுப யோகங்களால் நிறைந்தது.")
-                .nativePersonality(PredictionResponseDTO.NativePersonality.builder()
-                        .coreTemperament("தைரியமும் விடாமுயற்சியும் கொண்டவர்.")
-                        .keyStrengths(List.of("தலைமைத்துவம்", "தீர்க்கமான சிந்தனை"))
-                        .vulnerabilitiesAndKarmicLessons(List.of("முன்கோபம்"))
+                .message("ஜாதகரின் வாழ்க்கை சுப யோகங்களால் நிறைந்தது.")
+                .personalityAndBehavior(PredictionResponseDTO.PersonalityAndBehavior.builder()
+                        .coreTemperament("தைரியமும் விடாமுயற்சியும் கொண்டவர். தலைமைத்துவ ஆற்றல் மிக்கவர்.")
                         .build())
-                .auspiciousAnchors(anchors)
-                .healthAnalysis(PredictionResponseDTO.HealthAnalysis.builder()
-                        .ayurvedicConstitution("பித்த-வாத பிரகிருதி")
-                        .longevityVitalitySummary("தீர்க்காயுள் யோகம்")
-                        .organVulnerabilities(List.of("செரிமான மண்டலம்"))
-                        .recommendedDietAndLifestyle(List.of("இயற்கை உணவு"))
+                .retrospectivePastMilestones(List.of(
+                        PredictionResponseDTO.RetrospectivePastMilestone.builder()
+                                .approxPeriod("2015 - 2018")
+                                .milestoneTitle("உயர் கல்வி வெற்றி")
+                                .eventNarrative("பொறியியல் கல்வி நிறைவு மற்றும் முதல் வேலைவாய்ப்பு.")
+                                .build()
+                ))
+                .aiLongevityAnalysis(PredictionResponseDTO.AiLongevityAnalysis.builder()
+                        .calculatedAyulCeiling(82)
+                        .classification("Poornayu")
+                        .primarySpanRationale("லக்னாதிபதி மற்றும் 8-ஆம் அதிபதியின் சுப பலம்.")
+                        .activeYogasIdentified(List.of(
+                                PredictionResponseDTO.AiYogaItem.builder().yogaName("கஜகேசரி யோகம்").effect("அறிவு மற்றும் நிதி வளம்.").build()
+                        ))
+                        .activeDoshasIdentified(List.of(
+                                PredictionResponseDTO.AiDoshaItem.builder().doshaName("செவ்வாய் தோஷம்").remedialAdvice("செவ்வாய்க்கிழமை நெய்தீபம் ஏற்றுவது நலம்.").build()
+                        ))
                         .build())
-                .aiYogas(List.of(
-                        PredictionResponseDTO.AiYoga.builder().name("ருசக யோகம்").formingPlanets("செவ்வாய்").impact("அதிகார பதவி").build()
-                ))
-                .aiDoshams(List.of(
-                        PredictionResponseDTO.AiDosham.builder().name("செவ்வாய் தோஷம்").status("நிவர்த்தி").nullificationFactor("யோககாரகன் ஆட்சி").remedy("முருகன் வழிபாடு").build()
-                ))
-                .lifetimePredictions(List.of(
+                .yearlyPredictions(List.of(
                         PredictionResponseDTO.YearlyPrediction.builder()
                                 .year(2026)
-                                .age(30)
+                                .age(31)
                                 .dasaBhukthi("சுக்கிரன் - குரு")
-                                .yearlyTheme("தொழில் வளர்ச்சி மற்றும் சுப காரிய யோகம்")
-                                .detailedPrediction("இந்த ஆண்டு புதிய தொழில் முயற்சிகள் கைகூடும். குடும்பத்தில் அமைதியும் மகிழ்ச்சியும் நிலவும்.")
-                                .astrologicalBasis("10-ஆம் அதிபதி சுப பார்வை")
-                                .cautionsAndRemedies("வியாழக்கிழமைகளில் குரு பகவான் வழிபாடு செய்க.")
+                                .annualNarrative("இந்த ஆண்டு புதிய தொழில் முயற்சிகள் கைகூடும். குடும்பத்தில் அமைதியும் மகிழ்ச்சியும் நிலவும்.")
                                 .build()
                 ))
                 .build();
 
-        ComprehensiveReportDTO report = ComprehensiveReportDTO.builder()
-                .name("சுரேஷ் குமார்")
-                .dateOfBirth("1995-05-15")
-                .timeOfBirth("06:30")
-                .placeOfBirth("சென்னை")
-                .ayanamsa("LAHIRI")
-                .panchangamSystem("DRIK_TIRUKANITHAM")
-                .thithi("சுக்ல பக்ஷ துவிதியை")
-                .yogam("சித்தம்")
-                .karanam("பவ")
-                .birthProfile(ChartResponseDTO.BirthProfile.builder()
-                        .lagna("மேஷம்")
-                        .rashi("ரிஷபம்")
-                        .nakshatra("ரோகிணி")
-                        .nakshatraPada(1)
-                        .build())
-                .birthPlanetaryPositions(Collections.emptyList())
-                .vargaChartsMap(Collections.emptyMap())
-                .vimshottariTimeline(Collections.emptyList())
-                .shadbalaStrengths(ShadbalaDTO.builder().planetStrengths(Collections.emptyMap()).build())
-                .aiPredictions(aiPredictions)
-                .build();
+        BirthDetailsDTO birth = new BirthDetailsDTO("Adithiyan", 1996, 7, 25, 17, 45, 0, 13.0827, 80.2707, "LAHIRI");
+        var panchangam = panchangamFactory.getEngine(org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM);
+        var chartResult = panchangam.calculate(birth);
+
+        ComprehensiveReportDTO report = orchestrationService.compileComprehensivePdfData(chartResult, birth, new double[12]);
+        report.setAiPredictions(aiPredictions);
 
         byte[] pdfBytes = pdfExportService.generateAstrologyReport(report);
         assertNotNull(pdfBytes);
@@ -171,9 +146,46 @@ public class PdfExportServiceTest {
         ComprehensiveReportDTO report = orchestrationService.compileComprehensivePdfData(chartResult, birth, new double[12]);
         assertNotNull(report);
 
+        PredictionResponseDTO aiPredictions = PredictionResponseDTO.builder()
+                .enabled(true)
+                .message("Astrological analysis active.")
+                .personalityAndBehavior(PredictionResponseDTO.PersonalityAndBehavior.builder()
+                        .coreTemperament("தைரியமும் விடாமுயற்சியும் கொண்டவர். Leadership & perseverance.")
+                        .build())
+                .retrospectivePastMilestones(List.of(
+                        PredictionResponseDTO.RetrospectivePastMilestone.builder()
+                                .approxPeriod("2015 - 2018")
+                                .milestoneTitle("உயர் கல்வி வெற்றி")
+                                .eventNarrative("பொறியியல் கல்வி நிறைவு மற்றும் முதல் வேலைவாய்ப்பு.")
+                                .build()
+                ))
+                .aiLongevityAnalysis(PredictionResponseDTO.AiLongevityAnalysis.builder()
+                        .calculatedAyulCeiling(82)
+                        .classification("Poornayu")
+                        .primarySpanRationale("லக்னாதிபதி மற்றும் 8-ஆம் அதிபதியின் சுப பலம்.")
+                        .activeYogasIdentified(List.of(
+                                PredictionResponseDTO.AiYogaItem.builder().yogaName("கஜகேசரி யோகம்").effect("அறிவு மற்றும் நிதி வளம்.").build()
+                        ))
+                        .activeDoshasIdentified(List.of(
+                                PredictionResponseDTO.AiDoshaItem.builder().doshaName("செவ்வாய் தோஷம்").remedialAdvice("செவ்வாய்க்கிழமை நெய்தீபம் ஏற்றுவது நலம்.").build()
+                        ))
+                        .build())
+                .yearlyPredictions(List.of(
+                        PredictionResponseDTO.YearlyPrediction.builder()
+                                .year(2026)
+                                .age(31)
+                                .dasaBhukthi("சுக்கிரன் - குரு")
+                                .annualNarrative("இந்த ஆண்டு புதிய தொழில் முயற்சிகள் கைகூடும். குடும்பத்தில் அமைதியும் மகிழ்ச்சியும் நிலவும்.")
+                                .build()
+                ))
+                .build();
+
+        report.setAiPredictions(aiPredictions);
+
         org.vedic.astro.config.PdfExportProperties customProps = new org.vedic.astro.config.PdfExportProperties();
         customProps.setIncludeLifeAnchors(true);
         customProps.setIncludeYogasDoshams(true);
+        customProps.setIncludeAiPredictions(true);
 
         org.vedic.astro.service.PdfExportService customPdfService = new org.vedic.astro.service.PdfExportService(
                 translationService,

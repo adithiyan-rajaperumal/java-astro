@@ -477,10 +477,10 @@ public class PdfExportService {
             // =================================================================
             // 7. AI LIFE BALAN & YEAR-BY-YEAR PREDICTIONS (IF ENABLED)
             // =================================================================
-            if (data.getAiPredictions() != null && data.getAiPredictions().isEnabled()) {
-                boolean is10YearScope = "NEXT_10_YEARS".equalsIgnoreCase(data.getAiPredictions().getForecastMode())
-                        || (data.getAiPredictions().getLifetimePredictions() != null && data.getAiPredictions().getLifetimePredictions().size() <= 15)
-                        || (data.getAiPredictions().getFuturePredictions() != null && data.getAiPredictions().getFuturePredictions().size() <= 15);
+            if (pdfExportProperties.isIncludeAiPredictions() && data.getAiPredictions() != null && data.getAiPredictions().isEnabled()) {
+                var aiPred = data.getAiPredictions();
+                boolean is10YearScope = "TEN_YEARS".equalsIgnoreCase(aiPred.getForecastMode())
+                        || (aiPred.getYearlyPredictions() != null && aiPred.getYearlyPredictions().size() <= 15);
                 String aiTitleStr = is10YearScope
                         ? ts.getLabel("pdf.ai.10year.title")
                         : ts.getLabel("pdf.ai.lifepredictions.title");
@@ -489,216 +489,115 @@ public class PdfExportService {
                 aiTitle.setSpacingAfter(12);
                 document.add(aiTitle);
 
-                if (data.getAiPredictions().getOverallSummary() != null && !data.getAiPredictions().getOverallSummary().isBlank()) {
-                    Paragraph summ = buildMixedParagraph(data.getAiPredictions().getOverallSummary(), bFont, engBFont);
-                    summ.setSpacingAfter(14);
-                    document.add(summ);
+                // 1. Personality & Behavior
+                if (aiPred.getPersonalityAndBehavior() != null && aiPred.getPersonalityAndBehavior().getCoreTemperament() != null) {
+                    Paragraph pH = buildMixedParagraph(ts.getLabel("pdf.ai.personality.title"), sFont, engSFont);
+                    pH.setSpacingAfter(4);
+                    document.add(pH);
+
+                    Paragraph pDesc = buildMixedParagraph(aiPred.getPersonalityAndBehavior().getCoreTemperament(), bFont, engBFont);
+                    pDesc.setSpacingAfter(10);
+                    document.add(pDesc);
                 }
 
-                // Native Personality Section
-                if (data.getAiPredictions().getNativePersonality() != null) {
-                    var np = data.getAiPredictions().getNativePersonality();
-                    if (np.getCoreTemperament() != null && !np.getCoreTemperament().isBlank()) {
-                        String pTitleStr = "ta".equalsIgnoreCase(lang) ? "ஜாதகரின் சுபாவம் & ஆளுமைத் திறன்" : "Native Personality & Core Temperament";
-                        Paragraph pH = buildMixedParagraph(pTitleStr, sFont, engSFont);
-                        pH.setSpacingAfter(4);
-                        document.add(pH);
-
-                        Paragraph pDesc = buildMixedParagraph(np.getCoreTemperament(), bFont, engBFont);
-                        pDesc.setSpacingAfter(10);
-                        document.add(pDesc);
-                    }
-                }
-
-                // Auspicious Life Anchors Section
-                if (data.getAiPredictions().getAuspiciousAnchors() != null) {
-                    var anch = data.getAiPredictions().getAuspiciousAnchors();
-                    String anchTitleStr = "ta".equalsIgnoreCase(lang) ? "வாழ்நாள் சுப அதிர்ஷ்ட அம்சங்கள் (Auspicious Life Anchors)" : "Auspicious Life Anchors";
-                    Paragraph anchH = buildMixedParagraph(anchTitleStr, sFont, engSFont);
-                    anchH.setSpacingAfter(8);
-                    document.add(anchH);
-
-                    PdfPTable anchTable = new PdfPTable(2);
-                    anchTable.setWidthPercentage(100);
-                    anchTable.setSpacingAfter(14);
-                    anchTable.setWidths(new float[]{40f, 60f});
-
-                    PdfPCell ah1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப அம்சம்" : "Life Anchor Factor", boldB, Element.ALIGN_CENTER); ah1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); anchTable.addCell(ah1);
-                    PdfPCell ah2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "விபரம் & வழிகாட்டுதல்" : "Auspicious Details", boldB, Element.ALIGN_CENTER); ah2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); anchTable.addCell(ah2);
-
-                    if (anch.getLifeGemstone() != null && !anch.getLifeGemstone().isBlank()) {
-                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "ஆயுள் இரத்தினம் (Life Gemstone)" : "Life Gemstone", boldB, Element.ALIGN_LEFT));
-                        anchTable.addCell(buildTableCell(anch.getLifeGemstone(), bFont, Element.ALIGN_LEFT));
-                    }
-                    if (anch.getFavorableColors() != null && !anch.getFavorableColors().isBlank()) {
-                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப நிறங்கள் (Favorable Colors)" : "Favorable Colors", boldB, Element.ALIGN_LEFT));
-                        anchTable.addCell(buildTableCell(anch.getFavorableColors(), bFont, Element.ALIGN_LEFT));
-                    }
-                    if (anch.getLuckyNumbers() != null && !anch.getLuckyNumbers().isBlank()) {
-                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "அதிர்ஷ்ட எண்கள் (Lucky Numbers)" : "Lucky Numbers", boldB, Element.ALIGN_LEFT));
-                        anchTable.addCell(buildTableCell(anch.getLuckyNumbers(), bFont, Element.ALIGN_LEFT));
-                    }
-                    if (anch.getFavorableDays() != null && !anch.getFavorableDays().isBlank()) {
-                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப கிழமைகள் (Favorable Days)" : "Favorable Days", boldB, Element.ALIGN_LEFT));
-                        anchTable.addCell(buildTableCell(anch.getFavorableDays(), bFont, Element.ALIGN_LEFT));
-                    }
-                    if (anch.getIshtaDevata() != null && !anch.getIshtaDevata().isBlank()) {
-                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "இஷ்ட & உபாசனை தெய்வம் (Ishta Devata)" : "Ishta & Kula Devata", boldB, Element.ALIGN_LEFT));
-                        anchTable.addCell(buildTableCell(anch.getIshtaDevata(), bFont, Element.ALIGN_LEFT));
-                    }
-                    if (anch.getFavorableDirections() != null && !anch.getFavorableDirections().isBlank()) {
-                        anchTable.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப திசைகள் (Favorable Directions)" : "Favorable Directions", boldB, Element.ALIGN_LEFT));
-                        anchTable.addCell(buildTableCell(anch.getFavorableDirections(), bFont, Element.ALIGN_LEFT));
-                    }
-                    document.add(anchTable);
-                }
-
-                // Health & Vitality Diagnostics Section
-                if (data.getAiPredictions().getHealthAnalysis() != null) {
-                    var ha = data.getAiPredictions().getHealthAnalysis();
-                    String hTitleStr = "ta".equalsIgnoreCase(lang) ? "ஆரோக்கியம் & ஆயுள் பலம் (Health & Vitality Diagnostics)" : "Ayurvedic Constitution & Health Diagnostics";
-                    Paragraph hH = buildMixedParagraph(hTitleStr, sFont, engSFont);
-                    hH.setSpacingAfter(4);
-                    document.add(hH);
-
-                    String hDescText = (ha.getAyurvedicConstitution() != null ? ha.getAyurvedicConstitution() + " " : "")
-                            + (ha.getLongevityVitalitySummary() != null ? ha.getLongevityVitalitySummary() : "");
-                    if (!hDescText.isBlank()) {
-                        Paragraph hDesc = buildMixedParagraph(hDescText, bFont, engBFont);
-                        hDesc.setSpacingAfter(10);
-                        document.add(hDesc);
-                    }
-                }
-
-                // AI Classical Yogas Table
-                if (data.getAiPredictions().getAiYogas() != null && !data.getAiPredictions().getAiYogas().isEmpty()) {
-                    String yogTitleStr = "ta".equalsIgnoreCase(lang) ? "ஜோதிட யோகங்கள் (Classical Vedic Yogas)" : "Classical Vedic Yogas & Astrological Formations";
-                    Paragraph yogH = buildMixedParagraph(yogTitleStr, sFont, engSFont);
-                    yogH.setSpacingAfter(8);
-                    document.add(yogH);
-
-                    PdfPTable yogTable = new PdfPTable(3);
-                    yogTable.setWidthPercentage(100);
-                    yogTable.setSpacingAfter(14);
-                    yogTable.setWidths(new float[]{25f, 25f, 50f});
-
-                    PdfPCell yh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "யோகம்" : "Yoga Name", boldB, Element.ALIGN_CENTER); yh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); yogTable.addCell(yh1);
-                    PdfPCell yh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "காரக கிரகங்கள்" : "Forming Planets", boldB, Element.ALIGN_CENTER); yh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); yogTable.addCell(yh2);
-                    PdfPCell yh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "சுப பலன்கள் & தாக்கம்" : "Astrological Impact", boldB, Element.ALIGN_CENTER); yh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); yogTable.addCell(yh3);
-
-                    for (var y : data.getAiPredictions().getAiYogas()) {
-                        yogTable.addCell(buildTableCell(y.getName() != null ? y.getName() : "", bFont, Element.ALIGN_LEFT));
-                        yogTable.addCell(buildTableCell(y.getFormingPlanets() != null ? y.getFormingPlanets() : "", bFont, Element.ALIGN_LEFT));
-                        yogTable.addCell(buildTableCell(y.getImpact() != null ? y.getImpact() : "", bFont, Element.ALIGN_LEFT));
-                    }
-                    document.add(yogTable);
-                }
-
-                // AI Doshams & Shastric Nullifications Table
-                if (data.getAiPredictions().getAiDoshams() != null && !data.getAiPredictions().getAiDoshams().isEmpty()) {
-                    String doshTitleStr = "ta".equalsIgnoreCase(lang) ? "தோஷங்கள் & சாஸ்திர நிவர்த்திகள் (Doshas & Nullifications)" : "Vedic Doshams, Nullifications & Remedies";
-                    Paragraph doshH = buildMixedParagraph(doshTitleStr, sFont, engSFont);
-                    doshH.setSpacingAfter(8);
-                    document.add(doshH);
-
-                    PdfPTable doshTable = new PdfPTable(4);
-                    doshTable.setWidthPercentage(100);
-                    doshTable.setSpacingAfter(14);
-                    doshTable.setWidths(new float[]{22f, 18f, 32f, 28f});
-
-                    PdfPCell dh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "தோஷம்" : "Dosham", boldB, Element.ALIGN_CENTER); dh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh1);
-                    PdfPCell dh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நிலை" : "Status", boldB, Element.ALIGN_CENTER); dh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh2);
-                    PdfPCell dh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "நிவர்த்தி காரணம்" : "Nullification Factor", boldB, Element.ALIGN_CENTER); dh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh3);
-                    PdfPCell dh4 = buildTableCell("ta".equalsIgnoreCase(lang) ? "பரிகாரம்" : "Vedic Remedy", boldB, Element.ALIGN_CENTER); dh4.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh4);
-
-                    for (var d : data.getAiPredictions().getAiDoshams()) {
-                        doshTable.addCell(buildTableCell(d.getName() != null ? d.getName() : "", bFont, Element.ALIGN_LEFT));
-                        doshTable.addCell(buildTableCell(d.getStatus() != null ? d.getStatus() : "", bFont, Element.ALIGN_CENTER));
-                        doshTable.addCell(buildTableCell(d.getNullificationFactor() != null ? d.getNullificationFactor() : "", bFont, Element.ALIGN_LEFT));
-                        doshTable.addCell(buildTableCell(d.getRemedy() != null ? d.getRemedy() : "", bFont, Element.ALIGN_LEFT));
-                    }
-                    document.add(doshTable);
-                }
-
-                // Past Milestones Table
-                if (data.getAiPredictions().getPastMilestones() != null && !data.getAiPredictions().getPastMilestones().isEmpty()) {
-                    String pastTitleStr = "ta".equalsIgnoreCase(lang) ? "கடந்த கால சரிபார்ப்பு நிகழ்வுகள் (பிறப்பு முதல் தற்போதைய வயது வரை)" : "Past Life Verification Milestones (Birth to Current Age)";
-                    Paragraph pastH = buildMixedParagraph(pastTitleStr, sFont, engSFont);
+                // 2. Retrospective Past Milestones
+                if (aiPred.getRetrospectivePastMilestones() != null && !aiPred.getRetrospectivePastMilestones().isEmpty()) {
+                    Paragraph pastH = buildMixedParagraph(ts.getLabel("pdf.ai.retrospective.title"), sFont, engSFont);
                     pastH.setSpacingAfter(8);
                     document.add(pastH);
 
-                    PdfPTable pastTable = new PdfPTable(4);
+                    PdfPTable pastTable = new PdfPTable(3);
                     pastTable.setWidthPercentage(100);
                     pastTable.setSpacingAfter(14);
-                    pastTable.setWidths(new float[]{16f, 22f, 31f, 31f});
+                    pastTable.setWidths(new float[]{20f, 30f, 50f});
 
-                    PdfPCell h1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, Element.ALIGN_CENTER); h1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h1);
-                    PdfPCell h2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "திசா - புக்தி" : "Dasa - Bhukthi", boldB, Element.ALIGN_CENTER); h2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h2);
-                    PdfPCell h3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "முக்கிய நிகழ்வு" : "Milestone Event", boldB, Element.ALIGN_CENTER); h3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h3);
-                    PdfPCell h4 = buildTableCell("ta".equalsIgnoreCase(lang) ? "ஜோதிட காரகம்" : "Astrological Factor", boldB, Element.ALIGN_CENTER); h4.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h4);
+                    PdfPCell h1 = buildTableCell(ts.getLabel("pdf.ai.period.age"), boldB, Element.ALIGN_CENTER); h1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h1);
+                    PdfPCell h2 = buildTableCell(ts.getLabel("pdf.ai.milestone.title"), boldB, Element.ALIGN_CENTER); h2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h2);
+                    PdfPCell h3 = buildTableCell(ts.getLabel("pdf.ai.lived.experience"), boldB, Element.ALIGN_CENTER); h3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); pastTable.addCell(h3);
 
-                    for (var m : data.getAiPredictions().getPastMilestones()) {
-                        pastTable.addCell(buildTableCell(m.getYear() + " (Age " + m.getAge() + ")", engBFont, Element.ALIGN_CENTER));
-                        pastTable.addCell(buildTableCell(m.getDasaBhukthi() != null ? m.getDasaBhukthi() : "", bFont, Element.ALIGN_LEFT));
+                    for (var m : aiPred.getRetrospectivePastMilestones()) {
+                        pastTable.addCell(buildTableCell(m.getApproxPeriod() != null ? m.getApproxPeriod() : "", engBFont, Element.ALIGN_CENTER));
                         pastTable.addCell(buildTableCell(m.getMilestoneTitle() != null ? m.getMilestoneTitle() : "", bFont, Element.ALIGN_LEFT));
-                        pastTable.addCell(buildTableCell(m.getDescription() != null ? m.getDescription() : "", bFont, Element.ALIGN_LEFT));
+                        pastTable.addCell(buildTableCell(m.getEventNarrative() != null ? m.getEventNarrative() : "", bFont, Element.ALIGN_LEFT));
                     }
                     document.add(pastTable);
                 }
 
-                // Future Predictions Table
-                var futureList = data.getAiPredictions().getLifetimePredictions() != null && !data.getAiPredictions().getLifetimePredictions().isEmpty()
-                        ? data.getAiPredictions().getLifetimePredictions()
-                        : data.getAiPredictions().getFuturePredictions();
+                // 3. AI Shastric Longevity & Yogas Analysis
+                if (aiPred.getAiLongevityAnalysis() != null) {
+                    var lon = aiPred.getAiLongevityAnalysis();
+                    Paragraph lonH = buildMixedParagraph(ts.getLabel("pdf.ai.longevity.title"), sFont, engSFont);
+                    lonH.setSpacingAfter(6);
+                    document.add(lonH);
 
-                if (futureList != null && !futureList.isEmpty()) {
-                    boolean is10Year = "NEXT_10_YEARS".equalsIgnoreCase(data.getAiPredictions().getForecastMode())
-                            || futureList.size() <= 15;
-                    int sYr = data.getAiPredictions().getStartYear() > 0
-                            ? data.getAiPredictions().getStartYear()
-                            : futureList.get(0).getYear();
-                    int eYr = data.getAiPredictions().getEndYear() > 0
-                            ? data.getAiPredictions().getEndYear()
-                            : futureList.get(futureList.size() - 1).getYear();
-
-                    String futTitleStr;
-                    if (is10Year) {
-                        futTitleStr = "ta".equalsIgnoreCase(lang)
-                                ? "அடுத்த 10 ஆண்டுகளுக்கான பலன்கள் & வழிகாட்டுதல் (" + sYr + " – " + eYr + ")"
-                                : "10-Year Astrological Forecast & Guidance (" + sYr + " – " + eYr + ")";
-                    } else {
-                        futTitleStr = "ta".equalsIgnoreCase(lang)
-                                ? "வருடாந்திர வாழ்நாள் பலன்கள் & வழிகாட்டுதல் (" + sYr + " – " + eYr + ")"
-                                : "Year-by-Year Lifetime Astrological Forecast (" + sYr + " – " + eYr + ")";
+                    if (lon.getPrimarySpanRationale() != null && !lon.getPrimarySpanRationale().isBlank()) {
+                        String spanHeader = ts.getLabel("pdf.ai.calculated.ayul")
+                                + lon.getCalculatedAyulCeiling() + " (" + (lon.getClassification() != null ? lon.getClassification() : "") + ")\n"
+                                + lon.getPrimarySpanRationale();
+                        Paragraph spanP = buildMixedParagraph(spanHeader, bFont, engBFont);
+                        spanP.setSpacingAfter(10);
+                        document.add(spanP);
                     }
+
+                    if (lon.getActiveYogasIdentified() != null && !lon.getActiveYogasIdentified().isEmpty()) {
+                        PdfPTable yogTable = new PdfPTable(2);
+                        yogTable.setWidthPercentage(100);
+                        yogTable.setSpacingAfter(10);
+                        yogTable.setWidths(new float[]{35f, 65f});
+
+                        PdfPCell yh1 = buildTableCell(ts.getLabel("pdf.ai.active.yogas"), boldB, Element.ALIGN_CENTER); yh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); yogTable.addCell(yh1);
+                        PdfPCell yh2 = buildTableCell(ts.getLabel("pdf.ai.lived.experience"), boldB, Element.ALIGN_CENTER); yh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); yogTable.addCell(yh2);
+
+                        for (var y : lon.getActiveYogasIdentified()) {
+                            yogTable.addCell(buildTableCell(y.getYogaName() != null ? y.getYogaName() : "", bFont, Element.ALIGN_LEFT));
+                            yogTable.addCell(buildTableCell(y.getEffect() != null ? y.getEffect() : "", bFont, Element.ALIGN_LEFT));
+                        }
+                        document.add(yogTable);
+                    }
+
+                    if (lon.getActiveDoshasIdentified() != null && !lon.getActiveDoshasIdentified().isEmpty()) {
+                        PdfPTable doshTable = new PdfPTable(2);
+                        doshTable.setWidthPercentage(100);
+                        doshTable.setSpacingAfter(10);
+                        doshTable.setWidths(new float[]{35f, 65f});
+
+                        PdfPCell dh1 = buildTableCell(ts.getLabel("pdf.ai.active.doshas"), boldB, Element.ALIGN_CENTER); dh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh1);
+                        PdfPCell dh2 = buildTableCell(ts.getLabel("pdf.ai.lived.experience"), boldB, Element.ALIGN_CENTER); dh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); doshTable.addCell(dh2);
+
+                        for (var d : lon.getActiveDoshasIdentified()) {
+                            doshTable.addCell(buildTableCell(d.getDoshaName() != null ? d.getDoshaName() : "", bFont, Element.ALIGN_LEFT));
+                            doshTable.addCell(buildTableCell(d.getRemedialAdvice() != null ? d.getRemedialAdvice() : "", bFont, Element.ALIGN_LEFT));
+                        }
+                        document.add(doshTable);
+                    }
+                }
+
+                // 4. Yearly Predictions Table
+                var yearlyList = aiPred.getYearlyPredictions();
+                if (yearlyList != null && !yearlyList.isEmpty()) {
+                    int sYr = aiPred.getStartYear() > 0 ? aiPred.getStartYear() : yearlyList.get(0).getYear();
+                    int eYr = aiPred.getEndYear() > 0 ? aiPred.getEndYear() : yearlyList.get(yearlyList.size() - 1).getYear();
+
+                    String futTitleStr = is10YearScope
+                            ? ts.getLabel("pdf.ai.10year.title") + " (" + sYr + " – " + eYr + ")"
+                            : ts.getLabel("pdf.ai.lifepredictions.title") + " (" + sYr + " – " + eYr + ")";
                     Paragraph futH = buildMixedParagraph(futTitleStr, sFont, engSFont);
                     futH.setSpacingAfter(8);
                     document.add(futH);
 
-                    PdfPTable futTable = new PdfPTable(4);
+                    PdfPTable futTable = new PdfPTable(3);
                     futTable.setWidthPercentage(100);
                     futTable.setSpacingAfter(14);
-                    futTable.setWidths(new float[]{14f, 22f, 44f, 20f});
+                    futTable.setWidths(new float[]{16f, 24f, 60f});
 
-                    PdfPCell fh1 = buildTableCell("ta".equalsIgnoreCase(lang) ? "வருடம் / வயது" : "Year / Age", boldB, Element.ALIGN_CENTER); fh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh1);
-                    PdfPCell fh2 = buildTableCell("ta".equalsIgnoreCase(lang) ? "திசா & ஜோதிட அடிப்படை" : "Dasa & Planetary Basis", boldB, Element.ALIGN_CENTER); fh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh2);
-                    PdfPCell fh3 = buildTableCell("ta".equalsIgnoreCase(lang) ? "ஆண்டு பலன் & விரிவான விபரம்" : "Yearly Forecast & Details", boldB, Element.ALIGN_CENTER); fh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh3);
-                    PdfPCell fh4 = buildTableCell("ta".equalsIgnoreCase(lang) ? "எச்சரிக்கைகள் & பரிகாரங்கள்" : "Cautions & Remedies", boldB, Element.ALIGN_CENTER); fh4.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh4);
+                    PdfPCell fh1 = buildTableCell(ts.getLabel("pdf.ai.period.age"), boldB, Element.ALIGN_CENTER); fh1.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh1);
+                    PdfPCell fh2 = buildTableCell(ts.getLabel("pdf.ai.dasa.bhukthi"), boldB, Element.ALIGN_CENTER); fh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh2);
+                    PdfPCell fh3 = buildTableCell(ts.getLabel("pdf.ai.annual.narrative"), boldB, Element.ALIGN_CENTER); fh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh3);
 
-                    for (var f : futureList) {
-                        futTable.addCell(buildTableCell(f.getYear() + " (Age " + f.getAge() + ")", engBFont, Element.ALIGN_CENTER));
-                        String dasaBasis = (f.getDasaBhukthi() != null ? f.getDasaBhukthi() : "") +
-                                (f.getAstrologicalBasis() != null && !f.getAstrologicalBasis().isBlank() ? "\n[" + f.getAstrologicalBasis() + "]" : "");
-                        futTable.addCell(buildTableCell(dasaBasis, bFont, Element.ALIGN_LEFT));
-
-                        String narrative = (f.getYearlyTheme() != null && !f.getYearlyTheme().isBlank() ? "🎯 " + f.getYearlyTheme() + "\n\n" : "") +
-                                (f.getDetailedPrediction() != null && !f.getDetailedPrediction().isBlank() ? f.getDetailedPrediction() : ((f.getCareerAndFinance() != null ? f.getCareerAndFinance() : "") + " " + (f.getHealthAndFamily() != null ? f.getHealthAndFamily() : "")).trim());
-                        futTable.addCell(buildTableCell(narrative, bFont, Element.ALIGN_LEFT));
-
-                        String cautionsRemedies = f.getCautionsAndRemedies() != null && !f.getCautionsAndRemedies().isBlank()
-                                ? f.getCautionsAndRemedies()
-                                : (f.getRemediesGuidance() != null ? f.getRemediesGuidance() : "");
-                        futTable.addCell(buildTableCell(cautionsRemedies, bFont, Element.ALIGN_LEFT));
+                    for (var yp : yearlyList) {
+                        futTable.addCell(buildTableCell(yp.getYear() + " (Age " + yp.getAge() + ")", engBFont, Element.ALIGN_CENTER));
+                        futTable.addCell(buildTableCell(yp.getDasaBhukthi() != null ? yp.getDasaBhukthi() : "", bFont, Element.ALIGN_LEFT));
+                        futTable.addCell(buildTableCell(yp.getAnnualNarrative() != null ? yp.getAnnualNarrative() : "", bFont, Element.ALIGN_LEFT));
                     }
                     document.add(futTable);
                 }

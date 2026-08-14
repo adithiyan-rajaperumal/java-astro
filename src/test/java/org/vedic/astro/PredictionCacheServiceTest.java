@@ -31,12 +31,12 @@ public class PredictionCacheServiceTest {
 
         assertNull(cacheService.getLifetimePrediction(key));
 
-        PredictionResponseDTO resp = PredictionResponseDTO.builder().enabled(true).overallSummary("Test Summary").build();
+        PredictionResponseDTO resp = PredictionResponseDTO.builder().enabled(true).message("Test Summary").build();
         cacheService.putLifetimePrediction(key, resp);
 
         PredictionResponseDTO cached = cacheService.getLifetimePrediction(key);
         assertNotNull(cached);
-        assertEquals("Test Summary", cached.getOverallSummary());
+        assertEquals("Test Summary", cached.getMessage());
     }
 
     @Test

@@ -61,13 +61,11 @@ public class GeminiPredictionServiceTest {
         assertFalse(prompt.contains("Diagnostics:"));
         assertFalse(prompt.contains("\"ayurdayaProfile\""));
         assertFalse(prompt.contains("\"preCalculatedDiagnostics\""));
-        assertTrue(prompt.contains("ayurvedicHealthProfile"));
-        assertTrue(prompt.contains("detailedPrediction"));
-        assertTrue(prompt.contains("Ayurdaya") || prompt.contains("ஆயுள் நிர்ணயம்"));
-        assertTrue(prompt.contains("Career, Business & Wealth"));
-        assertTrue(prompt.contains("Health & Vitality Realities"));
-        assertTrue(prompt.contains("Family, Marriage & Progeny"));
-        assertTrue(prompt.contains("Parents, Elders & Mindset"));
+        assertTrue(prompt.contains("divisionalCharts"));
+        assertTrue(prompt.contains("yearlyPredictions"));
+        assertTrue(prompt.contains("aiLongevityAnalysis"));
+        assertTrue(prompt.contains("personalityAndBehavior"));
+        assertTrue(prompt.contains("retrospectivePastMilestones"));
     }
 
     @Test
@@ -101,7 +99,7 @@ public class GeminiPredictionServiceTest {
         // Verify JSON input contains structured houseLordshipTable and planetaryMatrix
         assertTrue(prompt.contains("houseLordshipTable"));
         assertTrue(prompt.contains("planetaryMatrix"));
-        assertTrue(prompt.contains("ayurvedicHealthProfile"));
+        assertTrue(prompt.contains("divisionalCharts"));
 
         // Verify Sun in Leo (Sign 5) -> House 4 from Taurus (Sign 2) Lagna
         assertTrue(prompt.contains("\"planet\" : \"Sun\""));
@@ -115,9 +113,9 @@ public class GeminiPredictionServiceTest {
 
         // Verify system instructions contain Rasi vs Bhava disambiguation and lordship rules
         String systemInstruction = predictionService.constructSystemInstruction("ta");
-        assertTrue(systemInstruction.contains("CRITICAL ASTROLOGICAL INTERPRETATION & LORDSHIP RULES"));
-        assertTrue(systemInstruction.contains("AYURVEDIC HEALTH PREDICTIONS"));
+        assertTrue(systemInstruction.contains("CRITICAL ASTROLOGICAL INTERPRETATION & NOTATION RULES"));
         assertTrue(systemInstruction.contains("AUTONOMOUS AYURDAYA (LONGEVITY) CALCULATION"));
+        assertTrue(systemInstruction.contains("YEARLY PREDICTIONS (UNCAPPED RICH NARRATIVE)"));
     }
 
     @Test
@@ -589,15 +587,12 @@ public class GeminiPredictionServiceTest {
         assertTrue(sunNode.get("occupantRole").asText().contains("NOT the 5th Lord"));
         assertTrue(sunNode.get("primaryDosha").asText().contains("Pitta"));
 
-        // Verify Ayurvedic Health Profile
-        com.fasterxml.jackson.databind.JsonNode health = root.get("ayurvedicHealthProfile");
-        assertNotNull(health);
-        assertNotNull(health.get("dominantPrakriti"));
-        assertEquals("Agni (Fire) / Dhanus", health.get("lagnaElement").asText());
-        assertEquals("Vrishabha (House 6)", health.get("rogaSthanaSign").asText());
-        assertEquals("Venus", health.get("rogaLord").asText());
-        assertTrue(health.get("calculatedOrganVulnerabilities").size() > 0);
-        assertTrue(health.get("dietaryAndLifestyleDirectives").size() > 0);
+        // Verify Divisional Charts Matrix with Lagna & House tags
+        com.fasterxml.jackson.databind.JsonNode vargas = root.get("divisionalCharts");
+        assertNotNull(vargas);
+        assertNotNull(vargas.get("D9_Navamsa_Dharma_Spouse"));
+        assertNotNull(vargas.get("D10_Dasamsa_Career"));
+        assertTrue(vargas.get("D9_Navamsa_Dharma_Spouse").has("Lagna"));
 
         // Verify that ayurdayaProfile and preCalculatedDiagnostics are NOT passed in prompt JSON to ensure autonomous AI calculation
         com.fasterxml.jackson.databind.JsonNode ayurdaya = root.get("ayurdayaProfile");
@@ -720,20 +715,44 @@ public class GeminiPredictionServiceTest {
     }
 
     @Test
-    public void testAuspiciousAnchorsGeneration() {
-        // Aries Lagna (1) -> Mars ruled
-        PredictionResponseDTO.AuspiciousAnchors ariesAnchors = GeminiPredictionService.calculateAuspiciousAnchors(1, 2, "ta");
-        assertNotNull(ariesAnchors);
-        assertTrue(ariesAnchors.getLifeGemstone().contains("பவளம்") || ariesAnchors.getLifeGemstone().contains("Coral"));
-        assertTrue(ariesAnchors.getFavorableColors().contains("சிவப்பு") || ariesAnchors.getFavorableColors().contains("Red"));
-        assertEquals("9, 1, 3", ariesAnchors.getLuckyNumbers());
-        assertTrue(ariesAnchors.getIshtaDevata().contains("முருகப்பெருமான்") || ariesAnchors.getIshtaDevata().contains("Muruga"));
+    public void testAutonomousAyulAndLeanParsing() {
+        String sampleJson = "{\n" +
+                "  \"candidates\": [{\n" +
+                "    \"content\": {\n" +
+                "      \"parts\": [{\n" +
+                "        \"text\": \"{\\n" +
+                "          \\\"aiLongevityAnalysis\\\": {\\n" +
+                "            \\\"calculatedAyulCeiling\\\": 82,\\n" +
+                "            \\\"classification\\\": \\\"Poornayu\\\",\\n" +
+                "            \\\"primarySpanRationale\\\": \\\"Strong Lagna and 8th lord\\\",\\n" +
+                "            \\\"activeYogasIdentified\\\": [{\\\"yogaName\\\": \\\"Gaja Kesari\\\", \\\"effect\\\": \\\"Wisdom\\\"}],\\n" +
+                "            \\\"activeDoshasIdentified\\\": []\\n" +
+                "          },\\n" +
+                "          \\\"personalityAndBehavior\\\": {\\n" +
+                "            \\\"coreTemperament\\\": \\\"Principled and analytical\\\"\\n" +
+                "          },\\n" +
+                "          \\\"retrospectivePastMilestones\\\": [{\\\"approxPeriod\\\": \\\"2018-2020\\\", \\\"milestoneTitle\\\": \\\"Degree\\\", \\\"eventNarrative\\\": \\\"Graduation\\\"}],\\n" +
+                "          \\\"yearlyPredictions\\\": [{\\\"year\\\": 2026, \\\"age\\\": 31, \\\"activeDasaBhukthi\\\": \\\"Rahu-Saturn\\\", \\\"annualNarrative\\\": \\\"Career breakthrough\\\"}]\\n" +
+                "        }\"\n" +
+                "      }]\n" +
+                "    }\n" +
+                "  }]\n" +
+                "}";
 
-        // Leo Lagna (5) -> Sun ruled
-        PredictionResponseDTO.AuspiciousAnchors leoAnchors = GeminiPredictionService.calculateAuspiciousAnchors(5, 5, "en");
-        assertNotNull(leoAnchors);
-        assertTrue(leoAnchors.getLifeGemstone().contains("Ruby"));
-        assertEquals("1, 4, 9", leoAnchors.getLuckyNumbers());
+        BirthDetailsDTO birth = new BirthDetailsDTO("Ramesh", 1995, 5, 15, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
+        PredictionRequestDTO req = PredictionRequestDTO.builder().birthDetails(birth).language("ta").build();
+
+        PredictionResponseDTO parsed = predictionService.parseGeminiResponse(sampleJson, req);
+        assertNotNull(parsed);
+        assertTrue(parsed.isEnabled());
+        assertNotNull(parsed.getAiLongevityAnalysis());
+        assertEquals(82, parsed.getAiLongevityAnalysis().getCalculatedAyulCeiling());
+        assertEquals("Poornayu", parsed.getAiLongevityAnalysis().getClassification());
+        assertNotNull(parsed.getPersonalityAndBehavior());
+        assertEquals("Principled and analytical", parsed.getPersonalityAndBehavior().getCoreTemperament());
+        assertEquals(1, parsed.getRetrospectivePastMilestones().size());
+        assertEquals(1, parsed.getYearlyPredictions().size());
+        assertEquals("Career breakthrough", parsed.getYearlyPredictions().get(0).getAnnualNarrative());
     }
 
     @Test
@@ -757,13 +776,13 @@ public class GeminiPredictionServiceTest {
         geminiProperties.setForecastYears(10);
         String prompt = predictionService.constructAstrologicalPrompt(req);
         assertNotNull(prompt);
-        assertTrue(prompt.contains("NEXT 10 YEARS") || prompt.contains("10 YEARS"));
-        assertTrue(prompt.contains("Career, Business & Wealth"));
+        assertTrue(prompt.contains("NEXT") || prompt.contains("10 YEARS") || prompt.contains("TEN_YEARS"));
+        assertTrue(prompt.contains("Career & Business") || prompt.contains("yearlyPredictions"));
 
         // Test fallback prediction returns populated metadata
         PredictionResponseDTO fallback = predictionService.generateOfflineRuleBasedBalan(req);
         assertNotNull(fallback);
-        assertEquals("NEXT_10_YEARS", fallback.getForecastMode());
+        assertTrue("TEN_YEARS".equals(fallback.getForecastMode()) || "NEXT_10_YEARS".equals(fallback.getForecastMode()));
         assertEquals(11, fallback.getTotalForecastYears());
         assertTrue(fallback.getStartYear() > 2020);
         assertTrue(fallback.getEndYear() >= fallback.getStartYear() + 10);

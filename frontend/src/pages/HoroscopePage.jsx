@@ -198,9 +198,10 @@ function HoroscopePage({ settings }) {
     return `drik_daily_${payload.name}_${payload.year}_${payload.month}_${payload.day}_${date}_${lang}`;
   };
 
-  const handleGeneratePredictions = async (forceRefresh = false) => {
+  const handleGeneratePredictions = async (forceRefresh = false, isTenYears = false) => {
     if (!report || !formPayload) return;
-    const cacheKey = getLifeStorageKey(formPayload, settings.language);
+    const modeKey = isTenYears ? '10y' : 'life';
+    const cacheKey = `${getLifeStorageKey(formPayload, settings.language)}_${modeKey}`;
 
     if (!forceRefresh && cacheKey) {
       try {
@@ -230,7 +231,8 @@ function HoroscopePage({ settings }) {
           birthDetails: formPayload,
           chartData: report,
           language: settings.language,
-          forceRefresh
+          forceRefresh,
+          isTenYears
         })
       });
       if (response.ok) {
