@@ -595,8 +595,12 @@ public class PdfExportService {
                     PdfPCell fh3 = buildTableCell(ts.getLabel("pdf.ai.annual.narrative"), boldB, Element.ALIGN_CENTER); fh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY); futTable.addCell(fh3);
 
                     for (var yp : yearlyList) {
+                        String dasaStr = yp.getDasaBhukthi();
+                        if (dasaStr == null || dasaStr.isBlank() || dasaStr.contains("(") || dasaStr.toLowerCase().contains("running")) {
+                            dasaStr = GeminiPredictionService.findDasaForYear(data.getVimshottariTimeline(), yp.getYear());
+                        }
                         futTable.addCell(buildTableCell(yp.getYear() + " (Age " + yp.getAge() + ")", engBFont, Element.ALIGN_CENTER));
-                        futTable.addCell(buildTableCell(yp.getDasaBhukthi() != null ? yp.getDasaBhukthi() : "", bFont, Element.ALIGN_LEFT));
+                        futTable.addCell(buildTableCell(dasaStr != null ? dasaStr : "", bFont, Element.ALIGN_LEFT));
                         futTable.addCell(buildTableCell(yp.getAnnualNarrative() != null ? yp.getAnnualNarrative() : "", bFont, Element.ALIGN_LEFT));
                     }
                     document.add(futTable);

@@ -1,6 +1,8 @@
 package org.vedic.astro.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -98,7 +100,11 @@ public class PredictionResponseDTO {
     public static class YearlyPrediction {
         private int year;
         private int age;
+        @JsonProperty("dasaBhukthi")
+        @JsonAlias({"activeDasaBhukthi", "dasaBhukthi", "runningDasa", "dasa_bhukthi", "dasa", "dasaPeriod"})
         private String dasaBhukthi;
+        @JsonProperty("annualNarrative")
+        @JsonAlias({"annualNarrative", "narrative", "annual_narrative", "prediction", "forecast"})
         private String annualNarrative;
     }
 

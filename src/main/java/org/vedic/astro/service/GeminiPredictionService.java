@@ -520,7 +520,7 @@ public class GeminiPredictionService {
           .append("    {\n")
           .append("      \"year\": ").append(currentYear).append(",\n")
           .append("      \"age\": ").append(currentAge).append(",\n")
-          .append("      \"activeDasaBhukthi\": \"(Running Dasa - Bhukthi)\",\n")
+          .append("      \"dasaBhukthi\": \"(Running Dasa - Bhukthi)\",\n")
           .append("      \"annualNarrative\": \"(Dense 4-6 sentence astrological paragraph detailing Dasa-Bhukthi lordships, D10 career, D2 wealth, D30 health, D9 family, and Graha remedy)\"\n")
           .append("    }\n")
           .append("  ]\n")
@@ -749,6 +749,15 @@ public class GeminiPredictionService {
                     parsed.setMessage("AI Life Balan synthesized via Google Gemini.");
 
                     var yearly = parsed.getYearlyPredictions();
+                    var dasas = req.getChartData() != null ? req.getChartData().getCurrentDasaTimeline() : null;
+                    if (yearly != null) {
+                        for (var yp : yearly) {
+                            if (yp.getDasaBhukthi() == null || yp.getDasaBhukthi().isBlank()
+                                    || yp.getDasaBhukthi().contains("(") || yp.getDasaBhukthi().toLowerCase().contains("running")) {
+                                yp.setDasaBhukthi(findDasaForYear(dasas, yp.getYear()));
+                            }
+                        }
+                    }
                     int count = yearly != null ? yearly.size() : 0;
                     int birthYear = req.getBirthDetails() != null ? req.getBirthDetails().year() : 1995;
                     int curYear = LocalDate.now().getYear();
@@ -1208,7 +1217,7 @@ public class GeminiPredictionService {
                 .build();
     }
 
-    private String findDasaForYear(List<DasaPeriod> dasas, int year) {
+    public static String findDasaForYear(List<DasaPeriod> dasas, int year) {
         if (dasas == null || dasas.isEmpty()) return "Vedic Dasa Period";
         LocalDate date = LocalDate.of(year, 6, 15);
         for (DasaPeriod d : dasas) {

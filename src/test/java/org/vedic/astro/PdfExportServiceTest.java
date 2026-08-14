@@ -199,4 +199,46 @@ public class PdfExportServiceTest {
             assertTrue(pdfBytes.length > 5000, "PDF size too small for language: " + lang);
         }
     }
+
+    @Test
+    public void testPdfAiBalanDasaBhukthiAutomaticBackfill() {
+        LocaleContextHolder.setLocale(new Locale("ta"));
+
+        BirthDetailsDTO birth = new BirthDetailsDTO("Adithiyan", 1996, 7, 25, 17, 45, 0, 13.0827, 80.2707, "LAHIRI");
+        var panchangam = panchangamFactory.getEngine(org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM);
+        var chartResult = panchangam.calculate(birth);
+
+        ComprehensiveReportDTO report = orchestrationService.compileComprehensivePdfData(chartResult, birth, new double[12]);
+
+        // AI predictions with empty dasaBhukthi to test backfill
+        PredictionResponseDTO aiPredictions = PredictionResponseDTO.builder()
+                .enabled(true)
+                .forecastMode("TEN_YEARS")
+                .startYear(2026)
+                .endYear(2030)
+                .startAge(30)
+                .endAge(34)
+                .totalForecastYears(5)
+                .yearlyPredictions(List.of(
+                        PredictionResponseDTO.YearlyPrediction.builder()
+                                .year(2026)
+                                .age(30)
+                                .dasaBhukthi("") // Empty to trigger backfill
+                                .annualNarrative("தொழில் வளர்ச்சி மற்றும் பணவரவு.")
+                                .build(),
+                        PredictionResponseDTO.YearlyPrediction.builder()
+                                .year(2027)
+                                .age(31)
+                                .dasaBhukthi(null) // Null to trigger backfill
+                                .annualNarrative("குடும்ப நலம் மற்றும் சுபகாரியங்கள்.")
+                                .build()
+                ))
+                .build();
+
+        report.setAiPredictions(aiPredictions);
+
+        byte[] pdfBytes = pdfExportService.generateAstrologyReport(report);
+        assertNotNull(pdfBytes);
+        assertTrue(pdfBytes.length > 5000);
+    }
 }
