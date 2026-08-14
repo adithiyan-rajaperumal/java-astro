@@ -47,6 +47,8 @@ const I18N_TERMS = {
   'Vata-Pitta': { en: 'Vata-Pitta', ta: 'வாத-பித்தம்', hi: 'वात-पित्त', te: 'వాత-పిత్తం', kn: 'ವಾತ-ಪಿತ್ತ', ml: 'വാത-പിത്തം' },
   'Pitta-Vata': { en: 'Pitta-Vata', ta: 'பித்த-வாதம்', hi: 'पित्त-वात', te: 'పిత్త-వాతం', kn: 'ಪಿತ್ತ-ವಾತ', ml: 'പിത്ത-വാതം' },
   'Kapha-Pitta': { en: 'Kapha-Pitta', ta: 'கப-பித்தம்', hi: 'कफ-पित्त', te: 'కఫ-పిత్తం', kn: 'ಕಫ-ಪಿತ್ತ', ml: 'കഫ-പിത്തം' },
+  'Sama Prakriti (Tridosha Balanced)': { en: 'Sama Prakriti (Tridosha Balanced)', ta: 'சம பிரகிருதி (திரிதோஷ சமநிலை)', hi: 'सम प्रकृति (त्रिदोष संतुलित)', te: 'సమ ప్రకృతి (త్రిదోష సమతుల్యత)', kn: 'ಸಮ ಪ್ರಕೃತಿ (ತ್ರಿದೋಷ ಸಮತೋಲನ)', ml: 'സമ പ്രകൃതി (ത്രിദോഷ സന്തുലിതം)' },
+  'Sama Prakriti': { en: 'Sama Prakriti', ta: 'சம பிரகிருதி (திரிதோஷ சமநிலை)', hi: 'सम प्रकृति', te: 'సమ ప్రకృతి', kn: 'ಸಮ ಪ್ರಕೃತಿ', ml: 'സമ പ്രകൃതി' },
   'Pitta-Kapha': { en: 'Pitta-Kapha', ta: 'பித்த-கபம்', hi: 'पित्त-कफ', te: 'పిత్త-కఫం', kn: 'ಪಿತ್ತ-ಕಫ', ml: 'പിത്ത-കഫം' },
   'Vata-Kapha': { en: 'Vata-Kapha', ta: 'வாத-கபம்', hi: 'वात-कफ', te: 'వాత-కఫం', kn: 'ವಾತ-ಕಫ', ml: 'വാത-കഫം' },
   'Kapha-Vata': { en: 'Kapha-Vata', ta: 'கப-வாதம்', hi: 'कफ-वात', te: 'కఫ-వాతం', kn: 'ಕಫ-ವಾತ', ml: 'കഫ-ವಾതം' },
@@ -349,6 +351,78 @@ const DIRECTIONS_I18N = {
 };
 
 const ORGAN_VULNERABILITIES_I18N = {
+  'Mars in House': {
+    en: 'Acute inflammatory spikes, muscular strain & bile heat sensitivity (Mars in Dusthana)',
+    ta: 'தீவிர அழற்சி, தசைப்பிடிப்பு மற்றும் பித்த உஷ்ண உணர்திறன் (செவ்வாய் மறைவு ஸ்தானத்தில்)',
+    hi: 'तीव्र सूजन, मांसपेशियों में खिंचाव व पित्त उष्मा संवेदनशीलता (मंगल त्रिक भाव में)',
+    te: 'తీవ్రమైన వాపు, కండరాల ఒత్తిడి మరియు పిత్త వేడి సున్నితత్వం (కుజుడు దుస్థానంలో)',
+    kn: 'ತೀವ್ರ ಉರಿಯೂತ, ಸ್ನಾಯು ಸೆಳೆತ ಮತ್ತು ಪಿತ್ತ ಉಷ್ಣ ಸೂಕ್ಷ್ಮತೆ (ಮಂಗಳ ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'തീവ്രമായ വീക്കം, പേശി വലിവ്, പിത്ത ഉഷ്ണ സംവേദനക്ഷമത (ചൊവ്വ ദുരിത ഭാവത്തിൽ)'
+  },
+  'Saturn in House': {
+    en: 'Joint stiffness, chronic dryness, sciatica or tendon fatigue (Saturn in Dusthana)',
+    ta: 'மூட்டு விறைப்பு, நாள்பட்ட வறட்சி, நரம்புத் தளர்ச்சி & தசைநார் சோர்வு (சனி மறைவு ஸ்தானத்தில்)',
+    hi: 'जोड़ों की जकड़न, पुराना रूखापन, साइटिका या स्नायु थकान (शनि त्रिक भाव में)',
+    te: 'కీళ్ల బిగుతు, దీర్ఘకాలిక పొడిబారడం, సయాటికా లేదా స్నాయువు అలసట (శని దుస్థానంలో)',
+    kn: 'ಕೀಲು ಬಿಗಿತ, ದೀರ್ಘಕಾಲದ ಶುಷ್ಕತೆ, ಸಿಯಾಟಿಕಾ ಅಥವಾ ಸ್ನಾಯು ಆಯಾಸ (ಶನಿ ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'സന്ധി മുറുക്കം, വരൾച്ച, സയാറ്റിക്ക അല്ലെങ്കിൽ ടെൻഡോൺ ക്ഷീണം (ശനി ദുരിത ഭാവത്തിൽ)'
+  },
+  'Rahu in House': {
+    en: 'Environmental allergies, food sensitivities & psychosomatic sleep disturbances (Rahu in Dusthana)',
+    ta: 'சுற்றுச்சூழல் ஒவ்வாமை, உணவு உணர்திறன் & தூக்க சுழற்சி மாறுபாடுகள் (ராகு மறைவு ஸ்தானத்தில்)',
+    hi: 'पर्यावरणीय एलर्जी, खाद्य संवेदनशीलता एवं अनिद्रा/मानसिक तनाव (राहु त्रिक भाव में)',
+    te: 'పర్యావరణ అలెర్జీలు, ఆహార సున్నితత్వం & నిద్రలేమి (రాహువు దుస్థానంలో)',
+    kn: 'ಪರಿಸರ ಅಲರ್ಜಿಗಳು, ಆಹಾರ ಸೂಕ್ಷ್ಮತೆ ಮತ್ತು ನಿದ್ರಾಹೀನತೆ (ರಾಹು ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'പരിസ്ഥിതി അലർജികൾ, ഭക്ഷണ സംവേദനക്ഷമത, ഉറക്കക്കുറവ് (രാഹു ദുരിത ഭാവത്തിൽ)'
+  },
+  'Ketu in House': {
+    en: 'Sharp intestinal heat, unexpected digestive hypersensitivity & subtle energy depletion (Ketu in Dusthana)',
+    ta: 'தீவிர குடல் உஷ்ணம், எதிர்பாராத செரிமான ஒவ்வாமை & ஆற்றல் குறைவு (கேது மறைவு ஸ்தானத்தில்)',
+    hi: 'आंतों की तीक्ष्ण गर्मी, अप्रत्याशित पाचन संवेदनशीलता व ऊर्जा ह्रास (केतु त्रिक भाव में)',
+    te: 'ప్రేగుల వేడి, ఊహించని జీర్ణ సున్నితత్వం & శక్తి క్షీణత (కేతువు దుస్థానంలో)',
+    kn: 'ಕರುಳಿನ ತೀವ್ರ ಉಷ್ಣ, ಅನಿರೀಕ್ಷಿತ ಜೀರ್ಣಕಾರಿ ಸೂಕ್ಷ್ಮತೆ & ಶಕ್ತಿ ಕುಸಿತ (ಕೇತು ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'കുടലിലെ തീവ്രമായ ചൂട്, ദഹന സംവേദനക്ഷമത, ഊർജ്ജക്കുറവ് (കേതു ദുരിത ഭാവത്തിൽ)'
+  },
+  'Sun in House': {
+    en: 'Cardiovascular stamina under stress, eyesight sensitivity & bone calcium absorption (Sun in Dusthana)',
+    ta: 'இதய உழைப்பு, கண் பார்வை உணர்திறன் & எலும்பு கால்சியம் உறிஞ்சுதல் (சூரியன் மறைவு ஸ்தானத்தில்)',
+    hi: 'तनाव में हृदय क्षमता, नेत्र संवेदनशीलता एवं अस्थि कैल्शियम अवशोषण (सूर्य त्रिक भाव में)',
+    te: 'గుండె సామర్థ్యం, కంటి చూపు సున్నితత్వం & ఎముకల కాల్షియం శోషణ (సూర్యుడు దుస్థానంలో)',
+    kn: 'ಹೃದಯದ ಸಾಮರ್ಥ್ಯ, ದೃಷ್ಟಿ ಸೂಕ್ಷ್ಮತೆ ಮತ್ತು ಮೂಳೆಯ ಕ್ಯಾಲ್ಸಿಯಂ ಹೀರಿಕೊಳ್ಳುವಿಕೆ (ಸೂರ್ಯ ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'ഹൃദയ ശേഷി, കാഴ്ച സംവേദനക്ഷമത, അസ്ഥി കാൽസ്യം ആഗിരണം (സൂര്യൻ ദുരിത ഭാവത്തിൽ)'
+  },
+  'Moon in House': {
+    en: 'Lymphatic sluggishness, fluid retention & emotional psychosomatic digestion (Moon in Dusthana)',
+    ta: 'நிணநீர் மந்தம், நீர்க்கட்டு & உணர்ச்சிவச செரிமான மாறுபாடுகள் (சந்திரன் மறைவு ஸ்தானத்தில்)',
+    hi: 'लसीका मंदता, जल संचय एवं भावनात्मक पाचन असंतुलन (चन्द्र त्रिक भाव में)',
+    te: 'శోషరస మందకొడితనం, శరీరంలో నీరు చేరడం & భావోద్వేగ జీర్ణ మార్పులు (చంద్రుడు దుస్థానంలో)',
+    kn: 'ದುಗ್ಧರಸ ಮಂದತೆ, ದೇಹದಲ್ಲಿ ನೀರು ಶೇಖರಣೆ ಮತ್ತು ಭಾವನಾತ್ಮಕ ಜೀರ್ಣಕಾರಿ ಅಸಮತೋಲನ (ಚಂದ್ರ ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'ലിംഫ് മന്ദത, ശരീരത്തിൽ നീർക്കെട്ട്, വൈകാരിക ദഹന വ്യതിയാനം (ചന്ദ്രൻ ദുരിത ഭാവത്തിൽ)'
+  },
+  'Venus in House': {
+    en: 'Renal hydration balance, endocrine equilibrium & urinary tract health (Venus in Dusthana)',
+    ta: 'சிறுநீரக நீரேற்றம், நாளமில்லா சுரப்பி சமநிலை & சிறுநீர்ப்பாதை ஆரோக்கியம் (சுக்கிரன் மறைவு ஸ்தானத்தில்)',
+    hi: 'वृक्क जलयोजन, अंतःस्रावी संतुलन एवं मूत्र प्रणाली स्वास्थ्य (शुक्र त्रिक भाव में)',
+    te: 'మూత్రపిండ హైడ్రేషన్, హార్మోన్ల సమతుల్యత & మూత్రనాళ ఆరోగ్యం (శుక్రుడు దుస్థానంలో)',
+    kn: 'ಮೂತ್ರಪಿಂಡ ಹೈಡ್ರೇಶನ್, ಅಂತಃಸ್ರಾವಕ ಸಮತೋಲನ & ಮೂತ್ರನಾಳದ ಕ್ಷೇಮ (ಶುಕ್ರ ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'വൃക്ക ജലാംശം, എൻഡോക്രൈൻ സന്തുലിതാവസ്ഥ, മൂത്രാശയ ആരോഗ്യം (ശുക്രൻ ദുരിത ഭാവത്തിൽ)'
+  },
+  'Jupiter in House': {
+    en: 'Hepatic liver metabolism, lipid balance & arterial circulation (Jupiter in Dusthana)',
+    ta: 'கல்லீரல் கொழுப்பு வளர்சிதை மாற்றம், லிபிட் சமநிலை & தமனி சுழற்சி (குரு மறைவு ஸ்தானத்தில்)',
+    hi: 'यकृत चयापचय, लिपिड संतुलन एवं धमनी परिसंचरण (गुरु त्रिक भाव में)',
+    te: 'కాలేయ జీవక్రియ, లిపిడ్ సమతుల్యత & రక్తనాళాల ప్రసరణ (గురుడు దుస్థానంలో)',
+    kn: 'ಯಕೃತ್ತಿನ ಚಯಾಪಚಯ, ಲಿಪಿಡ್ ಸಮತೋಲನ & ಅಪಧಮನಿ ಪರಿಚಲನೆ (ಗುರು ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'കരൾ ഉപാപചയം, ലിപിഡ് സന്തുലിതാവസ്ഥ, ധമനി ചംക്രമണം (വ്യാഴം ദുരിത ഭാവത്തിൽ)'
+  },
+  'Mercury in House': {
+    en: 'Enteric nervous system, skin barrier resilience & respiratory bronchial reactivity (Mercury in Dusthana)',
+    ta: 'குடல் நரம்பு மண்டலம், சருமப் பாதுகாப்பு அரண் & சுவாசக்குழாய் உணர்திறன் (புதன் மறைவு ஸ்தானத்தில்)',
+    hi: 'आंतों का तंत्रिका तंत्र, त्वचा सुरक्षा एवं श्वसन नली संवेदनशीलता (बुध त्रिक भाव में)',
+    te: 'ప్రేగుల నాడీ వ్యవస్థ, చర్మ రక్షణ & శ్వాసనాళ సున్నితత్వం (బుధుడు దుస్థానంలో)',
+    kn: 'ಕರುಳಿನ ನರಮಂಡಲ, ಚರ್ಮ ರಕ್ಷಣೆ & ಶ್ವಾಸನಾಳದ ಸೂಕ್ಷ್ಮತೆ (ಬುಧ ದುಃಸ್ಥಾನದಲ್ಲಿ)',
+    ml: 'കുടൽ നാഡീവ്യൂഹം, ചർമ്മ സംരക്ഷണം, ശ്വാസകോശ സംവേദനക്ഷമത (ബുധൻ ദുരിത ഭാവത്തിൽ)'
+  },
   'Mesha / Aries in 6th': {
     en: 'Head region, cranial circulation & inflammatory headaches (Aries in 6th House)',
     ta: 'தலைப்பகுதி, மூளை இரத்த ஓட்டம் மற்றும் அழற்சி தலைவலி உணர்திறன் (மேஷம் / 6-ஆம் பாவகம்)',
@@ -675,7 +749,188 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
 
   const translatePrakriti = (prakriti) => {
     if (!prakriti) return '';
+    for (const [key, map] of Object.entries(I18N_TERMS)) {
+      if (prakriti.includes(key)) {
+        return map[language] || map['en'] || prakriti;
+      }
+    }
     return I18N_TERMS[prakriti]?.[language] || I18N_TERMS[prakriti]?.['en'] || prakriti;
+  };
+
+  const translateAgniType = (agni) => {
+    if (!agni) return '';
+    if (language === 'en') return agni;
+    if (agni.includes('Samagni') || agni.includes('Balanced')) {
+      if (language === 'ta') return 'சமாக்னி (சமச்சீர் & உகந்த செரிமான அக்னி)';
+      if (language === 'hi') return 'समाग्नि (संतुलित एवं उत्तम जठराग्नि)';
+      if (language === 'te') return 'సమాగ్ని (సమతుల్య జీర్ణ శక్తి)';
+      if (language === 'kn') return 'ಸಮಾಗ್ನಿ (ಸಮತೋಲಿತ ಜಠರಾಗ್ನಿ)';
+      if (language === 'ml') return 'സമാഗ്നി (സന്തുലിത ദഹനശേഷി)';
+    }
+    if (agni.includes('Tikshnagni') || agni.includes('Intense')) {
+      if (language === 'ta') return 'தீக்ஷ்ணாக்னி (அதிவேக பித்த செரிமான அக்னி)';
+      if (language === 'hi') return 'तीक्ष्णाग्नि (तीव्र एवं द्रुत जठराग्नि)';
+      if (language === 'te') return 'తీక్ష్ణాగ్ని (తీవ్ర పిత్త జీర్ణ శక్తి)';
+      if (language === 'kn') return 'ತೀಕ್ಷ್ಣಾಗ್ನಿ (ತೀವ್ರ ಪಿತ್ತ ಜಠರಾಗ್ನಿ)';
+      if (language === 'ml') return 'തീക്ഷ്ണാഗ്നി (തീവ്ര പിത്ത ദഹനശക്തി)';
+    }
+    if (agni.includes('Vishamagni') || agni.includes('Irregular') || agni.includes('Variable')) {
+      if (language === 'ta') return 'விஷமாக்னி (ஏற்ற இறக்க வாத செரிமான அக்னி)';
+      if (language === 'hi') return 'विषमाग्नि (अनियमित वात जठराग्नि)';
+      if (language === 'te') return 'విషమాగ్ని (అస్థిర వాత జీర్ణ శక్తి)';
+      if (language === 'kn') return 'ವಿಷಮಾಗ್ನಿ (ಅಸ್ಥಿರ ವಾತ ಜಠರಾಗ್ನಿ)';
+      if (language === 'ml') return 'വിഷമാഗ്നി (അസ്ഥിര വാത ദഹനശക്തി)';
+    }
+    if (agni.includes('Mandagni') || agni.includes('Sluggish') || agni.includes('Slow')) {
+      if (language === 'ta') return 'மந்தாக்னி (மெதுவான கப செரிமான அக்னி)';
+      if (language === 'hi') return 'मंदाग्नि (धीमी कफ जठराग्नि)';
+      if (language === 'te') return 'మందాగ్ని (నెమ్మది కఫ జీర్ణ శక్తి)';
+      if (language === 'kn') return 'ಮಂದಾಗ್ನಿ (ನಿಧಾನ ಕಫ ಜಠರಾಗ್ನಿ)';
+      if (language === 'ml') return 'മന്ദാഗ്നി (മന്ദഗതിയിലുള്ള കഫ ദഹനശക്തി)';
+    }
+    return agni;
+  };
+
+  const translateBodyBuild = (build) => {
+    if (!build) return '';
+    if (language === 'en') return build;
+    if (build.includes('Sama Deha')) {
+      if (language === 'ta') return 'சமச்சீர் உடல்வாகு (Sama Deha - சமச்சீரான ஆரோக்கிய கட்டமைப்பு)';
+      if (language === 'hi') return 'सम देह (सुडौल व आनुपातिक शरीर रचना)';
+      if (language === 'te') return 'సమ దేహం (సమతుల్య శరీర సౌష్టవం)';
+      if (language === 'kn') return 'ಸಮ ದೇಹ (ಸಮತೋಲಿತ ಸುಂದರ ಮೈಕಟ್ಟು)';
+      if (language === 'ml') return 'സമ ദേഹം (സന്തുലിതമായ ശരീര ഘടന)';
+    }
+    if (build.includes('Krisa Deha') || build.includes('Slender')) {
+      if (language === 'ta') return 'மெலிந்த உடல்வாகு (Krisa Deha - வாதம்: விரைவான இயக்கம் & வறண்ட சருமம்)';
+      if (language === 'hi') return 'कृश देह (वात: छरहरा शरीर, द्रुत गति व शुष्क त्वचा)';
+      if (language === 'te') return 'కృశ దేహం (వాతం: సన్నని శరీరం, వేగవంతమైన కదలికలు)';
+      if (language === 'kn') return 'ಕೃಶ ದೇಹ (ವಾತ: ತೆಳ್ಳಗಿನ ಶರೀರ, ಚುರುಕಾದ ಚಲನವಲನ)';
+      if (language === 'ml') return 'കൃശ ദേഹം (വാതം: മെലിഞ്ഞ ശരീരം, വേഗത്തിലുള്ള ചലനം)';
+    }
+    if (build.includes('Madhya Deha') || build.includes('Medium Athletic')) {
+      if (language === 'ta') return 'நடுத்தர கட்டுடலான உடல்வாகு (Madhya Deha - பித்தம்: மிதமான எடை & அதிக வீரியம்)';
+      if (language === 'hi') return 'मध्य देह (पित्त: मध्यम एथलेटिक गठन व उच्च ओज)';
+      if (language === 'te') return 'మధ్య దేహం (పిత్తం: మధ్యస్థ దృఢమైన శరీరం)';
+      if (language === 'kn') return 'ಮಧ್ಯ ದೇಹ (ಪಿತ್ತ: ಮಧ್ಯಮ ಸುದೃಢ ಕಾಯ)';
+      if (language === 'ml') return 'മധ്യ ദേഹം (പിത്തം: ഇടത്തരം അത്‌ലറ്റിക് ശരീരം)';
+    }
+    if (build.includes('Sthula Deha') || build.includes('Solid / Broad')) {
+      if (language === 'ta') return 'திடகாத்திரமான அகன்ற உடல்வாகு (Sthula Deha - கபம்: வலுவான கட்டமைப்பு & அதிக சகிப்புத்தன்மை)';
+      if (language === 'hi') return 'स्थूल देह (कफ: पुष्ट, सुदृढ़ गठन व उच्च सहनशक्ति)';
+      if (language === 'te') return 'స్థూల దేహం (కఫం: బలిష్టమైన నిర్మాణం, అధిక ఓర్పు)';
+      if (language === 'kn') return 'ಸ್ಥೂಲ ದೇಹ (ಕಫ: ಬಲಿಷ್ಠ ಮೈಕಟ್ಟು, ಹೆಚ್ಚಿನ ಸಹಿಷ್ಣುತೆ)';
+      if (language === 'ml') return 'സ്ഥൂല ദേഹം (കഫം: ബലിഷ്ഠമായ ശരീരം, ഉയർന്ന സഹിഷ്ണുത)';
+    }
+    if (build.includes('Vata-Pitta')) {
+      if (language === 'ta') return 'வாத-பித்த உடல்வாகு (மெலிந்த-கட்டுடல், சுறுசுறுப்பான இயக்கம் & அதிக ஆற்றல்)';
+      if (language === 'hi') return 'वात-पित्त देह (छरहरा-मध्यम, फुर्तीला व ऊर्जावान)';
+      if (language === 'te') return 'వాత-పిత్త శరీరం (సన్నని-దృఢమైన, చురుకైన కదలికలు)';
+      if (language === 'kn') return 'ವಾತ-ಪಿತ್ತ ಶರೀರ (ತೆಳ್ಳಗಿನ-ಸುದೃಢ, ಚುರುಕುತನ)';
+      if (language === 'ml') return 'വാത-പിത്ത ശരീരം (മെലിഞ്ഞ-ദൃഢമായ, ഊർജ്ജസ്വലത)';
+    }
+    if (build.includes('Kapha-Pitta') || build.includes('Pitta-Kapha')) {
+      if (language === 'ta') return 'கப-பித்த உடல்வாகு (வலுவான தசைக்கட்டு, அதிக சகிப்புத்தன்மை & திடமான கட்டமைப்பு)';
+      if (language === 'hi') return 'कफ-पित्त देह (मजबूत मांसपेशियां, उच्च सहनशक्ति)';
+      if (language === 'te') return 'కఫ-పిత్త శరీరం (బలమైన కండర నిర్మాణం, అధిక శక్తి)';
+      if (language === 'kn') return 'ಕಫ-ಪಿತ್ತ ಶರೀರ (ಬಲವಾದ ಸ್ನಾಯು ರಚನೆ, ಹೆಚ್ಚಿನ ಸಹಿಷ್ಣುತೆ)';
+      if (language === 'ml') return 'കഫ-പിത്ത ശരീരം (ശക്തമായ പേശി ഘടന, ഉയർന്ന ഊർജ്ജം)';
+    }
+    if (build.includes('Vata-Kapha') || build.includes('Kapha-Vata')) {
+      if (language === 'ta') return 'வாத-கப உடல்வாகு (மாறுபடும் எலும்பு அமைப்பு, குளிர் உணர்திறன் & சீரான சகிப்புத்தன்மை)';
+      if (language === 'hi') return 'वात-कफ देह (परिवर्तनशील अस्थि संरचना व शीत संवेदनशीलता)';
+      if (language === 'te') return 'వాత-కఫ శరీరం (మారుతున్న ఎముకల నిర్మాణం, చలికి సున్నితత్వం)';
+      if (language === 'kn') return 'ವಾತ-ಕಫ ಶರೀರ (ಬದಲಾಗುವ ಮೂಳೆ ರಚನೆ, ಶೀತ ಸೂಕ್ಷ್ಮತೆ)';
+      if (language === 'ml') return 'വാത-കഫ ശരീരം (വ്യതിയാനമുള്ള അസ്ഥി ഘടന, തണുപ്പിനോട് സംവേദനക്ഷമത)';
+    }
+    return build;
+  };
+
+  const translatePrimaryDhatu = (dhatu) => {
+    if (!dhatu) return '';
+    if (language === 'en') return dhatu;
+    if (dhatu.includes('Asthi Dhatu') || dhatu.includes('Bone')) {
+      if (language === 'ta') return 'அஸ்தி தாது (எலும்பு பலம் & எலும்புக்கூடு கட்டமைப்பு - சூரியன்/சனி)';
+      if (language === 'hi') return 'अस्थि धातु (हड्डी घनत्व एवं कंकाल संरचना - सूर्य/शनि)';
+      if (language === 'te') return 'అస్థి ధాతువు (ఎముకల సాంద్రత & అస్థిపంజర బలం - సూర్యుడు/శని)';
+      if (language === 'kn') return 'ಅಸ್ಥಿ ಧಾತು (ಮೂಳೆಯ ಸಾಂದ್ರತೆ & ಅಸ್ಥಿಪಂಜರ ಬಲ - ಸೂರ್ಯ/ಶನಿ)';
+      if (language === 'ml') return 'അസ്ഥി ധാതു (അസ്ഥി സാന്ദ്രത, അസ്ഥികൂട ഘടന - സൂര്യൻ/ശനി)';
+    }
+    if (dhatu.includes('Rakta & Rasa') || dhatu.includes('Blood')) {
+      if (language === 'ta') return 'ரத்தம் & ரச தாது (ரத்த ஓட்டம், நிணநீர் & உடல் திரவங்கள் - சந்திரன்/செவ்வாய்)';
+      if (language === 'hi') return 'रक्त एवं रस धातु (रक्त परिसंचरण, लसिका एवं शारीरिक तरल - चन्द्र/मंगल)';
+      if (language === 'te') return 'రక్త & రస ధాతువు (రక్త ప్రసరణ, శోషరసం & శరీర ద్రవాలు - చంద్రుడు/కుజుడు)';
+      if (language === 'kn') return 'ರಕ್ತ & ರಸ ಧಾತು (ರಕ್ತ ಪರಿಚಲನೆ, ದುಗ್ಧರಸ & ದೇಹದ ದ್ರವಗಳು - ಚಂದ್ರ/ಮಂಗಳ)';
+      if (language === 'ml') return 'രക്ത & രസ ധാതു (രക്തചംക്രമണം, ലിംഫ്, ശരീര ദ്രവങ്ങൾ - ചന്ദ്രൻ/ചൊവ്വ)';
+    }
+    if (dhatu.includes('Majja & Mamsa') || dhatu.includes('Marrow')) {
+      if (language === 'ta') return 'மச்சை & மாமிச தாது (எலும்பு மச்சை, தசை வலிமை & சிவப்பணுக்கள் - செவ்வாய்)';
+      if (language === 'hi') return 'मज्जा एवं मांस धातु (अस्थि मज्जा, मांसपेशी बल एवं रक्त कण - मंगल)';
+      if (language === 'te') return 'మజ్జ & మాంస ధాతువు (ఎముక మజ్జ, కండరాల బలం & రక్త కణాలు - కుజుడు)';
+      if (language === 'kn') return 'ಮಜ್ಜಾ & ಮಾಂಸ ಧಾತು (ಮೂಳೆ ಮಜ್ಜೆ, ಸ್ನಾಯು ಬಲ & ರಕ್ತ ಕಣಗಳು - ಮಂಗಳ)';
+      if (language === 'ml') return 'മജ്ജ & മാംസ ധാതു (അസ്ഥിമജ്ജ, പേശിബലം, രക്താണുക്കൾ - ചൊവ്വ)';
+    }
+    if (dhatu.includes('Tvak & Rasa') || dhatu.includes('Skin')) {
+      if (language === 'ta') return 'தோல் & ரச தாது (சருமப் பாதுகாப்பு, பிளாஸ்மா & நரம்பு திரவப் பாதைகள் - புதன்)';
+      if (language === 'hi') return 'त्वचा एवं रस धातु (त्वचा आवरण, प्लाज्मा एवं तंत्रिका नलिकाएं - बुध)';
+      if (language === 'te') return 'చర్మ & రస ధాతువు (చర్మ రక్షణ, ప్లాస్మా & నాడీ వాహికలు - బుధుడు)';
+      if (language === 'kn') return 'ತ್ವಚ & ರಸ ಧಾತು (ಚರ್ಮ ರಕ್ಷಣೆ, ಪ್ಲಾಸ್ಮಾ & ನರ ನಾಳಗಳು - ಬುಧ)';
+      if (language === 'ml') return 'ത്വക് & രസ ധാതു (ചർമ്മ സംരക്ഷണം, പ്ലാസ്മ, നാഡീ ചാലകങ്ങൾ - ബുധൻ)';
+    }
+    if (dhatu.includes('Meda Dhatu') || dhatu.includes('Adipose')) {
+      if (language === 'ta') return 'மேதஸ் தாது (கொழுப்பு திசுக்கள், ஆரோக்கிய கொழுப்பு & சுரப்பிகள் - குரு)';
+      if (language === 'hi') return 'मेद धातु (वसा ऊतक, स्वस्थ वसा एवं ग्रंथि पोषण - गुरु)';
+      if (language === 'te') return 'మేదో ధాతువు (కొవ్వు కణజాలం, గ్రంథుల పోషణ - గురుడు)';
+      if (language === 'kn') return 'ಮೇದೋ ಧಾತು (ಕೊಬ್ಬಿನ ಅಂಗಾಂಶ, ಗ್ರಂಥಿಗಳ ಪೋಷಣೆ - ಗುರು)';
+      if (language === 'ml') return 'മേദസ്സ് ധാതു (കൊഴുപ്പ് കോശങ്ങൾ, ഗ്രന്ഥികളുടെ പോഷണം - വ്യാഴം)';
+    }
+    if (dhatu.includes('Shukra Dhatu') || dhatu.includes('Reproductive')) {
+      if (language === 'ta') return 'சுக்ல தாது (இனப்பெருக்க வீரியம், ஓஜஸ் & நோய் எதிர்ப்பு ஆற்றல் - சுக்கிரன்)';
+      if (language === 'hi') return 'शुक्र धातु (प्रजनन शक्ति, ओजस एवं जीवन प्रतिरक्षा - शुक्र)';
+      if (language === 'te') return 'శుక్ర ధాతువు (పునరుత్పత్తి శక్తి, ఓజస్సు & రోగనిరోధకత - శుక్రుడు)';
+      if (language === 'kn') return 'ಶುಕ್ರ ಧಾತು (ಪ್ರಜನನ ಶಕ್ತಿ, ಓಜಸ್ಸು & ರೋಗನಿರೋಧಕತೆ - ಶುಕ್ರ)';
+      if (language === 'ml') return 'ശുക്ര ധാതു (പ്രജനന ശേഷി, ഓജസ്സ്, പ്രതിരോധശേഷി - ശുക്രൻ)';
+    }
+    if (dhatu.includes('Snayu & Asthi') || dhatu.includes('Nerves')) {
+      if (language === 'ta') return 'ஸ்நாயு & அஸ்தி தாது (தசைநார், நரம்பு இணைப்பு & மூட்டு உயவு - சனி/ராகு)';
+      if (language === 'hi') return 'स्नायु एवं अस्थि धातु (नसें, कंडरा, स्नायुबंधन एवं संधि स्नेहन - शनि/राहु)';
+      if (language === 'te') return 'స్నాయు & అస్థి ధాతువు (నరాలు, స్నాయువులు & కీళ్ల కందెన - శని/రాహువు)';
+      if (language === 'kn') return 'ಸ್ನಾಯು & ಅಸ್ಥಿ ಧಾತು (ನರಗಳು, ಸ್ನಾಯುಬಂಧನ & ಕೀಲುಗಳ ಜಿಡ್ಡಿನಂಶ - ಶನಿ/ರಾಹು)';
+      if (language === 'ml') return 'സ്നായു & അസ്ഥി ധാതു (ഞരമ്പുകൾ, ടെൻഡോണുകൾ, സന്ധി സ്നേഹനം - ശനി/രാഹു)';
+    }
+    return dhatu;
+  };
+
+  const translateRasayana = (rasayana) => {
+    if (!rasayana) return '';
+    if (language === 'en') return rasayana;
+    if (rasayana.includes('Ashwagandha')) {
+      if (language === 'ta') return 'அஸ்வகந்தா, நல்லெண்ணெய் உடல் மசாஜ், பலா மற்றும் தசமூலம் கஷாயம் (வாத சமநிலை).';
+      if (language === 'hi') return 'अश्वगंधा, गुनगुने तिल तेल की मालिश, बला एवं दशमूलारिष्ट (वात संतुलन)।';
+      if (language === 'te') return 'అశ్వగంధ, నువ్వుల నూనె మర్దన, బలా మరియు దశమూలారిష్ట (వాత సమతుల్యత).';
+      if (language === 'kn') return 'ಅಶ್ವಗಂಧ, ಬೆಚ್ಚಗಿನ ಎಳ್ಳೆಣ್ಣೆ ಮಸಾಜ್, ಬಲಾ ಮತ್ತು ದಶಮೂಲ (ವಾತ ಸಮತೋಲನ).';
+      if (language === 'ml') return 'അശ്വഗന്ധ, എള്ളെണ്ണ തേച്ചു കുളി, ബലാ, ദശമൂല കഷായം (വാത സന്തുലനം).';
+    }
+    if (rasayana.includes('Amalaki') || rasayana.includes('Guduchi')) {
+      if (language === 'ta') return 'நெல்லிக்காய் (Amalaki), சீந்தில் (Guduchi), சதாவரி மற்றும் பிராமி நெய் (பித்த தணிப்பு).';
+      if (language === 'hi') return 'आंवला (Amalaki), गिलोय (Guduchi), शतावरी एवं ब्राह्मी घृत (पित्त शमन)।';
+      if (language === 'te') return 'ఉసిరి (Amalaki), తిప్పతీగ (Guduchi), శతావరి మరియు బ్రాహ్మీ నెయ్యి (పిత్త శాంతి).';
+      if (language === 'kn') return 'ನೆಲ್ಲಿಕಾಯಿ (Amalaki), ಅಮೃತಬಳ್ಳಿ (Guduchi), ಶತಾವರಿ ಮತ್ತು ಬ್ರಾಹ್ಮಿ ತುಪ್ಪ (ಪಿತ್ತ ಶಮನ).';
+      if (language === 'ml') return 'നെല്ലിക്ക (Amalaki), ചിറ്റമൃത് (Guduchi), ശതാവരി, ബ്രാഹ്മി നെയ്യ് (പിത്ത ശമനം).';
+    }
+    if (rasayana.includes('Triphala') || rasayana.includes('Trikatu')) {
+      if (language === 'ta') return 'திரிபலா, திரிகடுகம் (சுக்கு/மிளகு/திப்பிலி), துளசி மற்றும் குக்குலு (கப சமநிலை & மெட்டபாலிசம்).';
+      if (language === 'hi') return 'त्रिफला, त्रिकटु (सोंठ/काली मिर्च/पीपली), तुलसी एवं गुग्गुलु (कफ संतुलन व पाचन दीपन)।';
+      if (language === 'te') return 'త్రిఫల, త్రికటు (శొంఠి/మిరియాలు/పిప్పళ్లు), తులసి మరియు గుగ్గులు (కఫ సమతుల్యత).';
+      if (language === 'kn') return 'ತ್ರಿಫಲಾ, ತ್ರಿಕಟು (ಶುಂಠಿ/ಕಾಳುಮೆಣಸು/ಹಿಪ್ಪಲಿ), ತುಳಸಿ ಮತ್ತು ಗುಗ್ಗುಳು (ಕಫ ಸಮತೋಲನ).';
+      if (language === 'ml') return 'ത്രിഫല, ത്രികടു (ചുക്ക്/കുരുമുളക്/തിപ്പലി), തുളസി, ഗുഗ്ഗുലു (കഫ സന്തുലനം).';
+    }
+    if (language === 'ta') return 'சயவனப்பிராசம், பிராமி, நெல்லிக்காய் மற்றும் திரிபலா (திரிதோஷ ரசாயன சமநிலை).';
+    if (language === 'hi') return 'च्यवनप्राश, ब्राह्मी, आंवला एवं त्रिफला (समग्र त्रिदोष रसायन)।';
+    if (language === 'te') return 'చ్యవనప్రాశ్, బ్రాహ్మీ, ఉసిరి మరియు త్రిఫల (సమగ్ర త్రిదोष రసాయన).';
+    if (language === 'kn') return 'ಚ್ಯವನಪ್ರಾಶ, ಬ್ರಾಹ್ಮಿ, ನೆಲ್ಲಿಕಾಯಿ ಮತ್ತು ತ್ರಿಫಲಾ (ಸಮಗ್ರ ತ್ರಿದೋಷ ರಸಾಯನ).';
+    if (language === 'ml') return 'ച്യവനപ്രാശം, ബ്രാഹ്മി, നെല്ലിക്ക, ത്രിഫല (ത്രിദോഷ രസായനം).';
+    return rasayana;
   };
 
   const translateLagnaElement = (elem) => {
@@ -1012,26 +1267,61 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     if (!adj) return '';
     if (language === 'en') return adj;
 
+    if (adj.includes('Moon in Lagna') || adj.includes('Moon in 7th')) {
+      if (language === 'ta') return 'சந்திரன் 1 அல்லது 7-ல் உள்ளதால்: சந்திரன் & சனி இணை (Pair 2) பிரதான ஆயுள் நிர்ணயமாகிறது (ஜைமினி சூத்திரம் 2.1.23).';
+      if (language === 'hi') return 'चन्द्रमा लग्न या सप्तम भाव में स्थित: चन्द्र-शनि युग्म (Pair 2) प्रमुख निर्णायक बना (जैमिनी सूत्र 2.1.23)।';
+      if (language === 'te') return 'చంద్రుడు 1 లేదా 7వ స్థానంలో ఉన్నందున: చంద్ర-శని జత (Pair 2) ప్రధాన నిర్ణాయకం (జైమిని సూత్రం 2.1.23).';
+      if (language === 'kn') return 'ಚಂದ್ರ 1 ಅಥವಾ 7ನೇ ಮನೆಯಲ್ಲಿರುವ ಕಾರಣ: ಚಂದ್ರ-ಶನಿ ಜೋಡಿ (Pair 2) ಪ್ರಮುಖ ನಿರ್ಣಾಯಕ (ಜೈಮಿನಿ ಸೂತ್ರ 2.1.23).';
+      if (language === 'ml') return 'ചന്ദ്രൻ 1 അല്ലെങ്കിൽ 7-ാം ഭാവത്തിൽ സ്ഥിതിചെയ്യുന്നതിനാൽ: ചന്ദ്ര-ശനി ജോടി (Pair 2) പ്രധാന നിർണ്ണായകമാകുന്നു (ജൈമിനി സൂത്രം 2.1.23).';
+    }
     if (adj.includes('Jupiter') || adj.includes('Kakshya Vriddhi')) {
       if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் ஆயுள் கக்ஷ்ய விருத்தி அடைகிறது (+5 முதல் +7 ஆண்டுகள்).';
       if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से आयु में कक्ष्या वृद्धि (+5 से +7 वर्ष)।';
       if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల ఆయుష్షు కక్ష్యా వృద్ధి (+5 నుండి +7 సంవత్సరాలు).';
       if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಆಯುಷ್ಯದಲ್ಲಿ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ (+5 ರಿಂದ +7 ವರ್ಷಗಳು).';
-      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രികോണ ശുഭ സ്ഥാനം മൂലം ആയുസ്സിൽ കക്യാ വൃദ്ധി (+5 മുതൽ +7 വർഷം വരെ).';
+      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രിಕೋಣ ശുഭ സ്ഥാനം മൂലം ആയുസ്സിൽ കക്യാ വൃദ്ധി (+5 മുതൽ +7 വർഷം വരെ).';
     }
-    if (adj.includes('Saturn') || adj.includes('Ayushkaraka')) {
+    if (adj.includes('Ayushkaraka Saturn in Own/Exalted') || (adj.includes('Saturn') && adj.includes('Own/Exalted'))) {
       if (language === 'ta') return 'ஆயுள்காரகன் சனி பகவான் ஆட்சி/உச்ச பலத்தால் ஆயுள் நீட்டிப்பு கூடுகிறது (+4 ஆண்டுகள்).';
       if (language === 'hi') return 'आयुष्कारक शनि के स्वराशि/उच्च स्थिति से दीर्घायु बल प्राप्त होता है (+4 वर्ष)।';
       if (language === 'te') return 'ఆయుష్కారక శని స్వక్షేత్ర/ఉచ్ఛ స్థితి వల్ల ఆయుష్షు పెరుగుతుంది (+4 సంవత్సరాలు).';
       if (language === 'kn') return 'ಆಯುಷ್ಕಾರಕ ಶನಿಯ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಛ ಸ್ಥಾನದಿಂದ ದೀರ್ಘಾಯುಷ್ಯ ಬಲ (+4 ವರ್ಷಗಳು).';
-      if (language === 'ml') return 'ആയുഷ്കാരകനായ ശനിയുടെ സ്വക്ഷേത്ര/ഉച്ച സ്ഥിതിയാൽ ദീർഘായുസ്സ് ലഭിക്കുന്നു (+4 വർഷം).';
+      if (language === 'ml') return 'ಆಯುಷ್കാരಕനായ ശനിയുടെ സ്വക്ഷേത്ര/ഉച്ച സ്ഥിതിയാൽ ദീർഘായുസ്സ് ലഭിക്കുന്നു (+4 വർഷം).';
     }
-    if (adj.includes('Lagna Lord') || adj.includes('vitality')) {
+    if (adj.includes('Lagna Lord strong') || (adj.includes('Lagna Lord') && adj.includes('vitality'))) {
       if (language === 'ta') return 'லக்னாதிபதி ஆட்சி/உச்ச/கேந்திர சுப பலத்தால் சரீர நோய் எதிர்ப்பு ஆற்றல் மற்றும் ஆயுள் பலம் கூடுகிறது (+4 ஆண்டுகள்).';
       if (language === 'hi') return 'लग्नेश के स्वराशि/उच्च/केंद्र शुभ बल से शारीरिक रोग प्रतिरोधक क्षमता एवं आयु वृद्धि (+4 वर्ष)।';
       if (language === 'te') return 'లగ్నాధిపతి స్వక్షేత్ర/ఉచ్ఛ/కేంద్ర శుభ బలం వల్ల శారీరక రోగనిరోధక శక్తి మరియు ఆయుర్బలం పెరుగుతుంది (+4 సంవత్సరాలు).';
       if (language === 'kn') return 'ಲಗ್ನಾಧಿಪತಿಯ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಛ/ಕೇಂದ್ರ ಶುಭ ಬಲದಿಂದ ಶಾರೀರಿಕ ರೋಗನಿರೋಧಕ ಶಕ್ತಿ ಮತ್ತು ಆಯುರ್ಬಲ ವೃದ್ಧಿ (+4 ವರ್ಷಗಳು).';
-      if (language === 'ml') return 'ലഗ്നാധിപന്റെ സ്വക്ഷേത്ര/ഉച്ച/കേന്ദ്ര ശുഭ ബലത്താൽ ശാരീരിക പ്രതിരോധശേഷിയും ആയുർബലവും വർദ്ധിക്കുന്നു (+4 വർഷം).';
+      if (language === 'ml') return 'ലഗ്നാധിപന്റെ സ്വക്ഷേത്ര/ഉച്ച/കേന്ദ്ര ശുഭ ಬಲത്താൽ ശാരീരിക പ്രതിരോധശേഷിയും ആയുർബലവും വർദ്ധിക്കുന്നു (+4 വർഷം).';
+    }
+    if (adj.includes('Saturn in debility')) {
+      if (language === 'ta') return 'ஆயுள்காரகன் சனி நீசமடைந்ததால் கக்ஷ்ய ஹ்ராஸம் (ஆயுள் குறைப்பு: -5 ஆண்டுகள்).';
+      if (language === 'hi') return 'आयुष्कारक शनि नीचस्थ होने से कक्ष्य ह्रास (-5 वर्ष)।';
+      if (language === 'te') return 'ఆయుష్కారక శని నీచ స్థితితో కక్ష్య హ్రాసం (-5 సంవత్సరాలు).';
+      if (language === 'kn') return 'ಆಯುಷ್ಕಾರಕ ಶನಿ ನೀಚ ಸ್ಥಿತಿಯಿಂದ ಕಕ್ಷ್ಯ ಹ್ರಾಸ (-5 ವರ್ಷ).';
+      if (language === 'ml') return 'ആയുഷ്കാരകൻ ശനി നീചനായതിനാൽ കക്ഷ്യാ ഹ്രാസം (-5 വർഷം).';
+    }
+    if (adj.includes('Papakarthari Yoga')) {
+      if (language === 'ta') return 'லக்னத்திற்கு 12 மற்றும் 2-ல் பாபர்கள் (பாபகர்த்தாரி யோகம்) உடல்நலத்தில் எச்சரிக்கை கோருகிறது (-3 ஆண்டுகள்).';
+      if (language === 'hi') return 'लग्न के दोनों ओर (12वें व 2रे भाव) पाप ग्रह (पापकर्तरी योग) स्वास्थ्य सतर्कता अपेक्षित (-3 वर्ष)।';
+      if (language === 'te') return 'లగ్నానికి ఇరువైపులా పాప గ్రహాలు (పాపకర్తరి యోగం) ఆరోగ్య జాగ్రత్త అవసరం (-3 సంవత్సరాలు).';
+      if (language === 'kn') return 'ಲಗ್ನದ ಎರಡೂ ಬದಿ ಪಾಪ ಗ್ರಹಗಳು (ಪಾಪಕರ್ತರಿ ಯೋಗ) ಆರೋಗ್ಯ ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ (-3 ವರ್ಷ).';
+      if (language === 'ml') return 'ലഗ്നത്തിന്റെ ഇരുവശങ്ങളിലും പാപ ഗ്രഹങ്ങൾ (പാപകർതരി യോഗം) ആരോഗ്യ ജാഗ്രത ആവശ്യപ്പെടുന്നു (-3 വർഷം).';
+    }
+    if (adj.includes('Lagna Lord in Dusthana')) {
+      if (language === 'ta') return 'லக்னாதிபதி மறைவு ஸ்தானத்தில் உள்ளதால் ஆரோக்கியத்தில் சீரான கவனம் தேவை.';
+      if (language === 'hi') return 'लग्नेश त्रिक भाव (6/8/12) में स्थित होने से स्वास्थ्य सतर्कता आवश्यक।';
+      if (language === 'te') return 'లగ్నాధిపతి దుస్థానంలో ఉన్నందున ఆరోగ్యంపై నిరంతర శ్రద్ధ అవసరం.';
+      if (language === 'kn') return 'ಲಗ್ನಾಧಿಪತಿ ದುಃಸ್ಥಾನದಲ್ಲಿರುವ ಕಾರಣ ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಕಾಳಜಿ ಅಗತ್ಯ.';
+      if (language === 'ml') return 'ലഗ്നാധിപൻ ദുരിത ഭാവത്തിൽ നിൽക്കുന്നതിനാൽ ആരോഗ്യത്തിൽ ശ്രദ്ധ വേണം.';
+    }
+    if (adj.includes('distinct spans')) {
+      if (language === 'ta') return adj.includes('Odd Lagna') ? '3 இணைகளும் வேறுபட்ட முடிவுகள்: ஒற்றை லக்னத்திற்கு லக்னம்-ஹோரா லக்னம் (Pair 3) முன்னுரிமை பெறுகிறது.' : '3 இணைகளும் வேறுபட்ட முடிவுகள்: இரட்டை லக்னத்திற்கு லக்னாதிபதி-8ஆம் அதிபதி (Pair 1) முன்னுரிமை பெறுகிறது.';
+      if (language === 'hi') return adj.includes('Odd Lagna') ? 'तीनों युग्मों का भिन्न निर्णय: विषम लग्न के कारण लग्न-होरा लग्न (Pair 3) को प्राथमिकता।' : 'तीनों युग्मों का भिन्न निर्णय: सम लग्न के कारण लग्नेश-अष्टमेश (Pair 1) को प्राथमिकता।';
+      if (language === 'te') return adj.includes('Odd Lagna') ? '3 జతలు వేర్వేరు ఫలితాలు: బేసి లగ్నానికి లగ్నం-హోరా లగ్నం (Pair 3) ప్రాధాన్యత.' : '3 జతలు వేర్వేరు ఫలితాలు: సరి లగ్నానికి లగ్నాధిపతి-8వ అధిపతి (Pair 1) ప్రాధాన్యత.';
+      if (language === 'kn') return adj.includes('Odd Lagna') ? '3 ಜೋಡಿಗಳು ಭಿನ್ನ ಫಲಿತಾಂಶ: ಬೆಸ ಲಗ್ನಕ್ಕೆ ಲಗ್ನ-ಹೋರಾ ಲಗ್ನ (Pair 3) ಆದ್ಯತೆ.' : '3 ಜೋಡಿಗಳು ಭಿನ್ನ ಫಲಿತಾಂಶ: ಸರಿ ಲಗ್ನಕ್ಕೆ ಲಗ್ನಾಧಿಪತಿ-8ನೇ ಅಧಿಪತಿ (Pair 1) ಆದ್ಯತೆ.';
+      if (language === 'ml') return adj.includes('Odd Lagna') ? '3 ജോടികളും വ്യത്യസ്ത ഫലം: ഒറ്റ ലഗ്നത്തിന് ലഗ്നം-ഹോരാ ലഗ്നം (Pair 3) മുൻഗണന.' : '3 ജോടികളും വ്യത്യസ്ത ഫലം: ഇരട്ട ലഗ്നത്തിന് ലഗ്നാധിപൻ-8-ാം അധിപൻ (Pair 1) മുൻഗണന.';
     }
     return adj;
   };
@@ -1793,57 +2083,222 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
             </div>
           )}
 
-          {/* PRINCIPLE 3: Maraka & Badhaka Timeline */}
+          {/* PRINCIPLE 3: Maraka & Badhaka Timeline & Protection */}
           {ayurdaya?.criticalMarakaWindow && (
-            <div style={{ background: 'rgba(230, 126, 34, 0.08)', border: '1px solid rgba(230, 126, 34, 0.3)', borderRadius: '8px', padding: '14px' }}>
-              <strong style={{ fontSize: '13px', color: '#e67e22', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                ⚠️ {t('marakaTimelineTitle', language)}:
-              </strong>
-              <p style={{ fontSize: '12px', margin: '0 0 8px 0', color: 'var(--text-primary)', lineHeight: '1.4' }}>
-                {translateMarakaWindow(ayurdaya.criticalMarakaWindow)}
-              </p>
-              {ayurdaya?.marakaBadhakaTimeline?.recommendedRemedies && (
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', borderTop: '1px solid rgba(230, 126, 34, 0.2)', paddingTop: '6px' }}>
-                  🪔 <strong>{t('remediesRecommended', language)}:</strong> {translateRemedies(ayurdaya.marakaBadhakaTimeline.recommendedRemedies, ayurdaya.marakaBadhakaTimeline.activeMarakaPlanet)}
+            <div style={{ background: 'rgba(230, 126, 34, 0.06)', border: '1px solid rgba(230, 126, 34, 0.25)', borderRadius: '10px', padding: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#e67e22', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  ⚠️ {t('marakaTimelineTitle', language)}
+                </h4>
+                {ayurdaya?.marakaBadhakaTimeline?.activeBhukthi && (
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '3px 10px',
+                    borderRadius: '12px',
+                    background: ayurdaya.marakaBadhakaTimeline.isMarakaBhukthi ? 'rgba(231, 76, 60, 0.18)' : 'rgba(241, 196, 15, 0.18)',
+                    color: ayurdaya.marakaBadhakaTimeline.isMarakaBhukthi ? '#e74c3c' : '#f39c12',
+                    border: `1px solid ${ayurdaya.marakaBadhakaTimeline.isMarakaBhukthi ? '#e74c3c' : '#f39c12'}`
+                  }}>
+                    ⏳ {ayurdaya.marakaBadhakaTimeline.activeMahadasa} - {ayurdaya.marakaBadhakaTimeline.activeBhukthi} ({ayurdaya.marakaBadhakaTimeline.activeBhukthiRange || t('activeBhukthiLabel', language)})
+                  </span>
+                )}
+              </div>
+
+              {/* 4 Determinants: Maraka Lords, Badhaka Lord, 22nd Drekkana, Lagna Lord Shield */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px', marginBottom: '14px' }}>
+                {/* Maraka Lords (2 & 7) + Occupants */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    ⚔️ {t('marakaPeriods', language)}:
+                  </div>
+                  <strong style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
+                    {ayurdaya.marakaBadhakaTimeline?.marakaLords ?? '2nd & 7th Lords'}
+                  </strong>
+                  {(ayurdaya.marakaBadhakaTimeline?.marakaOccupants2?.length > 0 || ayurdaya.marakaBadhakaTimeline?.marakaOccupants7?.length > 0) && (
+                    <div style={{ fontSize: '10px', color: '#e67e22', marginTop: '4px' }}>
+                      {t('marakaOccupantsLabel', language)}: {[...(ayurdaya.marakaBadhakaTimeline?.marakaOccupants2 || []).map(p => `${p} (H2)`), ...(ayurdaya.marakaBadhakaTimeline?.marakaOccupants7 || []).map(p => `${p} (H7)`)].join(', ')}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* Badhaka Lord + Occupants */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    🚩 {t('badhakaLord', language) || 'Badhaka Lord'}:
+                  </div>
+                  <strong style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
+                    {ayurdaya.marakaBadhakaTimeline?.badhakaLord ?? '—'}
+                  </strong>
+                  {ayurdaya.marakaBadhakaTimeline?.badhakaOccupants?.length > 0 && (
+                    <div style={{ fontSize: '10px', color: '#f39c12', marginTop: '4px' }}>
+                      {t('badhakaOccupantsLabel', language)}: {ayurdaya.marakaBadhakaTimeline.badhakaOccupants.join(', ')}
+                    </div>
+                  )}
+                </div>
+
+                {/* 22nd Drekkana Lord (Kharesha) */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    🔮 {t('khareshaLabel', language)}:
+                  </div>
+                  <strong style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
+                    {ayurdaya.marakaBadhakaTimeline?.khareshaLord ?? '—'}
+                  </strong>
+                </div>
+
+                {/* Lagna Lord Immunity or Status */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    🛡️ {t('lagnaExemptionLabel', language)}:
+                  </div>
+                  <strong style={{ fontSize: '11px', color: ayurdaya.marakaBadhakaTimeline?.lagnaLordExemption ? '#2ecc71' : 'var(--text-secondary)' }}>
+                    {ayurdaya.marakaBadhakaTimeline?.lagnaLordExemption
+                      ? (language === 'ta' ? 'லக்னாதிபத்திய சுபத்துவத்தால் மாரக தோஷம் நீங்குகிறது ✓'
+                          : language === 'hi' ? 'लग्नेश कृपा से मारक दोष निवृत्ति ✓'
+                          : language === 'te' ? 'లగ్నాధిపతి శుభత్వంతో దోష నివృత్తి ✓'
+                          : language === 'kn' ? 'ಲಗ್ನಾಧಿಪತಿ ಕೃಪೆಯಿಂದ ದೋಷ ನಿವೃತ್ತಿ ✓'
+                          : language === 'ml' ? 'ലഗ്നാധിപ കൃപയാൽ ദോഷ നിവൃത്തി ✓'
+                          : 'Lagna Lordship Grants Protective Immunity ✓')
+                      : (language === 'ta' ? 'பராசர சாஸ்திர எச்சரிக்கை விதி முறைப்படி'
+                          : language === 'hi' ? 'मानक पाराशर मारक विधान लागू'
+                          : language === 'te' ? 'పరాశర సూత్రాల ప్రకారం'
+                          : language === 'kn' ? 'ಪರಾಶರ ನಿಯಮಾವಳಿ ಅನ್ವಯ'
+                          : language === 'ml' ? 'പರಾശര തത്വങ്ങൾ പ്രകാരം'
+                          : 'Standard Parashara Caution Protocol')}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Dasa-Bhukthi Micro-Window Callout */}
+              <div style={{ background: 'rgba(230, 126, 34, 0.1)', borderLeft: '3px solid #e67e22', borderRadius: '4px', padding: '8px 12px', marginBottom: '14px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
+                  ⏱️ {translateMarakaWindow(ayurdaya.criticalMarakaWindow)}
+                </div>
+              </div>
+
+              {/* 3-Tiered Remedies Section */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px' }}>
+                {/* 1. Universal Longevity Shield */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--accent-gold)', marginBottom: '4px' }}>
+                    🛡️ {t('universalRemediesLabel', language)}:
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                    {language === 'ta'
+                      ? 'மகா மிருத்யுஞ்ஜய மந்திர ஜபம் (தினமும் 108 முறை), ஆயுஷ்ய ஹோமம் மற்றும் ஸ்ரீ தன்வந்திரி வழிபாடு.'
+                      : language === 'hi'
+                        ? 'महामृत्युंजय मंत्र जप (प्रतिदिन 108 बार), आयुष्य होम एवं भगवान धन्वंतरि प्रार्थना।'
+                        : language === 'te'
+                          ? 'మహా మృత్యుంజయ మంత్ర జపం (రోజూ 108 సార్లు), ఆయుష్య హోమం మరియు ధన్వంతరి ప్రార్థన.'
+                          : language === 'kn'
+                            ? 'ಮಹಾ ಮೃತ್ಯುಂಜಯ ಮಂತ್ರ ಜಪ (ದಿನವೂ 108 ಬಾರಿ), ಆಯುಷ್ಯ ಹೋಮ ಮತ್ತು ಧನ್ವಂತರಿ ಪ್ರಾರ್ಥನೆ.'
+                            : language === 'ml'
+                              ? 'മഹാ മൃത്യുഞ്ജയ മന്ത്ര ജപം (ദിവസവും 108 തവണ), ആയുഷ്യ ഹോമം, ധന്വന്തരി പ്രാർത്ഥന.'
+                              : 'Maha Mrityunjaya Mantra Japa (108 times daily), Ayushya Homa, and Lord Dhanvantari Prayer.'}
+                  </div>
+                </div>
+
+                {/* 2. Badhaka & Kula Devata Remediation */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, color: '#f39c12', marginBottom: '4px' }}>
+                    🪔 {t('badhakaRemedyLabel', language)}:
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                    {language === 'ta'
+                      ? 'குலதெய்வ வழிபாடு, நெய் தீபம் ஏற்றுதல் மற்றும் அன்னதானம் செய்து பாதக தோஷத்தை நிவர்த்தி செய்யவும்.'
+                      : language === 'hi'
+                        ? 'कुलदेवता आराधना, मंदिर में घी का दीपक एवं अन्नदान द्वारा बाधक शांति करें।'
+                        : language === 'te'
+                          ? 'కులదేవత పూజ, నేతి దీపారాధన మరియు అన్నదానంతో బాధక దోష నివారణ.'
+                          : language === 'kn'
+                            ? 'ಕುಲದೇವತಾ ಪೂಜೆ, ತುಪ್ಪದ ದೀಪ ಮತ್ತು ಅನ್ನದಾನದ ಮೂಲಕ ಬಾಧಕ ಶಾಂತಿ.'
+                            : language === 'ml'
+                              ? 'കുലദേവതാ പൂജ, നെയ്‌വിളക്ക്, അന്നദാനം എന്നിവയിലൂടെ ബാധക ശാന്തി.'
+                              : (ayurdaya.marakaBadhakaTimeline?.badhakaRemedies || 'Kula Devata (Family Deity) worship and temple charity to clear Badhaka obstacles.')}
+                  </div>
+                </div>
+
+                {/* 3. Dasa-Bhukthi Tailored Remediation */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '6px', padding: '10px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, color: '#e67e22', marginBottom: '4px' }}>
+                    🕉️ {t('dasaBhukthiRemedyLabel', language)} ({ayurdaya.marakaBadhakaTimeline?.activeMarakaPlanet || t('active', language)}):
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                    {translateRemedies(ayurdaya.marakaBadhakaTimeline?.tailoredDasaRemedies || ayurdaya.marakaBadhakaTimeline?.recommendedRemedies, ayurdaya.marakaBadhakaTimeline?.activeMarakaPlanet)}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* Ayurvedic Constitution & Dosha Bars */}
+      {/* Ayurvedic Constitution & Body Frame */}
       <div className="card">
         <h3 style={{ margin: '0 0 16px 0', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
           🌿 {t('prakritiTitle', language)}
         </h3>
 
-        {/* Prakriti Overview Badges */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '18px' }}>
+        {/* Prakriti & Physiological Overview (6 Key Anchors) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginBottom: '18px' }}>
+          {/* 1. Dominant Prakriti */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
             <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
               🧬 {t('dominantPrakriti', language)}
             </span>
-            <strong style={{ fontSize: '15px', color: '#3498db' }}>
+            <strong style={{ fontSize: '14px', color: '#3498db' }}>
               {translatePrakriti(health?.dominantPrakriti) || 'Vata-Pitta'}
             </strong>
           </div>
 
+          {/* 2. Lagna Element */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
             <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
               🔥 {t('lagnaElement', language)}
             </span>
-            <strong style={{ fontSize: '15px', color: '#e67e22' }}>
+            <strong style={{ fontSize: '14px', color: '#e67e22' }}>
               {translateLagnaElement(health?.lagnaElement) || 'Agni (Fire)'}
             </strong>
           </div>
 
+          {/* 3. Roga Sthana (6th House) */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
             <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
               🏥 {t('rogaSthana', language)}
             </span>
-            <strong style={{ fontSize: '14px', color: 'var(--text-primary)' }}>
+            <strong style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
               {translateRogaSthana(health?.rogaSthanaSign, health?.rogaLord) || 'Kanya (House 6)'}
+            </strong>
+          </div>
+
+          {/* 4. Digestive & Metabolic Agni */}
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+              ⚡ {t('agniTitle', language)}
+            </span>
+            <strong style={{ fontSize: '13px', color: '#f39c12' }}>
+              {translateAgniType(health?.agniType) || 'Samagni (Balanced Fire)'}
+            </strong>
+          </div>
+
+          {/* 5. Deha Prakriti / Body Frame */}
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+              🏃 {t('bodyBuildTitle', language)}
+            </span>
+            <strong style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
+              {translateBodyBuild(health?.bodyBuild) || 'Madhya Deha (Medium Athletic)'}
+            </strong>
+          </div>
+
+          {/* 6. Primary Governing Dhatu */}
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+              🩸 {t('primaryDhatuTitle', language)}
+            </span>
+            <strong style={{ fontSize: '13px', color: '#2ecc71' }}>
+              {translatePrimaryDhatu(health?.primaryDhatu) || 'Rasa & Rakta Dhatu'}
             </strong>
           </div>
         </div>
@@ -1881,8 +2336,9 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
           </div>
         </div>
 
-        {/* Organ Vulnerabilities & Diet */}
+        {/* Organ Vulnerabilities & Diet & Rasayana Directives */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+          {/* Organ Vulnerabilities */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '14px' }}>
             <h4 style={{ margin: '0 0 10px 0', fontSize: '13px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '6px' }}>
               🩺 {t('organVulnerabilitiesTitle', language)}
@@ -1910,20 +2366,33 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
             )}
           </div>
 
+          {/* Diet, Lifestyle & Rasayana Directives */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: '8px', padding: '14px' }}>
             <h4 style={{ margin: '0 0 10px 0', fontSize: '13px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '6px' }}>
               🥗 {t('dietLifestyleTitle', language)}
             </h4>
             {health?.dietaryAndLifestyleDirectives && health.dietaryAndLifestyleDirectives.length > 0 ? (
-              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
+              <ul style={{ margin: '0 0 12px 0', paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
                 {health.dietaryAndLifestyleDirectives.map((directive, idx) => (
                   <li key={idx} style={{ marginBottom: '6px' }}>{translateLifestyleDirective(directive)}</li>
                 ))}
               </ul>
             ) : (
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 12px 0' }}>
                 {language === 'ta' ? 'சமச்சீர் சாத்விக உணவு பரிந்துரைக்கப்படுகிறது.' : language === 'hi' ? 'संतुलित सात्विक आहार की सिफारिश की जाती है।' : language === 'te' ? 'సమతుల్య సాత్విక ఆహారం సిఫార్సు చేయబడింది.' : language === 'kn' ? 'ಸಮತೋಲಿತ ಸಾತ್ವಿಕ ಆಹಾರವನ್ನು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ.' : language === 'ml' ? 'സന്തുലിതമായ സാത്വിക ഭക്ഷണം ശുപാർശ ചെയ്യുന്നു.' : 'Balanced Sattvic diet recommended.'}
               </p>
+            )}
+
+            {/* Recommended Rasayana Herbs Box */}
+            {health?.recommendedRasayana && (
+              <div style={{ background: 'rgba(46, 204, 113, 0.08)', border: '1px solid rgba(46, 204, 113, 0.25)', borderRadius: '6px', padding: '10px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#2ecc71', marginBottom: '4px' }}>
+                  🌿 {t('rasayanaTitle', language)}:
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                  {translateRasayana(health.recommendedRasayana)}
+                </div>
+              </div>
             )}
           </div>
         </div>

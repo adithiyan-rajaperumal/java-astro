@@ -7,6 +7,7 @@ import org.vedic.astro.dto.ChartResponseDTO;
 import org.vedic.astro.dto.ChartUiResponseDTO;
 import org.vedic.astro.dto.ComprehensiveReportDTO;
 import org.vedic.astro.dto.LifeAnchorsProfile;
+import org.vedic.astro.dto.ShadbalaDTO;
 import org.vedic.astro.model.ChartResult;
 import org.vedic.astro.model.DasaPeriod;
 import org.vedic.astro.model.PlanetaryPosition;
@@ -87,9 +88,10 @@ public class ChartOrchestrationService {
         int lagnaSignNum = d1.get("Lagna") != null ? d1.get("Lagna").getSignNumber() : 1;
         int moonSignNum = d1.get("Moon") != null ? d1.get("Moon").getSignNumber() : 1;
 
+        ShadbalaDTO shadbala = shadbalaService.calculateShadbala(d1);
         var healthProfile = org.vedic.astro.util.AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSignNum, moonSignNum, d1List);
         var ayurdayaProfile = ayurdayaEnabled
-                ? org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(lagnaSignNum, moonSignNum, d1List, dasas, pay.year(), pay.hour(), pay.minute())
+                ? org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(lagnaSignNum, moonSignNum, d1List, dasas, pay.year(), pay.hour(), pay.minute(), shadbala)
                 : null;
         var d9PosList = compileVargaList(9, res.getD1Positions(), null);
         var lifeAnchorsProfile = lifeAnchorsEnabled
@@ -189,8 +191,9 @@ public class ChartOrchestrationService {
         int pdfLagnaSign = d1.get("Lagna") != null ? d1.get("Lagna").getSignNumber() : 1;
         int pdfMoonSign = d1.get("Moon") != null ? d1.get("Moon").getSignNumber() : 1;
 
+        var pdfShadbala = shadbalaService.calculateShadbala(d1);
         var pdfHealthProfile = org.vedic.astro.util.AyurvedicAstrologyUtils.calculateHealthProfile(pdfLagnaSign, pdfMoonSign, d1PosList);
-        var pdfAyurdayaProfile = org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(pdfLagnaSign, pdfMoonSign, d1PosList, pdfDasas, pay.year(), pay.hour(), pay.minute());
+        var pdfAyurdayaProfile = org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(pdfLagnaSign, pdfMoonSign, d1PosList, pdfDasas, pay.year(), pay.hour(), pay.minute(), pdfShadbala);
         var pdfD9List = compileVargaList(9, d1, cusps);
         var pdfLifeAnchors = buildLifeAnchorsProfile(pdfLagnaSign, pdfMoonSign, d1, pdfD9List, pay, res.getJulianDayUT());
 

@@ -53,11 +53,60 @@ public class AyurvedicAstrologyUtilsTest {
         assertEquals("Vrishabha (House 6)", profile.rogaSthanaSign());
         assertEquals("Venus", profile.rogaLord());
 
+        assertNotNull(profile.agniType());
+        assertNotNull(profile.bodyBuild());
+        assertNotNull(profile.primaryDhatu());
+        assertNotNull(profile.recommendedRasayana());
+
         assertNotNull(profile.calculatedOrganVulnerabilities());
         assertFalse(profile.calculatedOrganVulnerabilities().isEmpty());
 
         assertNotNull(profile.dietaryAndLifestyleDirectives());
         assertFalse(profile.dietaryAndLifestyleDirectives().isEmpty());
+    }
+
+    @Test
+    public void testPlanetInLagnaModifier() {
+        int lagnaSign = 3; // Mithuna (Air -> Vata)
+        int moonSign = 7;  // Tula (Air -> Vata)
+
+        // Case A: Saturn posited in Lagna -> should heavily boost Vata
+        ChartResponseDTO.PositionDetail lagna = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("LAGNA").displayName("Lagna").signNumber(3).rashiName("Mithuna").build();
+        ChartResponseDTO.PositionDetail saturnInLagna = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SATURN").displayName("Saturn").signNumber(3).rashiName("Mithuna").build();
+        ChartResponseDTO.PositionDetail moon = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("MOON").displayName("Moon").signNumber(7).rashiName("Tula").build();
+
+        AyurvedicAstrologyUtils.AyurvedicHealthProfile profileSaturn =
+                AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSign, moonSign, List.of(lagna, saturnInLagna, moon));
+
+        assertTrue(profileSaturn.doshaPercentages().get("Vata") >= 50);
+        assertTrue(profileSaturn.dominantPrakriti().contains("Vata"));
+        assertTrue(profileSaturn.agniType().contains("Vishamagni"));
+        assertTrue(profileSaturn.bodyBuild().contains("Krisa Deha") || profileSaturn.bodyBuild().contains("Vata"));
+        assertTrue(profileSaturn.recommendedRasayana().contains("Ashwagandha"));
+    }
+
+    @Test
+    public void testDusthanaOccupantsPathology() {
+        int lagnaSign = 1; // Mesha (6th = Kanya(6), 8th = Vrishchika(8), 12th = Meena(12))
+        int moonSign = 1;
+
+        ChartResponseDTO.PositionDetail marsIn8 = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("MARS").displayName("Mars").signNumber(8).rashiName("Vrishchika").build();
+        ChartResponseDTO.PositionDetail saturnIn6 = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SATURN").displayName("Saturn").signNumber(6).rashiName("Kanya").build();
+        ChartResponseDTO.PositionDetail rahuIn12 = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("RAHU").displayName("Rahu").signNumber(12).rashiName("Meena").build();
+
+        AyurvedicAstrologyUtils.AyurvedicHealthProfile profile =
+                AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSign, moonSign, List.of(marsIn8, saturnIn6, rahuIn12));
+
+        List<String> vulns = profile.calculatedOrganVulnerabilities();
+        assertTrue(vulns.stream().anyMatch(v -> v.contains("Mars in House 8") || v.contains("inflammatory")));
+        assertTrue(vulns.stream().anyMatch(v -> v.contains("Saturn in House 6") || v.contains("stiffness")));
+        assertTrue(vulns.stream().anyMatch(v -> v.contains("Rahu in House 12") || v.contains("allergies")));
     }
 
     @Test

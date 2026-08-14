@@ -22,8 +22,36 @@ public class AyurvedicAstrologyUtils {
             String rogaSthanaSign,
             String rogaLord,
             List<String> calculatedOrganVulnerabilities,
-            List<String> dietaryAndLifestyleDirectives
-    ) {}
+            List<String> dietaryAndLifestyleDirectives,
+            String agniType,
+            String bodyBuild,
+            String primaryDhatu,
+            String recommendedRasayana
+    ) {
+        // Backwards-compatible constructor for 7-arg callers
+        public AyurvedicHealthProfile(
+                String dominantPrakriti,
+                Map<String, Integer> doshaPercentages,
+                String lagnaElement,
+                String rogaSthanaSign,
+                String rogaLord,
+                List<String> calculatedOrganVulnerabilities,
+                List<String> dietaryAndLifestyleDirectives) {
+            this(
+                    dominantPrakriti,
+                    doshaPercentages,
+                    lagnaElement,
+                    rogaSthanaSign,
+                    rogaLord,
+                    calculatedOrganVulnerabilities,
+                    dietaryAndLifestyleDirectives,
+                    "Samagni (Balanced & Optimal Digestive Fire)",
+                    "Madhya Deha (Balanced Proportions)",
+                    "Rasa & Rakta Dhatu (Vital Plasma & Fluids)",
+                    "Chyawanprash & Triphala"
+            );
+        }
+    }
 
     public static String getPlanetaryPrimaryDosha(String planet) {
         if (planet == null) return "Tridosha";
@@ -78,32 +106,44 @@ public class AyurvedicAstrologyUtils {
         double pittaScore = 0.0;
         double kaphaScore = 0.0;
 
-        // 1. Lagna Sign Tattva (Weight: 3.0)
+        // 1. Lagna Sign Tattva (Weight: 3.0) - Fundamental Deha Matrix
         double[] lagnaTattva = getTattvaDoshaVector(lagnaSign);
         vataScore += lagnaTattva[0] * 3.0;
         pittaScore += lagnaTattva[1] * 3.0;
         kaphaScore += lagnaTattva[2] * 3.0;
 
-        // 2. Lagna Lord Planetary Dosha (Weight: 3.0)
+        // 2. Lagna Lord Planetary Dosha (Weight: 3.0) - Physical Constitution Ruler
         String lagnaLord = PlanetDignityUtils.getSignLord(lagnaSign);
         double[] lagnaLordDosha = getPlanetDoshaVector(lagnaLord);
         vataScore += lagnaLordDosha[0] * 3.0;
         pittaScore += lagnaLordDosha[1] * 3.0;
         kaphaScore += lagnaLordDosha[2] * 3.0;
 
-        // 3. Moon Sign Tattva (Weight: 2.0)
+        // 3. Planets posited in Lagna (House 1) - Direct Physical Modification (Weight: 2.0 each)
+        if (d1Chart != null) {
+            for (ChartResponseDTO.PositionDetail p : d1Chart) {
+                if (p.getSignNumber() == lagnaSign && !"LAGNA".equalsIgnoreCase(p.getPlanetKey())) {
+                    double[] occupantDosha = getPlanetDoshaVector(p.getPlanetKey());
+                    vataScore += occupantDosha[0] * 2.0;
+                    pittaScore += occupantDosha[1] * 2.0;
+                    kaphaScore += occupantDosha[2] * 2.0;
+                }
+            }
+        }
+
+        // 4. Moon Sign Tattva (Weight: 2.0) - Manas & Fluid Constitution
         double[] moonTattva = getTattvaDoshaVector(moonSign);
         vataScore += moonTattva[0] * 2.0;
         pittaScore += moonTattva[1] * 2.0;
         kaphaScore += moonTattva[2] * 2.0;
 
-        // 4. Moon Planetary Dosha (Weight: 1.0)
+        // 5. Moon Planetary Dosha (Weight: 1.0)
         double[] moonPlanetDosha = getPlanetDoshaVector("Moon");
         vataScore += moonPlanetDosha[0] * 1.0;
         pittaScore += moonPlanetDosha[1] * 1.0;
         kaphaScore += moonPlanetDosha[2] * 1.0;
 
-        // 5. Sun Sign Tattva (Weight: 1.0)
+        // 6. Sun Sign Tattva (Weight: 1.0) - Vital Prana & Metabolic Heat
         int sunSign = 1;
         if (d1Chart != null) {
             for (ChartResponseDTO.PositionDetail p : d1Chart) {
@@ -118,7 +158,7 @@ public class AyurvedicAstrologyUtils {
         pittaScore += sunTattva[1] * 1.0;
         kaphaScore += sunTattva[2] * 1.0;
 
-        // 6. 6th House (Roga Sthana) Sign Tattva & 6th Lord Dosha (Weight: 2.0)
+        // 7. 6th House (Roga Sthana) Sign Tattva & 6th Lord Dosha (Weight: 2.0)
         int rogaSign = ((lagnaSign - 1 + 5) % 12) + 1;
         String rogaLord = PlanetDignityUtils.getSignLord(rogaSign);
         double[] rogaTattva = getTattvaDoshaVector(rogaSign);
@@ -127,6 +167,18 @@ public class AyurvedicAstrologyUtils {
         vataScore += (rogaTattva[0] + rogaLordDosha[0]) * 1.0;
         pittaScore += (rogaTattva[1] + rogaLordDosha[1]) * 1.0;
         kaphaScore += (rogaTattva[2] + rogaLordDosha[2]) * 1.0;
+
+        // 8. Planets posited in 6th House (Roga Sthana Occupants) - Active Pathological Modifiers (Weight: 1.5 each)
+        if (d1Chart != null) {
+            for (ChartResponseDTO.PositionDetail p : d1Chart) {
+                if (p.getSignNumber() == rogaSign && !"LAGNA".equalsIgnoreCase(p.getPlanetKey())) {
+                    double[] rogaOccupantDosha = getPlanetDoshaVector(p.getPlanetKey());
+                    vataScore += rogaOccupantDosha[0] * 1.5;
+                    pittaScore += rogaOccupantDosha[1] * 1.5;
+                    kaphaScore += rogaOccupantDosha[2] * 1.5;
+                }
+            }
+        }
 
         // Calculate Percentages
         double total = vataScore + pittaScore + kaphaScore;
@@ -140,13 +192,18 @@ public class AyurvedicAstrologyUtils {
         doshaPctMap.put("Vata", vataPct);
         doshaPctMap.put("Kapha", kaphaPct);
 
-        // Determine Dominant Prakriti String
+        // Classical Determinations
         String dominantPrakriti = determineDominantPrakriti(vataPct, pittaPct, kaphaPct);
+        String agniType = determineAgniType(dominantPrakriti, vataPct, pittaPct, kaphaPct);
+        String bodyBuild = determineBodyBuild(dominantPrakriti, lagnaSign);
+        String moonSignLord = PlanetDignityUtils.getSignLord(moonSign);
+        String primaryDhatu = determinePrimaryDhatu(lagnaLord, moonSignLord, dominantPrakriti);
+        String recommendedRasayana = determineRecommendedRasayana(dominantPrakriti);
 
-        // Organ Vulnerabilities based on 6th, 8th, 12th and planetary afflictions
+        // Organ Vulnerabilities based on 6th, 8th, 12th and active planetary afflictions
         List<String> organVulnerabilities = calculateOrganVulnerabilities(lagnaSign, rogaSign, rogaLord, d1Chart);
 
-        // Dietary and Lifestyle Directives
+        // Dietary and Lifestyle Directives (including Shad Rasa guidelines)
         List<String> lifestyleDirectives = calculateDietaryDirectives(dominantPrakriti);
 
         String lagnaElemStr = getRashiTattva(lagnaSign) + " / " + RASHIS[lagnaSign - 1];
@@ -159,7 +216,11 @@ public class AyurvedicAstrologyUtils {
                 rogaSignStr,
                 rogaLord,
                 organVulnerabilities,
-                lifestyleDirectives
+                lifestyleDirectives,
+                agniType,
+                bodyBuild,
+                primaryDhatu,
+                recommendedRasayana
         );
     }
 
@@ -188,15 +249,99 @@ public class AyurvedicAstrologyUtils {
 
     private static String determineDominantPrakriti(int vata, int pitta, int kapha) {
         int max = Math.max(vata, Math.max(pitta, kapha));
-        if (pitta >= 40 && vata >= 30) return "Pitta-Vata";
-        if (vata >= 40 && pitta >= 30) return "Vata-Pitta";
-        if (pitta >= 40 && kapha >= 30) return "Pitta-Kapha";
-        if (kapha >= 40 && pitta >= 30) return "Kapha-Pitta";
-        if (vata >= 40 && kapha >= 30) return "Vata-Kapha";
-        if (kapha >= 40 && vata >= 30) return "Kapha-Vata";
+        int min = Math.min(vata, Math.min(pitta, kapha));
+
+        // 1. Tridoshic Equilibrium / Sama Prakriti (Charaka Samhita Sutrasthana 1.57-58)
+        if ((max - min) <= 8 && vata >= 28 && pitta >= 28 && kapha >= 28) {
+            return "Sama Prakriti (Tridosha Balanced)";
+        }
+
+        // 2. Dual / Dwandvaja Prakriti (Top two within 12% and both >= 30%)
+        if (pitta >= 38 && vata >= 30 && Math.abs(pitta - vata) <= 12) return "Pitta-Vata";
+        if (vata >= 38 && pitta >= 30 && Math.abs(vata - pitta) <= 12) return "Vata-Pitta";
+        if (pitta >= 38 && kapha >= 30 && Math.abs(pitta - kapha) <= 12) return "Pitta-Kapha";
+        if (kapha >= 38 && pitta >= 30 && Math.abs(kapha - pitta) <= 12) return "Kapha-Pitta";
+        if (vata >= 38 && kapha >= 30 && Math.abs(vata - kapha) <= 12) return "Vata-Kapha";
+        if (kapha >= 38 && vata >= 30 && Math.abs(kapha - vata) <= 12) return "Kapha-Vata";
+
+        // 3. Ekadoshaja / Mono-dominant
         if (max == pitta) return "Pitta Dominant";
         if (max == vata) return "Vata Dominant";
         return "Kapha Dominant";
+    }
+
+    private static String determineAgniType(String dominantPrakriti, int vata, int pitta, int kapha) {
+        if (dominantPrakriti.contains("Sama")) {
+            return "Samagni (Balanced & Optimal Digestive Fire)";
+        }
+        if (pitta >= vata && pitta >= kapha && pitta >= 40) {
+            return "Tikshnagni (Intense & Hyper-Metabolic Fire)";
+        }
+        if (vata >= pitta && vata >= kapha && vata >= 38) {
+            return "Vishamagni (Irregular & Fluctuating Metabolism)";
+        }
+        if (kapha >= pitta && kapha >= vata && kapha >= 38) {
+            return "Mandagni (Sluggish & Slow Metabolic Agni)";
+        }
+        if (dominantPrakriti.contains("Pitta")) {
+            return "Tikshnagni (Intense & Hyper-Metabolic Fire)";
+        }
+        if (dominantPrakriti.contains("Vata")) {
+            return "Vishamagni (Irregular & Fluctuating Metabolism)";
+        }
+        return "Mandagni (Sluggish & Slow Metabolic Agni)";
+    }
+
+    private static String determineBodyBuild(String dominantPrakriti, int lagnaSign) {
+        if (dominantPrakriti.contains("Sama")) {
+            return "Sama Deha (Harmonious & Proportionate Athletic Frame)";
+        }
+        if (dominantPrakriti.equals("Vata Dominant")) {
+            return "Krisa Deha (Slender / Lean Frame, Quick Movements & Dry Skin)";
+        }
+        if (dominantPrakriti.equals("Pitta Dominant")) {
+            return "Madhya Deha (Medium Athletic Frame, High Vitality & Warm Complexion)";
+        }
+        if (dominantPrakriti.equals("Kapha Dominant")) {
+            return "Sthula Deha (Solid / Broad Frame, High Endurance & Smooth Complexion)";
+        }
+        if (dominantPrakriti.contains("Vata-Pitta") || dominantPrakriti.contains("Pitta-Vata")) {
+            return "Vata-Pitta Frame (Lean-Athletic, Quick Reflexes & Energetic Stamina)";
+        }
+        if (dominantPrakriti.contains("Kapha-Pitta") || dominantPrakriti.contains("Pitta-Kapha")) {
+            return "Kapha-Pitta Frame (Strong Muscular Build, High Stamina & Solid Structure)";
+        }
+        if (dominantPrakriti.contains("Vata-Kapha") || dominantPrakriti.contains("Kapha-Vata")) {
+            return "Vata-Kapha Frame (Variable Bone Structure, Cold Sensitivity & Steady Endurance)";
+        }
+        return "Madhya Deha (Balanced Proportions)";
+    }
+
+    private static String determinePrimaryDhatu(String lagnaLord, String moonSignLord, String dominantPrakriti) {
+        String keyLord = lagnaLord != null ? lagnaLord.toLowerCase() : "sun";
+        return switch (keyLord) {
+            case "sun" -> "Asthi Dhatu (Bone Density & Skeletal Structural Strength)";
+            case "moon" -> "Rakta & Rasa Dhatu (Blood Plasma, Bodily Fluids & Lymphatic Flow)";
+            case "mars" -> "Majja & Mamsa Dhatu (Bone Marrow, Muscle Tone & Vital Red Blood Cells)";
+            case "mercury" -> "Tvak & Rasa Dhatu (Skin Barrier, Plasma & Neural Fluid Channels)";
+            case "jupiter" -> "Meda Dhatu (Adipose Tissue, Healthy Fats & Glandular Nourishment)";
+            case "venus" -> "Shukra Dhatu (Reproductive Tissue, Vitality & Ojas Immunity)";
+            case "saturn" -> "Snayu & Asthi Dhatu (Nerves, Tendons, Ligaments & Joint Lubrication)";
+            default -> "Rasa & Rakta Dhatu (Vital Plasma & Fluids)";
+        };
+    }
+
+    private static String determineRecommendedRasayana(String dominantPrakriti) {
+        if (dominantPrakriti.contains("Vata")) {
+            return "Ashwagandha, Warm Sesame Oil massage, Bala, and Dashamoola";
+        }
+        if (dominantPrakriti.contains("Pitta")) {
+            return "Amalaki (Amla), Guduchi (Giloy), Shatavari, and Brahmi Ghee";
+        }
+        if (dominantPrakriti.contains("Kapha")) {
+            return "Triphala, Trikatu (Dry Ginger/Black Pepper/Pippali), Tulsi, and Guggulu";
+        }
+        return "Chyawanprash, Brahmi, Amalaki, and Triphala for holistic Tridosha Rasayana";
     }
 
     private static List<String> calculateOrganVulnerabilities(
@@ -207,7 +352,7 @@ public class AyurvedicAstrologyUtils {
 
         List<String> vulnerabilities = new ArrayList<>();
 
-        // Roga Sign based vulnerability
+        // 1. Roga Sign based vulnerability (House 6)
         String rogaSignVuln = switch (rogaSign) {
             case 1 -> "Head region, cerebral circulation & acute inflammatory headaches (Mesha / Aries in 6th)";
             case 2 -> "Throat, vocal cords, thyroid & facial tissue sensitivity (Vrishabha / Taurus in 6th)";
@@ -225,7 +370,7 @@ public class AyurvedicAstrologyUtils {
         };
         vulnerabilities.add(rogaSignVuln);
 
-        // Roga Lord based vulnerability
+        // 2. Roga Lord based vulnerability
         String rogaLordVuln = switch (rogaLord.toLowerCase()) {
             case "sun" -> "Cardiac stamina, eyesight clarity and bone mineral absorption (Sun as Roga Lord)";
             case "moon" -> "Body fluid balance, lymphatic regulation and mental equilibrium (Moon as Roga Lord)";
@@ -238,24 +383,63 @@ public class AyurvedicAstrologyUtils {
         };
         vulnerabilities.add(rogaLordVuln);
 
-        // 8th House (Ayurdaya / Chronic) check
+        // 3. Dynamic Dusthana Occupants (House 6, House 8, House 12)
         int eighthSign = ((lagnaSign - 1 + 7) % 12) + 1;
+        int twelfthSign = ((lagnaSign - 1 + 11) % 12) + 1;
+
+        if (d1Chart != null) {
+            for (ChartResponseDTO.PositionDetail p : d1Chart) {
+                if ("LAGNA".equalsIgnoreCase(p.getPlanetKey())) continue;
+                int sign = p.getSignNumber();
+                String name = p.getDisplayName() != null ? p.getDisplayName() : p.getPlanetKey();
+
+                if (sign == rogaSign) {
+                    vulnerabilities.add(getDusthanaPlanetPathology(name, 6));
+                } else if (sign == eighthSign) {
+                    vulnerabilities.add(getDusthanaPlanetPathology(name, 8));
+                } else if (sign == twelfthSign) {
+                    vulnerabilities.add(getDusthanaPlanetPathology(name, 12));
+                }
+            }
+        }
+
+        // 4. 8th House (Ayurdaya / Chronic resilience anchor)
         String eighthLord = PlanetDignityUtils.getSignLord(eighthSign);
         vulnerabilities.add("Longevity resilience & chronic vitality maintenance governed by 8th Lord " + eighthLord + " in " + RASHIS[eighthSign - 1]);
 
         return vulnerabilities;
     }
 
+    private static String getDusthanaPlanetPathology(String planet, int house) {
+        String p = planet.trim().toLowerCase();
+        String houseLabel = "House " + house;
+        return switch (p) {
+            case "mars", "kuja", "sevvai", "mangal" -> "Acute inflammatory spikes, muscular strain & bile heat sensitivity (" + planet + " in " + houseLabel + ")";
+            case "saturn", "shani" -> "Joint stiffness, chronic dryness, sciatica or tendon fatigue (" + planet + " in " + houseLabel + ")";
+            case "rahu" -> "Environmental allergies, food sensitivities & psychosomatic sleep disturbances (" + planet + " in " + houseLabel + ")";
+            case "ketu" -> "Sharp intestinal heat, unexpected digestive hypersensitivity & subtle energy depletion (" + planet + " in " + houseLabel + ")";
+            case "sun", "surya" -> "Cardiovascular stamina under stress, eyesight sensitivity & bone calcium absorption (" + planet + " in " + houseLabel + ")";
+            case "moon", "chandra" -> "Lymphatic sluggishness, fluid retention & emotional psychosomatic digestion (" + planet + " in " + houseLabel + ")";
+            case "venus", "shukra" -> "Renal hydration balance, endocrine equilibrium & urinary tract health (" + planet + " in " + houseLabel + ")";
+            case "jupiter", "guru" -> "Hepatic liver metabolism, lipid balance & arterial circulation (" + planet + " in " + houseLabel + ")";
+            case "mercury", "budha" -> "Enteric nervous system, skin barrier resilience & respiratory bronchial reactivity (" + planet + " in " + houseLabel + ")";
+            default -> "Metabolic sensitivity and immune caution (" + planet + " in " + houseLabel + ")";
+        };
+    }
+
     private static List<String> calculateDietaryDirectives(String prakriti) {
         List<String> directives = new ArrayList<>();
-        if (prakriti.contains("Pitta")) {
-            directives.add("Favor cooling, grounding, fresh whole foods with natural sweet, bitter, and astringent tastes");
+        if (prakriti.contains("Sama")) {
+            directives.add("Maintain balanced intake of all 6 tastes (Shad Rasas: Sweet, Sour, Salty, Pungent, Bitter, Astringent) according to seasonal transitions (Ritu Sandhi)");
+            directives.add("Favor freshly prepared Sattvic whole grains, organic vegetables, pure cow's ghee, and seasonal fruits to preserve natural equilibrium");
+        } else if (prakriti.contains("Pitta")) {
+            directives.add("Favor cooling, grounding, fresh whole foods with natural sweet, bitter, and astringent tastes (Shad Rasa: Madhura, Tikta, Kashaya)");
             directives.add("Limit pungent spices, sour citrus excess, fried oils, and late-night heavy meals during high Pitta seasons");
         } else if (prakriti.contains("Vata")) {
-            directives.add("Favor warm, nourishing, easily digestible cooked meals with healthy fats (ghee, sesame oil)");
+            directives.add("Favor warm, nourishing, easily digestible cooked meals with healthy fats (ghee, sesame oil) and sweet, sour, salty tastes (Shad Rasa: Madhura, Amla, Lavana)");
             directives.add("Maintain consistent meal schedules; avoid dry, cold, raw, and highly carbonated items");
         } else {
-            directives.add("Favor light, warm, dry, and mildly spiced preparations to stimulate metabolic Agni");
+            directives.add("Favor light, warm, dry, and mildly spiced preparations with pungent, bitter, and astringent tastes (Shad Rasa: Katu, Tikta, Kashaya) to stimulate metabolic Agni");
             directives.add("Minimize heavy dairy, refined sugars, cold beverages, and sedentary post-meal habits");
         }
         directives.add("Incorporate gentle daily Pranayama (Nadi Shodhana / Sheetali) and rhythmic sleep cycles to protect Ojas (vital immunity)");
