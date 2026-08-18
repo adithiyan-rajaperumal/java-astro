@@ -521,13 +521,14 @@ public class PdfExportService {
                 // 5. Recommended Rasayana
                 if (health.recommendedRasayana() != null) {
                     healthTab.addCell(buildTableCell(ts.getLabel("pdf.health.rasayana"), boldB, Element.ALIGN_LEFT));
-                    healthTab.addCell(buildTableCell(health.recommendedRasayana(), bFont, Element.ALIGN_LEFT));
+                    String rasayanaTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateRasayana(health.recommendedRasayana(), lang);
+                    healthTab.addCell(buildTableCell(rasayanaTrans, bFont, Element.ALIGN_LEFT));
                 }
 
                 // 6. Organ Vulnerabilities Focus
                 if (health.calculatedOrganVulnerabilities() != null && !health.calculatedOrganVulnerabilities().isEmpty()) {
                     healthTab.addCell(buildTableCell(ts.getLabel("pdf.health.organ_vulnerabilities"), boldB, Element.ALIGN_LEFT));
-                    String organs = String.join(", ", health.calculatedOrganVulnerabilities());
+                    String organs = org.vedic.astro.util.AstrologicalTranslationHelper.translateOrganVulnerabilities(health.calculatedOrganVulnerabilities(), lang);
                     healthTab.addCell(buildTableCell(organs, bFont, Element.ALIGN_LEFT));
                 }
 
@@ -562,7 +563,8 @@ public class PdfExportService {
                 ayuTab.addCell(h2);
 
                 String classTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateClassification(ayu.longevityClassification(), lang);
-                String rangeStr = ayu.lifespanRange() != null ? " (" + ayu.lifespanRange() + ")" : "";
+                String rangeTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateLifespanRange(ayu.lifespanRange(), lang);
+                String rangeStr = rangeTrans != null && !rangeTrans.isBlank() ? " (" + rangeTrans + ")" : "";
                 ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.classification"), boldB, Element.ALIGN_LEFT));
                 ayuTab.addCell(buildTableCell(classTrans + rangeStr, bFont, Element.ALIGN_LEFT));
 
@@ -706,8 +708,17 @@ public class PdfExportService {
                         if (dasaStr == null || dasaStr.isBlank() || dasaStr.contains("(") || dasaStr.toLowerCase().contains("running")) {
                             dasaStr = GeminiPredictionService.findDasaForYear(data.getVimshottariTimeline(), yp.getYear());
                         }
-                        futTable.addCell(buildTableCell(yp.getYear() + " (Age " + yp.getAge() + ")", engBFont, Element.ALIGN_CENTER));
-                        futTable.addCell(buildTableCell(dasaStr != null ? dasaStr : "", bFont, Element.ALIGN_LEFT));
+                        String localizedDasa = org.vedic.astro.util.AstrologicalTranslationHelper.translateDasaBhukthi(dasaStr, lang);
+                        String ageText = switch (lang.toLowerCase()) {
+                            case "ta" -> yp.getYear() + " (" + yp.getAge() + " வயது)";
+                            case "hi" -> yp.getYear() + " (आयु " + yp.getAge() + ")";
+                            case "te" -> yp.getYear() + " (వయస్సు " + yp.getAge() + ")";
+                            case "kn" -> yp.getYear() + " (ವಯಸ್ಸು " + yp.getAge() + ")";
+                            case "ml" -> yp.getYear() + " (വയസ്സ് " + yp.getAge() + ")";
+                            default -> yp.getYear() + " (Age " + yp.getAge() + ")";
+                        };
+                        futTable.addCell(buildTableCell(ageText, (isEnglish ? engBFont : bFont), Element.ALIGN_CENTER));
+                        futTable.addCell(buildTableCell(localizedDasa != null ? localizedDasa : "", bFont, Element.ALIGN_LEFT));
                         futTable.addCell(buildTableCell(yp.getAnnualNarrative() != null ? yp.getAnnualNarrative() : "", bFont, Element.ALIGN_LEFT));
                     }
                     document.add(futTable);
