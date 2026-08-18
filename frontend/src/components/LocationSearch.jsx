@@ -21,7 +21,11 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -79,6 +83,14 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
               <div
                 key={idx}
                 className="autocomplete-item"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSelect(item);
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleSelect(item);
+                }}
                 onClick={() => handleSelect(item)}
               >
                 {item.label}

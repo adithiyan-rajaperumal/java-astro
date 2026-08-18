@@ -478,6 +478,7 @@ export const translations = {
     "ttsSpeaking": "Reading aloud...",
     "ttsReadAiBalan": "Read AI Predictions",
     "ttsReadDailyBalan": "Read Today's Forecast",
+    "ttsReadAiMatching": "Read AI Compatibility Report",
     "ttsNoVoiceWarning": "Note: Your device does not have an Indic voice installed. Audio playback might use browser default voice."
   },
   "ta": {
@@ -955,6 +956,7 @@ export const translations = {
     "ttsSpeaking": "வாசிக்கிறது...",
     "ttsReadAiBalan": "AI பலன்களை வாசி",
     "ttsReadDailyBalan": "இன்றைய பலனை வாசி",
+    "ttsReadAiMatching": "AI பொருத்த அறிக்கையைக் கேளுங்கள்",
     "ttsNoVoiceWarning": "குறிப்பு: உங்கள் சாதனத்தில் தமிழ் குரல் இல்லை. இயல்புநிலை குரல் பயன்படுத்தப்படும்."
   },
   "hi": {
@@ -1432,6 +1434,7 @@ export const translations = {
     "ttsSpeaking": "पढ़ा जा रहा है...",
     "ttsReadAiBalan": "AI फलादेश सुनें",
     "ttsReadDailyBalan": "आज का राशिफल सुनें",
+    "ttsReadAiMatching": "AI अनुकूलता रिपोर्ट सुनें",
     "ttsNoVoiceWarning": "नोट: आपके डिवाइस में हिंदी आवाज़ स्थापित नहीं है। डिफ़ॉल्ट आवाज़ का उपयोग किया जाएगा।"
   },
   "te": {
@@ -1909,6 +1912,7 @@ export const translations = {
     "ttsSpeaking": "చదువుతోంది...",
     "ttsReadAiBalan": "AI ఫలితాలను వినండి",
     "ttsReadDailyBalan": "ఈరోజు ఫలితాలు వినండి",
+    "ttsReadAiMatching": "AI అనుకూలత నివేదికను వినండి",
     "ttsNoVoiceWarning": "గమనిక: మీ పరికరంలో తెలుగు వాయిస్ లేదు. డిఫాల్ట్ వాయిస్ ఉపయోగించబడుతుంది."
   },
   "kn": {
@@ -2386,6 +2390,7 @@ export const translations = {
     "ttsSpeaking": "ಓದಲಾಗುತ್ತಿದೆ...",
     "ttsReadAiBalan": "AI ಭವಿಷ್ಯವನ್ನು ಕೇಳಿ",
     "ttsReadDailyBalan": "ಇಂದಿನ ಭವಿಷ್ಯ ಕೇಳಿ",
+    "ttsReadAiMatching": "AI ಹೊಂದಾಣಿಕೆ ವರದಿಯನ್ನು ಆಲಿಸಿ",
     "ttsNoVoiceWarning": "ಗಮನಿಸಿ: ನಿಮ್ಮ ಸಾಧನದಲ್ಲಿ ಕನ್ನಡ ಧ್ವನಿ ಇಲ್ಲ. ಡೀಫಾಲ್ಟ್ ಧ್ವನಿಯನ್ನು ಬಳಸಲಾಗುತ್ತದೆ."
   },
   "ml": {
@@ -2863,6 +2868,7 @@ export const translations = {
     "ttsSpeaking": "വായിക്കുന്നു...",
     "ttsReadAiBalan": "AI ഫലങ്ങൾ വായിക്കുക",
     "ttsReadDailyBalan": "ഇന്നത്തെ ഫലം വായിക്കുക",
+    "ttsReadAiMatching": "AI പൊരുത്ത റിപ്പോർട്ട് കേൾക്കുക",
     "ttsNoVoiceWarning": "ശ്രദ്ധിക്കുക: നിങ്ങളുടെ ഉപകരണത്തിൽ മലയാളം ശബ്ദം ലഭ്യമല്ല. ഡിഫോൾട്ട് ശബ്ദം ഉപയോഗിക്കും."
   }
 };

@@ -58,7 +58,15 @@ function MatchingPage({ settings }) {
   };
 
   const handleDateChange = (val, setter) => {
-    setter(val);
+    const clean = val.replace(/\D/g, '');
+    let formatted = clean;
+    if (clean.length > 2) {
+      formatted = `${clean.slice(0, 2)}/${clean.slice(2)}`;
+    }
+    if (clean.length > 4) {
+      formatted = `${clean.slice(0, 2)}/${clean.slice(2, 4)}/${clean.slice(4, 8)}`;
+    }
+    setter(formatted);
   };
 
   const parseDateText = (str) => {

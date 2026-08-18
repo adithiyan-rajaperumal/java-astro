@@ -68,8 +68,8 @@ public class BaminiConverter {
         UNICODE_TO_BAMINI.put("டௌ", "nls");
         UNICODE_TO_BAMINI.put("டோ", "Nlh");
         UNICODE_TO_BAMINI.put("டொ", "nlh");
-        UNICODE_TO_BAMINI.put("டி", "lp");
-        UNICODE_TO_BAMINI.put("டீ", "lP");
+        UNICODE_TO_BAMINI.put("டி", "b");
+        UNICODE_TO_BAMINI.put("டீ", "B");
         UNICODE_TO_BAMINI.put("டா", "lh");
         UNICODE_TO_BAMINI.put("டு", "L");
         UNICODE_TO_BAMINI.put("டூ", "^");
