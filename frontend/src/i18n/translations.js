@@ -477,7 +477,8 @@ export const translations = {
     "ttsStop": "Stop",
     "ttsSpeaking": "Reading aloud...",
     "ttsReadAiBalan": "Read AI Predictions",
-    "ttsReadDailyBalan": "Read Today's Forecast"
+    "ttsReadDailyBalan": "Read Today's Forecast",
+    "ttsNoVoiceWarning": "Note: Your device does not have an Indic voice installed. Audio playback might use browser default voice."
   },
   "ta": {
     "dailyBalanTitle": "தனிப்பயனாக்கப்பட்ட இன்றைய ராசி பலன்",
@@ -953,7 +954,8 @@ export const translations = {
     "ttsStop": "நிறுத்து",
     "ttsSpeaking": "வாசிக்கிறது...",
     "ttsReadAiBalan": "AI பலன்களை வாசி",
-    "ttsReadDailyBalan": "இன்றைய பலனை வாசி"
+    "ttsReadDailyBalan": "இன்றைய பலனை வாசி",
+    "ttsNoVoiceWarning": "குறிப்பு: உங்கள் சாதனத்தில் தமிழ் குரல் இல்லை. இயல்புநிலை குரல் பயன்படுத்தப்படும்."
   },
   "hi": {
     "dailyBalanTitle": "व्यक्तिगत दैनिक राशिफल",
@@ -1429,7 +1431,8 @@ export const translations = {
     "ttsStop": "बंद करें",
     "ttsSpeaking": "पढ़ा जा रहा है...",
     "ttsReadAiBalan": "AI फलादेश सुनें",
-    "ttsReadDailyBalan": "आज का राशिफल सुनें"
+    "ttsReadDailyBalan": "आज का राशिफल सुनें",
+    "ttsNoVoiceWarning": "नोट: आपके डिवाइस में हिंदी आवाज़ स्थापित नहीं है। डिफ़ॉल्ट आवाज़ का उपयोग किया जाएगा।"
   },
   "te": {
     "dailyBalanTitle": "వ్యక్తిగత రోజువారీ రాశి ఫలితాలు",
@@ -1905,7 +1908,8 @@ export const translations = {
     "ttsStop": "ఆపు",
     "ttsSpeaking": "చదువుతోంది...",
     "ttsReadAiBalan": "AI ఫలితాలను వినండి",
-    "ttsReadDailyBalan": "ఈరోజు ఫలితాలు వినండి"
+    "ttsReadDailyBalan": "ఈరోజు ఫలితాలు వినండి",
+    "ttsNoVoiceWarning": "గమనిక: మీ పరికరంలో తెలుగు వాయిస్ లేదు. డిఫాల్ట్ వాయిస్ ఉపయోగించబడుతుంది."
   },
   "kn": {
     "dailyBalanTitle": "ವೈಯಕ್ತಿಕ ದೈನಂದಿನ ರಾಶಿ ಭವಿಷ್ಯ",
@@ -2381,7 +2385,8 @@ export const translations = {
     "ttsStop": "ನಿಲ್ಲಿಸಿ",
     "ttsSpeaking": "ಓದಲಾಗುತ್ತಿದೆ...",
     "ttsReadAiBalan": "AI ಭವಿಷ್ಯವನ್ನು ಕೇಳಿ",
-    "ttsReadDailyBalan": "ಇಂದಿನ ಭವಿಷ್ಯ ಕೇಳಿ"
+    "ttsReadDailyBalan": "ಇಂದಿನ ಭವಿಷ್ಯ ಕೇಳಿ",
+    "ttsNoVoiceWarning": "ಗಮನಿಸಿ: ನಿಮ್ಮ ಸಾಧನದಲ್ಲಿ ಕನ್ನಡ ಧ್ವನಿ ಇಲ್ಲ. ಡೀಫಾಲ್ಟ್ ಧ್ವನಿಯನ್ನು ಬಳಸಲಾಗುತ್ತದೆ."
   },
   "ml": {
     "dailyBalanTitle": "വ്യക്തിഗത ദൈനംദിന രാശിഫലം",
@@ -2857,7 +2862,8 @@ export const translations = {
     "ttsStop": "നിർത്തുക",
     "ttsSpeaking": "വായിക്കുന്നു...",
     "ttsReadAiBalan": "AI ഫലങ്ങൾ വായിക്കുക",
-    "ttsReadDailyBalan": "ഇന്നത്തെ ഫലം വായിക്കുക"
+    "ttsReadDailyBalan": "ഇന്നത്തെ ഫലം വായിക്കുക",
+    "ttsNoVoiceWarning": "ശ്രദ്ധിക്കുക: നിങ്ങളുടെ ഉപകരണത്തിൽ മലയാളം ശബ്ദം ലഭ്യമല്ല. ഡിഫോൾട്ട് ശബ്ദം ഉപയോഗിക്കും."
   }
 };
 
