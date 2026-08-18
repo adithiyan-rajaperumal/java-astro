@@ -671,6 +671,8 @@ public class GeminiPredictionService {
             throw new IllegalStateException("No valid Gemini API key configured.");
         }
 
+        List<String> models = geminiProperties.getResolvedModels();
+
         Map<String, Object> systemPart = Map.of("text", systemInstruction);
         Map<String, Object> systemInstructionObj = Map.of("parts", List.of(systemPart));
 
@@ -699,11 +701,15 @@ public class GeminiPredictionService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
+        int currentKeyIndex = 0;
+        int currentModelIndex = 0;
         Exception lastException = null;
-        for (int i = 0; i < apiKeys.size(); i++) {
-            String apiKey = apiKeys.get(i);
+
+        while (currentModelIndex < models.size() && currentKeyIndex < apiKeys.size()) {
+            String currentModel = models.get(currentModelIndex);
+            String currentKey = apiKeys.get(currentKeyIndex);
             String url = "https://generativelanguage.googleapis.com/v1beta/models/" 
-                    + geminiProperties.getModel() + ":generateContent?key=" + apiKey;
+                    + currentModel + ":generateContent?key=" + currentKey;
 
             try {
                 ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
@@ -712,25 +718,59 @@ public class GeminiPredictionService {
                 }
             } catch (org.springframework.web.client.HttpStatusCodeException e) {
                 lastException = e;
-                log.warn("Gemini API call failed with status {} on key index {}: {}", e.getStatusCode(), i, e.getMessage());
-                if (i < apiKeys.size() - 1) {
-                    log.info("Switching to fallback Gemini API key (index {})...", i + 1);
-                    continue;
+                int statusCode = e.getStatusCode().value();
+                String body = e.getResponseBodyAsString();
+
+                boolean isHighDemand503 = (statusCode == 503 || statusCode == 500)
+                        && (body.contains("high demand") || body.contains("UNAVAILABLE") || body.contains("temporarily"));
+                boolean isQuotaOrLimit = statusCode == 429 || statusCode == 403
+                        || body.contains("RESOURCE_EXHAUSTED") || body.contains("quota") || body.contains("limit");
+
+                if (isHighDemand503) {
+                    log.warn("Model '{}' is experiencing high demand (status 503). Switching to fallback model without changing API key.", currentModel);
+                    if (currentModelIndex < models.size() - 1) {
+                        currentModelIndex++;
+                        log.info("Trying next model: '{}' with current API key (index {})...", models.get(currentModelIndex), currentKeyIndex);
+                        continue;
+                    }
+                } else if (isQuotaOrLimit) {
+                    log.warn("Quota/Rate limit hit on API key index {} (status {}). Switching to backup API key.", currentKeyIndex, statusCode);
+                    if (currentKeyIndex < apiKeys.size() - 1) {
+                        currentKeyIndex++;
+                        log.info("Trying backup API key (index {}) with model '{}'...", currentKeyIndex, currentModel);
+                        continue;
+                    }
+                } else {
+                    log.warn("Gemini API call failed with status {} on model '{}', key index {}: {}", statusCode, currentModel, currentKeyIndex, e.getMessage());
+                    if (currentModelIndex < models.size() - 1) {
+                        currentModelIndex++;
+                        log.info("Trying fallback model: '{}' with current API key...", models.get(currentModelIndex));
+                        continue;
+                    } else if (currentKeyIndex < apiKeys.size() - 1) {
+                        currentKeyIndex++;
+                        log.info("Trying backup API key (index {})...", currentKeyIndex);
+                        continue;
+                    }
                 }
+                break;
             } catch (Exception e) {
                 lastException = e;
-                log.warn("Gemini API call encountered exception on key index {}: {}", i, e.getMessage());
-                if (i < apiKeys.size() - 1) {
-                    log.info("Switching to fallback Gemini API key (index {})...", i + 1);
+                log.warn("Gemini API call encountered exception on model '{}', key index {}: {}", currentModel, currentKeyIndex, e.getMessage());
+                if (currentModelIndex < models.size() - 1) {
+                    currentModelIndex++;
+                    continue;
+                } else if (currentKeyIndex < apiKeys.size() - 1) {
+                    currentKeyIndex++;
                     continue;
                 }
+                break;
             }
         }
 
         if (lastException != null) {
             throw lastException;
         }
-        throw new RuntimeException("Gemini API call failed across all configured API keys.");
+        throw new RuntimeException("Gemini API call failed across all configured models and API keys.");
     }
 
     public PredictionResponseDTO parseGeminiResponse(String rawApiResponse, PredictionRequestDTO req) {

@@ -43,6 +43,7 @@ gemini:
   # forecast-mode: NEXT_10_YEARS
   forecast-years: ${GEMINI_FORECAST_YEARS:0}
   model: ${GEMINI_MODEL:gemini-3.7-flash}
+  fallback-model: ${GEMINI_FALLBACK_MODEL:gemini-3.6-flash}
   temperature: ${GEMINI_TEMPERATURE:0.4}
   thinking-budget: ${GEMINI_THINKING_BUDGET:1024}
 

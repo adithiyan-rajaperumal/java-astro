@@ -19,11 +19,26 @@ public class GeminiProperties {
     private boolean matchingEnabled = true;
     private boolean pdfPredictionsEnabled = true;
     private String model = "gemini-3.7-flash";
+    private String fallbackModel = "gemini-3.6-flash";
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
     private Integer maxOutputTokens; // null means do not set, let API default
     private String forecastMode = "FULL_LIFESPAN";
     private int forecastYears = 0;
+
+    public java.util.List<String> getResolvedModels() {
+        java.util.List<String> models = new java.util.ArrayList<>();
+        if (model != null && !model.trim().isEmpty()) {
+            models.add(model.trim());
+        }
+        if (fallbackModel != null && !fallbackModel.trim().isEmpty() && !models.contains(fallbackModel.trim())) {
+            models.add(fallbackModel.trim());
+        }
+        if (models.isEmpty()) {
+            models.add("gemini-3.7-flash");
+        }
+        return models;
+    }
 
     public boolean is10YearForecastMode() {
         return (forecastYears > 0 && forecastYears <= 15)

@@ -866,6 +866,12 @@ public class GeminiPredictionServiceTest {
     @Test
     public void testModelDefaultAndMultiKeyFailoverProperties() {
         assertEquals("gemini-3.7-flash", geminiProperties.getModel());
+        assertEquals("gemini-3.6-flash", geminiProperties.getFallbackModel());
+
+        List<String> activeModels = geminiProperties.getResolvedModels();
+        assertEquals(2, activeModels.size());
+        assertEquals("gemini-3.7-flash", activeModels.get(0));
+        assertEquals("gemini-3.6-flash", activeModels.get(1));
 
         org.vedic.astro.config.GeminiProperties testProps = new org.vedic.astro.config.GeminiProperties();
         testProps.setApiKey("primary-key-123");
