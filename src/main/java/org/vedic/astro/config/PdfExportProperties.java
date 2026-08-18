@@ -10,6 +10,6 @@ import org.springframework.context.annotation.Configuration;
 public class PdfExportProperties {
     private boolean includeLifeAnchors = true;
     private boolean includeAyurdaya = true;
-    private boolean includeYogasDoshams = false;
+    private boolean includeYogasDoshams = true;
     private boolean includeAiPredictions = true;
 }

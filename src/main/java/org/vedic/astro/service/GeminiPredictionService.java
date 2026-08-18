@@ -63,8 +63,8 @@ public class GeminiPredictionService {
         try {
             String systemInstruction = constructSystemInstruction(lang);
             String prompt = constructAstrologicalPrompt(req);
-            String rawJson = callGeminiApi(systemInstruction, prompt);
-            PredictionResponseDTO parsed = parseGeminiResponse(rawJson, req);
+            GeminiApiResult result = callGeminiApi(systemInstruction, prompt);
+            PredictionResponseDTO parsed = parseGeminiResponse(result.responseBody(), req, result.modelUsed());
             if (parsed.isEnabled()) {
                 cacheService.putLifetimePrediction(cacheKey, parsed);
             }
@@ -122,8 +122,8 @@ public class GeminiPredictionService {
         try {
             String systemInstruction = constructDailySystemInstruction(lang);
             String prompt = constructDailyAstrologicalPrompt(req, panchangam, targetDate);
-            String rawJson = callGeminiApi(systemInstruction, prompt);
-            DailyBalanDTO parsed = parseDailyGeminiResponse(rawJson, req, panchangam, targetDateStr);
+            GeminiApiResult result = callGeminiApi(systemInstruction, prompt);
+            DailyBalanDTO parsed = parseDailyGeminiResponse(result.responseBody(), req, panchangam, targetDateStr, result.modelUsed());
             if (parsed.isEnabled()) {
                 cacheService.putDailyBalan(cacheKey, parsed, targetDate);
             }
@@ -665,7 +665,9 @@ public class GeminiPredictionService {
         return sb.toString();
     }
 
-    private String callGeminiApi(String systemInstruction, String prompt) throws Exception {
+    public record GeminiApiResult(String responseBody, String modelUsed) {}
+
+    private GeminiApiResult callGeminiApi(String systemInstruction, String prompt) throws Exception {
         List<String> apiKeys = geminiProperties.getResolvedApiKeys();
         if (apiKeys.isEmpty()) {
             throw new IllegalStateException("No valid Gemini API key configured.");
@@ -714,7 +716,7 @@ public class GeminiPredictionService {
             try {
                 ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
                 if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                    return response.getBody();
+                    return new GeminiApiResult(response.getBody(), currentModel);
                 }
             } catch (org.springframework.web.client.HttpStatusCodeException e) {
                 lastException = e;
@@ -774,6 +776,10 @@ public class GeminiPredictionService {
     }
 
     public PredictionResponseDTO parseGeminiResponse(String rawApiResponse, PredictionRequestDTO req) {
+        return parseGeminiResponse(rawApiResponse, req, geminiProperties.getModel());
+    }
+
+    public PredictionResponseDTO parseGeminiResponse(String rawApiResponse, PredictionRequestDTO req, String modelUsed) {
         try {
             JsonNode root = objectMapper.readTree(rawApiResponse);
 
@@ -785,7 +791,7 @@ public class GeminiPredictionService {
                 int completionTokens = usageNode.path("candidatesTokenCount").asInt(0);
                 int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
 
-                String model = geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash";
+                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
                 double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
                 double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
 
@@ -853,6 +859,10 @@ public class GeminiPredictionService {
     }
 
     public DailyBalanDTO parseDailyGeminiResponse(String rawApiResponse, DailyBalanRequestDTO req, DailyPanchangamDTO panchangam, String targetDateStr) {
+        return parseDailyGeminiResponse(rawApiResponse, req, panchangam, targetDateStr, geminiProperties.getModel());
+    }
+
+    public DailyBalanDTO parseDailyGeminiResponse(String rawApiResponse, DailyBalanRequestDTO req, DailyPanchangamDTO panchangam, String targetDateStr, String modelUsed) {
         String lang = req.getLanguage() != null ? req.getLanguage() : "ta";
         LocalDate targetDate = LocalDate.parse(targetDateStr);
         DeterministicDailyAnchors anchors = calculateDeterministicAnchors(targetDate, lang);
@@ -866,7 +876,7 @@ public class GeminiPredictionService {
                 int completionTokens = usageNode.path("candidatesTokenCount").asInt(0);
                 int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
 
-                String model = geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.6-flash";
+                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
                 double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
                 double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
 
@@ -1468,8 +1478,8 @@ public class GeminiPredictionService {
         try {
             String systemInstruction = constructMatchingSystemInstruction(effectiveLang);
             String prompt = constructMatchingPrompt(req, classicalResult);
-            String rawJson = callGeminiApi(systemInstruction, prompt);
-            MatchingAiPredictionDTO parsed = parseMatchingGeminiResponse(rawJson, effectiveLang, req, classicalResult);
+            GeminiApiResult result = callGeminiApi(systemInstruction, prompt);
+            MatchingAiPredictionDTO parsed = parseMatchingGeminiResponse(result.responseBody(), effectiveLang, req, classicalResult, result.modelUsed());
             if (parsed.isEnabled()) {
                 cacheService.putMatchingPrediction(cacheKey, parsed);
             }
@@ -1803,7 +1813,8 @@ public class GeminiPredictionService {
             String rawJson,
             String lang,
             MatchingRequestDTO req,
-            MatchingResponseDTO classicalResult) {
+            MatchingResponseDTO classicalResult,
+            String modelUsed) {
         try {
             JsonNode root = objectMapper.readTree(rawJson);
             JsonNode candidates = root.path("candidates");
@@ -1828,6 +1839,7 @@ public class GeminiPredictionService {
                     int candidatesTokens = usage.path("candidatesTokenCount").asInt(0);
                     int totalTokens = usage.path("totalTokenCount").asInt(promptTokens + candidatesTokens);
 
+                    String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
                     double costUsd = ((promptTokens / 1_000_000.0) * 0.15) + ((candidatesTokens / 1_000_000.0) * 0.60);
                     double costInr = costUsd * 86.50;
 
@@ -1837,7 +1849,7 @@ public class GeminiPredictionService {
                             .totalTokens(totalTokens)
                             .estimatedCostUsd(costUsd)
                             .estimatedCostInr(costInr)
-                            .modelUsed(geminiProperties.getModel())
+                            .modelUsed(model)
                             .build();
 
                     MatchingAiPredictionDTO parsed = objectMapper.readValue(jsonText, MatchingAiPredictionDTO.class);

@@ -168,7 +168,7 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
       {/* Token Usage Footer */}
       {aiData.tokenUsage && (
         <div style={{ textAlign: 'right', fontSize: '11px', color: 'var(--text-secondary)', marginTop: '10px' }}>
-          ⚡ Powered by Google Gemini ({aiData.tokenUsage.modelUsed || 'gemini-3.6-flash'}) • Tokens: {aiData.tokenUsage.totalTokens} • Cost: ₹{aiData.tokenUsage.estimatedCostInr?.toFixed(2) || '0.00'}
+          ⚡ Powered by Google Gemini ({aiData.tokenUsage.modelUsed || 'gemini-3.7-flash'}) • Tokens: {aiData.tokenUsage.totalTokens} • Cost: ₹{aiData.tokenUsage.estimatedCostInr?.toFixed(2) || '0.00'}
         </div>
       )}
     </div>
