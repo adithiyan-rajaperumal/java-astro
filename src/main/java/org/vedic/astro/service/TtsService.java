@@ -40,15 +40,16 @@ public class TtsService {
 
         try {
             String encodedText = URLEncoder.encode(trimmedText, StandardCharsets.UTF_8);
-            String url = "https://translate.google.com/translate_tts?ie=UTF-8&q=" + encodedText 
-                    + "&tl=" + effectiveLang + "&client=tw-ob";
+            java.net.URI uri = java.net.URI.create("https://translate.google.com/translate_tts?ie=UTF-8&q=" + encodedText 
+                    + "&tl=" + effectiveLang + "&client=tw-ob&total=1&idx=0&textlen=" + trimmedText.length());
 
             HttpHeaders headers = new HttpHeaders();
             headers.set(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+            headers.set(HttpHeaders.REFERER, "https://translate.google.com/");
             headers.set(HttpHeaders.ACCEPT, "audio/mpeg,audio/*;q=0.9");
 
             HttpEntity<Void> entity = new HttpEntity<>(headers);
-            ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
+            ResponseEntity<byte[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, byte[].class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null && response.getBody().length > 0) {
                 byte[] audio = response.getBody();

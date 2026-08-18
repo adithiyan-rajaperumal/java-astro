@@ -11,9 +11,23 @@ public class TtsServiceTest {
     @Test
     public void testTtsSynthesis() {
         TtsService ttsService = new TtsService();
-        byte[] audio = ttsService.synthesizeSpeech("வணக்கம்", "ta");
-        assertNotNull(audio);
-        // Returns valid audio bytes or empty on no network
+        String[] languages = {"ta", "hi", "te", "kn", "ml", "en"};
+        String[] samples = {
+                "வணக்கம் வாழ்க வளமுடன்",
+                "नमस्ते आप कैसे हैं",
+                "నమస్కారం బాగున్నారా",
+                "ನಮಸ್ಕಾರ ಹೇಗಿದ್ದೀರಾ",
+                "നമസ്കാരം സുഖമാണോ",
+                "Hello, welcome to Vedic Astrology"
+        };
+
+        for (int i = 0; i < languages.length; i++) {
+            byte[] audio = ttsService.synthesizeSpeech(samples[i], languages[i]);
+            assertNotNull(audio);
+            if (audio.length > 0) {
+                assertTrue(audio.length > 100, "Synthesized audio should contain MP3 stream bytes for " + languages[i]);
+            }
+        }
     }
 
     @Test
