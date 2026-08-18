@@ -862,4 +862,19 @@ public class GeminiPredictionServiceTest {
         geminiProperties.setForecastMode("FULL_LIFESPAN");
         geminiProperties.setForecastYears(0);
     }
+
+    @Test
+    public void testModelDefaultAndMultiKeyFailoverProperties() {
+        assertEquals("gemini-3.7-flash", geminiProperties.getModel());
+
+        org.vedic.astro.config.GeminiProperties testProps = new org.vedic.astro.config.GeminiProperties();
+        testProps.setApiKey("primary-key-123");
+        testProps.setBackupApiKey("backup-key-456");
+
+        List<String> resolved = testProps.getResolvedApiKeys();
+        assertEquals(2, resolved.size());
+        assertEquals("primary-key-123", resolved.get(0));
+        assertEquals("backup-key-456", resolved.get(1));
+        assertEquals("primary-key-123", testProps.getResolvedApiKey());
+    }
 }

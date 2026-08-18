@@ -35,7 +35,7 @@ public class ChartController {
         boolean lifeEnabled = geminiProperties != null && geminiProperties.isLifePredictionsEnabled();
         boolean dailyEnabled = geminiProperties != null && geminiProperties.isDailyBalanEnabled();
         boolean pdfEnabled = geminiProperties != null && geminiProperties.isPdfPredictionsEnabled();
-        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-3.6-flash";
+        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-3.7-flash";
         double temperature = geminiProperties != null ? geminiProperties.getTemperature() : 0.4;
         int thinkingBudget = geminiProperties != null ? geminiProperties.getThinkingBudget() : 1024;
         String forecastMode = geminiProperties != null ? geminiProperties.getForecastMode() : "FULL_LIFESPAN";

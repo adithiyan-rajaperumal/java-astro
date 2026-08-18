@@ -666,8 +666,10 @@ public class GeminiPredictionService {
     }
 
     private String callGeminiApi(String systemInstruction, String prompt) throws Exception {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/" 
-                + geminiProperties.getModel() + ":generateContent?key=" + geminiProperties.getResolvedApiKey();
+        List<String> apiKeys = geminiProperties.getResolvedApiKeys();
+        if (apiKeys.isEmpty()) {
+            throw new IllegalStateException("No valid Gemini API key configured.");
+        }
 
         Map<String, Object> systemPart = Map.of("text", systemInstruction);
         Map<String, Object> systemInstructionObj = Map.of("parts", List.of(systemPart));
@@ -697,11 +699,38 @@ public class GeminiPredictionService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            return response.getBody();
+        Exception lastException = null;
+        for (int i = 0; i < apiKeys.size(); i++) {
+            String apiKey = apiKeys.get(i);
+            String url = "https://generativelanguage.googleapis.com/v1beta/models/" 
+                    + geminiProperties.getModel() + ":generateContent?key=" + apiKey;
+
+            try {
+                ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+                if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                    return response.getBody();
+                }
+            } catch (org.springframework.web.client.HttpStatusCodeException e) {
+                lastException = e;
+                log.warn("Gemini API call failed with status {} on key index {}: {}", e.getStatusCode(), i, e.getMessage());
+                if (i < apiKeys.size() - 1) {
+                    log.info("Switching to fallback Gemini API key (index {})...", i + 1);
+                    continue;
+                }
+            } catch (Exception e) {
+                lastException = e;
+                log.warn("Gemini API call encountered exception on key index {}: {}", i, e.getMessage());
+                if (i < apiKeys.size() - 1) {
+                    log.info("Switching to fallback Gemini API key (index {})...", i + 1);
+                    continue;
+                }
+            }
         }
-        throw new RuntimeException("Gemini API call failed with status: " + response.getStatusCode());
+
+        if (lastException != null) {
+            throw lastException;
+        }
+        throw new RuntimeException("Gemini API call failed across all configured API keys.");
     }
 
     public PredictionResponseDTO parseGeminiResponse(String rawApiResponse, PredictionRequestDTO req) {
@@ -716,7 +745,7 @@ public class GeminiPredictionService {
                 int completionTokens = usageNode.path("candidatesTokenCount").asInt(0);
                 int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
 
-                String model = geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.6-flash";
+                String model = geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash";
                 double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
                 double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
 

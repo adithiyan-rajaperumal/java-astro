@@ -12,12 +12,13 @@ import java.util.Base64;
 @ConfigurationProperties(prefix = "gemini")
 public class GeminiProperties {
     private String apiKey = "";
+    private String backupApiKey = "";
     private boolean enabled = true;
     private boolean lifePredictionsEnabled = true;
     private boolean dailyBalanEnabled = true;
     private boolean matchingEnabled = true;
     private boolean pdfPredictionsEnabled = true;
-    private String model = "gemini-3.6-flash";
+    private String model = "gemini-3.7-flash";
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
     private Integer maxOutputTokens; // null means do not set, let API default
@@ -45,11 +46,29 @@ public class GeminiProperties {
         return Math.max(1, ayurdayaCeilingAge - currentAge);
     }
 
+    public java.util.List<String> getResolvedApiKeys() {
+        java.util.List<String> keys = new java.util.ArrayList<>();
+        String primary = resolveSingleKey(apiKey);
+        if (!primary.isEmpty()) {
+            keys.add(primary);
+        }
+        String backup = resolveSingleKey(backupApiKey);
+        if (!backup.isEmpty() && !keys.contains(backup)) {
+            keys.add(backup);
+        }
+        return keys;
+    }
+
     public String getResolvedApiKey() {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
+        java.util.List<String> keys = getResolvedApiKeys();
+        return keys.isEmpty() ? "" : keys.get(0);
+    }
+
+    private String resolveSingleKey(String key) {
+        if (key == null || key.trim().isEmpty()) {
             return "";
         }
-        String trimmed = apiKey.trim();
+        String trimmed = key.trim();
         if (trimmed.startsWith("enc:")) {
             try {
                 byte[] decoded = Base64.getDecoder().decode(trimmed.substring(4));

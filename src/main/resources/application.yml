@@ -32,6 +32,7 @@ astro:
 
 gemini:
   api-key: ${GEMINI_API_KEY:enc:QVEuQWI4Uk42SnB2Q3pJcU1QWjh5SXhGVExXZmhWeUlONk9xb3I5RFFGNFVxSGcyTjFQRXc}
+  backup-api-key: ${GEMINI_BACKUP_API_KEY:}
   enabled: ${GEMINI_ENABLED:true}
   life-predictions-enabled: ${GEMINI_LIFE_PREDICTIONS_ENABLED:true}
   daily-balan-enabled: ${GEMINI_DAILY_BALAN_ENABLED:true}
@@ -41,7 +42,7 @@ gemini:
   forecast-mode: ${GEMINI_FORECAST_MODE:FULL_LIFESPAN}
   # forecast-mode: NEXT_10_YEARS
   forecast-years: ${GEMINI_FORECAST_YEARS:0}
-  model: ${GEMINI_MODEL:gemini-3.6-flash}
+  model: ${GEMINI_MODEL:gemini-3.7-flash}
   temperature: ${GEMINI_TEMPERATURE:0.4}
   thinking-budget: ${GEMINI_THINKING_BUDGET:1024}
 
