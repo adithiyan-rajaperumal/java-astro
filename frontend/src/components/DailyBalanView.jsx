@@ -214,6 +214,14 @@ function DailyBalanView({
               <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
                 🎙️ {tts.isPlaying ? (tts.isPaused ? '⏸' : '🔊') : ''}
               </span>
+              {!tts.hasVoiceForLanguage && language !== 'en' && (
+                <span
+                  title={t('ttsNoVoiceWarning', language)}
+                  style={{ cursor: 'help', fontSize: '12px', color: 'var(--warning)', marginRight: '2px' }}
+                >
+                  ⚠️
+                </span>
+              )}
               {!tts.isPlaying ? (
                 <button
                   onClick={() => tts.speak(buildSpeechText())}
