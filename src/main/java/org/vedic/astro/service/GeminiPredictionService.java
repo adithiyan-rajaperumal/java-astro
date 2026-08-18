@@ -1413,7 +1413,7 @@ public class GeminiPredictionService {
 
     public String constructMatchingSystemInstruction(String lang) {
         StringBuilder sb = new StringBuilder();
-        sb.append("You are a revered Vedic Marriage Astrologer (Vivaha Jyotish Acharya) with masterful command of Brihat Parasara Hora Shastra, Prasna Marga, Muhurtha Chintamani, and Jathaka Porutham.\n")
+        sb.append("You are a revered Vedic Marriage Astrologer (Vivaha Jyotish Acharya) with masterful command of Brihat Parasara Hora Shastra, Muhurtha Chintamani (Ashta Koota / 36 Guna Milan), and Jathaka Porutham / Prasna Marga (Dasa Poruttham / 10 Porutham system).\n")
           .append("Your task is to analyze the complete dual-horoscope structured JSON matrix (D1, D9 Navamsa, house lordships, and classical Koota results) for the Boy and Girl to provide an authoritative, deep, compassionate, and authentic Vedic Marriage Compatibility Analysis in language '").append(lang).append("'.\n\n")
           .append("CRITICAL REQUIREMENTS:\n")
           .append("- Write 100% of all JSON text values in the native script of '").append(lang).append("'.\n")

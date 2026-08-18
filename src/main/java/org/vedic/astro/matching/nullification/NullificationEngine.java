@@ -30,6 +30,11 @@ public class NullificationEngine {
                 nullified = true;
                 reasonKey = "nullification.nadi.samerashi";
             }
+            // Same Nakshatra, different Rashis
+            else if (context.getBoyNakshatra() == context.getGirlNakshatra() && context.getBoyRashi() != context.getGirlRashi()) {
+                nullified = true;
+                reasonKey = "nullification.nadi.samenak_diffrashi";
+            }
             // Nakshatra lords are friends or identical
             else if (strict != StrictnessLevel.STRICT) {
                 String boyNakLord = getNakshatraLord(context.getBoyNakshatra());

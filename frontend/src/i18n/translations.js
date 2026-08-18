@@ -470,7 +470,14 @@ export const translations = {
     "activeYogasIdentified": "Active Auspicious Yogas",
     "activeDoshasIdentified": "Dosha & Remedial Guidance",
     "yearsSuffix": "Years",
-    "classicalLongevityRationale": "Classical Longevity Rationale"
+    "classicalLongevityRationale": "Classical Longevity Rationale",
+    "ttsPlay": "Read Out",
+    "ttsPause": "Pause",
+    "ttsResume": "Resume",
+    "ttsStop": "Stop",
+    "ttsSpeaking": "Reading aloud...",
+    "ttsReadAiBalan": "Read AI Predictions",
+    "ttsReadDailyBalan": "Read Today's Forecast"
   },
   "ta": {
     "dailyBalanTitle": "தனிப்பயனாக்கப்பட்ட இன்றைய ராசி பலன்",
@@ -939,7 +946,14 @@ export const translations = {
     "activeYogasIdentified": "ஜாதகத்தில் உள்ள சுப யோகங்கள்",
     "activeDoshasIdentified": "தோஷம் & பரிகார வழிகாட்டல்",
     "yearsSuffix": "ஆண்டுகள்",
-    "classicalLongevityRationale": "சாஸ்திர ஆயுள் விளக்கம்"
+    "classicalLongevityRationale": "சாஸ்திர ஆயுள் விளக்கம்",
+    "ttsPlay": "வாசிக்க",
+    "ttsPause": "இடைநிறுத்து",
+    "ttsResume": "தொடரவும்",
+    "ttsStop": "நிறுத்து",
+    "ttsSpeaking": "வாசிக்கிறது...",
+    "ttsReadAiBalan": "AI பலன்களை வாசி",
+    "ttsReadDailyBalan": "இன்றைய பலனை வாசி"
   },
   "hi": {
     "dailyBalanTitle": "व्यक्तिगत दैनिक राशिफल",
@@ -1408,7 +1422,14 @@ export const translations = {
     "activeYogasIdentified": "सक्रिय शुभ योग",
     "activeDoshasIdentified": "दोष एवं निवारण मार्गदर्शन",
     "yearsSuffix": "वर्ष",
-    "classicalLongevityRationale": "शास्त्रीय दीर्घायु तर्क"
+    "classicalLongevityRationale": "शास्त्रीय दीर्घायु तर्क",
+    "ttsPlay": "सुनें",
+    "ttsPause": "रोकें",
+    "ttsResume": "फिर से चलाएं",
+    "ttsStop": "बंद करें",
+    "ttsSpeaking": "पढ़ा जा रहा है...",
+    "ttsReadAiBalan": "AI फलादेश सुनें",
+    "ttsReadDailyBalan": "आज का राशिफल सुनें"
   },
   "te": {
     "dailyBalanTitle": "వ్యక్తిగత రోజువారీ రాశి ఫలితాలు",
@@ -1877,7 +1898,14 @@ export const translations = {
     "activeYogasIdentified": "సక్రియ శుభ యోగాలు",
     "activeDoshasIdentified": "దోషాలు మరియు పరిహార మార్గదర్శకత్వం",
     "yearsSuffix": "సంవత్సరాలు",
-    "classicalLongevityRationale": "శాస్త్రీయ ఆయుష్షు వివరణ"
+    "classicalLongevityRationale": "శాస్త్రీయ ఆయుష్షు వివరణ",
+    "ttsPlay": "వినండి",
+    "ttsPause": "పాజ్",
+    "ttsResume": "కొనసాగించు",
+    "ttsStop": "ఆపు",
+    "ttsSpeaking": "చదువుతోంది...",
+    "ttsReadAiBalan": "AI ఫలితాలను వినండి",
+    "ttsReadDailyBalan": "ఈరోజు ఫలితాలు వినండి"
   },
   "kn": {
     "dailyBalanTitle": "ವೈಯಕ್ತಿಕ ದೈನಂದಿನ ರಾಶಿ ಭವಿಷ್ಯ",
@@ -2346,7 +2374,14 @@ export const translations = {
     "activeYogasIdentified": "ಸಕ್ರಿಯ ಶುಭ ಯೋಗಗಳು",
     "activeDoshasIdentified": "ದೋಷ ಮತ್ತು ಪರಿಹಾರ ಮಾರ್ಗದರ್ಶನ",
     "yearsSuffix": "ವರ್ಷಗಳು",
-    "classicalLongevityRationale": "ಶಾಸ್ತ್ರೀಯ ಆಯುಷ್ಯ ವಿವರಣೆ"
+    "classicalLongevityRationale": "ಶಾಸ್ತ್ರೀಯ ಆಯುಷ್ಯ ವಿವರಣೆ",
+    "ttsPlay": "ಕೇಳಿ",
+    "ttsPause": "ವಿರಾಮ",
+    "ttsResume": "ಮುಂದುವರಿಸಿ",
+    "ttsStop": "ನಿಲ್ಲಿಸಿ",
+    "ttsSpeaking": "ಓದಲಾಗುತ್ತಿದೆ...",
+    "ttsReadAiBalan": "AI ಭವಿಷ್ಯವನ್ನು ಕೇಳಿ",
+    "ttsReadDailyBalan": "ಇಂದಿನ ಭವಿಷ್ಯ ಕೇಳಿ"
   },
   "ml": {
     "dailyBalanTitle": "വ്യക്തിഗത ദൈനംദിന രാശിഫലം",
@@ -2815,7 +2850,14 @@ export const translations = {
     "activeYogasIdentified": "സജീവ ശുഭ യോഗങ്ങൾ",
     "activeDoshasIdentified": "ദോഷവും പരിഹാര നിർദ്ദേശങ്ങളും",
     "yearsSuffix": "വർഷങ്ങൾ",
-    "classicalLongevityRationale": "ശാസ്ത്രീയ ആയുർദായ വിശദീകരണം"
+    "classicalLongevityRationale": "ശാസ്ത്രീയ ആയുർദായ വിശദീകരണം",
+    "ttsPlay": "വായിക്കുക",
+    "ttsPause": "താൽക്കാലികമായി നിർത്തുക",
+    "ttsResume": "തുടരുക",
+    "ttsStop": "നിർത്തുക",
+    "ttsSpeaking": "വായിക്കുന്നു...",
+    "ttsReadAiBalan": "AI ഫലങ്ങൾ വായിക്കുക",
+    "ttsReadDailyBalan": "ഇന്നത്തെ ഫലം വായിക്കുക"
   }
 };
 

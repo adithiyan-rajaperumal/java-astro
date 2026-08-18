@@ -331,9 +331,7 @@ public class PdfExportService {
 
                     PdfPCell dh2 = buildTableCell(ts.getLabel("pdf.doshas.hdr.status"), boldB, Element.ALIGN_CENTER);
                     dh2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
-                    doshaTab.addCell(dh2);
-
-                    PdfPCell dh3 = buildTableCell(ts.getLabel("pdf.doshas.hdr.remedy"), boldB, Element.ALIGN_CENTER);
+                        PdfPCell dh3 = buildTableCell(ts.getLabel("pdf.doshas.hdr.remedy"), boldB, Element.ALIGN_CENTER);
                     dh3.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                     doshaTab.addCell(dh3);
 
@@ -343,7 +341,6 @@ public class PdfExportService {
                                 ? ts.getLabel("pdf.status.nullified")
                                 : (d.isActive() ? ts.getLabel("pdf.status.active") : ts.getLabel("pdf.status.none"));
                         doshaTab.addCell(buildTableCell(statusStr, bFont, Element.ALIGN_CENTER));
-
                         String remedy = (d.getNullificationReason() != null ? d.getNullificationReason() + " " : "") +
                                 (d.getRemedySuggestion() != null ? d.getRemedySuggestion() : "");
                         doshaTab.addCell(buildTableCell(remedy.isBlank() ? "-" : remedy, bFont, Element.ALIGN_LEFT));
@@ -380,12 +377,14 @@ public class PdfExportService {
                 if (anchors.deities() != null) {
                     var d = anchors.deities();
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.ishta_devata"), boldB, Element.ALIGN_LEFT));
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? d.ishtaDevataTamil() : d.ishtaDevata(), bFont, Element.ALIGN_LEFT));
+                    String ishtaText = org.vedic.astro.util.AstrologicalTranslationHelper.translateDeity(d.ishtaDevata(), lang);
+                    anchTab.addCell(buildTableCell(ishtaText, bFont, Element.ALIGN_LEFT));
 
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.dharma_devata"), boldB, Element.ALIGN_LEFT));
-                    anchTab.addCell(buildTableCell("ta".equalsIgnoreCase(lang) ? d.dharmaDevataTamil() : d.dharmaDevata(), bFont, Element.ALIGN_LEFT));
+                    String dharmaText = org.vedic.astro.util.AstrologicalTranslationHelper.translateDeity(d.dharmaDevata(), lang);
+                    anchTab.addCell(buildTableCell(dharmaText, bFont, Element.ALIGN_LEFT));
 
-                    if (d.kulaDevataRemedy() != null) {
+                    if (d.kulaDevataRemedy() != null && !d.kulaDevataRemedy().isBlank()) {
                         anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.kula_devata"), boldB, Element.ALIGN_LEFT));
                         anchTab.addCell(buildTableCell(d.kulaDevataRemedy(), bFont, Element.ALIGN_LEFT));
                     }
@@ -394,16 +393,24 @@ public class PdfExportService {
                 if (anchors.gemology() != null) {
                     var g = anchors.gemology();
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.gemstone"), boldB, Element.ALIGN_LEFT));
-                    String gemDetails = ("ta".equalsIgnoreCase(lang) ? g.primaryGemstoneTamil() : g.primaryGemstone()) +
-                            " | " + g.recommendedMetal() + " | " + g.recommendedFinger() + " | " + g.activationDayAndTiming();
+                    String gemName = org.vedic.astro.util.AstrologicalTranslationHelper.translateGemstone(g.primaryGemstone(), lang);
+                    String metal = org.vedic.astro.util.AstrologicalTranslationHelper.translate(g.recommendedMetal(), lang);
+                    String finger = org.vedic.astro.util.AstrologicalTranslationHelper.translate(g.recommendedFinger(), lang);
+                    String timing = g.activationDayAndTiming() != null ? g.activationDayAndTiming() : "";
+                    String gemDetails = gemName + " | " + metal + " | " + finger + (timing.isEmpty() ? "" : " | " + timing);
                     anchTab.addCell(buildTableCell(gemDetails, bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.numerology() != null) {
                     var n = anchors.numerology();
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.numerology"), boldB, Element.ALIGN_LEFT));
-                    String numStr = "Driver: " + n.radicalDriverNumber() + " (" + n.radicalRulingPlanet() + ") | Conductor: " +
-                            n.destinyConductorNumber() + " (" + n.destinyRulingPlanet() + ") | Planet No: " + n.astrologicalPlanetNumber();
+                    String driverPlanet = org.vedic.astro.util.AstrologicalTranslationHelper.translate(n.radicalRulingPlanet(), lang);
+                    String conductorPlanet = org.vedic.astro.util.AstrologicalTranslationHelper.translate(n.destinyRulingPlanet(), lang);
+                    String driverLabel = ts.getLabel("birthDateDriver") != null ? ts.getLabel("birthDateDriver") : "Driver";
+                    String conductorLabel = ts.getLabel("destinyConductor") != null ? ts.getLabel("destinyConductor") : "Conductor";
+                    String numStr = driverLabel + ": " + n.radicalDriverNumber() + " (" + driverPlanet + ") | " +
+                            conductorLabel + ": " + n.destinyConductorNumber() + " (" + conductorPlanet + ") | " +
+                            ts.getLabel("astrologicalNumber") + ": " + n.astrologicalPlanetNumber();
                     anchTab.addCell(buildTableCell(numStr, bFont, Element.ALIGN_LEFT));
                 }
 
@@ -414,14 +421,20 @@ public class PdfExportService {
 
                 if (anchors.luckyDay() != null) {
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.lucky_day"), boldB, Element.ALIGN_LEFT));
-                    anchTab.addCell(buildTableCell(anchors.luckyDay().dayName() + " (" + anchors.luckyDay().rulingPlanet() + ") - " + anchors.luckyDay().auspiciousActivities(), bFont, Element.ALIGN_LEFT));
+                    String dayPlanet = org.vedic.astro.util.AstrologicalTranslationHelper.translate(anchors.luckyDay().rulingPlanet(), lang);
+                    String dayText = anchors.luckyDay().dayName() + " (" + dayPlanet + ") - " + anchors.luckyDay().auspiciousActivities();
+                    anchTab.addCell(buildTableCell(dayText, bFont, Element.ALIGN_LEFT));
                 }
 
                 if (anchors.directions() != null) {
                     anchTab.addCell(buildTableCell(ts.getLabel("pdf.lifeanchors.directions"), boldB, Element.ALIGN_LEFT));
-                    String dirStr = "Primary Vastu (Lagna): " + anchors.directions().primaryVastuDirection() +
-                            " | Secondary Vastu (Digbala): " + anchors.directions().secondaryVastuDirection() +
-                            " | Travel: " + anchors.directions().travelDirection();
+                    String primVastu = org.vedic.astro.util.AstrologicalTranslationHelper.translateDirection(anchors.directions().primaryVastuDirection(), lang);
+                    String secVastu = org.vedic.astro.util.AstrologicalTranslationHelper.translateDirection(anchors.directions().secondaryVastuDirection(), lang);
+                    String travelDir = org.vedic.astro.util.AstrologicalTranslationHelper.translateDirection(anchors.directions().travelDirection(), lang);
+                    String primLabel = ts.getLabel("pdf.lifeanchors.primary_vastu");
+                    String secLabel = ts.getLabel("pdf.lifeanchors.secondary_vastu");
+                    String travelLabel = ts.getLabel("travelDirection") != null ? ts.getLabel("travelDirection") : "Travel";
+                    String dirStr = primLabel + ": " + primVastu + " | " + secLabel + ": " + secVastu + " | " + travelLabel + ": " + travelDir;
                     anchTab.addCell(buildTableCell(dirStr, bFont, Element.ALIGN_LEFT));
                 }
 
@@ -458,8 +471,10 @@ public class PdfExportService {
                 h2.setBackgroundColor(java.awt.Color.LIGHT_GRAY);
                 ayuTab.addCell(h2);
 
+                String classTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateClassification(ayu.longevityClassification(), lang);
+                String rangeStr = ayu.lifespanRange() != null ? " (" + ayu.lifespanRange() + ")" : "";
                 ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.classification"), boldB, Element.ALIGN_LEFT));
-                ayuTab.addCell(buildTableCell(ayu.longevityClassification() + " (" + ayu.lifespanRange() + ")", bFont, Element.ALIGN_LEFT));
+                ayuTab.addCell(buildTableCell(classTrans + rangeStr, bFont, Element.ALIGN_LEFT));
 
                 if (ayu.criticalMarakaWindow() != null) {
                     ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.maraka_timeline"), boldB, Element.ALIGN_LEFT));

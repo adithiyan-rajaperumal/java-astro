@@ -1,5 +1,6 @@
 import React from 'react';
 import { t } from '../i18n/translations';
+import { useTextToSpeech } from '../utils/useTextToSpeech';
 
 function AiPredictionsView({
   report,
@@ -10,6 +11,8 @@ function AiPredictionsView({
   loading,
   error
 }) {
+  const tts = useTextToSpeech({ language });
+
   if (!predictions && !loading) {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--bg-card)' }}>
@@ -89,9 +92,58 @@ function AiPredictionsView({
   const yearlyList = predictions?.yearlyPredictions || [];
   const is10Year = predictions?.forecastMode === 'TEN_YEARS' || yearlyList.length <= 15;
 
+  const buildSpeechText = () => {
+    if (!predictions) return '';
+    const parts = [];
+
+    if (personality?.coreTemperament) {
+      parts.push(t('aiPersonalityBehaviorTitle', language) + '. ' + personality.coreTemperament);
+    }
+
+    if (milestones.length > 0) {
+      parts.push(t('retrospectiveMilestonesTitle', language));
+      milestones.forEach(m => {
+        parts.push((m.milestoneTitle || '') + (m.approxPeriod ? ' (' + m.approxPeriod + '): ' : ': ') + (m.eventNarrative || ''));
+      });
+    }
+
+    if (longevity) {
+      parts.push(t('aiLongevityAnalysisTitle', language));
+      if (longevity.calculatedAyulCeiling > 0) {
+        parts.push(t('aiCalculatedAyulCeiling', language) + ': ' + longevity.calculatedAyulCeiling + ' ' + t('yearsSuffix', language) + ' ' + (longevity.classification || ''));
+      }
+      if (longevity.primarySpanRationale) {
+        parts.push(longevity.primarySpanRationale);
+      }
+      if (longevity.activeYogasIdentified && longevity.activeYogasIdentified.length > 0) {
+        parts.push(t('activeYogasIdentified', language));
+        longevity.activeYogasIdentified.forEach(y => {
+          parts.push((y.yogaName || '') + ': ' + (y.effect || ''));
+        });
+      }
+      if (longevity.activeDoshasIdentified && longevity.activeDoshasIdentified.length > 0) {
+        parts.push(t('activeDoshasIdentified', language));
+        longevity.activeDoshasIdentified.forEach(d => {
+          parts.push((d.doshaName || '') + ': ' + (d.remedialAdvice || ''));
+        });
+      }
+    }
+
+    if (yearlyList.length > 0) {
+      parts.push(t('yearlyPredictionsStreamTitle', language));
+      yearlyList.forEach(yp => {
+        const yrIntro = `${yp.year}, ${t('yearAge', language)} ${yp.age}. ${yp.dasaBhukthi ? yp.dasaBhukthi + '.' : ''}`;
+        const narrative = yp.annualNarrative || yp.detailedPrediction || '';
+        parts.push(yrIntro + ' ' + narrative);
+      });
+    }
+
+    return parts.join('\n\n');
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* Top Status & Generation Bar */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+      {/* Top Status & Generation Bar with Text-to-Speech Player */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -104,9 +156,11 @@ function AiPredictionsView({
         padding: '12px 18px',
         fontSize: '13px',
         color: 'var(--text-secondary)',
-        boxShadow: 'var(--shadow)'
+        boxShadow: 'var(--shadow)',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <span style={{
             fontSize: '12px',
             fontWeight: 'bold',
@@ -130,7 +184,81 @@ function AiPredictionsView({
           )}
         </div>
 
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* TTS Audio Controls */}
+          {tts.isSupported && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '4px 8px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+            }}>
+              <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
+                🎙️ {tts.isPlaying ? (tts.isPaused ? '⏸' : '🔊') : ''}
+              </span>
+              {!tts.isPlaying ? (
+                <button
+                  onClick={() => tts.speak(buildSpeechText())}
+                  className="btn-primary"
+                  style={{ padding: '5px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  title={t('ttsReadAiBalan', language)}
+                >
+                  ▶ {t('ttsPlay', language)}
+                </button>
+              ) : (
+                <>
+                  {tts.isPaused ? (
+                    <button
+                      onClick={tts.resume}
+                      className="btn-primary"
+                      style={{ padding: '5px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      title={t('ttsResume', language)}
+                    >
+                      ▶ {t('ttsResume', language)}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={tts.pause}
+                      style={{
+                        background: 'var(--accent-gold)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '5px 12px',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                      }}
+                      title={t('ttsPause', language)}
+                    >
+                      ⏸ {t('ttsPause', language)}
+                    </button>
+                  )}
+                  <button
+                    onClick={tts.stop}
+                    style={{
+                      background: 'var(--danger)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '5px 12px',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      fontWeight: '600'
+                    }}
+                    title={t('ttsStop', language)}
+                  >
+                    ⏹ {t('ttsStop', language)}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
           <button
             onClick={() => onGenerate(true)}
             className="btn-primary"
@@ -150,12 +278,14 @@ function AiPredictionsView({
           borderLeft: '4px solid var(--accent-saffron)',
           borderRadius: '10px',
           padding: '20px',
-          background: 'var(--bg-card)'
+          background: 'var(--bg-card)',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           <h3 style={{ margin: '0 0 12px', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
             🧠 {t('aiPersonalityBehaviorTitle', language)}
           </h3>
-          <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--text-primary)', margin: 0 }}>
+          <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--text-primary)', margin: 0, wordBreak: 'break-word' }}>
             {personality.coreTemperament}
           </p>
         </div>
@@ -163,11 +293,11 @@ function AiPredictionsView({
 
       {/* 2. Retrospective Past Milestones Card */}
       {milestones.length > 0 && (
-        <div className="card" style={{ borderRadius: '10px', padding: '20px', background: 'var(--bg-card)' }}>
+        <div className="card" style={{ borderRadius: '10px', padding: '20px', background: 'var(--bg-card)', width: '100%', boxSizing: 'border-box' }}>
           <h3 style={{ margin: '0 0 16px', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
             🕰️ {t('retrospectiveMilestonesTitle', language)}
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '14px' }}>
             {milestones.map((m, idx) => (
               <div
                 key={idx}
@@ -178,7 +308,9 @@ function AiPredictionsView({
                   borderRight: '1px solid var(--border)',
                   borderBottom: '1px solid var(--border)',
                   borderRadius: '0 8px 8px 0',
-                  padding: '14px 16px'
+                  padding: '14px 16px',
+                  minWidth: 0,
+                  boxSizing: 'border-box'
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
@@ -191,7 +323,7 @@ function AiPredictionsView({
                     </span>
                   )}
                 </div>
-                <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
+                <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)', wordBreak: 'break-word' }}>
                   {m.eventNarrative}
                 </p>
               </div>
@@ -206,7 +338,9 @@ function AiPredictionsView({
           borderLeft: '4px solid var(--accent-gold)',
           borderRadius: '10px',
           padding: '20px',
-          background: 'var(--bg-card)'
+          background: 'var(--bg-card)',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
             <h3 style={{ margin: 0, color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
@@ -236,23 +370,26 @@ function AiPredictionsView({
               border: '1px solid var(--border)',
               borderRadius: '8px',
               padding: '12px 16px',
-              marginBottom: '16px'
+              marginBottom: '16px',
+              boxSizing: 'border-box'
             }}>
-              <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
+              <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)', wordBreak: 'break-word' }}>
                 📜 <strong>{t('classicalLongevityRationale', language)}:</strong> {longevity.primarySpanRationale}
               </p>
             </div>
           )}
 
           {/* Active Yogas & Active Doshas Subgrid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
             {/* Active Auspicious Yogas */}
             {longevity.activeYogasIdentified && longevity.activeYogasIdentified.length > 0 && (
               <div style={{
                 background: 'rgba(46, 125, 50, 0.04)',
                 border: '1px solid rgba(46, 125, 50, 0.25)',
                 borderRadius: '8px',
-                padding: '14px'
+                padding: '14px',
+                minWidth: 0,
+                boxSizing: 'border-box'
               }}>
                 <h4 style={{ margin: '0 0 10px', color: 'var(--success)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   ✨ {t('activeYogasIdentified', language)}
@@ -263,7 +400,7 @@ function AiPredictionsView({
                       <strong style={{ color: 'var(--accent-saffron)', fontSize: '13px', display: 'block', marginBottom: '2px' }}>
                         {y.yogaName}
                       </strong>
-                      <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.4', wordBreak: 'break-word' }}>
                         {y.effect}
                       </span>
                     </div>
@@ -278,7 +415,9 @@ function AiPredictionsView({
                 background: 'rgba(232, 93, 4, 0.04)',
                 border: '1px solid rgba(232, 93, 4, 0.25)',
                 borderRadius: '8px',
-                padding: '14px'
+                padding: '14px',
+                minWidth: 0,
+                boxSizing: 'border-box'
               }}>
                 <h4 style={{ margin: '0 0 10px', color: 'var(--accent-warm)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   🛡️ {t('activeDoshasIdentified', language)}
@@ -289,7 +428,7 @@ function AiPredictionsView({
                       <strong style={{ color: 'var(--danger)', fontSize: '13px', display: 'block', marginBottom: '2px' }}>
                         {d.doshaName}
                       </strong>
-                      <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.4', wordBreak: 'break-word' }}>
                         {d.remedialAdvice}
                       </span>
                     </div>
@@ -310,7 +449,7 @@ function AiPredictionsView({
         const yearRangeText = sYr && eYr ? ` (${sYr} – ${eYr}${sAge !== undefined && eAge !== undefined ? ` • ${language === 'ta' ? `வயது ${sAge} - ${eAge}` : `Age ${sAge} to ${eAge}`}` : ''})` : '';
 
         return (
-          <div className="card" style={{ borderRadius: '10px', padding: '20px', background: 'var(--bg-card)' }}>
+          <div className="card" style={{ borderRadius: '10px', padding: '20px', background: 'var(--bg-card)', width: '100%', boxSizing: 'border-box' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
               <h3 style={{ margin: 0, color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
                 📜 {t('yearlyPredictionsStreamTitle', language)}{yearRangeText}
@@ -328,7 +467,7 @@ function AiPredictionsView({
               </span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '16px' }}>
               {yearlyList.map((yp, idx) => {
                 const narrative = yp.annualNarrative || yp.detailedPrediction || '';
 
@@ -343,7 +482,9 @@ function AiPredictionsView({
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '12px',
-                      boxShadow: 'var(--shadow)'
+                      boxShadow: 'var(--shadow)',
+                      minWidth: 0,
+                      boxSizing: 'border-box'
                     }}
                   >
                     {/* Header */}
@@ -380,9 +521,10 @@ function AiPredictionsView({
                         background: 'var(--bg-primary)',
                         border: '1px solid var(--border)',
                         borderRadius: '6px',
-                        padding: '12px'
+                        padding: '12px',
+                        boxSizing: 'border-box'
                       }}>
-                        <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-primary)', lineHeight: '1.7', textAlign: 'justify' }}>
+                        <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-primary)', lineHeight: '1.7', textAlign: 'justify', wordBreak: 'break-word' }}>
                           {narrative}
                         </p>
                       </div>

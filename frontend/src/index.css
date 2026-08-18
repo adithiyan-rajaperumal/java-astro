@@ -998,3 +998,16 @@ input:focus, select:focus {
 .horai-table tr:nth-child(even) {
   background-color: #fafafa;
 }
+
+/* AI Balan & Prediction Card Mobile Safeguards */
+@media (max-width: 600px) {
+  .card {
+    padding: 14px 12px !important;
+    overflow-x: hidden !important;
+    word-break: break-word !important;
+  }
+  .grid-2, .grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
