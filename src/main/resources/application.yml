@@ -51,3 +51,4 @@ pdf:
   include-life-anchors: ${PDF_INCLUDE_LIFE_ANCHORS:true}
   include-ayurdaya: ${PDF_INCLUDE_AYURDAYA:true}
   include-yogas-doshams: ${PDF_INCLUDE_YOGAS_DOSHAMS:true}
+  include-ayurvedic-health: ${PDF_INCLUDE_AYURVEDIC_HEALTH:true}

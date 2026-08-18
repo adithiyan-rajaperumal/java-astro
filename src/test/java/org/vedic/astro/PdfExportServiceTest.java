@@ -185,6 +185,8 @@ public class PdfExportServiceTest {
         org.vedic.astro.config.PdfExportProperties customProps = new org.vedic.astro.config.PdfExportProperties();
         customProps.setIncludeLifeAnchors(true);
         customProps.setIncludeYogasDoshams(true);
+        customProps.setIncludeAyurdaya(true);
+        customProps.setIncludeAyurvedicHealth(true);
         customProps.setIncludeAiPredictions(true);
 
         org.vedic.astro.service.PdfExportService customPdfService = new org.vedic.astro.service.PdfExportService(
@@ -240,5 +242,27 @@ public class PdfExportServiceTest {
         byte[] pdfBytes = pdfExportService.generateAstrologyReport(report);
         assertNotNull(pdfBytes);
         assertTrue(pdfBytes.length > 5000);
+    }
+
+    @Test
+    public void testUthayasriHoroscopeFullExportAll6Languages() {
+        String[] languages = {"ta", "hi", "te", "kn", "ml", "en"};
+
+        BirthDetailsDTO birth = new BirthDetailsDTO("Uthayasri", 1998, 10, 14, 6, 30, 0, 13.0827, 80.2707, "LAHIRI");
+        var panchangam = panchangamFactory.getEngine(org.vedic.astro.panchangam.PanchangamType.DRIK_TIRUKANITHAM);
+        var chartResult = panchangam.calculate(birth);
+
+        ComprehensiveReportDTO report = orchestrationService.compileComprehensivePdfData(chartResult, birth, new double[12]);
+        assertNotNull(report.getStructuralDiagnostics());
+        assertNotNull(report.getAyurvedicHealth());
+        assertNotNull(report.getLifeAnchors());
+        assertNotNull(report.getAyurdayaProfile());
+
+        for (String lang : languages) {
+            LocaleContextHolder.setLocale(new Locale(lang));
+            byte[] pdf = pdfExportService.generateAstrologyReport(report);
+            assertNotNull(pdf, "PDF generation failed for " + lang);
+            assertTrue(pdf.length > 5000, "PDF size too small for " + lang + ": " + pdf.length);
+        }
     }
 }

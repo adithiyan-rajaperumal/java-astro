@@ -27,6 +27,10 @@ public class ZodiacUtils {
         return VEDIC_RASHIS[signNumber - 1];
     }
 
+    public static String getRashiName(int signNumber) {
+        return getVedicRashi(signNumber);
+    }
+
     public static int getNakshatraNumber(double absoluteLongitude) {
         double boundedLong = ((absoluteLongitude % 360.0) + 360.0) % 360.0;
         int index = (int) (boundedLong / (360.0 / 27.0)) + 1;
