@@ -32,7 +32,7 @@ astro:
 
 gemini:
   api-key: ${GEMINI_API_KEY:enc:QVEuQWI4Uk42SnB2Q3pJcU1QWjh5SXhGVExXZmhWeUlONk9xb3I5RFFGNFVxSGcyTjFQRXc}
-  backup-api-key: ${GEMINI_BACKUP_API_KEY:}
+  backup-api-key: ${GEMINI_BACKUP_API_KEY:enc:QVEuQWI4Uk42SXJyVnl0VmFmemNwUmNXeDZtQzFCc0gzZzRYR1JhYlJ6b2dtRVVVV01ST2c}
   enabled: ${GEMINI_ENABLED:true}
   life-predictions-enabled: ${GEMINI_LIFE_PREDICTIONS_ENABLED:true}
   daily-balan-enabled: ${GEMINI_DAILY_BALAN_ENABLED:true}
