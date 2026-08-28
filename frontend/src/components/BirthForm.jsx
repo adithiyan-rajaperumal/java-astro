@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import LocationSearch from './LocationSearch';
+import ClearableInput from './ClearableInput';
 import { t } from '../i18n/translations';
 
 function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang = 'en' }) {
@@ -82,10 +83,11 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
     <form onSubmit={handleSubmit} className="card">
       <div style={{ marginBottom: '15px' }}>
         <label>{t('name', lang)}</label>
-        <input
+        <ClearableInput
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onClear={() => setName('')}
           placeholder="Enter name"
           required
         />
@@ -94,10 +96,11 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
       <div className="grid-2">
         <div>
           <label>{t('birthDate', lang)} (DD/MM/YYYY)</label>
-          <input
+          <ClearableInput
             type="text"
             value={dateText}
             onChange={(e) => handleDateChange(e.target.value)}
+            onClear={() => setDateText('')}
             placeholder="DD/MM/YYYY"
             maxLength="10"
             required
@@ -105,10 +108,11 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
         </div>
         <div>
           <label>{t('birthTime', lang)}</label>
-          <input
+          <ClearableInput
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
+            onClear={() => setTime('')}
             required
           />
         </div>

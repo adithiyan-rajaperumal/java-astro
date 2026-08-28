@@ -222,10 +222,48 @@ input:focus, select:focus {
   border-radius: 6px;
 }
 
-/* Autocomplete Container */
+/* Autocomplete & Clearable Inputs */
+.input-clearable-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.input-clearable-wrapper input {
+  padding-right: 32px !important;
+  width: 100%;
+  margin-bottom: 0 !important;
+}
+.input-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.15s ease;
+  z-index: 2;
+}
+.input-clear-btn:hover {
+  color: var(--accent-saffron);
+  background-color: rgba(255, 107, 0, 0.12);
+}
 .autocomplete-container {
   position: relative;
   width: 100%;
+}
+.autocomplete-container input {
+  padding-right: 32px !important;
 }
 .autocomplete-dropdown {
   position: absolute;
