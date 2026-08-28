@@ -115,15 +115,14 @@ public class Panchangam120DaysChennaiValidationTest {
                 assertFalse(dto.muhurthamDay(), "Thithi Soonya day must NOT be a Subha Muhurtham day on: " + currentDate);
             }
 
-            if (dto.yogam().number() == 17) {
-                vyatipataCount++;
-                assertFalse(dto.muhurthamDay(), "Vyatipata Yoga day must NOT be a Subha Muhurtham day on: " + currentDate);
+            if (dto.yogam().number() == 1 || dto.yogam().number() == 6 || dto.yogam().number() == 9
+                    || dto.yogam().number() == 10 || dto.yogam().number() == 13 || dto.yogam().number() == 15
+                    || dto.yogam().number() == 17 || dto.yogam().number() == 19 || dto.yogam().number() == 27) {
+                assertFalse(dto.muhurthamDay(), "Inauspicious Nitya Yoga (" + dto.yogam().number() + ") must NOT be Subha Muhurtham on: " + currentDate);
             }
 
-            if (dto.yogam().number() == 27) {
-                vaidhritiCount++;
-                assertFalse(dto.muhurthamDay(), "Vaidhriti Yoga day must NOT be a Subha Muhurtham day on: " + currentDate);
-            }
+            if (dto.yogam().number() == 17) vyatipataCount++;
+            if (dto.yogam().number() == 27) vaidhritiCount++;
 
             if (dto.muhurthamDay()) {
                 subhaMuhurthamCount++;

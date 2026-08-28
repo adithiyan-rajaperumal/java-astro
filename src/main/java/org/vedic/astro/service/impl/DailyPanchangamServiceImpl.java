@@ -262,22 +262,43 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Agni Nakshathiram (Sun in Krittika Nakshatra = 3rd Nakshatra)
         boolean isAgniNakshathiram = (sunNakNum == 3);
 
-        // Auspicious Thithi Expansion (Include Dwadashi 12 & Purnima 15; exclude Rikta 4,9,14,19,24,29 & Amavasya 30)
-        boolean isAuspiciousThithi = (thithiIdx == 2 || thithiIdx == 3 || thithiIdx == 5 || thithiIdx == 7 || thithiIdx == 10 
-                || thithiIdx == 11 || thithiIdx == 12 || thithiIdx == 13 || thithiIdx == 15 || thithiIdx == 17 
-                || thithiIdx == 18 || thithiIdx == 20 || thithiIdx == 22 || thithiIdx == 25 || thithiIdx == 26 || thithiIdx == 28);
+        // 6 Ghatikas (2.4 hours / ~08:30 AM) Cutoff for Daytime Muhurtham Dominance
+        double cutoffJd = jdSunrise + (6.0 / 60.0);
 
-        // Auspicious Nakshatra
-        boolean isAuspiciousNakshatra = (nakIdx == 1 || nakIdx == 4 || nakIdx == 5 || nakIdx == 8 || nakIdx == 12 
-                || nakIdx == 13 || nakIdx == 14 || nakIdx == 15 || nakIdx == 17 || nakIdx == 21 
-                || nakIdx == 22 || nakIdx == 23 || nakIdx == 24 || nakIdx == 26 || nakIdx == 27);
+        // Transitions for Thithi and Nakshatra
+        double thithiTargetVal = thithiIdx * 12.0;
+        double thithiEndJd = findTransitionTime(jdSunrise, jdSunrise + 1.2, thithiTargetVal, jd -> {
+            double[] coords = getSunMoonLongitude(jd, ayanamsaType);
+            return (coords[1] - coords[0] + 720.0) % 360.0;
+        });
+
+        double nakTargetVal = nakIdx * (360.0 / 27.0);
+        double nakEndJd = findTransitionTime(jdSunrise, jdSunrise + 1.2, nakTargetVal, jd -> getMoonLongitude(jd, ayanamsaType));
+
+        // Daytime Dominant Thithi (if sunrise thithi expires within 6 ghatikas, daytime is ruled by the next thithi)
+        int daytimeThithiIdx = thithiIdx;
+        if (thithiEndJd > 0 && thithiEndJd < cutoffJd) {
+            daytimeThithiIdx = (thithiIdx % 30) + 1;
+        }
+        boolean isAuspiciousThithi = isAuspiciousThithiNumber(daytimeThithiIdx);
+
+        // Daytime Dominant Nakshatra (if sunrise star expires within 6 ghatikas, daytime is ruled by the next star)
+        int daytimeNakIdx = nakIdx;
+        if (nakEndJd > 0 && nakEndJd < cutoffJd) {
+            daytimeNakIdx = (nakIdx % 27) + 1;
+        }
+        boolean isAuspiciousNakshatra = isAuspiciousNakshatraNumber(daytimeNakIdx);
+
+        // Daytime Nakshatra-Vara Yogam (0=Amrita, 1=Siddha, 2=Marana, 3=Prabalarishta)
+        int daytimeYogamType = NAKSHATRA_VARA_YOGAMS[dayOfWeek0][daytimeNakIdx - 1];
+        boolean isAuspiciousNakVaraYogam = (daytimeYogamType == 0 || daytimeYogamType == 1);
 
         // Karanam check (Exclude Vishti Karanam = 7)
         boolean isAuspiciousKaranam = (karanamIdx != 7);
 
-        // Solar Rashi (Exclude Margazhi = 9)
+        // Solar Rashi Month Exclusions (Exclude Margazhi = 9, Purattasi = 6, Aadi = 4 for Subha Muhurtham)
         int solarRashi = (int) (coordinatesSun[0] / 30.0) + 1;
-        boolean isAuspiciousMonth = (solarRashi != 9);
+        boolean isAuspiciousMonth = (solarRashi != 9 && solarRashi != 6 && solarRashi != 4);
 
         // Masa Sankranti Day Detection (Sun Ingress into new sign between today's sunrise and next sunrise)
         double sunLongNextSunrise = getSunLongitude(jdNextSunrise, ayanamsaType);
@@ -290,11 +311,13 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         boolean isGuruMoudhya = Math.abs(angularDiff(sunLong, jupiterLong)) < 11.0;
         boolean isSukraMoudhya = Math.abs(angularDiff(sunLong, venusLong)) < 8.0;
 
-        // Thithi Soonya (Dagda Rashi) Validation
-        boolean isThithiSoonya = isMoonInThithiSoonya(thithiIdx, rashiNum);
+        // Thithi Soonya (Dagda Rashi) Validation on daytime Thithi
+        boolean isThithiSoonya = isMoonInThithiSoonya(daytimeThithiIdx, rashiNum);
 
-        // Nitya Yoga Mahadosha check (Strictly exclude Vyatipata #17 and Vaidhriti #27)
-        boolean isNityaYogaAuspicious = (yogamIdx != 17 && yogamIdx != 27);
+        // Nitya Yoga Mahadoshas & Adverse Yogas Exclusion
+        // Exclude: 1 (Vishkambha), 6 (Atiganda), 9 (Shoola), 10 (Ganda), 13 (Vyaghata), 15 (Vajra), 17 (Vyatipata), 19 (Parigha), 27 (Vaidhriti)
+        boolean isNityaYogaAuspicious = (yogamIdx != 1 && yogamIdx != 6 && yogamIdx != 9 && yogamIdx != 10 
+                && yogamIdx != 13 && yogamIdx != 15 && yogamIdx != 17 && yogamIdx != 19 && yogamIdx != 27);
 
         // Subha Muhurtham Day Calculation
         boolean isMuhurthamDay = (date.getDayOfWeek() != DayOfWeek.TUESDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY)
@@ -307,33 +330,56 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 && !isSukraMoudhya
                 && !isThithiSoonya
                 && isNityaYogaAuspicious
-                && (yogamTypeAtSunrise == 0 || yogamTypeAtSunrise == 1) // Must be Amrita or Siddha Yogam
-                && (netram > 0 && jeevan > 0);
+                && isAuspiciousNakVaraYogam
+                && (netram > 0 && jeevan > 0.0);
 
         // Muhurtham Timing Window Resolution
         String muhurthamWindow = null;
         if (isMuhurthamDay) {
-            String thithiEnd = thithiDTO.endTime();
-            String nakEnd = nakshatraDTO.endTime();
-            boolean thithiAllDay = thithiEnd == null || thithiEnd.contains("day") || thithiEnd.contains("நாள்") || thithiEnd.equals("--:--");
-            boolean nakAllDay = nakEnd == null || nakEnd.contains("day") || nakEnd.contains("நாள்") || nakEnd.equals("--:--");
+            boolean startsAfterThithi = (thithiEndJd > 0 && thithiEndJd < cutoffJd && !isAuspiciousThithiNumber(thithiIdx));
+            boolean startsAfterNak = (nakEndJd > 0 && nakEndJd < cutoffJd && !isAuspiciousNakshatraNumber(nakIdx));
 
-            if (thithiAllDay && nakAllDay) {
-                muhurthamWindow = translationService.getLabel("panchangam.throughout_day");
-                if (muhurthamWindow == null || muhurthamWindow.startsWith("panchangam.")) muhurthamWindow = "Throughout the day";
-            } else if (!thithiAllDay && nakAllDay) {
-                muhurthamWindow = thithiEnd;
-            } else if (thithiAllDay && !nakAllDay) {
-                muhurthamWindow = nakEnd;
+            String startTimeStr = null;
+            if (startsAfterThithi && startsAfterNak) {
+                startTimeStr = (thithiEndJd > nakEndJd) ? thithiDTO.endTime() : nakshatraDTO.endTime();
+            } else if (startsAfterThithi) {
+                startTimeStr = thithiDTO.endTime();
+            } else if (startsAfterNak) {
+                startTimeStr = nakshatraDTO.endTime();
+            }
+
+            // Find daytime expiration
+            String endTimeStr = null;
+            if (thithiEndJd >= cutoffJd && thithiEndJd < jdSunset) {
+                endTimeStr = thithiDTO.endTime();
+            }
+            if (nakEndJd >= cutoffJd && nakEndJd < jdSunset) {
+                if (endTimeStr == null || nakEndJd < thithiEndJd) {
+                    endTimeStr = nakshatraDTO.endTime();
+                }
+            }
+
+            if (startTimeStr != null && endTimeStr != null) {
+                muhurthamWindow = startTimeStr + " - " + endTimeStr;
+            } else if (startTimeStr != null) {
+                String afterLabel = translationService.getLabel("panchangam.after_time");
+                if (afterLabel == null || afterLabel.startsWith("panchangam.")) afterLabel = "After";
+                muhurthamWindow = afterLabel + " " + startTimeStr;
+            } else if (endTimeStr != null) {
+                String untilLabel = translationService.getLabel("panchangam.until_time");
+                if (untilLabel == null || untilLabel.startsWith("panchangam.")) untilLabel = "Until";
+                muhurthamWindow = untilLabel + " " + endTimeStr;
             } else {
-                muhurthamWindow = thithiEnd;
+                String throughoutDayLabel = translationService.getLabel("panchangam.throughout_day");
+                if (throughoutDayLabel == null || throughoutDayLabel.startsWith("panchangam.")) throughoutDayLabel = "Throughout the day";
+                muhurthamWindow = throughoutDayLabel;
             }
         }
 
         // Vasthu Result
         VasthuResult vasthu = calculateVasthuDetails(jdSunrise, jdSunset, coordinatesSun[0], dayOfWeek0, yogamTypeAtSunrise, zoneId, ayanamsaType);
 
-        boolean isTheiPirai = (thithiIdx > 15);
+        boolean isTheiPirai = (daytimeThithiIdx > 15);
 
         return new DailyPanchangamDTO(
             date.toString(),
@@ -481,6 +527,18 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         {3, 6, 9, 12},  // 29: Krishna Chaturdashi -> Mithuna (3), Kanya (6), Dhanus (9), Meena (12)
         {}              // 30: Amavasya -> None
     };
+
+    private boolean isAuspiciousThithiNumber(int thithiIdx) {
+        return (thithiIdx == 2 || thithiIdx == 3 || thithiIdx == 5 || thithiIdx == 7 || thithiIdx == 10 
+                || thithiIdx == 11 || thithiIdx == 12 || thithiIdx == 13 || thithiIdx == 15 || thithiIdx == 17 
+                || thithiIdx == 18 || thithiIdx == 20 || thithiIdx == 22 || thithiIdx == 25 || thithiIdx == 26 || thithiIdx == 28);
+    }
+
+    private boolean isAuspiciousNakshatraNumber(int nakIdx) {
+        return (nakIdx == 1 || nakIdx == 4 || nakIdx == 5 || nakIdx == 7 || nakIdx == 8 || nakIdx == 12 
+                || nakIdx == 13 || nakIdx == 14 || nakIdx == 15 || nakIdx == 17 || nakIdx == 21 
+                || nakIdx == 22 || nakIdx == 23 || nakIdx == 24 || nakIdx == 26 || nakIdx == 27);
+    }
 
     private boolean isMoonInThithiSoonya(int thithiIdx, int moonRashi) {
         if (thithiIdx >= 1 && thithiIdx <= 30) {
