@@ -75,5 +75,6 @@ public class PanchangamCalculationTest {
             }
         }
         System.out.println("Total Authentic Subha Muhurtham Days in 2026: " + totalMuhurthamDays);
+        assertTrue(totalMuhurthamDays >= 10, "Expected authentic Subha Muhurtham days in 2026, found: " + totalMuhurthamDays);
     }
 }
