@@ -454,9 +454,15 @@ function PanchangamPage({ settings }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ color: data.muhurthamDay ? (data.isTheiPirai ? '#e65100' : 'var(--success)') : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px', lineHeight: '1.5', wordBreak: 'break-word' }}>
                     {data.muhurthamDay 
-                      ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : '')
+                      ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.muhurthamWindow ? ` (${data.muhurthamWindow})` : '') + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : '')
                       : '❌ ' + t('inauspiciousDay', settings.language)}
                   </div>
+
+                  {data.sankrantiDay && (
+                    <div style={{ background: 'rgba(255, 107, 0, 0.12)', border: '1px solid var(--accent-saffron)', color: 'var(--accent-warm)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
+                      ☀️ {t('sankrantiDay', settings.language)}
+                    </div>
+                  )}
 
                   {data.isAgniNakshathiram && (
                     <div style={{ background: 'rgba(255, 152, 0, 0.15)', border: '1px solid #ff9800', color: '#ff9800', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
@@ -467,6 +473,24 @@ function PanchangamPage({ settings }) {
                   {data.vasthuDay && (
                     <div style={{ background: data.isTheiPirai ? '#fff3e0' : '#e8f5e9', border: `1px solid ${data.isTheiPirai ? '#ffe0b2' : '#a5d6a7'}`, color: data.isTheiPirai ? '#e65100' : '#2e7d32', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4', wordBreak: 'break-word' }}>
                       🏡 {t('vasthuTitle', settings.language)} {data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', settings.language)}` : ''}
+                    </div>
+                  )}
+
+                  {data.guruMoudhya && (
+                    <div style={{ background: 'rgba(237, 108, 2, 0.12)', border: '1px solid var(--warning)', color: 'var(--warning)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
+                      ⚠️ {t('guruMoudhya', settings.language)}
+                    </div>
+                  )}
+
+                  {data.sukraMoudhya && (
+                    <div style={{ background: 'rgba(237, 108, 2, 0.12)', border: '1px solid var(--warning)', color: 'var(--warning)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
+                      ⚠️ {t('sukraMoudhya', settings.language)}
+                    </div>
+                  )}
+
+                  {data.thithiSoonya && (
+                    <div style={{ background: 'rgba(100, 100, 100, 0.08)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
+                      🌑 {t('thithiSoonya', settings.language)}
                     </div>
                   )}
                 </div>

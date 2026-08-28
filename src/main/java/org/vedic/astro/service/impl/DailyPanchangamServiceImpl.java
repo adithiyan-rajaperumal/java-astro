@@ -279,14 +279,56 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         int solarRashi = (int) (coordinatesSun[0] / 30.0) + 1;
         boolean isAuspiciousMonth = (solarRashi != 9);
 
+        // Masa Sankranti Day Detection (Sun Ingress into new sign between today's sunrise and next sunrise)
+        double sunLongNextSunrise = getSunLongitude(jdNextSunrise, ayanamsaType);
+        int solarRashiNextSunrise = (int) (sunLongNextSunrise / 30.0) + 1;
+        boolean isSankrantiDay = (solarRashi != solarRashiNextSunrise);
+
+        // Guru (Jupiter) and Sukra (Venus) Moudhya (Combustion / Asthamanam)
+        double jupiterLong = getPlanetLongitude(jdSunrise, SweConst.SE_JUPITER, ayanamsaType);
+        double venusLong = getPlanetLongitude(jdSunrise, SweConst.SE_VENUS, ayanamsaType);
+        boolean isGuruMoudhya = Math.abs(angularDiff(sunLong, jupiterLong)) < 11.0;
+        boolean isSukraMoudhya = Math.abs(angularDiff(sunLong, venusLong)) < 8.0;
+
+        // Thithi Soonya (Dagda Rashi) Validation
+        boolean isThithiSoonya = isMoonInThithiSoonya(thithiIdx, rashiNum);
+
+        // Nitya Yoga Mahadosha check (Strictly exclude Vyatipata #17 and Vaidhriti #27)
+        boolean isNityaYogaAuspicious = (yogamIdx != 17 && yogamIdx != 27);
+
         // Subha Muhurtham Day Calculation
         boolean isMuhurthamDay = (date.getDayOfWeek() != DayOfWeek.TUESDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY)
                 && isAuspiciousThithi
                 && isAuspiciousNakshatra
                 && isAuspiciousKaranam
                 && isAuspiciousMonth
+                && !isSankrantiDay
+                && !isGuruMoudhya
+                && !isSukraMoudhya
+                && !isThithiSoonya
+                && isNityaYogaAuspicious
                 && (yogamTypeAtSunrise == 0 || yogamTypeAtSunrise == 1) // Must be Amrita or Siddha Yogam
                 && (netram > 0 && jeevan > 0);
+
+        // Muhurtham Timing Window Resolution
+        String muhurthamWindow = null;
+        if (isMuhurthamDay) {
+            String thithiEnd = thithiDTO.endTime();
+            String nakEnd = nakshatraDTO.endTime();
+            boolean thithiAllDay = thithiEnd == null || thithiEnd.contains("day") || thithiEnd.contains("நாள்") || thithiEnd.equals("--:--");
+            boolean nakAllDay = nakEnd == null || nakEnd.contains("day") || nakEnd.contains("நாள்") || nakEnd.equals("--:--");
+
+            if (thithiAllDay && nakAllDay) {
+                muhurthamWindow = translationService.getLabel("panchangam.throughout_day");
+                if (muhurthamWindow == null || muhurthamWindow.startsWith("panchangam.")) muhurthamWindow = "Throughout the day";
+            } else if (!thithiAllDay && nakAllDay) {
+                muhurthamWindow = thithiEnd;
+            } else if (thithiAllDay && !nakAllDay) {
+                muhurthamWindow = nakEnd;
+            } else {
+                muhurthamWindow = thithiEnd;
+            }
+        }
 
         // Vasthu Result
         VasthuResult vasthu = calculateVasthuDetails(jdSunrise, jdSunset, coordinatesSun[0], dayOfWeek0, yogamTypeAtSunrise, zoneId, ayanamsaType);
@@ -321,7 +363,12 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             isAgniNakshathiram,
             isTheiPirai,
             vasthu.vasthuNeram(),
-            vasthu.vasthuPujaNeram()
+            vasthu.vasthuPujaNeram(),
+            isSankrantiDay,
+            isGuruMoudhya,
+            isSukraMoudhya,
+            isThithiSoonya,
+            muhurthamWindow
         );
     }
 
@@ -399,6 +446,62 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         list.add(localized);
 
         return list;
+    }
+
+    private static final int[][] THITHI_SOONYA_RASHIS = {
+        {}, // 0 unused
+        {7, 10},        // 1: Shukla Prathama -> Tula (7), Makara (10)
+        {9, 12},        // 2: Dvitiya -> Dhanus (9), Meena (12)
+        {5, 10},        // 3: Tritiya -> Simha (5), Makara (10)
+        {11, 2},        // 4: Chaturthi -> Kumbha (11), Vrishabha (2)
+        {3, 6},         // 5: Panchami -> Mithuna (3), Kanya (6)
+        {1, 5},         // 6: Shashthi -> Mesha (1), Simha (5)
+        {9, 4},         // 7: Saptami -> Dhanus (9), Kataka (4)
+        {3, 6},         // 8: Ashtami -> Mithuna (3), Kanya (6)
+        {5, 8},         // 9: Navami -> Simha (5), Vrischika (8)
+        {5, 8},         // 10: Dashami -> Simha (5), Vrischika (8)
+        {9, 12},        // 11: Ekadashi -> Dhanus (9), Meena (12)
+        {7, 10},        // 12: Dvadashi -> Tula (7), Makara (10)
+        {2, 5},         // 13: Trayodashi -> Vrishabha (2), Simha (5)
+        {3, 6, 9, 12},  // 14: Chaturdashi -> Mithuna (3), Kanya (6), Dhanus (9), Meena (12)
+        {},             // 15: Purnima -> None
+        {7, 10},        // 16: Krishna Prathama -> Tula (7), Makara (10)
+        {9, 12},        // 17: Krishna Dvitiya -> Dhanus (9), Meena (12)
+        {5, 10},        // 18: Krishna Tritiya -> Simha (5), Makara (10)
+        {11, 2},        // 19: Krishna Chaturthi -> Kumbha (11), Vrishabha (2)
+        {3, 6},         // 20: Krishna Panchami -> Mithuna (3), Kanya (6)
+        {1, 5},         // 21: Krishna Shashthi -> Mesha (1), Simha (5)
+        {9, 4},         // 22: Krishna Saptami -> Dhanus (9), Kataka (4)
+        {3, 6},         // 23: Krishna Ashtami -> Mithuna (3), Kanya (6)
+        {5, 8},         // 24: Krishna Navami -> Simha (5), Vrischika (8)
+        {5, 8},         // 25: Krishna Dashami -> Simha (5), Vrischika (8)
+        {9, 12},        // 26: Krishna Ekadashi -> Dhanus (9), Meena (12)
+        {7, 10},        // 27: Krishna Dvadashi -> Tula (7), Makara (10)
+        {2, 5},         // 28: Krishna Trayodashi -> Vrishabha (2), Simha (5)
+        {3, 6, 9, 12},  // 29: Krishna Chaturdashi -> Mithuna (3), Kanya (6), Dhanus (9), Meena (12)
+        {}              // 30: Amavasya -> None
+    };
+
+    private boolean isMoonInThithiSoonya(int thithiIdx, int moonRashi) {
+        if (thithiIdx >= 1 && thithiIdx <= 30) {
+            for (int soonyaRashi : THITHI_SOONYA_RASHIS[thithiIdx]) {
+                if (soonyaRashi == moonRashi) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private double getPlanetLongitude(double jd, int planetConst, org.vedic.astro.model.AyanamsaType ayanamsaType) {
+        int calculationFlags = SweConst.SEFLG_SWIEPH | SweConst.SEFLG_SIDEREAL;
+        double[] xx = new double[6];
+        StringBuffer serr = new StringBuffer();
+        synchronized (swissEph) {
+            ayanamsaType.applyTo(swissEph);
+            swissEph.swe_calc_ut(jd, planetConst, calculationFlags, xx, serr);
+            return (xx[0] + 360.0) % 360.0;
+        }
     }
 
     private ZonedDateTime jdToZonedDateTime(double jd, ZoneId zoneId) {
