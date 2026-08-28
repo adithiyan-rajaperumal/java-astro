@@ -35,6 +35,12 @@
     </repositories>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Core Spring Web dependency for REST Endpoints & DTOs -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -134,7 +140,7 @@
                 <executions>
                     <execution>
                         <id>copy-frontend</id>
-                        <phase>prepare-package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>

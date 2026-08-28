@@ -16,6 +16,7 @@ import org.vedic.astro.service.ChartOrchestrationService;
 import org.vedic.astro.service.PdfExportService;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/v1/astrology")
@@ -34,9 +35,11 @@ public class ChartController {
         boolean lifeEnabled = geminiProperties != null && geminiProperties.isLifePredictionsEnabled();
         boolean dailyEnabled = geminiProperties != null && geminiProperties.isDailyBalanEnabled();
         boolean pdfEnabled = geminiProperties != null && geminiProperties.isPdfPredictionsEnabled();
-        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-3.6-flash";
+        String model = geminiProperties != null ? geminiProperties.getModel() : "gemini-3.7-flash";
         double temperature = geminiProperties != null ? geminiProperties.getTemperature() : 0.4;
         int thinkingBudget = geminiProperties != null ? geminiProperties.getThinkingBudget() : 1024;
+        String forecastMode = geminiProperties != null ? geminiProperties.getForecastMode() : "FULL_LIFESPAN";
+        int forecastYears = geminiProperties != null ? geminiProperties.getForecastYears() : 0;
         return ResponseEntity.ok(org.vedic.astro.dto.AppConfigDTO.builder()
                 .aiPredictionsEnabled(lifeEnabled)
                 .lifePredictionsEnabled(lifeEnabled)
@@ -45,13 +48,22 @@ public class ChartController {
                 .geminiModel(model)
                 .temperature(temperature)
                 .thinkingBudget(thinkingBudget)
+                .forecastMode(forecastMode)
+                .forecastYears(forecastYears)
                 .build());
     }
 
     @PostMapping(path = "/calculate", produces = "application/json;charset=UTF-8")
     public ResponseEntity<ChartUiResponseDTO> calculateNatalCharts(
             @RequestBody BirthDetailsDTO birthDetails,
-            @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType) {
+            @RequestParam(defaultValue = "DRIK_TIRUKANITHAM") PanchangamType systemType,
+            @RequestParam(required = false) String language,
+            @RequestHeader(value = "Accept-Language", defaultValue = "en") String acceptLanguage) {
+
+        String lang = (language != null && !language.isBlank()) ? language : acceptLanguage;
+        if (lang != null && !lang.isBlank()) {
+            org.springframework.context.i18n.LocaleContextHolder.setLocale(new Locale(lang.split("[,;_-]")[0]));
+        }
 
         // Factory resolves strategy pattern dynamically
         PanchangamEngine engine = panchangamFactory.getEngine(systemType);

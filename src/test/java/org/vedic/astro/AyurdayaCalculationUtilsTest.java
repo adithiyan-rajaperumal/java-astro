@@ -1,0 +1,336 @@
+package org.vedic.astro;
+
+import org.junit.jupiter.api.Test;
+import org.vedic.astro.dto.ChartResponseDTO;
+import org.vedic.astro.dto.ShadbalaDTO;
+import org.vedic.astro.model.DasaPeriod;
+import org.vedic.astro.util.AyurdayaCalculationUtils;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class AyurdayaCalculationUtilsTest {
+
+    @Test
+    public void testAyurdayaCalculationForPoornayuNative() {
+        // Sagittarius Lagna (Sign 9 - Dual)
+        int lagnaSign = 9;
+        // Moon in Cancer (Sign 4 - Movable)
+        int moonSign = 4;
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        // Lagna in Sagittarius
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(9).rashiName("Dhanus").degreeInSign(10.0).build());
+        // Lagna Lord Jupiter in Cancer (Sign 4 - Movable, Exalted in 8th)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").displayName("Jupiter").signNumber(4).rashiName("Kataka").degreeInSign(5.0).build());
+        // 8th Lord Moon in Cancer (Sign 4 - Movable, Own Sign)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(4).rashiName("Kataka").degreeInSign(15.0).build());
+        // Saturn in Libra (Sign 7 - Movable, Exalted in 11th)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(7).rashiName("Tula").degreeInSign(20.0).build());
+        // Sun in Aries (Sign 1 - Movable, Exalted in 5th)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SUN").displayName("Sun").signNumber(1).rashiName("Mesha").degreeInSign(10.0).build());
+        // Mars in Capricorn (Sign 10 - Movable, Exalted in 2nd)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MARS").displayName("Mars").signNumber(10).rashiName("Makara").degreeInSign(28.0).build());
+        // Venus in Taurus (Sign 2 - Fixed, Own Sign in 6th)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").displayName("Venus").signNumber(2).rashiName("Vrishabha").degreeInSign(15.0).build());
+        // Mercury in Cancer (Sign 4 - Movable in 8th)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MERCURY").displayName("Mercury").signNumber(4).rashiName("Kataka").degreeInSign(12.0).build());
+
+        // Dasa Timeline up to age 90
+        List<DasaPeriod> dasas = new ArrayList<>();
+        dasas.add(DasaPeriod.builder()
+                .planetName("Saturn")
+                .startDate(LocalDate.of(2060, 1, 1))
+                .endDate(LocalDate.of(2079, 12, 31))
+                .bhukthis(List.of(
+                        DasaPeriod.BhukthiPeriod.builder().planetName("Mercury").startDate(LocalDate.of(2075, 1, 1)).endDate(LocalDate.of(2077, 9, 30)).build(),
+                        DasaPeriod.BhukthiPeriod.builder().planetName("Ketu").startDate(LocalDate.of(2077, 10, 1)).endDate(LocalDate.of(2078, 11, 30)).build(),
+                        DasaPeriod.BhukthiPeriod.builder().planetName("Venus").startDate(LocalDate.of(2078, 12, 1)).endDate(LocalDate.of(2082, 1, 31)).build()
+                ))
+                .build());
+
+        ShadbalaDTO mockShadbala = ShadbalaDTO.builder().planetStrengths(Map.of(
+                "Jupiter", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(8.2).strengthCategory("VERY_STRONG").build(),
+                "Moon", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(7.1).strengthCategory("VERY_STRONG").build(),
+                "Saturn", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(6.8).strengthCategory("VERY_STRONG").build(),
+                "Sun", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(7.5).strengthCategory("VERY_STRONG").build(),
+                "Mars", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(6.4).strengthCategory("VERY_STRONG").build(),
+                "Venus", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(6.1).strengthCategory("STRONG").build(),
+                "Mercury", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(6.9).strengthCategory("STRONG").build()
+        )).build();
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, dasas, 1995, 14, 30, mockShadbala
+        );
+
+        assertNotNull(profile);
+        assertEquals("Poornayu", profile.longevityClassification());
+        assertTrue(profile.estimatedLifespanCeiling() >= 75 && profile.estimatedLifespanCeiling() <= 98,
+                "Poornayu ceiling should be between 75 and 98, got: " + profile.estimatedLifespanCeiling());
+        assertNotNull(profile.lifespanRange());
+        assertNotNull(profile.jaiminiThreePairs());
+        assertNotNull(profile.parasharaAyurBala());
+        assertNotNull(profile.marakaBadhakaTimeline());
+        assertTrue(profile.kakshyaAdjustments().size() > 0);
+        assertNotNull(profile.criticalMarakaWindow());
+        assertNotNull(profile.classicalRationale());
+
+        // Verify Parashara & Shadbala Sub-elements
+        Map<String, Object> pb = profile.parasharaAyurBala();
+        assertNotNull(pb.get("sariraBala"));
+        assertNotNull(pb.get("jeevaBala"));
+        assertNotNull(pb.get("ayurBala"));
+        assertNotNull(pb.get("vitalityScore"));
+        assertNotNull(pb.get("compositeScoreValue"));
+        assertTrue((Double) pb.get("compositeScoreValue") > 1.0);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> sarira = (Map<String, Object>) pb.get("sariraBala");
+        assertEquals("Jupiter", sarira.get("rulingPlanet"));
+        assertEquals(8.2, (Double) sarira.get("rupas"));
+    }
+
+    @Test
+    public void testHealthCautiousVitalityDetection() {
+        // Aries Lagna (Sign 1)
+        int lagnaSign = 1;
+        int moonSign = 8; // Scorpio (debilitated Moon)
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        // Lagna in Aries
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(1).rashiName("Mesha").degreeInSign(10.0).build());
+        // Lagna Lord Mars in Cancer (Sign 4 - Debilitated in 4th)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MARS").displayName("Mars").signNumber(4).rashiName("Kataka").degreeInSign(28.0).build());
+        // 8th Lord Mars
+        // Moon in Scorpio (Debilitated in 8th)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(8).rashiName("Vrishchika").degreeInSign(3.0).build());
+        // Saturn in Aries (Debilitated in 1st)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(1).rashiName("Mesha").degreeInSign(20.0).build());
+        // Jupiter in Capricorn (Debilitated in 10th)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").displayName("Jupiter").signNumber(10).rashiName("Makara").degreeInSign(5.0).build());
+
+        ShadbalaDTO weakShadbala = ShadbalaDTO.builder().planetStrengths(Map.of(
+                "Mars", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(3.8).strengthCategory("WEAK").build(),
+                "Jupiter", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(4.5).strengthCategory("WEAK").build(),
+                "Moon", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(4.0).strengthCategory("WEAK").build(),
+                "Saturn", ShadbalaDTO.PlanetaryStrength.builder().totalShadbalaRupas(3.6).strengthCategory("WEAK").build()
+        )).build();
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, List.of(), 1990, 6, 0, weakShadbala
+        );
+
+        assertNotNull(profile.parasharaAyurBala());
+        String score = (String) profile.parasharaAyurBala().get("vitalityScore");
+        assertTrue(score.contains("Cautious") || score.contains("Moderate"), "Weak chart should yield Cautious or Moderate, got: " + score);
+    }
+
+    @Test
+    public void testMarakaAndBadhakaEdgeCases() {
+        // Capricorn Lagna (Sign 10 - Movable)
+        int lagnaSign = 10;
+        int moonSign = 10;
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        // Lagna in Capricorn at 14 degrees
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(10).rashiName("Makara").degreeInSign(14.0).build());
+        // Saturn (Lagna Lord & 2nd Lord) in 10th house Libra
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(7).rashiName("Tula").degreeInSign(20.0).build());
+        // Rahu in 2nd house (Aquarius - Sign 11)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("RAHU").displayName("Rahu").signNumber(11).rashiName("Kumbha").degreeInSign(15.0).build());
+        // Mars in 7th house (Cancer - Sign 4)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MARS").displayName("Mars").signNumber(4).rashiName("Kataka").degreeInSign(28.0).build());
+        // Jupiter in 11th house (Scorpio - Sign 8, Badhaka house for Chara Lagna)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").displayName("Jupiter").signNumber(8).rashiName("Vrishchika").degreeInSign(10.0).build());
+
+        // Dasa Timeline
+        List<DasaPeriod> dasas = new ArrayList<>();
+        dasas.add(DasaPeriod.builder()
+                .planetName("Saturn")
+                .startDate(LocalDate.of(2065, 1, 1))
+                .endDate(LocalDate.of(2084, 1, 1))
+                .bhukthis(List.of(
+                        DasaPeriod.BhukthiPeriod.builder().planetName("Mercury").startDate(LocalDate.of(2075, 1, 1)).endDate(LocalDate.of(2077, 9, 30)).build(),
+                        DasaPeriod.BhukthiPeriod.builder().planetName("Ketu").startDate(LocalDate.of(2077, 10, 1)).endDate(LocalDate.of(2078, 11, 30)).build(),
+                        DasaPeriod.BhukthiPeriod.builder().planetName("Venus").startDate(LocalDate.of(2078, 12, 1)).endDate(LocalDate.of(2082, 1, 31)).build()
+                ))
+                .build());
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, dasas, 1995, 12, 0, null
+        );
+
+        assertNotNull(profile.marakaBadhakaTimeline());
+        Map<String, Object> mb = profile.marakaBadhakaTimeline();
+
+        // 1. Verify Lagna Lord Exemption
+        assertNotNull(mb.get("lagnaLordExemption"));
+        assertTrue(((String) mb.get("lagnaLordExemption")).contains("Saturn rules both Lagna"));
+
+        // 2. Verify Maraka & Badhaka Occupants
+        @SuppressWarnings("unchecked")
+        List<String> occ2 = (List<String>) mb.get("marakaOccupants2");
+        assertTrue(occ2.contains("Rahu"));
+
+        @SuppressWarnings("unchecked")
+        List<String> occ7 = (List<String>) mb.get("marakaOccupants7");
+        assertTrue(occ7.contains("Mars"));
+
+        @SuppressWarnings("unchecked")
+        List<String> badhakaOcc = (List<String>) mb.get("badhakaOccupants");
+        assertTrue(badhakaOcc.contains("Jupiter"));
+
+        // 3. Verify 22nd Drekkana Lord
+        assertNotNull(mb.get("khareshaLord"));
+
+        // 4. Verify Active Bhukthi
+        assertNotNull(mb.get("activeBhukthi"));
+        assertNotNull(mb.get("universalRemedies"));
+        assertNotNull(mb.get("badhakaRemedies"));
+    }
+
+    @Test
+    public void testModalityEvaluationRules() {
+        // Movable + Movable -> Poornayu
+        assertEquals("Poornayu", AyurdayaCalculationUtils.getModalitySpan(
+                AyurdayaCalculationUtils.Modality.CHARA, AyurdayaCalculationUtils.Modality.CHARA));
+
+        // Movable + Fixed -> Madhyayu
+        assertEquals("Madhyayu", AyurdayaCalculationUtils.getModalitySpan(
+                AyurdayaCalculationUtils.Modality.CHARA, AyurdayaCalculationUtils.Modality.STHIRA));
+
+        // Movable + Dual -> Alpayu
+        assertEquals("Alpayu", AyurdayaCalculationUtils.getModalitySpan(
+                AyurdayaCalculationUtils.Modality.CHARA, AyurdayaCalculationUtils.Modality.DWISVABHAVA));
+
+        // Fixed + Fixed -> Alpayu
+        assertEquals("Alpayu", AyurdayaCalculationUtils.getModalitySpan(
+                AyurdayaCalculationUtils.Modality.STHIRA, AyurdayaCalculationUtils.Modality.STHIRA));
+
+        // Fixed + Dual -> Poornayu
+        assertEquals("Poornayu", AyurdayaCalculationUtils.getModalitySpan(
+                AyurdayaCalculationUtils.Modality.STHIRA, AyurdayaCalculationUtils.Modality.DWISVABHAVA));
+
+        // Dual + Dual -> Madhyayu
+        assertEquals("Madhyayu", AyurdayaCalculationUtils.getModalitySpan(
+                AyurdayaCalculationUtils.Modality.DWISVABHAVA, AyurdayaCalculationUtils.Modality.DWISVABHAVA));
+    }
+
+    @Test
+    public void testMoonInLagnaOr7thOverride() {
+        // Taurus Lagna (Sign 2 - Fixed)
+        int lagnaSign = 2;
+        // Moon in Scorpio (Sign 8 - Fixed, in 7th house from Taurus Lagna)
+        int moonSign = 8;
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(2).rashiName("Vrishabha").degreeInSign(15.0).build());
+        // Lagna Lord Venus in Gemini (Sign 3 - Dual) -> Pair 1: Fixed + Dual = Poornayu
+        // 8th Lord Jupiter in Virgo (Sign 6 - Dual) -> Pair 1: Dual + Dual = Madhyayu (LL in Dual & 8L in Dual -> Madhyayu)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").displayName("Venus").signNumber(3).rashiName("Mithuna").degreeInSign(10.0).build());
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").displayName("Jupiter").signNumber(6).rashiName("Kanya").degreeInSign(12.0).build());
+        // Moon in Scorpio (Sign 8 - Fixed)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(8).rashiName("Vrishchika").degreeInSign(5.0).build());
+        // Saturn in Pisces (Sign 12 - Dual) -> Pair 2: Moon (Fixed) & Saturn (Dual) = Poornayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(12).rashiName("Meena").degreeInSign(18.0).build());
+        // Sun in Leo (Sign 5)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SUN").displayName("Sun").signNumber(5).rashiName("Simha").degreeInSign(10.0).build());
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, List.of(), 1990, 10, 0, null
+        );
+
+        // Pair 2 (Poornayu) and Pair 3 (Poornayu) agree -> Poornayu
+        assertEquals("Poornayu", profile.longevityClassification());
+        assertTrue(profile.estimatedLifespanCeiling() >= 75);
+    }
+
+    @Test
+    public void testDistinctThreeSpansMoonIn7thTieBreaker() {
+        // Taurus Lagna (Sign 2 - Fixed)
+        int lagnaSign = 2;
+        // Moon in Scorpio (Sign 8 - Fixed, in 7th house)
+        int moonSign = 8;
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(2).rashiName("Vrishabha").degreeInSign(15.0).build());
+        // Pair 1: LL Venus in Dual (Gemini 3) & 8L Jupiter in Dual (Virgo 6) -> Madhyayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").displayName("Venus").signNumber(3).rashiName("Mithuna").degreeInSign(10.0).build());
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").displayName("Jupiter").signNumber(6).rashiName("Kanya").degreeInSign(12.0).build());
+        // Pair 2: Moon in Fixed (Scorpio 8) & Saturn in Dual (Pisces 12) -> Poornayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(8).rashiName("Vrishchika").degreeInSign(5.0).build());
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(12).rashiName("Meena").degreeInSign(18.0).build());
+        // Pair 3: Lagna (Fixed 2) & HL (Fixed: Scorpio 8) -> Fixed + Fixed = Alpayu!
+        // Sun in Leo (Sign 5) at 10 deg, birth at 6:00 AM (0 hours) -> HL at 130 deg = Leo (Fixed) -> Fixed + Fixed = Alpayu!
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SUN").displayName("Sun").signNumber(5).rashiName("Simha").degreeInSign(10.0).build());
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, List.of(), 1990, 6, 0, null
+        );
+
+        assertNotNull(profile);
+        // All 3 pairs are distinct (Madhyayu, Poornayu, Alpayu) -> Moon in 7th house decides tie -> Poornayu!
+        assertEquals("Poornayu", profile.longevityClassification());
+        assertTrue(profile.kakshyaAdjustments().stream().anyMatch(a -> a.contains("Moon in 7th house")));
+    }
+
+    @Test
+    public void testKakshyaHrasaAndPapakarthari() {
+        // Aries Lagna (Sign 1 - Movable)
+        int lagnaSign = 1;
+        int moonSign = 1;
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(1).rashiName("Mesha").degreeInSign(10.0).build());
+        // Lagna Lord Mars in 6th house Virgo (Sign 6 - Dual) & 8th Lord Mars -> Pair 1: Dual + Dual = Madhyayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MARS").displayName("Mars").signNumber(6).rashiName("Kanya").degreeInSign(15.0).build());
+        // Moon in Aries (Sign 1 - Movable)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(1).rashiName("Mesha").degreeInSign(20.0).build());
+        // Saturn in Aries (Sign 1 - Debilitated)
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(1).rashiName("Mesha").degreeInSign(5.0).build());
+        // Malefic in 12th house (Pisces - Sign 12) -> Rahu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("RAHU").displayName("Rahu").signNumber(12).rashiName("Meena").degreeInSign(10.0).build());
+        // Malefic in 2nd house (Taurus - Sign 2) -> Sun
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SUN").displayName("Sun").signNumber(2).rashiName("Vrishabha").degreeInSign(10.0).build());
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, List.of(), 1990, 8, 0, null
+        );
+
+        assertNotNull(profile);
+        // Verify Kakshya Hrasa adjustments triggered
+        assertTrue(profile.kakshyaAdjustments().stream().anyMatch(a -> a.contains("Saturn in debility")));
+        assertTrue(profile.kakshyaAdjustments().stream().anyMatch(a -> a.contains("Papakarthari Yoga")));
+    }
+
+    @Test
+    public void testTwoPairsAgreePrevailsOverSingleDiscordantPair() {
+        // Libra Lagna (Sign 7 - Movable)
+        int lagnaSign = 7;
+        // Moon in Aries (Sign 1 - Movable, in 7th house)
+        int moonSign = 1;
+
+        List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(7).rashiName("Tula").degreeInSign(15.0).build());
+        // Lagna Lord Venus in Virgo (Dual) & 8th Lord Venus in Virgo (Dual) -> Pair 1: Dual + Dual = Madhyayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").displayName("Venus").signNumber(6).rashiName("Kanya").degreeInSign(10.0).build());
+        // Moon in Aries (Movable) & Saturn in Pisces (Dual) -> Pair 2: Movable + Dual = Alpayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(1).rashiName("Mesha").degreeInSign(5.0).build());
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(12).rashiName("Meena").degreeInSign(18.0).build());
+        // Hora Lagna in Taurus (Fixed) -> Pair 3: Lagna (Movable) + HL (Fixed) = Madhyayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SUN").displayName("Sun").signNumber(5).rashiName("Simha").degreeInSign(10.0).build());
+
+        AyurdayaCalculationUtils.AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign, moonSign, d1Chart, List.of(), 1995, 12, 0, null
+        );
+
+        assertNotNull(profile);
+        // Pair 1 (Madhyayu) and Pair 3 (Madhyayu) both agree (2 out of 3 votes) -> Majority Consensus is Madhyayu!
+        assertEquals("Madhyayu", profile.longevityClassification());
+        assertTrue(profile.estimatedLifespanCeiling() >= 62, "Madhyayu should have ceiling >= 62, got: " + profile.estimatedLifespanCeiling());
+    }
+}

@@ -21,6 +21,15 @@ public class TranslationService {
         return IndicPreShaper.shape(value);
     }
 
+    public String getLabel(String key, Object... args) {
+        if (key == null) return "";
+        try {
+            String value = messageSource.getMessage(key, args, null, LocaleContextHolder.getLocale());
+            if (value != null) return IndicPreShaper.shape(value);
+        } catch (Exception ignored) {}
+        return getLabel(key);
+    }
+
     public String getLabel(String key) {
         if (key == null) return "";
         String value = messageSource.getMessage(key, null, null, LocaleContextHolder.getLocale());

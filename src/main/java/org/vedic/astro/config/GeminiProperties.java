@@ -12,20 +12,78 @@ import java.util.Base64;
 @ConfigurationProperties(prefix = "gemini")
 public class GeminiProperties {
     private String apiKey = "";
+    private String backupApiKey = "";
     private boolean enabled = true;
     private boolean lifePredictionsEnabled = true;
     private boolean dailyBalanEnabled = true;
     private boolean matchingEnabled = true;
     private boolean pdfPredictionsEnabled = true;
-    private String model = "gemini-3.6-flash";
+    private String model = "gemini-3.7-flash";
+    private String fallbackModel = "gemini-3.6-flash";
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
+    private Integer maxOutputTokens; // null means do not set, let API default
+    private String forecastMode = "FULL_LIFESPAN";
+    private int forecastYears = 0;
+
+    public java.util.List<String> getResolvedModels() {
+        java.util.List<String> models = new java.util.ArrayList<>();
+        if (model != null && !model.trim().isEmpty()) {
+            models.add(model.trim());
+        }
+        if (fallbackModel != null && !fallbackModel.trim().isEmpty() && !models.contains(fallbackModel.trim())) {
+            models.add(fallbackModel.trim());
+        }
+        if (models.isEmpty()) {
+            models.add("gemini-3.7-flash");
+        }
+        return models;
+    }
+
+    public boolean is10YearForecastMode() {
+        return (forecastYears > 0 && forecastYears <= 15)
+                || "NEXT_10_YEARS".equalsIgnoreCase(forecastMode)
+                || "10".equals(forecastMode)
+                || "NEXT_15_YEARS".equalsIgnoreCase(forecastMode)
+                || "15".equals(forecastMode);
+    }
+
+    public int resolveForecastYears(int currentAge, int ayurdayaCeilingAge) {
+        if (forecastYears > 0) {
+            return forecastYears;
+        }
+        if ("NEXT_10_YEARS".equalsIgnoreCase(forecastMode) || "10".equals(forecastMode)) {
+            return 10;
+        }
+        if ("NEXT_15_YEARS".equalsIgnoreCase(forecastMode) || "15".equals(forecastMode)) {
+            return 15;
+        }
+        return Math.max(1, ayurdayaCeilingAge - currentAge);
+    }
+
+    public java.util.List<String> getResolvedApiKeys() {
+        java.util.List<String> keys = new java.util.ArrayList<>();
+        String primary = resolveSingleKey(apiKey);
+        if (!primary.isEmpty()) {
+            keys.add(primary);
+        }
+        String backup = resolveSingleKey(backupApiKey);
+        if (!backup.isEmpty() && !keys.contains(backup)) {
+            keys.add(backup);
+        }
+        return keys;
+    }
 
     public String getResolvedApiKey() {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
+        java.util.List<String> keys = getResolvedApiKeys();
+        return keys.isEmpty() ? "" : keys.get(0);
+    }
+
+    private String resolveSingleKey(String key) {
+        if (key == null || key.trim().isEmpty()) {
             return "";
         }
-        String trimmed = apiKey.trim();
+        String trimmed = key.trim();
         if (trimmed.startsWith("enc:")) {
             try {
                 byte[] decoded = Base64.getDecoder().decode(trimmed.substring(4));

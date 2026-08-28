@@ -5,6 +5,7 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (value) {
@@ -21,7 +22,11 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -55,6 +60,20 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
     setQuery(e.target.value);
   };
 
+  const handleClear = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuery('');
+    setSuggestions([]);
+    setShowDropdown(false);
+    if (onChange) {
+      onChange(null);
+    }
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
   const handleSelect = (item) => {
     setQuery(item.label);
     setShowDropdown(false);
@@ -66,12 +85,25 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
   return (
     <div className="autocomplete-container" ref={dropdownRef}>
       <input
+        ref={inputRef}
         type="text"
         value={query}
         onChange={handleInputChange}
         onFocus={() => query.trim() && setShowDropdown(true)}
         placeholder={placeholder}
       />
+      {query && (
+        <button
+          type="button"
+          className="input-clear-btn"
+          onClick={handleClear}
+          tabIndex={-1}
+          aria-label="Clear location"
+          title="Clear location"
+        >
+          ✕
+        </button>
+      )}
       {showDropdown && (
         <div className="autocomplete-dropdown">
           {suggestions.length > 0 ? (
@@ -79,6 +111,14 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
               <div
                 key={idx}
                 className="autocomplete-item"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSelect(item);
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleSelect(item);
+                }}
                 onClick={() => handleSelect(item)}
               >
                 {item.label}

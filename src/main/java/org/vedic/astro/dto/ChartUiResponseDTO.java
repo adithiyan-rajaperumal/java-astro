@@ -39,6 +39,17 @@ public class ChartUiResponseDTO {
     private String yogam;
     private String karanam;
 
+    // Health & Ayurdaya Longevity Engine
+    private org.vedic.astro.util.AyurvedicAstrologyUtils.AyurvedicHealthProfile ayurvedicHealth;
+    private org.vedic.astro.util.AyurdayaCalculationUtils.AyurdayaProfile ayurdayaProfile;
+
+    // Personal Elements, Deities & Life Anchors Engine
+    private LifeAnchorsProfile lifeAnchors;
+
+    // Feature Toggles
+    private boolean lifeAnchorsEnabled;
+    private boolean ayurdayaEnabled;
+
     // AI Prediction Capabilities
     private boolean aiPredictionsEnabled;
 }

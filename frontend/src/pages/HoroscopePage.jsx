@@ -3,6 +3,7 @@ import BirthForm from '../components/BirthForm';
 import IndianChart from '../components/IndianChart';
 import AiPredictionsView from '../components/AiPredictionsView';
 import DailyBalanView from '../components/DailyBalanView';
+import LifeAnchorsLongevityView from '../components/LifeAnchorsLongevityView';
 import { t } from '../i18n/translations';
 import { getSavedHoroscopes, saveHoroscope, deleteSavedHoroscope, isProfileAlreadySaved } from '../utils/savedHoroscopes';
 
@@ -147,7 +148,7 @@ function HoroscopePage({ settings }) {
     setDailyBalan(null);
     setActiveSubTab('charts'); // Always default to charts on calculate
     try {
-      const response = await fetch('/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM', {
+      const response = await fetch(`/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM&language=${settings.language}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -167,6 +168,25 @@ function HoroscopePage({ settings }) {
       setLoading(false);
     }
   };
+
+  // Automatically refresh horoscope report when language changes
+  useEffect(() => {
+    if (formPayload && report) {
+      fetch(`/api/v1/astrology/calculate?systemType=DRIK_TIRUKANITHAM&language=${settings.language}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': settings.language
+        },
+        body: JSON.stringify(formPayload)
+      })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setReport(data);
+      })
+      .catch(console.error);
+    }
+  }, [settings.language]);
 
   const getLifeStorageKey = (payload, lang) => {
     if (!payload) return null;
@@ -569,11 +589,12 @@ function HoroscopePage({ settings }) {
 
   const renderShadbalaTab = () => {
     const shadbala = report?.shadbalaStrengths;
+    const language = settings?.language || 'en';
     if (!report || !shadbala || !shadbala.planetStrengths) {
       return (
         <div className="card">
-          <h3 className="title-gold">{t('shadbalaTab', settings.language)}</h3>
-          <p style={{ color: 'var(--text-secondary)' }}>No Shadbala strength data available.</p>
+          <h3 className="title-gold">{t('shadbalaTab', language)}</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>{t('calculating', language) || 'No Shadbala strength data available.'}</p>
         </div>
       );
     }
@@ -582,7 +603,7 @@ function HoroscopePage({ settings }) {
 
     return (
       <div className="card">
-        <h3 className="title-gold">{t('shadbalaTab', settings.language)}</h3>
+        <h3 className="title-gold">{t('shadbalaTab', language)}</h3>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '15px' }}>
           {language === 'ta' ? '6 விதமான கிரக பலங்களின் (ஸ்தான, திக், கால, சேஷ்டா, திருக், நைசர்கிக) மதிப்பீடு' : 'Six-fold Planetary Strength Assessment (in Rupas)'}
         </p>
@@ -591,20 +612,20 @@ function HoroscopePage({ settings }) {
           <table className="horai-table">
             <thead>
               <tr>
-                <th>{t('planet', settings.language)}</th>
-                <th>{t('sthana', settings.language)}</th>
-                <th>{t('dig', settings.language)}</th>
-                <th>{t('kala', settings.language)}</th>
-                <th>{t('cheshta', settings.language)}</th>
-                <th>{t('total', settings.language)}</th>
-                <th>{t('status', settings.language)}</th>
+                <th>{t('planet', language)}</th>
+                <th>{t('sthana', language)}</th>
+                <th>{t('dig', language)}</th>
+                <th>{t('kala', language)}</th>
+                <th>{t('cheshta', language)}</th>
+                <th>{t('total', language)}</th>
+                <th>{t('status', language)}</th>
               </tr>
             </thead>
             <tbody>
               {planets.map((planetKey, idx) => {
                 const strength = shadbala.planetStrengths[planetKey];
-                const localizedPlanet = t('planet.' + planetKey.toLowerCase(), settings.language) !== ('planet.' + planetKey.toLowerCase())
-                  ? t('planet.' + planetKey.toLowerCase(), settings.language)
+                const localizedPlanet = t('planet.' + planetKey.toLowerCase(), language) !== ('planet.' + planetKey.toLowerCase())
+                  ? t('planet.' + planetKey.toLowerCase(), language)
                   : planetKey;
                 const reqRupas = REQUIRED_SHADBALA_RUPAS[planetKey.toUpperCase()] || 6.0;
                 const totalRupas = strength.totalShadbalaRupas || 0;
@@ -622,16 +643,28 @@ function HoroscopePage({ settings }) {
                       {totalRupas.toFixed(2)} R ({pct}%)
                     </td>
                     <td>
-                      <span style={{ 
-                        color: isStrong ? '#27ae60' : '#e67e22',
-                        background: isStrong ? 'rgba(39, 174, 96, 0.1)' : 'rgba(230, 126, 34, 0.1)',
-                        padding: '2px 8px',
-                        borderRadius: '10px',
-                        fontWeight: 'bold',
-                        fontSize: '12px'
-                      }}>
-                        {strength.strengthCategory || (isStrong ? 'STRONG' : 'MODERATE')}
-                      </span>
+                      {(() => {
+                        const rawCat = (strength.strengthCategory || '').toLowerCase().replace(/[\s/_]+/g, '');
+                        let statusText = '';
+                        if (rawCat === 'verystrong') statusText = t('veryStrong', language);
+                        else if (rawCat === 'strong' || rawCat === 'strongoptimum' || rawCat === 'optimum') statusText = t('strong', language);
+                        else if (rawCat === 'moderate') statusText = t('moderate', language);
+                        else if (rawCat === 'weak') statusText = t('weak', language);
+                        else statusText = isStrong ? t('strong', language) : t('moderate', language);
+
+                        return (
+                          <span style={{ 
+                            color: isStrong ? '#27ae60' : '#e67e22',
+                            background: isStrong ? 'rgba(39, 174, 96, 0.1)' : 'rgba(230, 126, 34, 0.1)',
+                            padding: '2px 8px',
+                            borderRadius: '10px',
+                            fontWeight: 'bold',
+                            fontSize: '12px'
+                          }}>
+                            {statusText}
+                          </span>
+                        );
+                      })()}
                     </td>
                   </tr>
                 );
@@ -919,6 +952,14 @@ function HoroscopePage({ settings }) {
             >
               {t('diagnosticsTab', settings.language)}
             </button>
+            {report?.lifeAnchorsEnabled !== false && (
+              <button 
+                className={`tab-btn ${activeSubTab === 'health' ? 'active' : ''}`}
+                onClick={() => setActiveSubTab('health')}
+              >
+                {t('healthAndLongevityTab', settings.language)}
+              </button>
+            )}
             {lifeEnabled && (
               <button 
                 className={`tab-btn ${activeSubTab === 'predictions' ? 'active' : ''}`}
@@ -934,6 +975,12 @@ function HoroscopePage({ settings }) {
           {activeSubTab === 'dasa' && renderDasaTab()}
           {activeSubTab === 'shadbala' && renderShadbalaTab()}
           {activeSubTab === 'diagnostics' && renderDiagnosticsTab()}
+          {report?.lifeAnchorsEnabled !== false && activeSubTab === 'health' && (
+            <LifeAnchorsLongevityView
+              chartData={report}
+              language={settings.language}
+            />
+          )}
           {activeSubTab === 'predictions' && (
             <AiPredictionsView
               report={report}

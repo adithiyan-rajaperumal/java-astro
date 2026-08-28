@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import LocationSearch from '../components/LocationSearch';
+import ClearableInput from '../components/ClearableInput';
 import AiMatchingView from '../components/AiMatchingView';
 import { t } from '../i18n/translations';
 import { getSavedHoroscopes } from '../utils/savedHoroscopes';
@@ -58,7 +59,15 @@ function MatchingPage({ settings }) {
   };
 
   const handleDateChange = (val, setter) => {
-    setter(val);
+    const clean = val.replace(/\D/g, '');
+    let formatted = clean;
+    if (clean.length > 2) {
+      formatted = `${clean.slice(0, 2)}/${clean.slice(2)}`;
+    }
+    if (clean.length > 4) {
+      formatted = `${clean.slice(0, 2)}/${clean.slice(2, 4)}/${clean.slice(4, 8)}`;
+    }
+    setter(formatted);
   };
 
   const parseDateText = (str) => {
@@ -322,15 +331,23 @@ function MatchingPage({ settings }) {
               </div>
               <div style={{ marginTop: '15px' }}>
                 <label>{t('name', settings.language)}</label>
-                <input type="text" value={boyName} onChange={(e) => setBoyName(e.target.value)} required />
+                <ClearableInput
+                  type="text"
+                  value={boyName}
+                  onChange={(e) => setBoyName(e.target.value)}
+                  onClear={() => setBoyName('')}
+                  placeholder="Enter boy's name"
+                  required
+                />
               </div>
               <div className="grid-2">
                 <div>
                   <label>{t('birthDate', settings.language)}</label>
-                  <input
+                  <ClearableInput
                     type="text"
                     value={boyDate}
                     onChange={(e) => handleDateChange(e.target.value, setBoyDate)}
+                    onClear={() => setBoyDate('')}
                     placeholder="DD/MM/YYYY"
                     maxLength="10"
                     required
@@ -338,12 +355,22 @@ function MatchingPage({ settings }) {
                 </div>
                 <div>
                   <label>{t('birthTime', settings.language)}</label>
-                  <input type="time" value={boyTime} onChange={(e) => setBoyTime(e.target.value)} required />
+                  <ClearableInput
+                    type="time"
+                    value={boyTime}
+                    onChange={(e) => setBoyTime(e.target.value)}
+                    onClear={() => setBoyTime('')}
+                    required
+                  />
                 </div>
               </div>
-              <div>
+              <div style={{ marginBottom: '15px' }}>
                 <label>{t('birthLocation', settings.language)}</label>
-                <LocationSearch value={boyLocation} onChange={setBoyLocation} />
+                <LocationSearch
+                  value={boyLocation}
+                  onChange={setBoyLocation}
+                  placeholder={t('searchLocation', settings.language) || 'Type city name and select suggestion...'}
+                />
               </div>
             </div>
 
@@ -368,15 +395,23 @@ function MatchingPage({ settings }) {
               </div>
               <div style={{ marginTop: '15px' }}>
                 <label>{t('name', settings.language)}</label>
-                <input type="text" value={girlName} onChange={(e) => setGirlName(e.target.value)} required />
+                <ClearableInput
+                  type="text"
+                  value={girlName}
+                  onChange={(e) => setGirlName(e.target.value)}
+                  onClear={() => setGirlName('')}
+                  placeholder="Enter girl's name"
+                  required
+                />
               </div>
               <div className="grid-2">
                 <div>
                   <label>{t('birthDate', settings.language)}</label>
-                  <input
+                  <ClearableInput
                     type="text"
                     value={girlDate}
                     onChange={(e) => handleDateChange(e.target.value, setGirlDate)}
+                    onClear={() => setGirlDate('')}
                     placeholder="DD/MM/YYYY"
                     maxLength="10"
                     required
@@ -384,12 +419,22 @@ function MatchingPage({ settings }) {
                 </div>
                 <div>
                   <label>{t('birthTime', settings.language)}</label>
-                  <input type="time" value={girlTime} onChange={(e) => setGirlTime(e.target.value)} required />
+                  <ClearableInput
+                    type="time"
+                    value={girlTime}
+                    onChange={(e) => setGirlTime(e.target.value)}
+                    onClear={() => setGirlTime('')}
+                    required
+                  />
                 </div>
               </div>
-              <div>
+              <div style={{ marginBottom: '15px' }}>
                 <label>{t('birthLocation', settings.language)}</label>
-                <LocationSearch value={girlLocation} onChange={setGirlLocation} />
+                <LocationSearch
+                  value={girlLocation}
+                  onChange={setGirlLocation}
+                  placeholder={t('searchLocation', settings.language) || 'Type city name and select suggestion...'}
+                />
               </div>
             </div>
           </div>

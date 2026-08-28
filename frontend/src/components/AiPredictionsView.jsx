@@ -1,4 +1,6 @@
+import React from 'react';
 import { t } from '../i18n/translations';
+import { useTextToSpeech } from '../utils/useTextToSpeech';
 
 function AiPredictionsView({
   report,
@@ -9,33 +11,44 @@ function AiPredictionsView({
   loading,
   error
 }) {
+  const tts = useTextToSpeech({ language });
+
   if (!predictions && !loading) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '40px 20px' }}>
-        <h3 style={{ color: 'var(--accent-gold)', marginBottom: '10px' }}>
-          {t('aiBalanTab', language)}
+      <div className="card" style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--bg-card)' }}>
+        <h3 style={{ color: 'var(--accent-saffron)', marginBottom: '12px' }}>
+          ✨ {t('aiBalanTab', language)}
         </h3>
-        <p style={{ maxWidth: '650px', margin: '0 auto 25px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+        <p style={{ maxWidth: '680px', margin: '0 auto 25px', color: 'var(--text-secondary)', lineHeight: '1.6', fontSize: '14px' }}>
           {language === 'ta'
-            ? 'உங்கள் ஜாதகத்தின் 12 வர்க்கங்கள் (D1, D9, D10, D12, D30) மற்றும் விம்சோத்தரி திசா புக்தி அடிப்படையில் கணிக்கப்பட்ட துல்லியமான வாழ்நாள் பலன்கள்.'
-            : 'Authentic lifetime predictions synthesized from 12-Varga charts (D1, D9, D10, D12, D30) and running Vimshottari Dasa-Bhukthi timelines.'}
+            ? 'உங்கள் ஜாதகத்தின் 12 வர்க்க சக்கரங்கள் (D1, D9, D10, D12, D30...), ஷட்பலம் மற்றும் விம்சோத்தரி திசா புக்தி அடிப்படையில் AI சுயமாக கணிக்கும் ஆழமான வாழ்நாள் பலன்கள்.'
+            : 'Authentic astrological predictions synthesized from 12 Divisional Varga charts (D1, D9, D10, D12, D30...), Shadbala planetary matrices, and Vimshottari Dasa-Bhukthi timelines.'}
         </p>
-        <button
-          onClick={() => onGenerate(false)}
-          className="btn-primary"
-          style={{ padding: '12px 28px', fontSize: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-        >
-          ✨ {t('generateAiBalan', language)}
-        </button>
+
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            onClick={() => onGenerate(false)}
+            className="btn-primary"
+            style={{
+              padding: '14px 32px',
+              fontSize: '16px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}
+          >
+            ✨ {t('generateAiBalan', language) || 'Generate AI Life Predictions'}
+          </button>
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '50px 20px' }}>
+      <div className="card" style={{ textAlign: 'center', padding: '50px 20px', background: 'var(--bg-card)' }}>
         <div className="spinner" style={{ margin: '0 auto 20px' }}></div>
-        <h4 style={{ color: 'var(--accent-gold)' }}>{t('generatingAiBalan', language)}</h4>
+        <h4 style={{ color: 'var(--accent-saffron)', marginBottom: '8px' }}>{t('generatingAiBalan', language)}</h4>
         <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
           {t('horoscopeCalculating', language)}
         </p>
@@ -45,12 +58,12 @@ function AiPredictionsView({
 
   if (error) {
     return (
-      <div className="card" style={{ borderLeft: '4px solid var(--danger)', background: 'rgba(231, 76, 60, 0.08)' }}>
+      <div className="card" style={{ borderLeft: '4px solid var(--danger)', background: 'rgba(231, 76, 60, 0.06)' }}>
         <h4 style={{ color: 'var(--danger)', margin: '0 0 8px' }}>
           ⚠️ {t('calculationFaulted', language)}
         </h4>
         <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>{error}</p>
-        <button onClick={() => onGenerate(true)} className="btn-primary">
+        <button onClick={() => onGenerate(true)} className="btn-primary" style={{ padding: '8px 20px' }}>
           🔄 {t('retry', language)}
         </button>
       </div>
@@ -59,8 +72,8 @@ function AiPredictionsView({
 
   if (predictions && predictions.enabled === false) {
     return (
-      <div className="card" style={{ borderLeft: '4px solid #e74c3c', background: 'rgba(231, 76, 60, 0.08)' }}>
-        <h4 style={{ color: '#e74c3c', margin: '0 0 8px' }}>
+      <div className="card" style={{ borderLeft: '4px solid var(--danger)', background: 'rgba(231, 76, 60, 0.06)' }}>
+        <h4 style={{ color: 'var(--danger)', margin: '0 0 8px' }}>
           ⚠️ {t('calculationFaulted', language)}
         </h4>
         <p style={{ color: 'var(--text-secondary)', margin: '0 0 15px', fontSize: '14px' }}>
@@ -73,379 +86,464 @@ function AiPredictionsView({
     );
   }
 
-  const personality = predictions?.nativePersonality;
-  const health = predictions?.healthAnalysis;
-  const aiYogas = predictions?.aiYogas || [];
-  const aiDoshams = predictions?.aiDoshams || [];
-  const pastPhases = predictions?.pastKeyPhases || [];
-  const lifetimeList = predictions?.lifetimePredictions || predictions?.futurePredictions || [];
+  const personality = predictions?.personalityAndBehavior;
+  const milestones = predictions?.retrospectivePastMilestones || [];
+  const longevity = predictions?.aiLongevityAnalysis;
+  const yearlyList = predictions?.yearlyPredictions || [];
+  const is10Year = predictions?.forecastMode === 'TEN_YEARS' || yearlyList.length <= 15;
+
+  const buildSpeechText = () => {
+    if (!predictions) return '';
+    const parts = [];
+
+    if (personality?.coreTemperament) {
+      parts.push(t('aiPersonalityBehaviorTitle', language) + '. ' + personality.coreTemperament);
+    }
+
+    if (milestones.length > 0) {
+      parts.push(t('retrospectiveMilestonesTitle', language));
+      milestones.forEach(m => {
+        parts.push((m.milestoneTitle || '') + (m.approxPeriod ? ' (' + m.approxPeriod + '): ' : ': ') + (m.eventNarrative || ''));
+      });
+    }
+
+    if (longevity) {
+      parts.push(t('aiLongevityAnalysisTitle', language));
+      if (longevity.calculatedAyulCeiling > 0) {
+        parts.push(t('aiCalculatedAyulCeiling', language) + ': ' + longevity.calculatedAyulCeiling + ' ' + t('yearsSuffix', language) + ' ' + (longevity.classification || ''));
+      }
+      if (longevity.primarySpanRationale) {
+        parts.push(longevity.primarySpanRationale);
+      }
+      if (longevity.activeYogasIdentified && longevity.activeYogasIdentified.length > 0) {
+        parts.push(t('activeYogasIdentified', language));
+        longevity.activeYogasIdentified.forEach(y => {
+          parts.push((y.yogaName || '') + ': ' + (y.effect || ''));
+        });
+      }
+      if (longevity.activeDoshasIdentified && longevity.activeDoshasIdentified.length > 0) {
+        parts.push(t('activeDoshasIdentified', language));
+        longevity.activeDoshasIdentified.forEach(d => {
+          parts.push((d.doshaName || '') + ': ' + (d.remedialAdvice || ''));
+        });
+      }
+    }
+
+    if (yearlyList.length > 0) {
+      parts.push(t('yearlyPredictionsStreamTitle', language));
+      yearlyList.forEach(yp => {
+        const yrIntro = `${yp.year}, ${t('yearAge', language)} ${yp.age}. ${yp.dasaBhukthi ? yp.dasaBhukthi + '.' : ''}`;
+        const narrative = yp.annualNarrative || yp.detailedPrediction || '';
+        parts.push(yrIntro + ' ' + narrative);
+      });
+    }
+
+    return parts.join('\n\n');
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* Token Usage & Cache Notice Badge */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+      {/* Top Status & Generation Bar with Text-to-Speech Player */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '12px',
-        background: 'rgba(255, 215, 0, 0.05)',
-        border: '1px solid rgba(255, 215, 0, 0.25)',
-        borderRadius: '8px',
-        padding: '10px 16px',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        borderRadius: '10px',
+        padding: '12px 18px',
         fontSize: '13px',
-        color: 'var(--text-secondary)'
+        color: 'var(--text-secondary)',
+        boxShadow: 'var(--shadow)',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-          <span>💾 <strong style={{ color: 'var(--accent-gold)' }}>{t('cachedNotice30Days', language)}</strong></span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <span style={{
+            fontSize: '12px',
+            fontWeight: 'bold',
+            padding: '3px 10px',
+            borderRadius: '12px',
+            background: 'rgba(255, 107, 0, 0.08)',
+            color: 'var(--accent-warm)',
+            border: '1px solid var(--accent-gold)'
+          }}>
+            {is10Year ? '⚡ ' + t('tenYearMode', language) : '🪐 ' + t('lifetimeMode', language)}
+          </span>
+          <span>💾 <strong style={{ color: 'var(--accent-warm)' }}>{t('cachedNotice30Days', language)}</strong></span>
           {predictions?.tokenUsage && (
             <>
               <span>⚡ <strong>{predictions.tokenUsage.totalTokens?.toLocaleString()}</strong> {t('tokensCount', language) || 'tokens'}</span>
               {(predictions.tokenUsage.estimatedCostUsd > 0 || predictions.tokenUsage.estimatedCostInr > 0) && (
                 <span>💵 <strong>${predictions.tokenUsage.estimatedCostUsd?.toFixed(4)} / ₹{predictions.tokenUsage.estimatedCostInr?.toFixed(2)}</strong></span>
               )}
-              <span>🤖 <code style={{ color: 'var(--text-primary)' }}>{predictions.tokenUsage.modelUsed}</code></span>
+              <span>🤖 <code style={{ color: 'var(--accent-saffron)' }}>{predictions.tokenUsage.modelUsed}</code></span>
             </>
           )}
         </div>
-        <button
-          onClick={() => onGenerate(true)}
-          className="btn-primary"
-          style={{
-            padding: '5px 12px',
-            fontSize: '12px',
-            background: 'none',
-            border: '1px solid var(--border)',
-            color: 'var(--text-primary)'
-          }}
-        >
-          🔄 {t('regenerateAiBalan', language)}
-        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* TTS Audio Controls */}
+          {tts.isSupported && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '4px 8px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+            }}>
+              <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
+                🎙️ {tts.isPlaying ? (tts.isPaused ? '⏸' : '🔊') : ''}
+              </span>
+              {!tts.hasVoiceForLanguage && language !== 'en' && (
+                <span
+                  title={t('ttsNoVoiceWarning', language)}
+                  style={{ cursor: 'help', fontSize: '12px', color: 'var(--warning)', marginRight: '2px' }}
+                >
+                  ⚠️
+                </span>
+              )}
+              {!tts.isPlaying ? (
+                <button
+                  onClick={() => tts.speak(buildSpeechText())}
+                  className="btn-primary"
+                  style={{ padding: '5px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  title={t('ttsReadAiBalan', language)}
+                >
+                  ▶ {t('ttsPlay', language)}
+                </button>
+              ) : (
+                <>
+                  {tts.isPaused ? (
+                    <button
+                      onClick={tts.resume}
+                      className="btn-primary"
+                      style={{ padding: '5px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      title={t('ttsResume', language)}
+                    >
+                      ▶ {t('ttsResume', language)}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={tts.pause}
+                      style={{
+                        background: 'var(--accent-gold)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '5px 12px',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                      }}
+                      title={t('ttsPause', language)}
+                    >
+                      ⏸ {t('ttsPause', language)}
+                    </button>
+                  )}
+                  <button
+                    onClick={tts.stop}
+                    style={{
+                      background: 'var(--danger)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '5px 12px',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      fontWeight: '600'
+                    }}
+                    title={t('ttsStop', language)}
+                  >
+                    ⏹ {t('ttsStop', language)}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={() => onGenerate(true)}
+            className="btn-primary"
+            style={{
+              padding: '8px 18px',
+              fontSize: '13px'
+            }}
+          >
+            ✨ {t('regenerateAiBalan', language)}
+          </button>
+        </div>
       </div>
 
-      {/* Overall Astrological Summary Card */}
-      {predictions?.overallSummary && (
+      {/* 1. Personality & Behavioral Profile Card */}
+      {personality?.coreTemperament && (
         <div className="card" style={{
-          background: 'linear-gradient(135deg, rgba(255,215,0,0.08), rgba(20,20,30,0.7))',
-          border: '1px solid var(--accent-gold)'
+          borderLeft: '4px solid var(--accent-saffron)',
+          borderRadius: '10px',
+          padding: '20px',
+          background: 'var(--bg-card)',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
-          <h3 style={{ margin: '0 0 10px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🌟 {t('overallSummaryTitle', language)}
+          <h3 style={{ margin: '0 0 12px', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
+            🧠 {t('aiPersonalityBehaviorTitle', language)}
           </h3>
-          <p style={{ lineHeight: '1.7', fontSize: '14px', margin: 0, color: 'var(--text-primary)' }}>
-            {predictions.overallSummary}
+          <p style={{ fontSize: '14px', lineHeight: '1.7', color: 'var(--text-primary)', margin: 0, wordBreak: 'break-word' }}>
+            {personality.coreTemperament}
           </p>
         </div>
       )}
 
-      {/* Native Personality Card */}
-      {personality && (
-        <div className="card">
-          <h3 style={{ margin: '0 0 12px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🧘 {t('aiPersonalityTitle', language)}
+      {/* 2. Retrospective Past Milestones Card */}
+      {milestones.length > 0 && (
+        <div className="card" style={{ borderRadius: '10px', padding: '20px', background: 'var(--bg-card)', width: '100%', boxSizing: 'border-box' }}>
+          <h3 style={{ margin: '0 0 16px', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
+            🕰️ {t('retrospectiveMilestonesTitle', language)}
           </h3>
-          {personality.coreTemperament && (
-            <p style={{ fontSize: '14px', lineHeight: '1.6', color: 'var(--text-primary)', marginBottom: '14px' }}>
-              {personality.coreTemperament}
-            </p>
-          )}
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px' }}>
-            {personality.keyStrengths && personality.keyStrengths.length > 0 && (
-              <div style={{ background: 'rgba(46, 204, 113, 0.05)', border: '1px solid rgba(46, 204, 113, 0.2)', borderRadius: '8px', padding: '14px' }}>
-                <h4 style={{ margin: '0 0 8px', color: '#2ecc71', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  ✅ {t('keyStrengths', language)}
-                </h4>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
-                  {personality.keyStrengths.map((st, i) => (
-                    <li key={i}>{st}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {personality.vulnerabilitiesAndKarmicLessons && personality.vulnerabilitiesAndKarmicLessons.length > 0 && (
-              <div style={{ background: 'rgba(230, 126, 34, 0.05)', border: '1px solid rgba(230, 126, 34, 0.25)', borderRadius: '8px', padding: '14px' }}>
-                <h4 style={{ margin: '0 0 8px', color: '#e67e22', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  ⚖️ {t('karmicLessons', language)}
-                </h4>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
-                  {personality.vulnerabilitiesAndKarmicLessons.map((vl, i) => (
-                    <li key={i}>{vl}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Ayurvedic Health Analysis */}
-      {health && (
-        <div className="card">
-          <h3 style={{ margin: '0 0 12px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🌿 {t('healthAnalysisTitle', language)}
-          </h3>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px', marginBottom: '14px' }}>
-            {health.ayurvedicConstitution && (
-              <div style={{ background: 'rgba(52, 152, 219, 0.05)', border: '1px solid rgba(52, 152, 219, 0.2)', borderRadius: '8px', padding: '14px' }}>
-                <h4 style={{ margin: '0 0 6px', color: '#3498db', fontSize: '14px' }}>
-                  🌀 {t('ayurvedicConstitution', language)}
-                </h4>
-                <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-primary)' }}>
-                  {health.ayurvedicConstitution}
-                </p>
-              </div>
-            )}
-
-            {health.longevityVitalitySummary && (
-              <div style={{ background: 'rgba(155, 89, 182, 0.05)', border: '1px solid rgba(155, 89, 182, 0.2)', borderRadius: '8px', padding: '14px' }}>
-                <h4 style={{ margin: '0 0 6px', color: '#9b59b6', fontSize: '14px' }}>
-                  ⚡ {t('longevityVitality', language)}
-                </h4>
-                <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-primary)' }}>
-                  {health.longevityVitalitySummary}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px' }}>
-            {health.organVulnerabilities && health.organVulnerabilities.length > 0 && (
-              <div style={{ background: 'rgba(231, 76, 60, 0.05)', border: '1px solid rgba(231, 76, 60, 0.2)', borderRadius: '8px', padding: '14px' }}>
-                <h4 style={{ margin: '0 0 8px', color: '#e74c3c', fontSize: '14px' }}>
-                  🩺 {t('organVulnerabilities', language)}
-                </h4>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
-                  {health.organVulnerabilities.map((v, i) => (
-                    <li key={i}>{v}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {health.recommendedDietAndLifestyle && health.recommendedDietAndLifestyle.length > 0 && (
-              <div style={{ background: 'rgba(46, 204, 113, 0.05)', border: '1px solid rgba(46, 204, 113, 0.2)', borderRadius: '8px', padding: '14px' }}>
-                <h4 style={{ margin: '0 0 8px', color: '#2ecc71', fontSize: '14px' }}>
-                  🥗 {t('recommendedDietLifestyle', language)}
-                </h4>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
-                  {health.recommendedDietAndLifestyle.map((d, i) => (
-                    <li key={i}>{d}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* AI Classical Yogas */}
-      {aiYogas.length > 0 && (
-        <div className="card">
-          <h3 style={{ margin: '0 0 14px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            ✨ {t('classicalYogasTitle', language)}
-          </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
-            {aiYogas.map((y, idx) => (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '14px' }}>
+            {milestones.map((m, idx) => (
               <div
                 key={idx}
                 style={{
-                  background: 'rgba(255, 215, 0, 0.03)',
-                  border: '1px solid rgba(255, 215, 0, 0.2)',
-                  borderRadius: '8px',
-                  padding: '12px 16px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <strong style={{ color: 'var(--accent-gold)', fontSize: '14px' }}>{y.name}</strong>
-                  {y.formingPlanets && (
-                    <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: '4px' }}>
-                      {y.formingPlanets}
-                    </span>
-                  )}
-                </div>
-                <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  {y.impact}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* AI Doshams Analysis */}
-      {aiDoshams.length > 0 && (
-        <div className="card">
-          <h3 style={{ margin: '0 0 14px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🛡️ {t('doshamsAnalysisTitle', language)}
-          </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '12px' }}>
-            {aiDoshams.map((d, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '8px',
-                  padding: '14px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <strong style={{ color: 'var(--text-primary)', fontSize: '14px' }}>{d.name}</strong>
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 'bold',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    background: (d.status?.toLowerCase().includes('nullified') || d.status?.toLowerCase().includes('நிவர்த்தி'))
-                      ? 'rgba(46, 204, 113, 0.15)'
-                      : 'rgba(231, 76, 60, 0.15)',
-                    color: (d.status?.toLowerCase().includes('nullified') || d.status?.toLowerCase().includes('நிவர்த்தி'))
-                      ? '#2ecc71'
-                      : '#e74c3c'
-                  }}>
-                    {d.status}
-                  </span>
-                </div>
-                {d.nullificationFactor && (
-                  <p style={{ margin: '0 0 6px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                    <strong>{t('nullificationReason', language)}:</strong> {d.nullificationFactor}
-                  </p>
-                )}
-                {d.remedy && (
-                  <p style={{ margin: 0, fontSize: '12px', color: 'var(--accent-gold)', lineHeight: '1.4' }}>
-                    <strong>{t('remedyTitle', language)}:</strong> {d.remedy}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Past Key Turning Points */}
-      {pastPhases.length > 0 && (
-        <div className="card">
-          <h3 style={{ margin: '0 0 14px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            ⏳ {t('pastTurningPointsTitle', language)}
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {pastPhases.map((phase, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--bg-primary)',
                   borderLeft: '4px solid var(--accent-gold)',
                   borderTop: '1px solid var(--border)',
                   borderRight: '1px solid var(--border)',
                   borderBottom: '1px solid var(--border)',
                   borderRadius: '0 8px 8px 0',
-                  padding: '14px 16px'
+                  padding: '14px 16px',
+                  minWidth: 0,
+                  boxSizing: 'border-box'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '8px' }}>
-                  <strong style={{ color: 'var(--accent-gold)', fontSize: '14px' }}>
-                    {phase.phaseTitle || phase.title || `${t('phaseLabel', language)} ${idx + 1}`}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                  <strong style={{ color: 'var(--accent-warm)', fontSize: '14px' }}>
+                    {m.milestoneTitle}
                   </strong>
-                  <div style={{ display: 'flex', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                    <span>📅 {phase.periodOrAge || phase.period}</span>
-                    {phase.dasaBhukthi && (
-                      <span>🪐 {phase.dasaBhukthi}</span>
-                    )}
-                  </div>
+                  {m.approxPeriod && (
+                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255, 107, 0, 0.08)', border: '1px solid rgba(255, 107, 0, 0.2)', padding: '2px 8px', borderRadius: '4px', fontWeight: '500' }}>
+                      📅 {m.approxPeriod}
+                    </span>
+                  )}
                 </div>
-                <p style={{ margin: '0 0 6px', fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
-                  {phase.livedExperience || phase.description}
+                <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)', wordBreak: 'break-word' }}>
+                  {m.eventNarrative}
                 </p>
-                {phase.astrologicalBasis && (
-                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', opacity: 0.85 }}>
-                    🪐 <strong>{t('astrologicalBasis', language)}:</strong> {phase.astrologicalBasis}
-                  </div>
-                )}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Year-by-Year Lifetime Predictions (Unified Narrative) */}
-      {lifetimeList.length > 0 && (
-        <div className="card">
+      {/* 3. AI Shastric Longevity & Active Yogas Analysis Card */}
+      {longevity && (
+        <div className="card" style={{
+          borderLeft: '4px solid var(--accent-gold)',
+          borderRadius: '10px',
+          padding: '20px',
+          background: 'var(--bg-card)',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
-            <h3 style={{ margin: 0, color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              🔮 {t('lifetimeForecastTitle', language)}
+            <h3 style={{ margin: 0, color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
+              ⏳ {t('aiLongevityAnalysisTitle', language)}
             </h3>
+
+            {longevity.calculatedAyulCeiling > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  padding: '4px 14px',
+                  borderRadius: '16px',
+                  background: 'rgba(255, 107, 0, 0.1)',
+                  color: 'var(--accent-warm)',
+                  border: '1px solid var(--accent-gold)'
+                }}>
+                  🎯 {t('aiCalculatedAyulCeiling', language)}: {longevity.calculatedAyulCeiling} {t('yearsSuffix', language)} ({longevity.classification || 'Poornayu'})
+                </span>
+              </div>
+            )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '15px' }}>
-            {lifetimeList.map((fp, idx) => {
-              const narrativeText = fp.detailedPrediction || [fp.careerAndFinance, fp.healthAndFamily, fp.careerProfession, fp.wealthFinance, fp.healthVitality, fp.marriageFamily, fp.parentsKids].filter(Boolean).join(' ');
+          {longevity.primarySpanRationale && (
+            <div style={{
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginBottom: '16px',
+              boxSizing: 'border-box'
+            }}>
+              <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: 'var(--text-primary)', wordBreak: 'break-word' }}>
+                📜 <strong>{t('classicalLongevityRationale', language)}:</strong> {longevity.primarySpanRationale}
+              </p>
+            </div>
+          )}
 
-              return (
-                <div
-                  key={idx}
-                  style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px'
-                  }}
-                >
-                  {/* Year Card Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
-                    <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--accent-gold)' }}>
-                      🌟 {fp.year} ({t('yearAge', language)}: {fp.age})
-                    </span>
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(255,215,0,0.1)', padding: '2px 8px', borderRadius: '4px', fontWeight: '500' }}>
-                      {fp.dasaBhukthi}
-                    </span>
-                  </div>
-
-                  {/* Yearly Theme Headline */}
-                  {fp.yearlyTheme && (
-                    <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--text-primary)', lineHeight: '1.4' }}>
-                      🎯 {fp.yearlyTheme}
-                    </div>
-                  )}
-
-                  {/* Detailed Unified Narrative Paragraph */}
-                  {narrativeText && (
-                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border)', borderRadius: '6px', padding: '12px' }}>
-                      <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-primary)', lineHeight: '1.6' }}>
-                        {narrativeText}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Astrological Basis */}
-                  {fp.astrologicalBasis && (
-                    <div style={{ fontSize: '11px', color: 'var(--accent-gold)', opacity: 0.9 }}>
-                      🪐 <strong>{t('astrologicalBasis', language)}:</strong> {fp.astrologicalBasis}
-                    </div>
-                  )}
-
-                  {/* Cautions & Remedies */}
-                  {(fp.cautionsAndRemedies || fp.favorableVsCaution || fp.remediesGuidance) && (
-                    <div style={{ background: 'rgba(230, 126, 34, 0.05)', border: '1px solid rgba(230, 126, 34, 0.25)', borderRadius: '6px', padding: '10px' }}>
-                      <strong style={{ fontSize: '12px', color: '#e67e22', display: 'block', marginBottom: '4px' }}>
-                        ⚠️ {t('cautionsAndRemedies', language)}:
+          {/* Active Yogas & Active Doshas Subgrid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
+            {/* Active Auspicious Yogas */}
+            {longevity.activeYogasIdentified && longevity.activeYogasIdentified.length > 0 && (
+              <div style={{
+                background: 'rgba(46, 125, 50, 0.04)',
+                border: '1px solid rgba(46, 125, 50, 0.25)',
+                borderRadius: '8px',
+                padding: '14px',
+                minWidth: 0,
+                boxSizing: 'border-box'
+              }}>
+                <h4 style={{ margin: '0 0 10px', color: 'var(--success)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  ✨ {t('activeYogasIdentified', language)}
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {longevity.activeYogasIdentified.map((y, idx) => (
+                    <div key={idx} style={{ background: '#ffffff', border: '1px solid rgba(46, 125, 50, 0.15)', padding: '8px 10px', borderRadius: '6px' }}>
+                      <strong style={{ color: 'var(--accent-saffron)', fontSize: '13px', display: 'block', marginBottom: '2px' }}>
+                        {y.yogaName}
                       </strong>
-                      <p style={{ fontSize: '12px', margin: 0, color: 'var(--text-primary)', lineHeight: '1.4' }}>
-                        {fp.cautionsAndRemedies || `${fp.favorableVsCaution || ''} ${fp.remediesGuidance || ''}`.trim()}
-                      </p>
+                      <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.4', wordBreak: 'break-word' }}>
+                        {y.effect}
+                      </span>
                     </div>
-                  )}
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            )}
+
+            {/* Active Doshas & Remedial Guidance */}
+            {longevity.activeDoshasIdentified && longevity.activeDoshasIdentified.length > 0 && (
+              <div style={{
+                background: 'rgba(232, 93, 4, 0.04)',
+                border: '1px solid rgba(232, 93, 4, 0.25)',
+                borderRadius: '8px',
+                padding: '14px',
+                minWidth: 0,
+                boxSizing: 'border-box'
+              }}>
+                <h4 style={{ margin: '0 0 10px', color: 'var(--accent-warm)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  🛡️ {t('activeDoshasIdentified', language)}
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {longevity.activeDoshasIdentified.map((d, idx) => (
+                    <div key={idx} style={{ background: '#ffffff', border: '1px solid rgba(232, 93, 4, 0.15)', padding: '8px 10px', borderRadius: '6px' }}>
+                      <strong style={{ color: 'var(--danger)', fontSize: '13px', display: 'block', marginBottom: '2px' }}>
+                        {d.doshaName}
+                      </strong>
+                      <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.4', wordBreak: 'break-word' }}>
+                        {d.remedialAdvice}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
+
+      {/* 4. Year-by-Year Predictions (Uncapped Rich Narrative Stream) */}
+      {yearlyList.length > 0 && (() => {
+        const sYr = predictions?.startYear || yearlyList[0]?.year || '';
+        const eYr = predictions?.endYear || yearlyList[yearlyList.length - 1]?.year || '';
+        const sAge = predictions?.startAge ?? yearlyList[0]?.age;
+        const eAge = predictions?.endAge ?? yearlyList[yearlyList.length - 1]?.age;
+        const yearRangeText = sYr && eYr ? ` (${sYr} – ${eYr}${sAge !== undefined && eAge !== undefined ? ` • ${language === 'ta' ? `வயது ${sAge} - ${eAge}` : `Age ${sAge} to ${eAge}`}` : ''})` : '';
+
+        return (
+          <div className="card" style={{ borderRadius: '10px', padding: '20px', background: 'var(--bg-card)', width: '100%', boxSizing: 'border-box' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+              <h3 style={{ margin: 0, color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '17px' }}>
+                📜 {t('yearlyPredictionsStreamTitle', language)}{yearRangeText}
+              </h3>
+              <span style={{
+                fontSize: '12px',
+                fontWeight: 'bold',
+                padding: '4px 12px',
+                borderRadius: '12px',
+                background: 'rgba(255, 107, 0, 0.08)',
+                color: 'var(--accent-warm)',
+                border: '1px solid var(--accent-gold)'
+              }}>
+                {is10Year ? `⚡ ${t('tenYearMode', language)}` : `🪐 ${t('lifetimeMode', language)} (${yearlyList.length} ${t('yearsSuffix', language)})`}
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '16px' }}>
+              {yearlyList.map((yp, idx) => {
+                const narrative = yp.annualNarrative || yp.detailedPrediction || '';
+
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px',
+                      boxShadow: 'var(--shadow)',
+                      minWidth: 0,
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    {/* Header */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      borderBottom: '1px solid var(--border)',
+                      paddingBottom: '8px',
+                      flexWrap: 'wrap',
+                      gap: '6px'
+                    }}>
+                      <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--accent-saffron)' }}>
+                        🌟 {yp.year} ({t('yearAge', language)}: {yp.age})
+                      </span>
+                      {yp.dasaBhukthi && (
+                        <span style={{
+                          fontSize: '12px',
+                          color: 'var(--text-secondary)',
+                          background: 'rgba(255, 107, 0, 0.06)',
+                          border: '1px solid rgba(255, 107, 0, 0.2)',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          fontWeight: '500'
+                        }}>
+                          🪐 {yp.dasaBhukthi}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Uncapped Rich Narrative */}
+                    {narrative && (
+                      <div style={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        padding: '12px',
+                        boxSizing: 'border-box'
+                      }}>
+                        <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-primary)', lineHeight: '1.7', textAlign: 'justify', wordBreak: 'break-word' }}>
+                          {narrative}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

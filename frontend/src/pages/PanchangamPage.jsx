@@ -343,6 +343,40 @@ function PanchangamPage({ settings }) {
     return text;
   };
 
+  const formatMuhurthamWindow = (windowStr, lang) => {
+    if (!windowStr) return '';
+    const trimmed = windowStr.trim();
+    if (trimmed === 'Throughout the day' || trimmed === 'நாள் முழுவதும்' || trimmed === 'दिन भर' || trimmed === 'రోజంతా' || trimmed === 'ದಿನವಿಡೀ' || trimmed === 'ദിനം മുഴുവൻ') {
+      return t('throughoutDay', lang) || trimmed;
+    }
+    if (trimmed.includes(' - ')) {
+      return trimmed;
+    }
+    const untilPrefixMatch = trimmed.match(/^Until\s+(.*)$/i);
+    const untilSuffixMatch = trimmed.match(/^(.*?)\s+(வரை|तक|వరకు|ವರೆಗೆ|വരെ)$/i);
+    if (untilPrefixMatch || untilSuffixMatch) {
+      const time = untilPrefixMatch ? untilPrefixMatch[1] : untilSuffixMatch[1];
+      if (lang === 'ta') return `${time} வரை`;
+      if (lang === 'hi') return `${time} तक`;
+      if (lang === 'te') return `${time} వరకు`;
+      if (lang === 'kn') return `${time} ವರೆಗೆ`;
+      if (lang === 'ml') return `${time} വരെ`;
+      return `Until ${time}`;
+    }
+    const afterPrefixMatch = trimmed.match(/^After\s+(.*)$/i);
+    const afterSuffixMatch = trimmed.match(/^(.*?)\s+(பின்|பிறகு|के बाद|తరువాత|ನಂತರ|ശേഷം)$/i);
+    if (afterPrefixMatch || afterSuffixMatch) {
+      const time = afterPrefixMatch ? afterPrefixMatch[1] : afterSuffixMatch[1];
+      if (lang === 'ta') return `${time} பின்`;
+      if (lang === 'hi') return `${time} के बाद`;
+      if (lang === 'te') return `${time} తరువాత`;
+      if (lang === 'kn') return `${time} ನಂತರ`;
+      if (lang === 'ml') return `${time} ശേഷം`;
+      return `After ${time}`;
+    }
+    return trimmed;
+  };
+
   return (
     <div style={{ width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
       {/* Mobile-First Responsive Date Navigation Top Bar */}
@@ -454,9 +488,15 @@ function PanchangamPage({ settings }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ color: data.muhurthamDay ? (data.isTheiPirai ? '#e65100' : 'var(--success)') : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px', lineHeight: '1.5', wordBreak: 'break-word' }}>
                     {data.muhurthamDay 
-                      ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : '')
+                      ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.muhurthamWindow ? ` (${formatMuhurthamWindow(data.muhurthamWindow, settings.language)})` : '') + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : '')
                       : '❌ ' + t('inauspiciousDay', settings.language)}
                   </div>
+
+                  {data.sankrantiDay && (
+                    <div style={{ background: 'rgba(255, 107, 0, 0.12)', border: '1px solid var(--accent-saffron)', color: 'var(--accent-warm)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
+                      ☀️ {t('sankrantiDay', settings.language)}
+                    </div>
+                  )}
 
                   {data.isAgniNakshathiram && (
                     <div style={{ background: 'rgba(255, 152, 0, 0.15)', border: '1px solid #ff9800', color: '#ff9800', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
@@ -469,11 +509,50 @@ function PanchangamPage({ settings }) {
                       🏡 {t('vasthuTitle', settings.language)} {data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', settings.language)}` : ''}
                     </div>
                   )}
+
+                  {data.guruMoudhya && (
+                    <div style={{ background: 'rgba(237, 108, 2, 0.12)', border: '1px solid var(--warning)', color: 'var(--warning)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
+                      ⚠️ {t('guruMoudhya', settings.language)}
+                    </div>
+                  )}
+
+                  {data.sukraMoudhya && (
+                    <div style={{ background: 'rgba(237, 108, 2, 0.12)', border: '1px solid var(--warning)', color: 'var(--warning)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
+                      ⚠️ {t('sukraMoudhya', settings.language)}
+                    </div>
+                  )}
+
+                  {data.thithiSoonya && !data.muhurthamDay && (
+                    <div style={{ background: 'rgba(100, 100, 100, 0.08)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
+                      🌑 {t('thithiSoonya', settings.language)}
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', borderTop: '1px dashed var(--border)', paddingTop: '6px' }}>
                   {t('netram', settings.language)}: <strong>{data.netram}</strong> | {t('jeevan', settings.language)}: <strong>{data.jeevan}</strong>
                 </div>
+
+                {/* Subha Muhurtham Guidance & Caution Banners */}
+                {data.muhurthamDay && (data.adverseNityaYoga || data.thithiSoonya || data.isPurattasiOrAadi) && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
+                    {data.adverseNityaYoga && (
+                      <div style={{ background: '#fff8e1', border: '1px solid #ffe082', color: '#8d6e03', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        ⚠️ <strong>{(t('adverseYogaCaution', settings.language) || '').replace('{time}', data.adverseYogaAvoidWindow || '')}</strong>
+                      </div>
+                    )}
+                    {data.thithiSoonya && (
+                      <div style={{ background: '#f5f5f5', border: '1px solid #e0e0e0', color: '#555555', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        🌑 <strong>{t('thithiSoonyaCaution', settings.language)}</strong>
+                      </div>
+                    )}
+                    {data.isPurattasiOrAadi && (
+                      <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        ℹ️ <strong>{t('purattasiAadiCaution', settings.language)}</strong>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

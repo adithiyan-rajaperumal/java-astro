@@ -1,7 +1,10 @@
 import React from 'react';
 import { t } from '../i18n/translations';
+import { useTextToSpeech } from '../utils/useTextToSpeech';
 
-function AiMatchingView({ aiData, loading, onGenerate, language }) {
+function AiMatchingView({ aiData, loading, onGenerate, language = 'en' }) {
+  const tts = useTextToSpeech({ language });
+
   if (loading) {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '40px 20px' }}>
@@ -54,10 +57,182 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
     { key: 'doshaParity', data: aiData.doshaPapasamyaParity, icon: '⚖️', label: t('doshaPapasamyaParity', language) },
   ];
 
+  const buildSpeechText = () => {
+    if (!aiData) return '';
+    const parts = [];
+
+    // Title & Overall Score
+    parts.push(`${t('aiMatchingTitle', language)}. ${t('overallCompatibility', language)}: ${aiData.compatibilityPercentage ? aiData.compatibilityPercentage.toFixed(0) : '0'}%. ${aiData.overallVerdict || ''}`);
+
+    // Executive Summary
+    if (aiData.executiveSummary) {
+      parts.push(`${t('executiveSummary', language)}: ${aiData.executiveSummary}`);
+    }
+
+    // 5 Domain Analyses
+    domainList.forEach(({ label, data }) => {
+      if (data && data.analysis) {
+        let domainText = `${label || data.title}: ${data.scoreOrStatus ? data.scoreOrStatus + '. ' : ''}${data.analysis}`;
+        if (data.astrologicalBasis) {
+          domainText += ` ${t('astrologicalBasisLabel', language)}: ${data.astrologicalBasis}`;
+        }
+        parts.push(domainText);
+      }
+    });
+
+    // Key Strengths
+    if (aiData.keyStrengths && aiData.keyStrengths.length > 0) {
+      parts.push(`${t('keyStrengthsTitle', language)}: ${aiData.keyStrengths.join('. ')}`);
+    }
+
+    // Growth Areas & Cautions
+    if (aiData.growthAreasAndCautions && aiData.growthAreasAndCautions.length > 0) {
+      parts.push(`${t('cautionsTitle', language)}: ${aiData.growthAreasAndCautions.join('. ')}`);
+    }
+
+    // Remedies
+    if (aiData.authenticVedicRemedies && aiData.authenticVedicRemedies.length > 0) {
+      parts.push(`${t('remediesTitle', language)}: ${aiData.authenticVedicRemedies.join('. ')}`);
+    }
+
+    return parts.join('\n\n');
+  };
+
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+      {/* Top Status & Audio Control Bar */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        borderRadius: '10px',
+        padding: '12px 18px',
+        fontSize: '13px',
+        color: 'var(--text-secondary)',
+        boxShadow: 'var(--shadow)',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <span>✨ <strong style={{ color: 'var(--accent-warm)' }}>{t('aiMatchingTitle', language)}</strong></span>
+          <span>💾 <strong style={{ color: 'var(--accent-warm)' }}>{t('cached3HourNotice', language)}</strong></span>
+          {aiData.tokenUsage && (
+            <>
+              <span>⚡ <strong>{aiData.tokenUsage.totalTokens?.toLocaleString()}</strong> {t('tokensCount', language) || 'tokens'}</span>
+              {(aiData.tokenUsage.estimatedCostUsd > 0 || aiData.tokenUsage.estimatedCostInr > 0) && (
+                <span>💵 <strong>₹{aiData.tokenUsage.estimatedCostInr?.toFixed(2)}</strong></span>
+              )}
+              <span>🤖 <code style={{ color: 'var(--accent-saffron)' }}>{aiData.tokenUsage.modelUsed || 'gemini-3.7-flash'}</code></span>
+            </>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* TTS Audio Controls */}
+          {tts.isSupported && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '4px 8px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+            }}>
+              <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--accent-saffron)', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
+                🎙️ {tts.isPlaying ? (tts.isPaused ? '⏸' : '🔊') : ''}
+              </span>
+              {!tts.hasVoiceForLanguage && language !== 'en' && (
+                <span
+                  title={t('ttsNoVoiceWarning', language)}
+                  style={{ cursor: 'help', fontSize: '12px', color: 'var(--warning)', marginRight: '2px' }}
+                >
+                  ⚠️
+                </span>
+              )}
+              {!tts.isPlaying ? (
+                <button
+                  onClick={() => tts.speak(buildSpeechText())}
+                  className="btn-primary"
+                  style={{ padding: '5px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  title={t('ttsReadAiMatching', language)}
+                >
+                  ▶ {t('ttsPlay', language)}
+                </button>
+              ) : (
+                <>
+                  {tts.isPaused ? (
+                    <button
+                      onClick={tts.resume}
+                      className="btn-primary"
+                      style={{ padding: '5px 12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      title={t('ttsResume', language)}
+                    >
+                      ▶ {t('ttsResume', language)}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={tts.pause}
+                      style={{
+                        background: 'var(--accent-gold)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '5px 12px',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        fontWeight: '600'
+                      }}
+                      title={t('ttsPause', language)}
+                    >
+                      ⏸ {t('ttsPause', language)}
+                    </button>
+                  )}
+                  <button
+                    onClick={tts.stop}
+                    style={{
+                      background: 'var(--danger)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '5px 12px',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      fontWeight: '600'
+                    }}
+                    title={t('ttsStop', language)}
+                  >
+                    ⏹ {t('ttsStop', language)}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={onGenerate}
+            className="btn-primary"
+            style={{
+              padding: '6px 14px',
+              fontSize: '12px',
+              background: 'none',
+              border: '1px solid var(--border)',
+              color: 'var(--text-primary)',
+              cursor: 'pointer'
+            }}
+          >
+            🔄 {t('refreshAiAnalysis', language)}
+          </button>
+        </div>
+      </div>
+
       {/* AI Score & Verdict Banner */}
-      <div className="card matching-header" style={{ marginBottom: '20px' }}>
+      <div className="card matching-header">
         <div className="score-circle">
           <span className="number">
             {aiData.compatibilityPercentage ? aiData.compatibilityPercentage.toFixed(0) : '0'}%
@@ -72,13 +247,6 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
         <div style={{ marginTop: '12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
           ✨ {t('aiMatchingTitle', language)} • {t('cached3HourNotice', language)}
         </div>
-        <button
-          onClick={onGenerate}
-          className="btn-primary"
-          style={{ marginTop: '15px', background: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)', padding: '6px 14px', fontSize: '12px' }}
-        >
-          🔄 {t('refreshAiAnalysis', language)}
-        </button>
       </div>
 
       {/* Executive Summary */}
@@ -94,7 +262,7 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
       )}
 
       {/* 5 Domain Deep Dive Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
         {domainList.map(({ key, data, icon, label }) => {
           if (!data) return null;
           return (
@@ -123,7 +291,7 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
       </div>
 
       {/* Key Strengths & Cautions in 2 Columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
         {aiData.keyStrengths && aiData.keyStrengths.length > 0 && (
           <div className="card" style={{ borderLeft: '4px solid var(--success)' }}>
             <h4 style={{ margin: '0 0 12px 0', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -168,7 +336,7 @@ function AiMatchingView({ aiData, loading, onGenerate, language }) {
       {/* Token Usage Footer */}
       {aiData.tokenUsage && (
         <div style={{ textAlign: 'right', fontSize: '11px', color: 'var(--text-secondary)', marginTop: '10px' }}>
-          ⚡ Powered by Google Gemini ({aiData.tokenUsage.modelUsed || 'gemini-3.6-flash'}) • Tokens: {aiData.tokenUsage.totalTokens} • Cost: ₹{aiData.tokenUsage.estimatedCostInr?.toFixed(2) || '0.00'}
+          ⚡ Powered by Google Gemini ({aiData.tokenUsage.modelUsed || 'gemini-3.7-flash'}) • Tokens: {aiData.tokenUsage.totalTokens} • Cost: ₹{aiData.tokenUsage.estimatedCostInr?.toFixed(2) || '0.00'}
         </div>
       )}
     </div>

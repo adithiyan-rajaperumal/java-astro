@@ -25,13 +25,30 @@ spring:
   messages:
     encoding: UTF-8
 
+astro:
+  features:
+    life-anchors-enabled: ${FEATURE_LIFE_ANCHORS_ENABLED:true}
+    ayurdaya-enabled: ${FEATURE_AYURDAYA_ENABLED:true}
+
 gemini:
   api-key: ${GEMINI_API_KEY:enc:QVEuQWI4Uk42SnB2Q3pJcU1QWjh5SXhGVExXZmhWeUlONk9xb3I5RFFGNFVxSGcyTjFQRXc}
+  backup-api-key: ${GEMINI_BACKUP_API_KEY:enc:QVEuQWI4Uk42SXJyVnl0VmFmemNwUmNXeDZtQzFCc0gzZzRYR1JhYlJ6b2dtRVVVV01ST2c}
   enabled: ${GEMINI_ENABLED:true}
   life-predictions-enabled: ${GEMINI_LIFE_PREDICTIONS_ENABLED:true}
   daily-balan-enabled: ${GEMINI_DAILY_BALAN_ENABLED:true}
   matching-enabled: ${GEMINI_MATCHING_ENABLED:true}
   pdf-predictions-enabled: ${GEMINI_PDF_PREDICTIONS_ENABLED:true}
-  model: ${GEMINI_MODEL:gemini-3.6-flash}
+  # Forecast span mode: FULL_LIFESPAN (entire Ayurdaya lifespan) or NEXT_10_YEARS / NEXT_15_YEARS
+  forecast-mode: ${GEMINI_FORECAST_MODE:FULL_LIFESPAN}
+  # forecast-mode: NEXT_10_YEARS
+  forecast-years: ${GEMINI_FORECAST_YEARS:0}
+  model: ${GEMINI_MODEL:gemini-3.7-flash}
+  fallback-model: ${GEMINI_FALLBACK_MODEL:gemini-3.6-flash}
   temperature: ${GEMINI_TEMPERATURE:0.4}
   thinking-budget: ${GEMINI_THINKING_BUDGET:1024}
+
+pdf:
+  include-life-anchors: ${PDF_INCLUDE_LIFE_ANCHORS:true}
+  include-ayurdaya: ${PDF_INCLUDE_AYURDAYA:true}
+  include-yogas-doshams: ${PDF_INCLUDE_YOGAS_DOSHAMS:true}
+  include-ayurvedic-health: ${PDF_INCLUDE_AYURVEDIC_HEALTH:true}

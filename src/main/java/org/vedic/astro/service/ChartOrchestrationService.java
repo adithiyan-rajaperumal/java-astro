@@ -6,12 +6,16 @@ import org.vedic.astro.dto.BirthDetailsDTO;
 import org.vedic.astro.dto.ChartResponseDTO;
 import org.vedic.astro.dto.ChartUiResponseDTO;
 import org.vedic.astro.dto.ComprehensiveReportDTO;
+import org.vedic.astro.dto.LifeAnchorsProfile;
+import org.vedic.astro.dto.ShadbalaDTO;
 import org.vedic.astro.model.ChartResult;
+import org.vedic.astro.model.DasaPeriod;
 import org.vedic.astro.model.PlanetaryPosition;
 import org.vedic.astro.util.ZodiacUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,6 +31,12 @@ public class ChartOrchestrationService {
     private final AstrologyDiagnosticsService diagnosticsService;
     private final TimezoneService timezoneService;
     private final org.vedic.astro.config.GeminiProperties geminiProperties;
+
+    @org.springframework.beans.factory.annotation.Value("${astro.features.life-anchors-enabled:true}")
+    private boolean lifeAnchorsEnabled;
+
+    @org.springframework.beans.factory.annotation.Value("${astro.features.ayurdaya-enabled:true}")
+    private boolean ayurdayaEnabled;
 
     public ChartUiResponseDTO convertToUiDashboardResponse(ChartResult res, BirthDetailsDTO pay) {
         PlanetaryPosition moon = res.getD1Positions().get("Moon");
@@ -73,6 +83,21 @@ public class ChartOrchestrationService {
 
         String resolvedTz = timezoneService.getTimezoneFromCoordinates(pay.latitude(), pay.longitude());
 
+        List<ChartResponseDTO.PositionDetail> d1List = compileVargaList(1, res.getD1Positions(), null);
+        List<DasaPeriod> dasas = dasaEngine.calculateVimshottariTimeline(moon.getAbsoluteLongitude(), dob);
+        int lagnaSignNum = d1.get("Lagna") != null ? d1.get("Lagna").getSignNumber() : 1;
+        int moonSignNum = d1.get("Moon") != null ? d1.get("Moon").getSignNumber() : 1;
+
+        ShadbalaDTO shadbala = shadbalaService.calculateShadbala(d1);
+        var healthProfile = org.vedic.astro.util.AyurvedicAstrologyUtils.calculateHealthProfile(lagnaSignNum, moonSignNum, d1List);
+        var ayurdayaProfile = ayurdayaEnabled
+                ? org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(lagnaSignNum, moonSignNum, d1List, dasas, pay.year(), pay.hour(), pay.minute(), shadbala)
+                : null;
+        var d9PosList = compileVargaList(9, res.getD1Positions(), null);
+        var lifeAnchorsProfile = lifeAnchorsEnabled
+                ? buildLifeAnchorsProfile(lagnaSignNum, moonSignNum, d1, d9PosList, pay, res.getJulianDayUT())
+                : null;
+
         return ChartUiResponseDTO.builder().name(res.getName()).dateOfBirth(dob.toString())
                 .timeOfBirth(String.format("%02d:%02d:%02d", pay.hour(), pay.minute(), pay.second()))
                 .latitude(pay.latitude())
@@ -85,12 +110,17 @@ public class ChartOrchestrationService {
                 .karanam(computedKaranam)
                 .aiPredictionsEnabled(geminiProperties != null && geminiProperties.isFeatureEnabled())
                 .localMeanTime(res.getLocalMeanTime()).birthProfile(buildProfileHeader(res.getD1Positions()))
-                .d1Chart(compileVargaList(1, res.getD1Positions(), null))
-                .d9Chart(compileVargaList(9, res.getD1Positions(), null))
+                .d1Chart(d1List)
+                .d9Chart(d9PosList)
                 .bhavaChart(compileVargaList(-1, res.getD1Positions(), null))
-                .currentDasaTimeline(dasaEngine.calculateVimshottariTimeline(moon.getAbsoluteLongitude(), dob))
+                .currentDasaTimeline(dasas)
                 .shadbalaStrengths(shadbalaService.calculateShadbala(d1))
                 .structuralDiagnostics(diagnosticsService.runHoroscopeDiagnostics(d1))
+                .ayurvedicHealth(healthProfile)
+                .ayurdayaProfile(ayurdayaProfile)
+                .lifeAnchors(lifeAnchorsProfile)
+                .lifeAnchorsEnabled(lifeAnchorsEnabled)
+                .ayurdayaEnabled(ayurdayaEnabled)
                 .build();
     }
 
@@ -141,32 +171,40 @@ public class ChartOrchestrationService {
         int karanamIdx = (int) (elongation / 6.0) + 1;
         String computedKaranam = ts.getLabel("karanam." + resolveKaranamId(karanamIdx));
 
-        Map<String, List<ChartResponseDTO.PositionDetail>> suiteMap = new java.util.LinkedHashMap<>();
-        suiteMap.put("d1", compileVargaList(1, d1, cusps));
-        suiteMap.put("d2", compileVargaList(2, d1, cusps));
-        suiteMap.put("d3", compileVargaList(3, d1, cusps));
-        suiteMap.put("bhava", compileVargaList(-1, d1, cusps));
-        suiteMap.put("d7", compileVargaList(7, d1, cusps));
-        suiteMap.put("d9", compileVargaList(9, d1, cusps));
-        suiteMap.put("d10", compileVargaList(10, d1, cusps));
-        suiteMap.put("d12", compileVargaList(12, d1, cusps));
-        suiteMap.put("d20", compileVargaList(20, d1, cusps));
-        suiteMap.put("d24", compileVargaList(24, d1, cusps));
-        suiteMap.put("d30", compileVargaList(30, d1, cusps));
-        suiteMap.put("d60", compileVargaList(60, d1, cusps));
+        String resolvedTz = timezoneService.getTimezoneFromCoordinates(pay.latitude(), pay.longitude());
+        String place = pay.resolvePlaceName() != null ? pay.resolvePlaceName() : "Chennai, India";
 
-        String place = pay.resolvePlaceName();
-        if (place == null || place.isBlank()) {
-            place = String.format("%.4f° N/S, %.4f° E/W", pay.latitude(), pay.longitude());
+        Map<String, List<ChartResponseDTO.PositionDetail>> suiteMap = new LinkedHashMap<>();
+        int[] vargas = { 1, 2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60 };
+        for (int v : vargas) {
+            var vargaList = compileVargaList(v, d1, cusps);
+            suiteMap.put("D" + v, vargaList);
+            suiteMap.put("d" + v, vargaList);
         }
+        var bhavaList = compileVargaList(-1, d1, cusps);
+        suiteMap.put("Bhava", bhavaList);
+        suiteMap.put("bhava", bhavaList);
+
+        List<ChartResponseDTO.PositionDetail> d1PosList = d1.entrySet().stream()
+                .map(e -> mapToDetail(e.getKey().toUpperCase(), e.getValue())).collect(Collectors.toList());
+        List<DasaPeriod> pdfDasas = dasaEngine.calculateVimshottariTimeline(moonLong, dob);
+        int pdfLagnaSign = d1.get("Lagna") != null ? d1.get("Lagna").getSignNumber() : 1;
+        int pdfMoonSign = d1.get("Moon") != null ? d1.get("Moon").getSignNumber() : 1;
+
+        var pdfShadbala = shadbalaService.calculateShadbala(d1);
+        var pdfHealthProfile = org.vedic.astro.util.AyurvedicAstrologyUtils.calculateHealthProfile(pdfLagnaSign, pdfMoonSign, d1PosList);
+        var pdfAyurdayaProfile = org.vedic.astro.util.AyurdayaCalculationUtils.calculateAyurdaya(pdfLagnaSign, pdfMoonSign, d1PosList, pdfDasas, pay.year(), pay.hour(), pay.minute(), pdfShadbala);
+        var pdfD9List = compileVargaList(9, d1, cusps);
+        var pdfLifeAnchors = buildLifeAnchorsProfile(pdfLagnaSign, pdfMoonSign, d1, pdfD9List, pay, res.getJulianDayUT());
 
         return ComprehensiveReportDTO.builder()
-                .name(pay.name())
+                .name(res.getName())
                 .dateOfBirth(dob.toString())
                 .timeOfBirth(String.format("%02d:%02d:%02d", pay.hour(), pay.minute(), pay.second()))
                 .localMeanTime(res.getLocalMeanTime())
                 .latitude(pay.latitude())
                 .longitude(pay.longitude())
+                .resolvedTimezone(resolvedTz != null ? resolvedTz : "Asia/Kolkata")
                 .placeOfBirth(place)
                 .thithi(computedThithi)
                 .yogam(computedYogam)
@@ -174,12 +212,14 @@ public class ChartOrchestrationService {
                 .ayanamsa(pay.ayanamsa() != null ? pay.ayanamsa() : "LAHIRI")
                 .panchangamSystem("DRIK_TIRUKANITHAM")
                 .birthProfile(buildProfileHeader(d1))
-                .birthPlanetaryPositions(d1.entrySet().stream()
-                        .map(e -> mapToDetail(e.getKey().toUpperCase(), e.getValue())).collect(Collectors.toList()))
+                .birthPlanetaryPositions(d1PosList)
                 .vargaChartsMap(suiteMap)
-                .vimshottariTimeline(dasaEngine.calculateVimshottariTimeline(moonLong, dob))
+                .vimshottariTimeline(pdfDasas)
                 .shadbalaStrengths(shadbalaService.calculateShadbala(d1))
                 .structuralDiagnostics(diagnosticsService.runHoroscopeDiagnostics(d1))
+                .ayurvedicHealth(pdfHealthProfile)
+                .ayurdayaProfile(pdfAyurdayaProfile)
+                .lifeAnchors(pdfLifeAnchors)
                 .build();
     }
 
@@ -240,5 +280,31 @@ public class ChartOrchestrationService {
                 .displayName(ts.getLabel("planet." + key + ".short")).signNumber(p.getSignNumber())
                 .rashiName(ts.getLocalizedRashi(p.getSignNumber())).degreeInSign(p.getDegreeInSign())
                 .formattedDegree(ZodiacUtils.formatDMS(p.getDegreeInSign())).build();
+    }
+
+    private LifeAnchorsProfile buildLifeAnchorsProfile(
+            int lagnaSign,
+            int moonSign,
+            Map<String, PlanetaryPosition> d1,
+            List<ChartResponseDTO.PositionDetail> d9,
+            BirthDetailsDTO pay,
+            double julianDay) {
+
+        String lagnaLord = org.vedic.astro.util.PlanetDignityUtils.getSignLord(lagnaSign);
+        var numerology = org.vedic.astro.util.NumerologyUtils.calculateNumerology(pay.day(), pay.month(), pay.year(), lagnaLord);
+        var luckyDates = org.vedic.astro.util.NumerologyUtils.calculateLuckyDates(numerology.radicalDriverNumber(), moonSign, java.util.Collections.emptyList());
+        var deities = org.vedic.astro.util.SpiritualDeityUtils.calculateSpiritualDeities(d1, d9);
+        var gemology = org.vedic.astro.util.GemologyEngineUtils.calculateGemologyRecommendation(lagnaSign, d1);
+        var structuralBundle = org.vedic.astro.util.StructuralAnchorsUtils.calculateStructuralAnchors(lagnaSign, moonSign, d1, julianDay);
+
+        return new LifeAnchorsProfile(
+                numerology,
+                structuralBundle.luckyDay(),
+                luckyDates,
+                structuralBundle.directions(),
+                deities,
+                gemology,
+                structuralBundle.structuralAnchors()
+        );
     }
 }
