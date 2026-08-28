@@ -522,7 +522,7 @@ function PanchangamPage({ settings }) {
                     </div>
                   )}
 
-                  {data.thithiSoonya && (
+                  {data.thithiSoonya && !data.muhurthamDay && (
                     <div style={{ background: 'rgba(100, 100, 100, 0.08)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12.5px', lineHeight: '1.4' }}>
                       🌑 {t('thithiSoonya', settings.language)}
                     </div>
@@ -538,7 +538,7 @@ function PanchangamPage({ settings }) {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
                     {data.adverseNityaYoga && (
                       <div style={{ background: '#fff8e1', border: '1px solid #ffe082', color: '#8d6e03', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
-                        ⚠️ <strong>{t('adverseYogaCaution', settings.language)}</strong>
+                        ⚠️ <strong>{(t('adverseYogaCaution', settings.language) || '').replace('{time}', data.adverseYogaAvoidWindow || '')}</strong>
                       </div>
                     )}
                     {data.thithiSoonya && (

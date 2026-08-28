@@ -322,6 +322,14 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Strict Nitya Yoga Mahadoshas (17 Vyatipata & 27 Vaidhriti)
         boolean isNityaYogaMahadosha = (yogamIdx == 17 || yogamIdx == 27);
 
+        // Calculate specific clock time window to avoid (first 5 ghatikas / 2 hours after sunrise)
+        String adverseYogaAvoidWindow = null;
+        if (isAdverseNityaYoga) {
+            double avoidEndJd = jdSunrise + (2.0 / 24.0); // 5 ghatikas = 2 hours
+            String avoidEndTimeStr = jdToZonedDateTime(avoidEndJd, zoneId).format(timeFormatter);
+            adverseYogaAvoidWindow = sunriseStr + " - " + avoidEndTimeStr;
+        }
+
         // Subha Muhurtham Day Calculation (Universal Standard)
         boolean isMuhurthamDay = (date.getDayOfWeek() != DayOfWeek.TUESDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY)
                 && isAuspiciousThithi
@@ -418,7 +426,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             isThithiSoonya,
             isAdverseNityaYoga,
             isPurattasiOrAadi,
-            muhurthamWindow
+            muhurthamWindow,
+            adverseYogaAvoidWindow
         );
     }
 
