@@ -296,9 +296,10 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Karanam check (Exclude Vishti Karanam = 7)
         boolean isAuspiciousKaranam = (karanamIdx != 7);
 
-        // Solar Rashi Month Exclusions (Exclude Margazhi = 9, Purattasi = 6, Aadi = 4 for Subha Muhurtham)
+        // Solar Rashi Month Check (Exclude Margazhi = 9; flag Aadi = 4 & Purattasi = 6 with caution)
         int solarRashi = (int) (coordinatesSun[0] / 30.0) + 1;
-        boolean isAuspiciousMonth = (solarRashi != 9 && solarRashi != 6 && solarRashi != 4);
+        boolean isPurattasiOrAadi = (solarRashi == 4 || solarRashi == 6);
+        boolean isAuspiciousMonth = (solarRashi != 9);
 
         // Masa Sankranti Day Detection (Sun Ingress into new sign between today's sunrise and next sunrise)
         double sunLongNextSunrise = getSunLongitude(jdNextSunrise, ayanamsaType);
@@ -314,12 +315,14 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         // Thithi Soonya (Dagda Rashi) Validation on daytime Thithi
         boolean isThithiSoonya = isMoonInThithiSoonya(daytimeThithiIdx, rashiNum);
 
-        // Nitya Yoga Mahadoshas & Adverse Yogas Exclusion
-        // Exclude: 1 (Vishkambha), 6 (Atiganda), 9 (Shoola), 10 (Ganda), 13 (Vyaghata), 15 (Vajra), 17 (Vyatipata), 19 (Parigha), 27 (Vaidhriti)
-        boolean isNityaYogaAuspicious = (yogamIdx != 1 && yogamIdx != 6 && yogamIdx != 9 && yogamIdx != 10 
-                && yogamIdx != 13 && yogamIdx != 15 && yogamIdx != 17 && yogamIdx != 19 && yogamIdx != 27);
+        // Minor Adverse Nitya Yogas (Non-Mahadosha adverse yogas: 1, 6, 9, 10, 13, 15, 19)
+        boolean isAdverseNityaYoga = (yogamIdx == 1 || yogamIdx == 6 || yogamIdx == 9 || yogamIdx == 10 
+                || yogamIdx == 13 || yogamIdx == 15 || yogamIdx == 19);
 
-        // Subha Muhurtham Day Calculation
+        // Strict Nitya Yoga Mahadoshas (17 Vyatipata & 27 Vaidhriti)
+        boolean isNityaYogaMahadosha = (yogamIdx == 17 || yogamIdx == 27);
+
+        // Subha Muhurtham Day Calculation (Universal Standard)
         boolean isMuhurthamDay = (date.getDayOfWeek() != DayOfWeek.TUESDAY && date.getDayOfWeek() != DayOfWeek.SATURDAY)
                 && isAuspiciousThithi
                 && isAuspiciousNakshatra
@@ -328,8 +331,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 && !isSankrantiDay
                 && !isGuruMoudhya
                 && !isSukraMoudhya
-                && !isThithiSoonya
-                && isNityaYogaAuspicious
+                && !isNityaYogaMahadosha
                 && isAuspiciousNakVaraYogam
                 && (netram > 0 && jeevan > 0.0);
 
@@ -414,6 +416,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             isGuruMoudhya,
             isSukraMoudhya,
             isThithiSoonya,
+            isAdverseNityaYoga,
+            isPurattasiOrAadi,
             muhurthamWindow
         );
     }

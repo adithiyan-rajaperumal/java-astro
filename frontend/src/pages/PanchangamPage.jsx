@@ -498,6 +498,27 @@ function PanchangamPage({ settings }) {
                 <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', borderTop: '1px dashed var(--border)', paddingTop: '6px' }}>
                   {t('netram', settings.language)}: <strong>{data.netram}</strong> | {t('jeevan', settings.language)}: <strong>{data.jeevan}</strong>
                 </div>
+
+                {/* Subha Muhurtham Guidance & Caution Banners */}
+                {data.muhurthamDay && (data.adverseNityaYoga || data.thithiSoonya || data.isPurattasiOrAadi) && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
+                    {data.adverseNityaYoga && (
+                      <div style={{ background: '#fff8e1', border: '1px solid #ffe082', color: '#8d6e03', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        ⚠️ <strong>{t('adverseYogaCaution', settings.language)}</strong>
+                      </div>
+                    )}
+                    {data.thithiSoonya && (
+                      <div style={{ background: '#f5f5f5', border: '1px solid #e0e0e0', color: '#555555', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        🌑 <strong>{t('thithiSoonyaCaution', settings.language)}</strong>
+                      </div>
+                    )}
+                    {data.isPurattasiOrAadi && (
+                      <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        ℹ️ <strong>{t('purattasiAadiCaution', settings.language)}</strong>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
