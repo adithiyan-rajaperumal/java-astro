@@ -364,13 +364,13 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             if (startTimeStr != null && endTimeStr != null) {
                 muhurthamWindow = startTimeStr + " - " + endTimeStr;
             } else if (startTimeStr != null) {
-                String afterLabel = translationService.getLabel("panchangam.after_time");
-                if (afterLabel == null || afterLabel.startsWith("panchangam.")) afterLabel = "After";
-                muhurthamWindow = afterLabel + " " + startTimeStr;
+                String pattern = translationService.getLabel("panchangam.after_time_pattern", startTimeStr);
+                if (pattern == null || pattern.startsWith("panchangam.")) pattern = "After " + startTimeStr;
+                muhurthamWindow = pattern;
             } else if (endTimeStr != null) {
-                String untilLabel = translationService.getLabel("panchangam.until_time");
-                if (untilLabel == null || untilLabel.startsWith("panchangam.")) untilLabel = "Until";
-                muhurthamWindow = untilLabel + " " + endTimeStr;
+                String pattern = translationService.getLabel("panchangam.until_time_pattern", endTimeStr);
+                if (pattern == null || pattern.startsWith("panchangam.")) pattern = "Until " + endTimeStr;
+                muhurthamWindow = pattern;
             } else {
                 String throughoutDayLabel = translationService.getLabel("panchangam.throughout_day");
                 if (throughoutDayLabel == null || throughoutDayLabel.startsWith("panchangam.")) throughoutDayLabel = "Throughout the day";

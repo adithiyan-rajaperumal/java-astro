@@ -343,6 +343,40 @@ function PanchangamPage({ settings }) {
     return text;
   };
 
+  const formatMuhurthamWindow = (windowStr, lang) => {
+    if (!windowStr) return '';
+    const trimmed = windowStr.trim();
+    if (trimmed === 'Throughout the day' || trimmed === 'நாள் முழுவதும்' || trimmed === 'दिन भर' || trimmed === 'రోజంతా' || trimmed === 'ದಿನವಿಡೀ' || trimmed === 'ദിനം മുഴുവൻ') {
+      return t('throughoutDay', lang) || trimmed;
+    }
+    if (trimmed.includes(' - ')) {
+      return trimmed;
+    }
+    const untilPrefixMatch = trimmed.match(/^Until\s+(.*)$/i);
+    const untilSuffixMatch = trimmed.match(/^(.*?)\s+(வரை|तक|వరకు|ವರೆಗೆ|വരെ)$/i);
+    if (untilPrefixMatch || untilSuffixMatch) {
+      const time = untilPrefixMatch ? untilPrefixMatch[1] : untilSuffixMatch[1];
+      if (lang === 'ta') return `${time} வரை`;
+      if (lang === 'hi') return `${time} तक`;
+      if (lang === 'te') return `${time} వరకు`;
+      if (lang === 'kn') return `${time} ವರೆಗೆ`;
+      if (lang === 'ml') return `${time} വരെ`;
+      return `Until ${time}`;
+    }
+    const afterPrefixMatch = trimmed.match(/^After\s+(.*)$/i);
+    const afterSuffixMatch = trimmed.match(/^(.*?)\s+(பின்|பிறகு|के बाद|తరువాత|ನಂತರ|ശേഷം)$/i);
+    if (afterPrefixMatch || afterSuffixMatch) {
+      const time = afterPrefixMatch ? afterPrefixMatch[1] : afterSuffixMatch[1];
+      if (lang === 'ta') return `${time} பின்`;
+      if (lang === 'hi') return `${time} के बाद`;
+      if (lang === 'te') return `${time} తరువాత`;
+      if (lang === 'kn') return `${time} ನಂತರ`;
+      if (lang === 'ml') return `${time} ശേഷം`;
+      return `After ${time}`;
+    }
+    return trimmed;
+  };
+
   return (
     <div style={{ width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
       {/* Mobile-First Responsive Date Navigation Top Bar */}
@@ -454,7 +488,7 @@ function PanchangamPage({ settings }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ color: data.muhurthamDay ? (data.isTheiPirai ? '#e65100' : 'var(--success)') : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px', lineHeight: '1.5', wordBreak: 'break-word' }}>
                     {data.muhurthamDay 
-                      ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.muhurthamWindow ? ` (${data.muhurthamWindow})` : '') + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : '')
+                      ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.muhurthamWindow ? ` (${formatMuhurthamWindow(data.muhurthamWindow, settings.language)})` : '') + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : '')
                       : '❌ ' + t('inauspiciousDay', settings.language)}
                   </div>
 
