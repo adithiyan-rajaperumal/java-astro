@@ -1007,7 +1007,6 @@ input:focus, select:focus {
 @media (max-width: 600px) {
   .card {
     padding: 14px 12px !important;
-    overflow-x: hidden !important;
     word-break: break-word !important;
   }
   .grid-2, .grid-3 {

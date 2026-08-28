@@ -349,9 +349,13 @@ function MatchingPage({ settings }) {
                   <input type="time" value={boyTime} onChange={(e) => setBoyTime(e.target.value)} required />
                 </div>
               </div>
-              <div>
+              <div style={{ marginBottom: '15px' }}>
                 <label>{t('birthLocation', settings.language)}</label>
-                <LocationSearch value={boyLocation} onChange={setBoyLocation} />
+                <LocationSearch
+                  value={boyLocation}
+                  onChange={setBoyLocation}
+                  placeholder={t('searchLocation', settings.language) || 'Type city name and select suggestion...'}
+                />
               </div>
             </div>
 
@@ -395,9 +399,13 @@ function MatchingPage({ settings }) {
                   <input type="time" value={girlTime} onChange={(e) => setGirlTime(e.target.value)} required />
                 </div>
               </div>
-              <div>
+              <div style={{ marginBottom: '15px' }}>
                 <label>{t('birthLocation', settings.language)}</label>
-                <LocationSearch value={girlLocation} onChange={setGirlLocation} />
+                <LocationSearch
+                  value={girlLocation}
+                  onChange={setGirlLocation}
+                  placeholder={t('searchLocation', settings.language) || 'Type city name and select suggestion...'}
+                />
               </div>
             </div>
           </div>
