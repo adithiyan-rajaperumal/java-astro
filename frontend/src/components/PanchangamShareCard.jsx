@@ -9,6 +9,40 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
   const untilStr = t('until', lang);
   const thenStr = t('then', lang);
 
+  const formatMuhurthamWindow = (windowStr, l) => {
+    if (!windowStr) return '';
+    const trimmed = windowStr.trim();
+    if (trimmed === 'Throughout the day' || trimmed === 'நாள் முழுவதும்' || trimmed === 'दिन भर' || trimmed === 'రోజంతా' || trimmed === 'ದಿನವಿಡೀ' || trimmed === 'ദിനം മുഴുവൻ') {
+      return t('throughoutDay', l) || trimmed;
+    }
+    if (trimmed.includes(' - ')) {
+      return trimmed;
+    }
+    const timeMatch = trimmed.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?)/i);
+    const isUntil = trimmed.toLowerCase().includes('until') || trimmed.includes('வரை') || trimmed.includes('तक') || trimmed.includes('వరకు') || trimmed.includes('ವರೆಗೆ') || trimmed.includes('വരെ');
+    const isAfter = trimmed.toLowerCase().includes('after') || trimmed.includes('பின்') || trimmed.includes('பிறகு') || trimmed.includes('கே बाद') || trimmed.includes('తరువాత') || trimmed.includes('ನಂತರ') || trimmed.includes('ശേഷം');
+
+    if (isUntil && timeMatch) {
+      const time = timeMatch[1].trim();
+      if (l === 'ta') return `${time} வரை`;
+      if (l === 'hi') return `${time} तक`;
+      if (l === 'te') return `${time} వరకు`;
+      if (l === 'kn') return `${time} ವರೆಗೆ`;
+      if (l === 'ml') return `${time} വരെ`;
+      return `Until ${time}`;
+    }
+    if (isAfter && timeMatch) {
+      const time = timeMatch[1].trim();
+      if (l === 'ta') return `${time} பிறகு`;
+      if (l === 'hi') return `${time} के बाद`;
+      if (l === 'te') return `${time} తరువాత`;
+      if (l === 'kn') return `${time} ನಂತರ`;
+      if (l === 'ml') return `${time} ശേഷം`;
+      return `After ${time}`;
+    }
+    return trimmed;
+  };
+
   const formatElementTiming = (elem) => {
     if (!elem) return '';
     const firstName = elem.localizedName || elem.name;
@@ -45,6 +79,9 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
   };
 
   const dayName = getDayName(currentDate, lang);
+  const currentOrigin = (typeof window !== 'undefined' && window.location?.origin) 
+    ? window.location.origin 
+    : 'https://drik-vedic.onrender.com';
 
   return (
     <div
@@ -85,7 +122,7 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
         {/* Sun & Moon Times with whiteSpace: nowrap */}
         <div style={{
           display: 'flex',
-          justify: 'center',
+          justifyContent: 'center',
           gap: '20px',
           marginTop: '8px',
           paddingTop: '8px',
@@ -107,25 +144,49 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
         display: 'flex',
         flexWrap: 'wrap',
         gap: '8px',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#fff3e0',
         padding: '10px 16px',
         borderRadius: '8px',
         border: '1px solid #ffe0b2',
-        marginBottom: '14px',
+        marginBottom: '10px',
         fontSize: '15px',
         fontWeight: 'bold'
       }}>
         <div style={{ color: data.muhurthamDay ? (data.isTheiPirai ? '#d84315' : '#2e7d32') : '#c62828' }}>
           {data.muhurthamDay 
-            ? '✅ ' + t('subhaMuhurtham', lang) + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', lang)}` : '')
+            ? '✅ ' + (t('subhaMuhurtham', lang) || t('auspiciousDay', lang)) + (data.muhurthamWindow ? ` (${formatMuhurthamWindow(data.muhurthamWindow, lang)})` : '') + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', lang)}` : '')
             : '❌ ' + t('inauspiciousDay', lang)}
         </div>
+
+        {data.sankrantiDay && (
+          <div style={{ backgroundColor: '#fff3e0', color: '#e65100', padding: '4px 10px', borderRadius: '14px', border: '1px solid #ffcc80' }}>
+            ☀️ {t('sankrantiDay', lang)}
+          </div>
+        )}
 
         {data.vasthuDay && (
           <div style={{ backgroundColor: data.isTheiPirai ? '#fff3e0' : '#e8f5e9', color: data.isTheiPirai ? '#d84315' : '#1b5e20', padding: '4px 10px', borderRadius: '14px', border: `1px solid ${data.isTheiPirai ? '#ffcc80' : '#a5d6a7'}` }}>
             🏡 {t('vasthuTitle', lang)}: {data.vasthuNeram?.start} - {data.vasthuNeram?.end} {data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', lang)}` : ''}
+          </div>
+        )}
+
+        {data.guruMoudhya && (
+          <div style={{ backgroundColor: '#fff3e0', color: '#e65100', padding: '4px 10px', borderRadius: '14px', border: '1px solid #ffcc80' }}>
+            ⚠️ {t('guruMoudhya', lang)}
+          </div>
+        )}
+
+        {data.sukraMoudhya && (
+          <div style={{ backgroundColor: '#fff3e0', color: '#e65100', padding: '4px 10px', borderRadius: '14px', border: '1px solid #ffcc80' }}>
+            ⚠️ {t('sukraMoudhya', lang)}
+          </div>
+        )}
+
+        {data.thithiSoonya && !data.muhurthamDay && (
+          <div style={{ backgroundColor: '#eeeeee', color: '#616161', padding: '4px 10px', borderRadius: '14px', border: '1px solid #e0e0e0' }}>
+            🌑 {t('thithiSoonya', lang)}
           </div>
         )}
 
@@ -139,6 +200,27 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
           👁️ {t('netram', lang)}: <strong>{data.netram}</strong> | 🌿 {t('jeevan', lang)}: <strong>{data.jeevan}</strong>
         </div>
       </div>
+
+      {/* Subha Muhurtham Guidance & Caution Banners */}
+      {data.muhurthamDay && (data.adverseNityaYoga || data.thithiSoonya || data.isPurattasiOrAadi) && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px' }}>
+          {data.adverseNityaYoga && (
+            <div style={{ background: '#fff8e1', border: '1px solid #ffe082', color: '#8d6e03', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
+              ⚠️ {(t('adverseYogaCaution', lang) || '').replace('{time}', data.adverseYogaAvoidWindow || '')}
+            </div>
+          )}
+          {data.thithiSoonya && (
+            <div style={{ background: '#f5f5f5', border: '1px solid #e0e0e0', color: '#555555', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
+              🌑 {t('thithiSoonyaCaution', lang)}
+            </div>
+          )}
+          {data.isPurattasiOrAadi && (
+            <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
+              ℹ️ {t('purattasiAadiCaution', lang)}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Core 5 Limbs & Zodiac Section */}
       <div style={{
@@ -223,7 +305,7 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
                   borderRadius: '6px',
                   border: '1px solid #a5d6a7',
                   display: 'flex',
-                  justify: 'space-between',
+                  justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
                   <span style={{ fontWeight: 'bold', color: '#2e7d32' }}>{s.label}</span>
@@ -274,7 +356,7 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
               borderRadius: '6px',
               border: '1px solid #ffe082',
               display: 'flex',
-              justify: 'space-between',
+              justifyContent: 'space-between',
               alignItems: 'center',
               gap: '12px'
             }}>
@@ -294,7 +376,7 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
         color: '#b71c1c',
         fontWeight: 'bold'
       }}>
-        Generated by https://tinyurl.com/drik-vedic
+        Generated by {currentOrigin}
       </div>
     </div>
   );
