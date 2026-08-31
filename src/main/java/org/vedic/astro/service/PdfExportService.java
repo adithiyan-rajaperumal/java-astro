@@ -568,6 +568,32 @@ public class PdfExportService {
                 ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.classification"), boldB, Element.ALIGN_LEFT));
                 ayuTab.addCell(buildTableCell(classTrans + rangeStr, bFont, Element.ALIGN_LEFT));
 
+                if (ayu.khandaSubTier() != null && !ayu.khandaSubTier().isBlank()) {
+                    ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.khanda_sub_tier"), boldB, Element.ALIGN_LEFT));
+                    String khandaTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateKhandaSubTier(ayu.khandaSubTier(), lang);
+                    ayuTab.addCell(buildTableCell(khandaTrans, bFont, Element.ALIGN_LEFT));
+                }
+
+                if (ayu.jaiminiThreePairs() != null) {
+                    String ruleApplied = (String) ayu.jaiminiThreePairs().get("ruleApplied");
+                    String overrideReason = (String) ayu.jaiminiThreePairs().get("overrideReason");
+                    if (ruleApplied != null && !ruleApplied.isBlank()) {
+                        ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.jaimini_pairs"), boldB, Element.ALIGN_LEFT));
+                        String pairSummary = ruleApplied + (overrideReason != null && !overrideReason.isBlank() ? ": " + overrideReason : "");
+                        String pairTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateRationale(pairSummary, lang);
+                        ayuTab.addCell(buildTableCell(pairTrans, bFont, Element.ALIGN_LEFT));
+                    }
+                }
+
+                if (ayu.shoolaDasaInfo() != null) {
+                    String critShoola = ayu.shoolaDasaInfo().criticalShoolaWindow();
+                    if (critShoola != null && !critShoola.isBlank()) {
+                        ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.shoola_dasa"), boldB, Element.ALIGN_LEFT));
+                        String shoolaTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateShoolaWindow(critShoola, lang);
+                        ayuTab.addCell(buildTableCell(shoolaTrans, bFont, Element.ALIGN_LEFT));
+                    }
+                }
+
                 if (ayu.criticalMarakaWindow() != null) {
                     ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.maraka_timeline"), boldB, Element.ALIGN_LEFT));
                     String marakaTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateMarakaWindow(ayu.criticalMarakaWindow(), lang);
@@ -578,6 +604,12 @@ public class PdfExportService {
                     ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.rationale"), boldB, Element.ALIGN_LEFT));
                     String rationaleTrans = org.vedic.astro.util.AstrologicalTranslationHelper.translateRationale(ayu.classicalRationale(), lang);
                     ayuTab.addCell(buildTableCell(rationaleTrans, bFont, Element.ALIGN_LEFT));
+                }
+
+                if (ayu.marakaTimeline() != null && ayu.marakaTimeline().get("recommendedRemedies") != null) {
+                    ayuTab.addCell(buildTableCell(ts.getLabel("pdf.ayurdaya.remedies"), boldB, Element.ALIGN_LEFT));
+                    String remedies = (String) ayu.marakaTimeline().get("recommendedRemedies");
+                    ayuTab.addCell(buildTableCell(remedies, bFont, Element.ALIGN_LEFT));
                 }
 
                 document.add(ayuTab);

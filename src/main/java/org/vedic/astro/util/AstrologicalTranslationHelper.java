@@ -983,6 +983,127 @@ public class AstrologicalTranslationHelper {
         return translate(classification, lang);
     }
 
+    public static String translateKhandaSubTier(String khanda, String lang) {
+        if (khanda == null || khanda.isBlank()) return "";
+        if ("en".equalsIgnoreCase(lang)) return khanda;
+
+        String res = khanda;
+        String yearsTrans = switch (lang.toLowerCase()) {
+            case "ta" -> "ஆண்டுகள்";
+            case "hi" -> "वर्ष";
+            case "te" -> "సంవత్సరాలు";
+            case "kn" -> "ವರ್ಷಗಳು";
+            case "ml" -> "വർഷങ്ങൾ";
+            default -> "Years";
+        };
+        res = res.replace("Years", yearsTrans).replace("years", yearsTrans);
+
+        switch (lang.toLowerCase()) {
+            case "ta":
+                res = res.replace("Balarishta / Adhama Alpayu", "பாலரிஷ்டம் / அதம அல்பாயுள்")
+                        .replace("Madhyama Alpayu", "மத்திம அல்பாயுள்")
+                        .replace("Uttama Alpayu", "உத்தம அல்பாயுள்")
+                        .replace("Adhama Madhyayu", "அதம மத்தியாயுள்")
+                        .replace("Madhyama Madhyayu", "மத்திம மத்தியாயுள்")
+                        .replace("Uttama Madhyayu", "உத்தம மத்தியாயுள்")
+                        .replace("Adhama Poornayu", "அதம பூரணாயுள்")
+                        .replace("Madhyama Poornayu", "மத்திம பூரணாயுள்")
+                        .replace("Paramayu / Deerghayu", "பரமாயுள் / தீர்க்காயுள்");
+                break;
+            case "hi":
+                res = res.replace("Balarishta / Adhama Alpayu", "बालारिष्ट / अधम अल्पायु")
+                        .replace("Madhyama Alpayu", "मध्यम अल्पायु")
+                        .replace("Uttama Alpayu", "उत्तम अल्पायु")
+                        .replace("Adhama Madhyayu", "अधम मध्यायु")
+                        .replace("Madhyama Madhyayu", "मध्यम मध्यायु")
+                        .replace("Uttama Madhyayu", "उत्तम मध्यायु")
+                        .replace("Adhama Poornayu", "अधम पूर्णायु")
+                        .replace("Madhyama Poornayu", "मध्यम पूर्णायु")
+                        .replace("Paramayu / Deerghayu", "परमायु / दीर्घायु");
+                break;
+            case "te":
+                res = res.replace("Balarishta / Adhama Alpayu", "బాలారిష్ట / అధమ అల్పాయుష్షు")
+                        .replace("Madhyama Alpayu", "మధ్యమ అల్పాయుష్షు")
+                        .replace("Uttama Alpayu", "ఉత్తమ అల్పాయుష్షు")
+                        .replace("Adhama Madhyayu", "అధమ మధ్యాయుష్షు")
+                        .replace("Madhyama Madhyayu", "మధ్యమ మధ్యాయుష్షు")
+                        .replace("Uttama Madhyayu", "ఉత్తమ మధ్యాయుష్షు")
+                        .replace("Adhama Poornayu", "అధమ పూర్ణాయుష్షు")
+                        .replace("Madhyama Poornayu", "మధ్యమ పూర్ణాయుష్షు")
+                        .replace("Paramayu / Deerghayu", "పరమాయుష్షు / దీర్ఘాయుష్షు");
+                break;
+            case "kn":
+                res = res.replace("Balarishta / Adhama Alpayu", "ಬಾಲಾರಿಷ್ಟ / ಅಧಮ ಅಲ್ಪಾಯುಷ್ಯ")
+                        .replace("Madhyama Alpayu", "ಮಧ್ಯಮ ಅಲ್ಪಾಯುಷ್ಯ")
+                        .replace("Uttama Alpayu", "ಉತ್ತಮ ಅಲ್ಪಾಯುಷ್ಯ")
+                        .replace("Adhama Madhyayu", "ಅಧಮ ಮಧ್ಯಾಯುಷ್ಯ")
+                        .replace("Madhyama Madhyayu", "ಮಧ್ಯಮ ಮಧ್ಯಾಯುಷ್ಯ")
+                        .replace("Uttama Madhyayu", "ಉತ್ತಮ ಮಧ್ಯಾಯುಷ್ಯ")
+                        .replace("Adhama Poornayu", "ಅಧಮ ಪೂರ್ಣಾಯುಷ್ಯ")
+                        .replace("Madhyama Poornayu", "ಮಧ್ಯಮ ಪೂರ್ಣಾಯುಷ್ಯ")
+                        .replace("Paramayu / Deerghayu", "ಪರಮಾಯುಷ್ಯ / ದೀರ್ಘಾಯುಷ್ಯ");
+                break;
+            case "ml":
+                res = res.replace("Balarishta / Adhama Alpayu", "ബാലാരിഷ്ടം / അധമ അല്പായുസ്സ്")
+                        .replace("Madhyama Alpayu", "മധ്യമ അല്പായുസ്സ്")
+                        .replace("Uttama Alpayu", "ഉത്തമ അല്പായുസ്സ്")
+                        .replace("Adhama Madhyayu", "അധമ മദ്ധ്യായുസ്സ്")
+                        .replace("Madhyama Madhyayu", "മധ്യമ മദ്ധ്യായുസ്സ്")
+                        .replace("Uttama Madhyayu", "ഉത്തമ മദ്ധ്യായുസ്സ്")
+                        .replace("Adhama Poornayu", "അധമ പൂർണ്ണായുസ്സ്")
+                        .replace("Madhyama Poornayu", "മധ്യമ പൂർണ്ണായുസ്സ്")
+                        .replace("Paramayu / Deerghayu", "പരമായുസ്സ് / ദീർഘായുസ്സ്");
+                break;
+        }
+        return res;
+    }
+
+    public static String translateShoolaWindow(String window, String lang) {
+        if (window == null || window.isBlank()) return "";
+        if ("en".equalsIgnoreCase(lang)) return window;
+
+        String res = window;
+        for (int i = 1; i <= 12; i++) {
+            String rashi = ZodiacUtils.getRashiName(i);
+            String rashiTrans = translate(rashi, lang);
+            res = res.replace(rashi, rashiTrans);
+        }
+
+        switch (lang.toLowerCase()) {
+            case "ta":
+                res = res.replace("Age", "வயது")
+                        .replace("represents the primary Trishoola longevity transition window.", "முக்கிய சூல ஆயுள் எச்சரிக்கை காலமாகும்.")
+                        .replace("represents a key Rudra health transition window.", "முக்கிய ருத்ர ஆரோக்கிய எச்சரிக்கை காலமாகும்.")
+                        .replace("represents the primary longevity transition window.", "முக்கிய ஆயுள் எச்சரிக்கை காலமாகும்.");
+                break;
+            case "hi":
+                res = res.replace("Age", "आयु")
+                        .replace("represents the primary Trishoola longevity transition window.", "मुख्य त्रिशूल आयु संक्रमण काल है।")
+                        .replace("represents a key Rudra health transition window.", "मुख्य रुद्र स्वास्थ्य सतर्कता काल है।")
+                        .replace("represents the primary longevity transition window.", "मुख्य आयु संक्रमण काल है।");
+                break;
+            case "te":
+                res = res.replace("Age", "వయస్సు")
+                        .replace("represents the primary Trishoola longevity transition window.", "ప్రధాన త్రిశూల ఆయుష్షు పరివర్తన కాలం.")
+                        .replace("represents a key Rudra health transition window.", "ప్రధాన రుద్ర ఆరోగ్య అప్రమత్త కాలం.")
+                        .replace("represents the primary longevity transition window.", "ప్రధాన ఆయుష్షు అప్రమత్త కాలం.");
+                break;
+            case "kn":
+                res = res.replace("Age", "ವಯಸ್ಸು")
+                        .replace("represents the primary Trishoola longevity transition window.", "ಮುಖ್ಯ ತ್ರಿಶೂಲ ಆಯುಷ್ಯ ಪರಿವರ್ತನೆಯ ಕಾಲಾವಧಿ.")
+                        .replace("represents a key Rudra health transition window.", "ಮುಖ್ಯ ರುದ್ರ ಆರೋಗ್ಯ ಎಚ್ಚರಿಕೆಯ ಕಾಲಾವಧಿ.")
+                        .replace("represents the primary longevity transition window.", "ಮುಖ್ಯ ಆಯುಷ್ಯ ಎಚ್ಚರಿಕೆಯ ಕಾಲಾವಧಿ.");
+                break;
+            case "ml":
+                res = res.replace("Age", "വയസ്സ്")
+                        .replace("represents the primary Trishoola longevity transition window.", "പ്രധാന ത്രിശൂല ആയുസ്സ് പരിവർത്തന കാലഘട്ടം.")
+                        .replace("represents a key Rudra health transition window.", "പ്രധാന രുദ്ര ആരോഗ്യ ജാഗ്രതാ കാലഘട്ടം.")
+                        .replace("represents the primary longevity transition window.", "പ്രധാന ആയുസ്സ് ജാഗ്രതാ കാലഘട്ടം.");
+                break;
+        }
+        return res;
+    }
+
     public static String translateLifespanRange(String lifespanRange, String lang) {
         if (lifespanRange == null || lifespanRange.isBlank()) return "";
         if ("en".equalsIgnoreCase(lang)) return lifespanRange;
