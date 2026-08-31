@@ -1209,6 +1209,8 @@ public class AstrologicalTranslationHelper {
                      .replace("Lagna Lord debilitated in Dusthana applies Kakshya Hrasa (-4 years).", "லக்னாதிபதி நீசமாக உள்ளதால் கக்ஷ்ய ஹ்ராஸம் (-4 ஆண்டுகள்) ஏற்படுகிறது.")
                      .replace("Lagna hemmed between malefics in 12th & 2nd (Papakarthari Yoga) cautions physical vitality (-3 years).", "லக்னம் பாபகர்த்தாரி யோகத்தில் உள்ளதால் உடலாரோக்கியத்தில் கூடுதல் கவனம் தேவைப்படுகிறது (-3 ஆண்டுகள்).")
                      .replace("Moon hemmed between malefics in 12th & 2nd (Papakarthari Yoga on Moon) cautions vitality (-3 years).", "சந்திரன் பாபகர்த்தரி யோகத்தில் உள்ளதால் மன/உடல் நலனில் எச்சரிக்கை தேவை (-3 ஆண்டுகள்).")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted confers Kakshya Vriddhi \\(elevating longevity compartment from Alpayu to Madhyayu\\)\\.", "ஆத்மகாரகன் ($1) கேந்திர/திரிகோணம்/உச்சத்தில் அமர்ந்து கக்ஷ்ய விருத்தி அருள்கிறார் (அல்பாயுளிலிருந்து மத்தியாயுளுக்கு உயர்வு).")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted reinforces longevity vitality \\(\\+(\\d+) years\\)\\.", "ஆத்மகாரகன் ($1) கேந்திர/திரிகோணம்/உச்சத்தில் அமர்ந்து ஆயுள் பலத்தை அதிகரிக்கிறார் (+$2 ஆண்டுகள்).")
                      .replace("Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa (-3 years).", "கேந்திரங்களில் சுப கிரகங்களின்றி பாவ கிரகங்கள் மட்டுமே இருப்பதால் கக்ஷ்ய ஹிராஸம் உண்டாகிறது (-3 ஆண்டுகள்).");
         } else if (lang.equalsIgnoreCase("hi")) {
             res = res.replace("Determined via Parashara & Jaimini Ayurdaya based on Lagna Lord (" + (m.find(0) ? m.group(1) : "") + "), 8th Lord (" + (m.find(0) ? m.group(2) : "") + "), Moon, Saturn, and Hora Lagna modalities, refined with Kakshya Vriddhi and Shadbala life-force: ",
@@ -1249,6 +1251,8 @@ public class AstrologicalTranslationHelper {
                      .replace("Lagna Lord debilitated in Dusthana applies Kakshya Hrasa (-4 years).", "लग्नेश दुस्थान में नीच होने से कक्ष्या ह्रास (-4 वर्ष) होता है।")
                      .replace("Lagna hemmed between malefics in 12th & 2nd (Papakarthari Yoga) cautions physical vitality (-3 years).", "लग्न पापकर्तरी योग में होने से शारीरिक स्वास्थ्य में सावधानी आवश्यक है (-3 वर्ष)।")
                      .replace("Moon hemmed between malefics in 12th & 2nd (Papakarthari Yoga on Moon) cautions vitality (-3 years).", "चन्द्रमा पापकर्तरी योग में होने से मानसिक/शारीरिक स्वास्थ्य में सावधानी आवश्यक है (-3 वर्ष)।")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted confers Kakshya Vriddhi \\(elevating longevity compartment from Alpayu to Madhyayu\\)\\.", "आत्मकारक ($1) केंद्र/त्रिकोण/उच्च में स्थित होकर कक्ष्या वृद्धि प्रदान करते हैं (अल्पायु से मध्यायु में पदोन्नति)।")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted reinforces longevity vitality \\(\\+(\\d+) years\\)\\.", "आत्मकारक ($1) केंद्र/त्रिकोण/उच्च में स्थित होकर प्राणशक्ति को सुदृढ़ करते हैं (+$2 वर्ष)।")
                      .replace("Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa (-3 years).", "केंद्रों में शुभ ग्रहों के बिना केवल पाप ग्रह होने से कक्ष्या ह्रास होता है (-3 वर्ष)।");
         } else if (lang.equalsIgnoreCase("te")) {
             res = res.replace("Determined via Parashara & Jaimini Ayurdaya based on Lagna Lord (" + (m.find(0) ? m.group(1) : "") + "), 8th Lord (" + (m.find(0) ? m.group(2) : "") + "), Moon, Saturn, and Hora Lagna modalities, refined with Kakshya Vriddhi and Shadbala life-force: ",
@@ -1289,6 +1293,8 @@ public class AstrologicalTranslationHelper {
                      .replace("Lagna Lord debilitated in Dusthana applies Kakshya Hrasa (-4 years).", "లగ్నాధిపతి దుస్థానంలో నీచంలో ఉండటం వల్ల కక్ష్యా హ్రాసం (-4 సంవత్సరాలు) వర్తిస్తుంది.")
                      .replace("Lagna hemmed between malefics in 12th & 2nd (Papakarthari Yoga) cautions physical vitality (-3 years).", "లగ్నం పాపకర్తరి యోగంలో ఉండటం వల్ల ఆరోగ్య జాగ్రత్త అవసరం (-3 సంవత్సరాలు).")
                      .replace("Moon hemmed between malefics in 12th & 2nd (Papakarthari Yoga on Moon) cautions vitality (-3 years).", "చంద్రుడు పాపకర్తరి యోగంలో ఉండటం వల్ల మానసిక/శరీర ఆరోగ్యంపై జాగ్రత్త అవసరం (-3 సంవత్సరాలు).")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted confers Kakshya Vriddhi \\(elevating longevity compartment from Alpayu to Madhyayu\\)\\.", "ఆత్మకారకుడు ($1) కేంద్ర/త్రికోణం/ఉచ్ఛంలో ఉండి కక్ష్యా వృద్ధిని ప్రసాదిస్తాడు (అల్పాయుష్షు నుండి మధ్యాయుష్షుకు పెంపు).")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted reinforces longevity vitality \\(\\+(\\d+) years\\)\\.", "ఆత్మకారకుడు ($1) కేంద్ర/త్రికోణం/ఉచ్ఛంలో ఉండి ఆయుష్షు బలాన్ని పెంచుతాడు (+$2 సంవత్సరాలు).")
                      .replace("Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa (-3 years).", "కేంద్రాలలో శుభ గ్రహాలు లేకుండా కేవలం పాప గ్రహాలు ఉండటం వల్ల కక్ష్యా హ్రాసం కలుగుతుంది (-3 సంవత్సరాలు).");
         } else if (lang.equalsIgnoreCase("kn")) {
             res = res.replace("Determined via Parashara & Jaimini Ayurdaya based on Lagna Lord (" + (m.find(0) ? m.group(1) : "") + "), 8th Lord (" + (m.find(0) ? m.group(2) : "") + "), Moon, Saturn, and Hora Lagna modalities, refined with Kakshya Vriddhi and Shadbala life-force: ",
@@ -1329,6 +1335,8 @@ public class AstrologicalTranslationHelper {
                      .replace("Lagna Lord debilitated in Dusthana applies Kakshya Hrasa (-4 years).", "ಲಗ್ನಾಧಿಪತಿ ದುಃಸ್ಥಾನದಲ್ಲಿ ನೀಚನಾಗಿದ್ದರಿಂದ ಕಕ್ಷ್ಯಾ ಹ್ರಾಸ (-4 ವರ್ಷಗಳು) ಉಂಟಾಗುತ್ತದೆ.")
                      .replace("Lagna hemmed between malefics in 12th & 2nd (Papakarthari Yoga) cautions physical vitality (-3 years).", "ಲಗ್ನವು ಪಾಪಕರ್ತರಿ ಯೋಗದಲ್ಲಿದ್ದು ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ (-3 ವರ್ಷಗಳು).")
                      .replace("Moon hemmed between malefics in 12th & 2nd (Papakarthari Yoga on Moon) cautions vitality (-3 years).", "ಚಂದ್ರನು ಪಾಪಕರ್ತರಿ ಯೋಗದಲ್ಲಿದ್ದು ಮಾನಸಿಕ/ದೈಹಿಕ ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ (-3 ವರ್ಷಗಳು).")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted confers Kakshya Vriddhi \\(elevating longevity compartment from Alpayu to Madhyayu\\)\\.", "ಆತ್ಮಕಾರಕ ($1) ಕೇಂದ್ರ/ತ್ರಿಕೋಣ/ಉಚ್ಛದಲ್ಲಿದ್ದು ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ ನೀಡುತ್ತಾನೆ (ಅಲ್ಪಾಯುಷ್ಯದಿಂದ ಮಧ್ಯಾಯುಷ್ಯಕ್ಕೆ ಏರಿಕೆ).")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted reinforces longevity vitality \\(\\+(\\d+) years\\)\\.", "ಆತ್ಮಕಾರಕ ($1) ಕೇಂದ್ರ/ತ್ರಿಕೋಣ/ಉಚ್ಛದಲ್ಲಿದ್ದು ಆಯುಷ್ಯ ಬಲವನ್ನು ಹೆಚ್ಚಿಸುತ್ತಾನೆ (+$2 ವರ್ಷಗಳು).")
                      .replace("Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa (-3 years).", "ಕೇಂದ್ರಗಳಲ್ಲಿ ಶುಭ ಗ್ರಹಗಳಿಲ್ಲದೆ ಕೇವಲ ಪಾಪ ಗ್ರಹಗಳಿರುವುದರಿಂದ ಕಕ್ಷ್ಯಾ ಹ್ರಾಸ ಉಂಟಾಗುತ್ತದೆ (-3 ವರ್ಷಗಳು).");
         } else if (lang.equalsIgnoreCase("ml")) {
             res = res.replace("Determined via Parashara & Jaimini Ayurdaya based on Lagna Lord (" + (m.find(0) ? m.group(1) : "") + "), 8th Lord (" + (m.find(0) ? m.group(2) : "") + "), Moon, Saturn, and Hora Lagna modalities, refined with Kakshya Vriddhi and Shadbala life-force: ",
@@ -1369,6 +1377,8 @@ public class AstrologicalTranslationHelper {
                      .replace("Lagna Lord debilitated in Dusthana applies Kakshya Hrasa (-4 years).", "ലഗ്നാധിപൻ ദുസ്ഥാനത്ത് നീചനായതിനാൽ കക്ഷ്യാ ഹ്രാസം (-4 വർഷങ്ങൾ) ബാധകമാകുന്നു.")
                      .replace("Lagna hemmed between malefics in 12th & 2nd (Papakarthari Yoga) cautions physical vitality (-3 years).", "ലഗ്നം പാപകർത്താരി യോഗത്തിലായതിനാൽ ആരോഗ്യ ശ്രദ്ധ ആവശ്യമാണ് (-3 വർഷങ്ങൾ).")
                      .replace("Moon hemmed between malefics in 12th & 2nd (Papakarthari Yoga on Moon) cautions vitality (-3 years).", "ചന്ദ്രൻ പാപകർത്താരി യോഗത്തിലായതിനാൽ മാനസിക/ശാരീരിക ആരോഗ്യ ശ്രദ്ധ ആവശ്യമാണ് (-3 വർഷങ്ങൾ).")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted confers Kakshya Vriddhi \\(elevating longevity compartment from Alpayu to Madhyayu\\)\\.", "ആത്മകാരകൻ ($1) കേന്ദ്ര/ത്രികോണ/ഉച്ചത്തിൽ സ്ഥിതി ചെയ്ത് കക്ഷ്യാ വൃദ്ധി നൽകുന്നു (അല്പായുസ്സിൽ നിന്ന് മദ്ധ്യായുസ്സിലേക്ക് ഉയർച്ച).")
+                     .replaceAll("Atmakaraka \\((.*?)\\) in Kendra/Trikona/Exalted reinforces longevity vitality \\(\\+(\\d+) years\\)\\.", "ആത്മകാരകൻ ($1) കേന്ദ്ര/ത്രികോണ/ഉച്ചത്തിൽ സ്ഥിതി ചെയ്ത് ആയുർബലം വർദ്ധിപ്പിക്കുന്നു (+$2 വർഷങ്ങൾ).")
                      .replace("Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa (-3 years).", "കേന്ദ്രങ്ങളിൽ ശുഭന്മാരില്ലാതെ പാപ ഗ്രഹങ്ങൾ മാത്രമുള്ളതിനാൽ കക്ഷ്യാ ഹ്രാസം ഉണ്ടാകുന്നു (-3 വർഷങ്ങൾ).");
         }
         return res;

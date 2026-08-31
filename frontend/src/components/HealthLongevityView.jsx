@@ -182,6 +182,8 @@ export default function HealthLongevityView({ chartData, language }) {
     if (!span) return null;
     const isP = span === 'Poornayu';
     const isM = span === 'Madhyayu';
+    const isA = span === 'Alpayu';
+    if (!isP && !isM && !isA) return null;
     const bg = isP ? 'rgba(46, 204, 113, 0.15)' : isM ? 'rgba(241, 196, 15, 0.15)' : 'rgba(231, 76, 60, 0.15)';
     const col = isP ? '#2ecc71' : isM ? '#f1c40f' : '#e74c3c';
     const border = isP ? 'rgba(46, 204, 113, 0.3)' : isM ? 'rgba(241, 196, 15, 0.3)' : 'rgba(231, 76, 60, 0.3)';
@@ -1063,7 +1065,14 @@ export default function HealthLongevityView({ chartData, language }) {
               📜 {t('classicalRationale', language)}
             </div>
             <div style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: '1.4' }}>
-              {translateOverrideReason(ayurdaya?.lifespanRange) || 'Brihat Parashara & Jaimini Sutras'}
+              {ayurdaya?.lifespanRange ? (
+                language === 'ta' ? ayurdaya.lifespanRange.replace(/Years/g, 'வயது') :
+                language === 'hi' ? ayurdaya.lifespanRange.replace(/Years/g, 'वर्ष') :
+                language === 'te' ? ayurdaya.lifespanRange.replace(/Years/g, 'సంవత్సరాలు') :
+                language === 'kn' ? ayurdaya.lifespanRange.replace(/Years/g, 'ವರ್ಷಗಳು') :
+                language === 'ml' ? ayurdaya.lifespanRange.replace(/Years/g, 'വയസ്സ്') :
+                ayurdaya.lifespanRange
+              ) : 'Brihat Parashara & Jaimini Sutras'}
             </div>
           </div>
 
@@ -1091,13 +1100,13 @@ export default function HealthLongevityView({ chartData, language }) {
         </div>
 
         {/* 3-Pair Modality Table */}
-        {ayurdaya?.threePairsDetails && Object.keys(ayurdaya.threePairsDetails).length > 0 && (
+        {(ayurdaya?.jaiminiThreePairs || ayurdaya?.threePairsDetails) && Object.keys(ayurdaya.jaiminiThreePairs || ayurdaya.threePairsDetails).length > 0 && (
           <div style={{ marginBottom: '18px' }}>
             <h4 style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               📊 {t('threePairsTitle', language)}
             </h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
-              {Object.entries(ayurdaya.threePairsDetails)
+              {Object.entries(ayurdaya.jaiminiThreePairs || ayurdaya.threePairsDetails)
                 .filter(([pairKey]) => pairKey.startsWith('pair') || pairKey === 'majorityConsensus')
                 .map(([pairKey, detail], idx) => {
                   const isObj = typeof detail === 'object' && detail !== null;
