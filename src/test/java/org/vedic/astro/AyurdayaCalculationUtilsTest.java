@@ -8,6 +8,7 @@ import org.vedic.astro.util.AyurdayaCalculationUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,10 +70,12 @@ public class AyurdayaCalculationUtilsTest {
 
         assertNotNull(profile);
         assertEquals("Poornayu", profile.longevityClassification());
-        assertTrue(profile.estimatedLifespanCeiling() >= 75 && profile.estimatedLifespanCeiling() <= 98,
-                "Poornayu ceiling should be between 75 and 98, got: " + profile.estimatedLifespanCeiling());
+        assertTrue(profile.estimatedLifespanCeiling() >= 75 && profile.estimatedLifespanCeiling() <= 108,
+                "Poornayu ceiling should be between 75 and 108, got: " + profile.estimatedLifespanCeiling());
         assertNotNull(profile.lifespanRange());
+        assertNotNull(profile.khandaSubTier());
         assertNotNull(profile.jaiminiThreePairs());
+        assertNotNull(profile.kakshyaAnalysis());
         assertNotNull(profile.parasharaAyurBala());
         assertNotNull(profile.marakaBadhakaTimeline());
         assertTrue(profile.kakshyaAdjustments().size() > 0);
@@ -532,5 +535,205 @@ public class AyurdayaCalculationUtilsTest {
 
         // Cancer Lagna (4) -> 8th reverse is Sagittarius (9) -> single lord Jupiter
         assertEquals("Jupiter", AyurdayaCalculationUtils.getActiveEighthLord(4, Map.of()));
+    }
+
+    @Test
+    public void testKakshyaVriddhiPromotionFromAlpayuToMadhyayu() {
+        // Lagna in Aries (Sign 1)
+        int lagnaSign = 1;
+        int moonSign = 1;
+
+        Map<String, ChartResponseDTO.PositionDetail> planetMap = new HashMap<>();
+        // Jupiter in Cancer (Sign 4 - Exalted in 4th Kendra)
+        planetMap.put("JUPITER", ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").signNumber(4).degreeInSign(5.0).build());
+        planetMap.put("MOON", ChartResponseDTO.PositionDetail.builder().planetKey("MOON").signNumber(1).degreeInSign(10.0).build());
+
+        AyurdayaCalculationUtils.KakshyaResult result = AyurdayaCalculationUtils.evaluateKakshyaModifiers(
+                "Alpayu", lagnaSign, moonSign, planetMap, null
+        );
+
+        assertNotNull(result);
+        assertEquals("Madhyayu", result.adjustedSpan(), "Alpayu should be promoted to Madhyayu via Jupiter Kendra/Exalted");
+        assertTrue(result.adjustedCeilingAge() >= 68, "Adjusted ceiling should be at least 68, got: " + result.adjustedCeilingAge());
+        assertTrue(result.adjustments().stream().anyMatch(a -> a.contains("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi")));
+
+        Map<String, Object> analysis = result.kakshyaAnalysis();
+        assertNotNull(analysis);
+        assertEquals("Alpayu", analysis.get("baseSpan"));
+        assertEquals("Madhyayu", analysis.get("adjustedSpan"));
+        assertTrue((Integer) analysis.get("vriddhiCount") >= 1);
+    }
+
+    @Test
+    public void testKakshyaVriddhiPromotionFromMadhyayuToPoornayu() {
+        // Lagna in Aries (Sign 1)
+        int lagnaSign = 1;
+        int moonSign = 1;
+
+        Map<String, ChartResponseDTO.PositionDetail> planetMap = new HashMap<>();
+        // Jupiter in Sagittarius (Sign 9 - Own Sign, 9th Trikona)
+        planetMap.put("JUPITER", ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").signNumber(9).degreeInSign(15.0).build());
+
+        AyurdayaCalculationUtils.KakshyaResult result = AyurdayaCalculationUtils.evaluateKakshyaModifiers(
+                "Madhyayu", lagnaSign, moonSign, planetMap, null
+        );
+
+        assertNotNull(result);
+        assertEquals("Poornayu", result.adjustedSpan(), "Madhyayu should be promoted to Poornayu via Jupiter Trikona/Own sign");
+        assertTrue(result.adjustedCeilingAge() >= 82, "Adjusted ceiling should be at least 82, got: " + result.adjustedCeilingAge());
+        assertTrue(result.adjustments().stream().anyMatch(a -> a.contains("elevating longevity compartment from Madhyayu to Poornayu")));
+
+        Map<String, Object> analysis = result.kakshyaAnalysis();
+        assertNotNull(analysis);
+        assertEquals("Madhyayu", analysis.get("baseSpan"));
+        assertEquals("Poornayu", analysis.get("adjustedSpan"));
+        assertTrue((Integer) analysis.get("vriddhiCount") >= 1);
+    }
+
+    @Test
+    public void testKakshyaHrasaDemotionWithDebilitatedSaturn() {
+        // Leo Lagna (Sign 5)
+        int lagnaSign = 5;
+        int moonSign = 5;
+
+        Map<String, ChartResponseDTO.PositionDetail> planetMap = new HashMap<>();
+        // Saturn debilitated in Aries (Sign 1 - 9th house) without Neechabhanga
+        // Dispositor Mars in Gemini (11th house, non-kendra from Leo Lagna and Leo Moon)
+        // Exaltation Lord Venus in Sagittarius (5th house, non-kendra)
+        planetMap.put("SATURN", ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").signNumber(1).degreeInSign(10.0).build());
+        planetMap.put("MARS", ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(3).degreeInSign(10.0).build());
+        planetMap.put("VENUS", ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").signNumber(9).degreeInSign(10.0).build());
+        planetMap.put("MOON", ChartResponseDTO.PositionDetail.builder().planetKey("MOON").signNumber(5).degreeInSign(10.0).build());
+
+        // Test Poornayu -> Madhyayu demotion
+        AyurdayaCalculationUtils.KakshyaResult resultPoorna = AyurdayaCalculationUtils.evaluateKakshyaModifiers(
+                "Poornayu", lagnaSign, moonSign, planetMap, null
+        );
+
+        assertNotNull(resultPoorna);
+        assertEquals("Madhyayu", resultPoorna.adjustedSpan(), "Poornayu should be demoted to Madhyayu via debilitated Saturn");
+        assertTrue(resultPoorna.adjustedCeilingAge() <= 68, "Adjusted ceiling should be demoted, got: " + resultPoorna.adjustedCeilingAge());
+        assertTrue(resultPoorna.adjustments().stream().anyMatch(a -> a.contains("Ayushkaraka Saturn in debility applies Kakshya Hrasa reduction")));
+        assertTrue((Integer) resultPoorna.kakshyaAnalysis().get("hrasaCount") >= 1);
+
+        // Test Madhyayu -> Alpayu demotion
+        AyurdayaCalculationUtils.KakshyaResult resultMadhya = AyurdayaCalculationUtils.evaluateKakshyaModifiers(
+                "Madhyayu", lagnaSign, moonSign, planetMap, null
+        );
+        assertEquals("Alpayu", resultMadhya.adjustedSpan(), "Madhyayu should be demoted to Alpayu via debilitated Saturn");
+        assertTrue(resultMadhya.adjustedCeilingAge() <= 36);
+    }
+
+    @Test
+    public void testKakshyaHrasaCancellationViaNeechabhanga() {
+        // Aries Lagna (Sign 1)
+        int lagnaSign = 1;
+        int moonSign = 1;
+
+        Map<String, ChartResponseDTO.PositionDetail> planetMap = new HashMap<>();
+        // Saturn in Aries (Sign 1 - Debilitated in 1st house)
+        // Dispositor Mars in Capricorn (Sign 10 - Exalted in 10th Kendra) -> Neechabhanga Rajayoga Law 1 & 2!
+        planetMap.put("SATURN", ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").signNumber(1).degreeInSign(10.0).build());
+        planetMap.put("MARS", ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(10).degreeInSign(20.0).build());
+        planetMap.put("MOON", ChartResponseDTO.PositionDetail.builder().planetKey("MOON").signNumber(1).degreeInSign(15.0).build());
+
+        assertTrue(AyurdayaCalculationUtils.hasNeechabhanga("Saturn", 1, planetMap, lagnaSign, moonSign));
+
+        AyurdayaCalculationUtils.KakshyaResult result = AyurdayaCalculationUtils.evaluateKakshyaModifiers(
+                "Poornayu", lagnaSign, moonSign, planetMap, null
+        );
+
+        assertNotNull(result);
+        assertEquals("Poornayu", result.adjustedSpan(), "Debilitated Saturn with Neechabhanga must NOT be demoted");
+        assertTrue(result.adjustments().stream().anyMatch(a -> a.contains("Neecha Bhanga")),
+                "Should record Neecha Bhanga cancellation: " + result.adjustments());
+    }
+
+    @Test
+    public void testPapakarthariOnMoonAndLagna() {
+        // Taurus Lagna (Sign 2)
+        int lagnaSign = 2;
+        // Moon in Leo (Sign 5)
+        int moonSign = 5;
+
+        Map<String, ChartResponseDTO.PositionDetail> planetMap = new HashMap<>();
+        // Papakarthari on Lagna: 12th (Aries 1) occupied by Sun, 2nd (Gemini 3) occupied by Mars
+        planetMap.put("SUN", ChartResponseDTO.PositionDetail.builder().planetKey("SUN").signNumber(1).degreeInSign(10.0).build());
+        planetMap.put("MARS", ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(3).degreeInSign(10.0).build());
+        // Papakarthari on Moon: 12th from Moon (Cancer 4) occupied by Saturn, 2nd from Moon (Virgo 6) occupied by Rahu
+        planetMap.put("SATURN", ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").signNumber(4).degreeInSign(10.0).build());
+        planetMap.put("RAHU", ChartResponseDTO.PositionDetail.builder().planetKey("RAHU").signNumber(6).degreeInSign(10.0).build());
+        planetMap.put("MOON", ChartResponseDTO.PositionDetail.builder().planetKey("MOON").signNumber(5).degreeInSign(10.0).build());
+
+        AyurdayaCalculationUtils.KakshyaResult result = AyurdayaCalculationUtils.evaluateKakshyaModifiers(
+                "Madhyayu", lagnaSign, moonSign, planetMap, null
+        );
+
+        assertNotNull(result);
+        assertTrue(result.adjustments().stream().anyMatch(a -> a.contains("Lagna hemmed between malefics in 12th & 2nd (Papakarthari Yoga)")));
+        assertTrue(result.adjustments().stream().anyMatch(a -> a.contains("Moon hemmed between malefics in 12th & 2nd (Papakarthari Yoga on Moon)")));
+
+        Map<String, Object> analysis = result.kakshyaAnalysis();
+        assertEquals(true, analysis.get("papakarthariLagna"));
+        assertEquals(true, analysis.get("papakarthariMoon"));
+        assertTrue((Integer) analysis.get("hrasaCount") >= 2);
+    }
+
+    @Test
+    public void testKhandaSubTierResolutionForAllSpans() {
+        // 1. Alpayu 12-Year Sub-Tiers via Navamsha Modalities
+        // D9 Lagna Chara (1) & D9 HL Dwisvabhava (3) -> Alpayu (Lower Tier)
+        assertEquals("Balarishta / Adhama Alpayu (0 - 12 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Alpayu", 20, 1, 3));
+        // D9 Lagna Chara (1) & D9 HL Sthira (2) -> Madhyayu (Middle Tier)
+        assertEquals("Madhyama Alpayu (12 - 24 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Alpayu", 20, 1, 2));
+        // D9 Lagna Chara (1) & D9 HL Chara (1) -> Poornayu (Upper Tier)
+        assertEquals("Uttama Alpayu (24 - 36 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Alpayu", 20, 1, 1));
+
+        // 2. Madhyayu 12-Year Sub-Tiers via Navamsha Modalities
+        assertEquals("Adhama Madhyayu (36 - 48 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Madhyayu", 55, 1, 3));
+        assertEquals("Madhyama Madhyayu (48 - 60 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Madhyayu", 55, 1, 2));
+        assertEquals("Uttama Madhyayu (60 - 72 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Madhyayu", 55, 1, 1));
+
+        // 3. Poornayu 12-Year Sub-Tiers via Navamsha Modalities
+        assertEquals("Adhama Poornayu (72 - 84 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Poornayu", 85, 1, 3));
+        assertEquals("Madhyama Poornayu (84 - 96 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Poornayu", 85, 1, 2));
+        assertEquals("Paramayu / Deerghayu (96 - 108 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Poornayu", 85, 1, 1));
+
+        // 4. Ceiling Age Fallback Resolution (lagnaNavamsha = 0, hlNavamsha = 0)
+        assertEquals("Balarishta / Adhama Alpayu (0 - 12 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Alpayu", 10, 0, 0));
+        assertEquals("Madhyama Alpayu (12 - 24 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Alpayu", 20, 0, 0));
+        assertEquals("Uttama Alpayu (24 - 36 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Alpayu", 30, 0, 0));
+
+        assertEquals("Adhama Madhyayu (36 - 48 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Madhyayu", 45, 0, 0));
+        assertEquals("Madhyama Madhyayu (48 - 60 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Madhyayu", 55, 0, 0));
+        assertEquals("Uttama Madhyayu (60 - 72 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Madhyayu", 68, 0, 0));
+
+        assertEquals("Adhama Poornayu (72 - 84 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Poornayu", 80, 0, 0));
+        assertEquals("Madhyama Poornayu (84 - 96 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Poornayu", 90, 0, 0));
+        assertEquals("Paramayu / Deerghayu (96 - 108 Years)",
+                AyurdayaCalculationUtils.determineKhandaSubTier("Poornayu", 100, 0, 0));
+
+        // 5. Navamsha Sign Calculator Helper Check
+        assertEquals(1, AyurdayaCalculationUtils.calculateNavamshaSign(1, 2.0)); // Aries 2° -> Aries D9 (1)
+        assertEquals(9, AyurdayaCalculationUtils.calculateNavamshaSign(1, 28.0)); // Aries 28° -> Sagittarius D9 (9)
+        assertEquals(10, AyurdayaCalculationUtils.calculateNavamshaSign(2, 2.0)); // Taurus 2° -> Capricorn D9 (10)
+        assertEquals(4, AyurdayaCalculationUtils.calculateNavamshaSign(4, 1.0)); // Cancer 1° -> Cancer D9 (4)
     }
 }

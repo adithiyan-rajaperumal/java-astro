@@ -33,18 +33,60 @@ public class AyurdayaCalculationUtils {
         DWISVABHAVA  // Dual: Gemini 3, Virgo 6, Sagittarius 9, Pisces 12
     }
 
+    public record KakshyaResult(
+            String adjustedSpan,
+            int baseCeilingAge,
+            int adjustedCeilingAge,
+            List<String> adjustments,
+            Map<String, Object> kakshyaAnalysis
+    ) {}
+
     public record AyurdayaProfile(
             String longevityClassification,
             int estimatedLifespanCeiling,
             String lifespanRange,
+            String khandaSubTier,
             Map<String, Object> threePairsDetails,
             Map<String, Object> jaiminiThreePairs,
+            Map<String, Object> kakshyaAnalysis,
             Map<String, Object> parasharaAyurBala,
             Map<String, Object> marakaBadhakaTimeline,
             List<String> kakshyaAdjustments,
             String criticalMarakaWindow,
             String classicalRationale
-    ) {}
+    ) {
+        public AyurdayaProfile(
+                String longevityClassification,
+                int estimatedLifespanCeiling,
+                String lifespanRange,
+                Map<String, Object> threePairsDetails,
+                Map<String, Object> jaiminiThreePairs,
+                Map<String, Object> parasharaAyurBala,
+                Map<String, Object> marakaBadhakaTimeline,
+                List<String> kakshyaAdjustments,
+                String criticalMarakaWindow,
+                String classicalRationale
+        ) {
+            this(
+                    longevityClassification,
+                    estimatedLifespanCeiling,
+                    lifespanRange,
+                    determineKhandaSubTier(longevityClassification, estimatedLifespanCeiling),
+                    threePairsDetails,
+                    jaiminiThreePairs,
+                    Map.of(),
+                    parasharaAyurBala,
+                    marakaBadhakaTimeline,
+                    kakshyaAdjustments,
+                    criticalMarakaWindow,
+                    classicalRationale
+            );
+        }
+
+        public Map<String, Object> marakaTimeline() {
+            return marakaBadhakaTimeline;
+        }
+    }
 
     public record SynthesisResult(
             String span,
@@ -190,105 +232,16 @@ public class AyurdayaCalculationUtils {
                 span1, span2, span3, moonHouse, isOddLagna, akInKendra, akPos, lagnaSign
         );
 
-        String baseSpan = synthesis.span();
         String rawConsensusSpan = synthesis.span();
+        KakshyaResult kakshya = evaluateKakshyaModifiers(rawConsensusSpan, lagnaSign, activeMoonSign, planetMap, shadbala);
+        String baseSpan = kakshya.adjustedSpan();
+        int baseCeilingAge = kakshya.adjustedCeilingAge();
+
         List<String> adjustments = new ArrayList<>();
         if (synthesis.overrideReason() != null && !synthesis.overrideReason().isEmpty()) {
             adjustments.add(synthesis.overrideReason());
         }
-
-        // Classical Ayurdaya Baseline Compartments (Alpayu: 0-36, Madhyayu: 36-72, Poornayu: 72-108)
-        int baseCeilingAge = switch (baseSpan) {
-            case "Poornayu" -> 84;
-            case "Madhyayu" -> 68;
-            case "Alpayu" -> 34;
-            default -> 72;
-        };
-
-        // Kakshya Vriddhi (Longevity Expansion - Jaimini Upadesha Sutras 2.1.26-30)
-        // Factor A: Jupiter in Kendra (1,4,7,10), Trikona (5,9), or Exalted/Own Sign
-        if (jupiterPos != null) {
-            int jupHouse = ((jupiterPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
-            boolean jupStrong = PlanetDignityUtils.isOwnSign("Jupiter", jupiterPos.getSignNumber()) ||
-                    PlanetDignityUtils.isExalted("Jupiter", jupiterPos.getSignNumber());
-            if (jupHouse == 1 || jupHouse == 4 || jupHouse == 7 || jupHouse == 10 || jupHouse == 5 || jupHouse == 9 || jupStrong) {
-                if ("Alpayu".equals(baseSpan)) {
-                    adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (elevating longevity compartment from Alpayu to Madhyayu baseline ~68 yrs).");
-                    baseSpan = "Madhyayu";
-                    baseCeilingAge = 68;
-                } else if ("Madhyayu".equals(baseSpan)) {
-                    adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (elevating longevity compartment from Madhyayu to Poornayu baseline ~82 yrs).");
-                    baseSpan = "Poornayu";
-                    baseCeilingAge = 82;
-                } else {
-                    adjustments.add("Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (+4 years).");
-                    baseCeilingAge += 4;
-                }
-            }
-        }
-
-        // Factor B: Ayushkaraka Saturn in Own Sign / Exalted
-        if (saturnPos != null) {
-            if (PlanetDignityUtils.isOwnSign("Saturn", saturnPos.getSignNumber()) || PlanetDignityUtils.isExalted("Saturn", saturnPos.getSignNumber())) {
-                adjustments.add("Ayushkaraka Saturn in Own/Exalted sign reinforces longevity (+4 years).");
-                baseCeilingAge += 4;
-            }
-        }
-
-        // Factor C: Lagna Lord in Kendra / Trikona / Exalted
-        if (lagnaLordPos != null) {
-            int llHouse = ((lagnaLordPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
-            if (PlanetDignityUtils.isExalted(lagnaLord, lagnaLordPos.getSignNumber()) || PlanetDignityUtils.isOwnSign(lagnaLord, lagnaLordPos.getSignNumber())) {
-                adjustments.add("Lagna Lord strong in own/exalted sign adds physical vitality (+4 years).");
-                baseCeilingAge += 4;
-            }
-        }
-
-        // Kakshya Hrasa (Longevity Reductions)
-        // Factor 1: Ayushkaraka Saturn in Debility (in Aries)
-        if (saturnPos != null && PlanetDignityUtils.isDebilitated("Saturn", saturnPos.getSignNumber())) {
-            boolean saturnNeechaBhanga = hasNeechabhanga("Saturn", saturnPos.getSignNumber(), planetMap, lagnaSign, activeMoonSign);
-            if (saturnNeechaBhanga) {
-                adjustments.add("Ayushkaraka Saturn possesses Neecha Bhanga (cancellation of debility into longevity stability).");
-                baseCeilingAge += 2;
-            } else {
-                adjustments.add("Ayushkaraka Saturn in debility applies Kakshya Hrasa reduction (-5 years).");
-                baseCeilingAge -= 5;
-                if ("Poornayu".equals(baseSpan) && baseCeilingAge < 74) baseSpan = "Madhyayu";
-                else if ("Madhyayu".equals(baseSpan) && baseCeilingAge <= 42) baseSpan = "Alpayu";
-            }
-        }
-
-        // Factor 2: Lagna Lord in Dusthana (6/8/12) and Debilitated
-        if (lagnaLordPos != null) {
-            int llHouse = ((lagnaLordPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
-            if (llHouse == 6 || llHouse == 8 || llHouse == 12) {
-                if (PlanetDignityUtils.isDebilitated(lagnaLord, lagnaLordPos.getSignNumber())) {
-                    adjustments.add("Lagna Lord debilitated in Dusthana applies Kakshya Hrasa (-4 years).");
-                    baseCeilingAge -= 4;
-                } else {
-                    adjustments.add("Lagna Lord in Dusthana (6/8/12) advises mindful health regimen.");
-                    baseCeilingAge -= 2;
-                }
-            }
-        }
-
-        // Factor 3: Papakarthari Yoga on Lagna (12th and 2nd occupied by natural malefics)
-        int h12Sign = ((lagnaSign + 12 - 1 - 1) % 12) + 1;
-        int h2Sign = ((lagnaSign + 2 - 1 - 1) % 12) + 1;
-        boolean h12Malefic = false;
-        boolean h2Malefic = false;
-        for (var mKey : List.of("SUN", "MARS", "SATURN", "RAHU", "KETU")) {
-            var p = planetMap.get(mKey);
-            if (p != null) {
-                if (p.getSignNumber() == h12Sign) h12Malefic = true;
-                if (p.getSignNumber() == h2Sign) h2Malefic = true;
-            }
-        }
-        if (h12Malefic && h2Malefic) {
-            adjustments.add("Lagna hemmed between malefics in 12th & 2nd (Papakarthari Yoga) cautions physical vitality (-3 years).");
-            baseCeilingAge -= 3;
-        }
+        adjustments.addAll(kakshya.adjustments());
 
         // 3. PRINCIPLE 2: Parashara & Shadbala Life-Force (Sarira, Jeeva & Ayushkaraka Bala)
         // A. Sarira Bala (Lagna Lord & Deha Constitution)
@@ -598,8 +551,12 @@ public class AyurdayaCalculationUtils {
         marakaTimelineMap.put("universalRemedies", "Maha Mrityunjaya Mantra Japa (108 times daily), Ayushya Homa, and Lord Dhanvantari Prayer");
         marakaTimelineMap.put("recommendedRemedies", tailoredRemedy + " Along with " + badhakaRemedy);
 
+        int lagnaNavamsha = calculateNavamshaSign(lagnaSign, lagnaDeg);
+        int hlNavamsha = calculateNavamshaSign(horaLagnaSign, 15.0);
+        String khandaSubTier = determineKhandaSubTier(baseSpan, baseCeilingAge, lagnaNavamsha, hlNavamsha);
+
         String lifespanRangeStr = switch (baseSpan) {
-            case "Poornayu" -> (baseCeilingAge - 5) + " - " + Math.min(105, baseCeilingAge + 8) + " Years (~" + (targetYear - 5) + " - " + (targetYear + 8) + ")";
+            case "Poornayu" -> (baseCeilingAge - 5) + " - " + Math.min(108, baseCeilingAge + 8) + " Years (~" + (targetYear - 5) + " - " + (targetYear + 8) + ")";
             case "Madhyayu" -> Math.max(36, baseCeilingAge - 6) + " - " + Math.min(74, baseCeilingAge + 4) + " Years (~" + (targetYear - 6) + " - " + (targetYear + 4) + ")";
             case "Alpayu" -> "0 - " + Math.min(38, baseCeilingAge + 3) + " Years (~" + birthYear + " - " + (birthYear + Math.min(38, baseCeilingAge + 3)) + ")";
             default -> (baseCeilingAge - 4) + " - " + (baseCeilingAge + 4) + " Years (~" + (targetYear - 4) + " - " + (targetYear + 4) + ")";
@@ -631,14 +588,16 @@ public class AyurdayaCalculationUtils {
 
         String rationale = "Determined via Parashara & Jaimini Ayurdaya based on Lagna Lord (" + lagnaLord +
                 "), 8th Lord (" + eighthLord + "), Moon, Saturn, and Hora Lagna modalities, refined with Kakshya Vriddhi and Shadbala life-force: " +
-                baseSpan + ". " + String.join(" ", adjustments);
+                baseSpan + " (" + khandaSubTier + "). " + String.join(" ", adjustments);
 
         return new AyurdayaProfile(
                 baseSpan,
                 baseCeilingAge,
                 lifespanRangeStr,
+                khandaSubTier,
                 threePairsMap,
                 threePairsMap,
+                kakshya.kakshyaAnalysis(),
                 parasharaBalaMap,
                 marakaTimelineMap,
                 adjustments,
@@ -697,7 +656,7 @@ public class AyurdayaCalculationUtils {
         };
     }
 
-    private static boolean hasNeechabhanga(
+    public static boolean hasNeechabhanga(
             String planet,
             int sign,
             Map<String, ChartResponseDTO.PositionDetail> map,
@@ -709,8 +668,8 @@ public class AyurdayaCalculationUtils {
         int exSign = PlanetDignityUtils.getExaltationSign(planet);
         String exLord = PlanetDignityUtils.getSignLord(exSign);
 
-        var lordPos = map.get(dispositor.toUpperCase());
-        var exLordPos = map.get(exLord.toUpperCase());
+        var lordPos = findPosition(map, dispositor);
+        var exLordPos = findPosition(map, exLord);
 
         // Law 1: Dispositor in Kendra from Lagna or Moon
         if (lordPos != null) {
@@ -725,13 +684,357 @@ public class AyurdayaCalculationUtils {
             if (PlanetDignityUtils.isKendra(hL) || PlanetDignityUtils.isKendra(hM) || PlanetDignityUtils.isExalted(exLord, exLordPos.getSignNumber())) return true;
         }
         // Law 3: Exalted companion in same sign
-        for (var entry : map.entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(pKey) || entry.getKey().equalsIgnoreCase("LAGNA")) continue;
-            if (entry.getValue().getSignNumber() == sign && PlanetDignityUtils.isExalted(entry.getKey(), entry.getValue().getSignNumber())) {
+        if (map != null) {
+            for (var entry : map.entrySet()) {
+                if (entry.getKey() != null && (entry.getKey().equalsIgnoreCase(pKey) || entry.getKey().equalsIgnoreCase("LAGNA"))) continue;
+                if (entry.getValue() != null && entry.getValue().getSignNumber() == sign && PlanetDignityUtils.isExalted(entry.getKey(), entry.getValue().getSignNumber())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Evaluates Kakshya Vriddhi (promotions/increments) and Kakshya Hrasa (demotions/reductions)
+     * according to classical Jaimini and Parashara rules.
+     */
+    public static KakshyaResult evaluateKakshyaModifiers(
+            String baseSpan,
+            int lagnaSign,
+            int moonSign,
+            Map<String, ChartResponseDTO.PositionDetail> planetMap,
+            ShadbalaDTO shadbala) {
+
+        String currentSpan = (baseSpan != null && !baseSpan.isBlank()) ? baseSpan.trim() : "Madhyayu";
+        int baseCeilingAge = switch (currentSpan) {
+            case "Poornayu" -> 84;
+            case "Madhyayu" -> 68;
+            case "Alpayu" -> 34;
+            default -> 72;
+        };
+        int currentCeiling = baseCeilingAge;
+
+        List<String> adjustments = new ArrayList<>();
+        List<String> promotions = new ArrayList<>();
+        List<String> reductions = new ArrayList<>();
+
+        String lagnaLord = PlanetDignityUtils.getSignLord(lagnaSign);
+        ChartResponseDTO.PositionDetail lagnaLordPos = findPosition(planetMap, lagnaLord);
+        ChartResponseDTO.PositionDetail jupiterPos = findPosition(planetMap, "Jupiter");
+        ChartResponseDTO.PositionDetail saturnPos = findPosition(planetMap, "Saturn");
+        ChartResponseDTO.PositionDetail moonPos = findPosition(planetMap, "Moon");
+        ChartResponseDTO.PositionDetail sunPos = findPosition(planetMap, "Sun");
+
+        int activeMoonSign = moonPos != null ? moonPos.getSignNumber() : moonSign;
+
+        // Atmakaraka (AK) identification
+        ChartResponseDTO.PositionDetail akPos = null;
+        double maxDegree = -1.0;
+        if (planetMap != null) {
+            for (String pKey : List.of("SUN", "MOON", "MARS", "MERCURY", "JUPITER", "VENUS", "SATURN")) {
+                ChartResponseDTO.PositionDetail pos = findPosition(planetMap, pKey);
+                if (pos != null && pos.getDegreeInSign() > maxDegree) {
+                    maxDegree = pos.getDegreeInSign();
+                    akPos = pos;
+                }
+            }
+        }
+
+        // --- KAKSHYA VRIDDHI (Promotions & Increments) ---
+        // Factor 1: Jupiter in Kendra (1,4,7,10), Trikona (5,9), or Exalted / Own sign
+        if (jupiterPos != null) {
+            int jupHouse = ((jupiterPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
+            boolean jupStrong = PlanetDignityUtils.isOwnSign("Jupiter", jupiterPos.getSignNumber()) ||
+                    PlanetDignityUtils.isExalted("Jupiter", jupiterPos.getSignNumber());
+            boolean jupKT = (jupHouse == 1 || jupHouse == 4 || jupHouse == 7 || jupHouse == 10 || jupHouse == 5 || jupHouse == 9);
+            if (jupKT || jupStrong) {
+                if ("Alpayu".equals(currentSpan)) {
+                    String msg = "Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (elevating longevity compartment from Alpayu to Madhyayu baseline ~68 yrs).";
+                    adjustments.add(msg);
+                    promotions.add(msg);
+                    currentSpan = "Madhyayu";
+                    currentCeiling = 68;
+                } else if ("Madhyayu".equals(currentSpan)) {
+                    String msg = "Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (elevating longevity compartment from Madhyayu to Poornayu baseline ~82 yrs).";
+                    adjustments.add(msg);
+                    promotions.add(msg);
+                    currentSpan = "Poornayu";
+                    currentCeiling = 82;
+                } else {
+                    String msg = "Jupiter benefic Kendra/Trikona placement confers Kakshya Vriddhi (+4 years).";
+                    adjustments.add(msg);
+                    promotions.add(msg);
+                    currentCeiling += 4;
+                }
+            }
+        }
+
+        // Factor 2: Atmakaraka (AK) exalted or in Kendra/Trikona
+        if (akPos != null && akPos.getPlanetKey() != null) {
+            int akHouse = ((akPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
+            String akName = capitalize(akPos.getPlanetKey());
+            boolean akExalted = PlanetDignityUtils.isExalted(akPos.getPlanetKey(), akPos.getSignNumber());
+            boolean akKT = (akHouse == 1 || akHouse == 4 || akHouse == 7 || akHouse == 10 || akHouse == 5 || akHouse == 9);
+            if (akExalted || akKT) {
+                if ("Alpayu".equals(currentSpan)) {
+                    String msg = "Atmakaraka (" + akName + ") in Kendra/Trikona/Exalted confers Kakshya Vriddhi (elevating longevity compartment from Alpayu to Madhyayu).";
+                    adjustments.add(msg);
+                    promotions.add(msg);
+                    currentSpan = "Madhyayu";
+                    currentCeiling = 68;
+                } else {
+                    String msg = "Atmakaraka (" + akName + ") in Kendra/Trikona/Exalted reinforces longevity vitality (+4 years).";
+                    adjustments.add(msg);
+                    promotions.add(msg);
+                    currentCeiling += 4;
+                }
+            }
+        }
+
+        // Factor 3: Ayushkaraka Saturn in Own sign / Exalted
+        if (saturnPos != null) {
+            if (PlanetDignityUtils.isOwnSign("Saturn", saturnPos.getSignNumber()) || PlanetDignityUtils.isExalted("Saturn", saturnPos.getSignNumber())) {
+                String msg = "Ayushkaraka Saturn in Own/Exalted sign reinforces longevity (+4 years).";
+                adjustments.add(msg);
+                promotions.add(msg);
+                currentCeiling += 4;
+            }
+        }
+
+        // Factor 4: Lagna Lord in Kendra/Trikona/Exalted/Own sign
+        if (lagnaLordPos != null) {
+            int llHouse = ((lagnaLordPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
+            boolean llExalted = PlanetDignityUtils.isExalted(lagnaLord, lagnaLordPos.getSignNumber());
+            boolean llOwn = PlanetDignityUtils.isOwnSign(lagnaLord, lagnaLordPos.getSignNumber());
+            boolean llKT = (llHouse == 1 || llHouse == 4 || llHouse == 7 || llHouse == 10 || llHouse == 5 || llHouse == 9);
+            if (llExalted || llOwn || llKT) {
+                String msg = "Lagna Lord strong in own/exalted/Kendra/Trikona adds physical vitality (+4 years).";
+                adjustments.add(msg);
+                promotions.add(msg);
+                currentCeiling += 4;
+            }
+        }
+
+        // --- KAKSHYA HRASA (Demotions & Reductions) ---
+        // Factor 1: Saturn in Debility (without Neechabhanga)
+        if (saturnPos != null && PlanetDignityUtils.isDebilitated("Saturn", saturnPos.getSignNumber())) {
+            boolean saturnNeechaBhanga = hasNeechabhanga("Saturn", saturnPos.getSignNumber(), planetMap, lagnaSign, activeMoonSign);
+            if (saturnNeechaBhanga) {
+                String msg = "Ayushkaraka Saturn possesses Neecha Bhanga (cancellation of debility into longevity stability).";
+                adjustments.add(msg);
+                promotions.add(msg);
+                currentCeiling += 2;
+            } else {
+                String msg = "Ayushkaraka Saturn in debility applies Kakshya Hrasa reduction (-5 years).";
+                adjustments.add(msg);
+                reductions.add(msg);
+                currentCeiling -= 5;
+                if ("Poornayu".equals(currentSpan)) {
+                    currentSpan = "Madhyayu";
+                    if (currentCeiling > 72) currentCeiling = 68;
+                } else if ("Madhyayu".equals(currentSpan)) {
+                    currentSpan = "Alpayu";
+                    if (currentCeiling > 36) currentCeiling = 34;
+                }
+            }
+        }
+
+        // Factor 2: Lagna Lord in Dusthana (6/8/12) & Debilitated
+        if (lagnaLordPos != null) {
+            int llHouse = ((lagnaLordPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
+            if (llHouse == 6 || llHouse == 8 || llHouse == 12) {
+                if (PlanetDignityUtils.isDebilitated(lagnaLord, lagnaLordPos.getSignNumber())) {
+                    String msg = "Lagna Lord debilitated in Dusthana applies Kakshya Hrasa (-4 years).";
+                    adjustments.add(msg);
+                    reductions.add(msg);
+                    currentCeiling -= 4;
+                    if ("Poornayu".equals(currentSpan) && currentCeiling < 72) {
+                        currentSpan = "Madhyayu";
+                    } else if ("Madhyayu".equals(currentSpan) && currentCeiling <= 40) {
+                        currentSpan = "Alpayu";
+                    }
+                } else {
+                    String msg = "Lagna Lord in Dusthana (6/8/12) advises mindful health regimen.";
+                    adjustments.add(msg);
+                    reductions.add(msg);
+                    currentCeiling -= 2;
+                }
+            }
+        }
+
+        // Factor 3: Papakarthari Yoga on Lagna (12th & 2nd occupied by natural malefics)
+        int h12Sign = ((lagnaSign + 12 - 1 - 1) % 12) + 1;
+        int h2Sign = ((lagnaSign + 2 - 1 - 1) % 12) + 1;
+        boolean lagna12Mal = hasMaleficInSign(planetMap, h12Sign);
+        boolean lagna2Mal = hasMaleficInSign(planetMap, h2Sign);
+        boolean papakarthariLagna = lagna12Mal && lagna2Mal;
+        if (papakarthariLagna) {
+            String msg = "Lagna hemmed between malefics in 12th & 2nd (Papakarthari Yoga) cautions physical vitality (-3 years).";
+            adjustments.add(msg);
+            reductions.add(msg);
+            currentCeiling -= 3;
+        }
+
+        // Factor 4: Papakarthari Yoga on Moon (12th & 2nd occupied by natural malefics)
+        int moonH12 = ((activeMoonSign + 12 - 1 - 1) % 12) + 1;
+        int moonH2 = ((activeMoonSign + 2 - 1 - 1) % 12) + 1;
+        boolean moon12Mal = hasMaleficInSign(planetMap, moonH12);
+        boolean moon2Mal = hasMaleficInSign(planetMap, moonH2);
+        boolean papakarthariMoon = moon12Mal && moon2Mal;
+        if (papakarthariMoon) {
+            String msg = "Moon hemmed between malefics in 12th & 2nd (Papakarthari Yoga on Moon) cautions vitality (-3 years).";
+            adjustments.add(msg);
+            reductions.add(msg);
+            currentCeiling -= 3;
+        }
+
+        // Factor 5: Malefics in Kendras with no Benefics in Kendras
+        int kendraMalefics = 0;
+        int kendraBenefics = 0;
+        if (planetMap != null) {
+            for (String malKey : List.of("SUN", "MARS", "SATURN", "RAHU", "KETU")) {
+                ChartResponseDTO.PositionDetail p = findPosition(planetMap, malKey);
+                if (p != null) {
+                    int h = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
+                    if (h == 1 || h == 4 || h == 7 || h == 10) kendraMalefics++;
+                }
+            }
+            for (String benKey : List.of("JUPITER", "VENUS", "MERCURY")) {
+                ChartResponseDTO.PositionDetail p = findPosition(planetMap, benKey);
+                if (p != null) {
+                    int h = ((p.getSignNumber() - lagnaSign + 12) % 12) + 1;
+                    if (h == 1 || h == 4 || h == 7 || h == 10) kendraBenefics++;
+                }
+            }
+            if (moonPos != null) {
+                int mh = ((moonPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
+                if (mh == 1 || mh == 4 || mh == 7 || mh == 10) {
+                    if (sunPos != null) {
+                        double moonAbs = ((moonPos.getSignNumber() - 1) * 30.0) + moonPos.getDegreeInSign();
+                        double sunAbs = ((sunPos.getSignNumber() - 1) * 30.0) + sunPos.getDegreeInSign();
+                        double el = (moonAbs - sunAbs + 720.0) % 360.0;
+                        if (el > 60.0 && el < 300.0) kendraBenefics++;
+                    }
+                }
+            }
+        }
+        boolean kendraAffliction = (kendraMalefics > 0 && kendraBenefics == 0);
+        if (kendraAffliction) {
+            String msg = "Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa (-3 years).";
+            adjustments.add(msg);
+            reductions.add(msg);
+            currentCeiling -= 3;
+        }
+
+        // Bounded ceiling
+        if ("Poornayu".equals(currentSpan)) currentCeiling = Math.max(72, Math.min(108, currentCeiling));
+        else if ("Madhyayu".equals(currentSpan)) currentCeiling = Math.max(36, Math.min(72, currentCeiling));
+        else if ("Alpayu".equals(currentSpan)) currentCeiling = Math.max(0, Math.min(36, currentCeiling));
+
+        Map<String, Object> kakshyaAnalysis = new LinkedHashMap<>();
+        kakshyaAnalysis.put("baseSpan", baseSpan);
+        kakshyaAnalysis.put("baseCeilingAge", baseCeilingAge);
+        kakshyaAnalysis.put("adjustedSpan", currentSpan);
+        kakshyaAnalysis.put("adjustedCeilingAge", currentCeiling);
+        kakshyaAnalysis.put("netYearsAdjustment", currentCeiling - baseCeilingAge);
+        kakshyaAnalysis.put("vriddhiCount", promotions.size());
+        kakshyaAnalysis.put("hrasaCount", reductions.size());
+        kakshyaAnalysis.put("promotions", promotions);
+        kakshyaAnalysis.put("reductions", reductions);
+        if (akPos != null && akPos.getPlanetKey() != null) {
+            kakshyaAnalysis.put("atmakaraka", capitalize(akPos.getPlanetKey()) + " (" + Math.round(akPos.getDegreeInSign() * 100.0) / 100.0 + "°)");
+        }
+        kakshyaAnalysis.put("papakarthariLagna", papakarthariLagna);
+        kakshyaAnalysis.put("papakarthariMoon", papakarthariMoon);
+        kakshyaAnalysis.put("kendraAffliction", kendraAffliction);
+
+        return new KakshyaResult(
+                currentSpan,
+                baseCeilingAge,
+                currentCeiling,
+                adjustments,
+                kakshyaAnalysis
+        );
+    }
+
+    public static boolean hasMaleficInSign(Map<String, ChartResponseDTO.PositionDetail> planetMap, int signNumber) {
+        if (planetMap == null) return false;
+        for (String mKey : List.of("SUN", "MARS", "SATURN", "RAHU", "KETU")) {
+            ChartResponseDTO.PositionDetail p = findPosition(planetMap, mKey);
+            if (p != null && p.getSignNumber() == signNumber) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Classifies the 12-Year Khanda sub-tier within a 36-year Ayurdaya compartment:
+     * - Alpayu: 0-12 yrs (Balarishta / Adhama Alpayu), 12-24 yrs (Madhyama Alpayu), 24-36 yrs (Uttama Alpayu)
+     * - Madhyayu: 36-48 yrs (Adhama Madhyayu), 48-60 yrs (Madhyama Madhyayu), 60-72 yrs (Uttama Madhyayu)
+     * - Poornayu: 72-84 yrs (Adhama Poornayu), 84-96 yrs (Madhyama Poornayu), 96-108 yrs (Paramayu / Deerghayu)
+     */
+    public static String determineKhandaSubTier(String span, int ceilingAge, int lagnaNavamshaSign, int hlNavamshaSign) {
+        String normSpan = (span != null && !span.isBlank()) ? span.trim() : "Madhyayu";
+
+        String subCategory; // "Alpayu", "Madhyayu", "Poornayu" indicating Lower, Middle, Upper tier
+        if (lagnaNavamshaSign >= 1 && lagnaNavamshaSign <= 12 && hlNavamshaSign >= 1 && hlNavamshaSign <= 12) {
+            Modality m1 = getModality(lagnaNavamshaSign);
+            Modality m2 = getModality(hlNavamshaSign);
+            subCategory = getModalitySpan(m1, m2);
+        } else {
+            // Fallback via ceiling age within span compartment
+            if (normSpan.equalsIgnoreCase("Alpayu")) {
+                if (ceilingAge <= 12) subCategory = "Alpayu";
+                else if (ceilingAge <= 24) subCategory = "Madhyayu";
+                else subCategory = "Poornayu";
+            } else if (normSpan.equalsIgnoreCase("Madhyayu")) {
+                if (ceilingAge <= 48) subCategory = "Alpayu";
+                else if (ceilingAge <= 60) subCategory = "Madhyayu";
+                else subCategory = "Poornayu";
+            } else { // Poornayu
+                if (ceilingAge <= 84) subCategory = "Alpayu";
+                else if (ceilingAge <= 96) subCategory = "Madhyayu";
+                else subCategory = "Poornayu";
+            }
+        }
+
+        if (normSpan.equalsIgnoreCase("Alpayu")) {
+            return switch (subCategory) {
+                case "Alpayu" -> "Balarishta / Adhama Alpayu (0 - 12 Years)";
+                case "Madhyayu" -> "Madhyama Alpayu (12 - 24 Years)";
+                case "Poornayu" -> "Uttama Alpayu (24 - 36 Years)";
+                default -> "Madhyama Alpayu (12 - 24 Years)";
+            };
+        } else if (normSpan.equalsIgnoreCase("Madhyayu")) {
+            return switch (subCategory) {
+                case "Alpayu" -> "Adhama Madhyayu (36 - 48 Years)";
+                case "Madhyayu" -> "Madhyama Madhyayu (48 - 60 Years)";
+                case "Poornayu" -> "Uttama Madhyayu (60 - 72 Years)";
+                default -> "Madhyama Madhyayu (48 - 60 Years)";
+            };
+        } else { // Poornayu
+            return switch (subCategory) {
+                case "Alpayu" -> "Adhama Poornayu (72 - 84 Years)";
+                case "Madhyayu" -> "Madhyama Poornayu (84 - 96 Years)";
+                case "Poornayu" -> "Paramayu / Deerghayu (96 - 108 Years)";
+                default -> "Adhama Poornayu (72 - 84 Years)";
+            };
+        }
+    }
+
+    public static String determineKhandaSubTier(String span, int ceilingAge) {
+        return determineKhandaSubTier(span, ceilingAge, 0, 0);
+    }
+
+    /**
+     * Calculates the D9 Navamsha sign (1 to 12) from Rasi sign (1 to 12) and degree (0 to 30).
+     */
+    public static int calculateNavamshaSign(int sign, double degree) {
+        double absLong = ((sign - 1) * 30.0) + Math.max(0.0, Math.min(29.9999, degree));
+        int navIndex = (int) (absLong / (30.0 / 9.0));
+        return (navIndex % 12) + 1;
     }
 
     /**
