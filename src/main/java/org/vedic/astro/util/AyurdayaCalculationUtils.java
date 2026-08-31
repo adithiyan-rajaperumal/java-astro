@@ -53,7 +53,8 @@ public class AyurdayaCalculationUtils {
             Map<String, Object> marakaBadhakaTimeline,
             List<String> kakshyaAdjustments,
             String criticalMarakaWindow,
-            String classicalRationale
+            String classicalRationale,
+            ShoolaDasaCalculationUtils.ShoolaDasaReport shoolaDasaInfo
     ) {
         public AyurdayaProfile(
                 String longevityClassification,
@@ -79,7 +80,39 @@ public class AyurdayaCalculationUtils {
                     marakaBadhakaTimeline,
                     kakshyaAdjustments,
                     criticalMarakaWindow,
-                    classicalRationale
+                    classicalRationale,
+                    null
+            );
+        }
+
+        public AyurdayaProfile(
+                String longevityClassification,
+                int estimatedLifespanCeiling,
+                String lifespanRange,
+                String khandaSubTier,
+                Map<String, Object> threePairsDetails,
+                Map<String, Object> jaiminiThreePairs,
+                Map<String, Object> kakshyaAnalysis,
+                Map<String, Object> parasharaAyurBala,
+                Map<String, Object> marakaBadhakaTimeline,
+                List<String> kakshyaAdjustments,
+                String criticalMarakaWindow,
+                String classicalRationale
+        ) {
+            this(
+                    longevityClassification,
+                    estimatedLifespanCeiling,
+                    lifespanRange,
+                    khandaSubTier,
+                    threePairsDetails,
+                    jaiminiThreePairs,
+                    kakshyaAnalysis,
+                    parasharaAyurBala,
+                    marakaBadhakaTimeline,
+                    kakshyaAdjustments,
+                    criticalMarakaWindow,
+                    classicalRationale,
+                    null
             );
         }
 
@@ -590,6 +623,11 @@ public class AyurdayaCalculationUtils {
                 "), 8th Lord (" + eighthLord + "), Moon, Saturn, and Hora Lagna modalities, refined with Kakshya Vriddhi and Shadbala life-force: " +
                 baseSpan + " (" + khandaSubTier + "). " + String.join(" ", adjustments);
 
+        // 5. Maharishi Jaimini Shoola Dasa
+        ShoolaDasaCalculationUtils.ShoolaDasaReport shoolaDasaInfo = ShoolaDasaCalculationUtils.calculateShoolaDasa(
+                lagnaSign, planetMap, birthYear, baseCeilingAge
+        );
+
         return new AyurdayaProfile(
                 baseSpan,
                 baseCeilingAge,
@@ -602,7 +640,8 @@ public class AyurdayaCalculationUtils {
                 marakaTimelineMap,
                 adjustments,
                 activeMarakaDasaInfo,
-                rationale
+                rationale,
+                shoolaDasaInfo
         );
     }
 
