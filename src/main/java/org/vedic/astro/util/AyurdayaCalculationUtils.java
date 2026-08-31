@@ -46,6 +46,13 @@ public class AyurdayaCalculationUtils {
             String classicalRationale
     ) {}
 
+    public record SynthesisResult(
+            String span,
+            String ruleApplied,
+            String overrideReason,
+            Map<String, Object> threePairsMap
+    ) {}
+
     public static Modality getModality(int signNumber) {
         return switch (signNumber) {
             case 1, 4, 7, 10 -> Modality.CHARA;
@@ -160,47 +167,35 @@ public class AyurdayaCalculationUtils {
         Modality mHL = getModality(horaLagnaSign);
         String span3 = getModalitySpan(mLagna, mHL);
 
-        // Majority Resolution & Classical Exceptions across the 3 Jaimini pairs
-        Map<String, Integer> votes = new HashMap<>();
-        votes.put("Poornayu", 0);
-        votes.put("Madhyayu", 0);
-        votes.put("Alpayu", 0);
-        votes.put(span1, votes.get(span1) + 1);
-        votes.put(span2, votes.get(span2) + 1);
-        votes.put(span3, votes.get(span3) + 1);
-
-        String baseSpan;
-        List<String> adjustments = new ArrayList<>();
+        // Identify Atmakaraka (AK) - Planet with highest degree in sign (0-30 deg) among 7 classical planets
+        ChartResponseDTO.PositionDetail akPos = null;
+        double maxDegree = -1.0;
+        for (String pKey : List.of("SUN", "MOON", "MARS", "MERCURY", "JUPITER", "VENUS", "SATURN")) {
+            ChartResponseDTO.PositionDetail pos = planetMap.get(pKey);
+            if (pos != null && pos.getDegreeInSign() > maxDegree) {
+                maxDegree = pos.getDegreeInSign();
+                akPos = pos;
+            }
+        }
+        boolean isOddLagna = (lagnaSign % 2 != 0);
+        boolean akInKendra = false;
+        if (akPos != null) {
+            int akHouse = ((akPos.getSignNumber() - lagnaSign + 12) % 12) + 1;
+            akInKendra = (akHouse == 1 || akHouse == 4 || akHouse == 7 || akHouse == 10);
+        }
 
         int moonHouse = ((activeMoonSign - lagnaSign + 12) % 12) + 1;
 
-        // Classical Jaimini Resolution Priority (BPHS Ch 45 & JUS 2.1.15-25):
-        // 1. Primary Rule (Dwi-Samvada): If 2 or 3 pairs agree on the same span, that majority consensus prevails.
-        if (votes.get("Poornayu") >= 2) {
-            baseSpan = "Poornayu";
-        } else if (votes.get("Madhyayu") >= 2) {
-            baseSpan = "Madhyayu";
-        } else if (votes.get("Alpayu") >= 2) {
-            baseSpan = "Alpayu";
-        } else {
-            // 2. Ambiguity Tie-Breaker (All 3 pairs give 3 distinct spans: Poorna, Madhya, Alpa)
-            if (moonHouse == 1 || moonHouse == 7) {
-                // Classical Exception: Moon in 1st or 7th House decides tie (Jaimini Upadesha Sutra 2.1.23)
-                baseSpan = span2;
-                adjustments.add("All 3 pairs distinct with Moon in " + (moonHouse == 1 ? "Lagna (1st)" : "7th house") +
-                        ": Moon-Saturn pair (Pair 2) decides tie-breaker (Jaimini Sutra 2.1.23).");
-            } else {
-                // Odd vs Even Lagna Tie-Breaker (Jaimini Sutra 2.1.24)
-                boolean isOddLagna = (lagnaSign % 2 != 0);
-                baseSpan = isOddLagna ? span3 : span1;
-                adjustments.add("All 3 pairs indicate distinct spans: " +
-                        (isOddLagna ? "Odd Lagna gives precedence to Lagna-Hora Lagna (Pair 3)."
-                                : "Even Lagna gives precedence to Lagna Lord-8th Lord (Pair 1)."));
-            }
-        }
+        SynthesisResult synthesis = synthesizeThreePairs(
+                span1, span2, span3, moonHouse, isOddLagna, akInKendra, akPos, lagnaSign
+        );
 
-        // The raw consensus derived purely from Jaimini 3-pair method (before Kakshya modifications)
-        String rawConsensusSpan = baseSpan;
+        String baseSpan = synthesis.span();
+        String rawConsensusSpan = synthesis.span();
+        List<String> adjustments = new ArrayList<>();
+        if (synthesis.overrideReason() != null && !synthesis.overrideReason().isEmpty()) {
+            adjustments.add(synthesis.overrideReason());
+        }
 
         // Classical Ayurdaya Baseline Compartments (Alpayu: 0-36, Madhyayu: 36-72, Poornayu: 72-108)
         int baseCeilingAge = switch (baseSpan) {
@@ -614,17 +609,25 @@ public class AyurdayaCalculationUtils {
         Map<String, Object> threePairsMap = new LinkedHashMap<>();
         threePairsMap.put("pair1_lagnaLord_and_8thLord", Map.of(
                 "planets", lagnaLord + " (" + mLL + ") & " + eighthLord + " (" + m8L + ")",
-                "derivedSpan", span1
+                "derivedSpan", span1,
+                "modality1", mLL.name(),
+                "modality2", m8L.name()
         ));
         threePairsMap.put("pair2_moon_and_saturn", Map.of(
                 "planets", "Moon (" + mMoon + ") & Saturn (" + mSat + ")",
-                "derivedSpan", span2
+                "derivedSpan", span2,
+                "modality1", mMoon.name(),
+                "modality2", mSat.name()
         ));
         threePairsMap.put("pair3_lagna_and_horaLagna", Map.of(
                 "planets", "Lagna (" + mLagna + ") & Hora Lagna (" + mHL + ")",
-                "derivedSpan", span3
+                "derivedSpan", span3,
+                "modality1", mLagna.name(),
+                "modality2", mHL.name()
         ));
         threePairsMap.put("majorityConsensus", rawConsensusSpan);
+        threePairsMap.put("ruleApplied", synthesis.ruleApplied());
+        threePairsMap.put("overrideReason", synthesis.overrideReason() != null ? synthesis.overrideReason() : "");
 
         String rationale = "Determined via Parashara & Jaimini Ayurdaya based on Lagna Lord (" + lagnaLord +
                 "), 8th Lord (" + eighthLord + "), Moon, Saturn, and Hora Lagna modalities, refined with Kakshya Vriddhi and Shadbala life-force: " +
@@ -915,5 +918,118 @@ public class AyurdayaCalculationUtils {
                 }
             }
         };
+    }
+
+    /**
+     * Synthesizes Jaimini 3-pair longevity spans following the classical Vishesha Sutras & synthesis hierarchy:
+     * 1. Tri-Samvada (3/3 Consensus): All 3 pairs agree -> Unanimous baseline span.
+     * 2. Vishesha Sutra 1 (Chandra-Kendra): Moon in 1st or 7th house -> Pair 2 (Moon + Saturn) overrides.
+     * 3. Vishesha Sutra 2 (Atmakaraka Kendra): AK in 1st or 7th house -> Lagna/AK pair overrides (Odd Lagna -> Pair 3, Even Lagna -> Pair 1).
+     * 4. Dwi-Samvada (2/3 Majority): 2-pair majority consensus.
+     * 5. Asamvada (All 3 Differ): Moon in 1st/7th -> Pair 2; Odd Lagna -> Pair 3; Even Lagna -> Pair 1.
+     */
+    public static SynthesisResult synthesizeThreePairs(
+            String span1,
+            String span2,
+            String span3,
+            int moonHouse,
+            boolean isOddLagna,
+            boolean akInKendra,
+            ChartResponseDTO.PositionDetail akPos,
+            int lagnaSign) {
+
+        Map<String, Object> pairsMap = new LinkedHashMap<>();
+        pairsMap.put("pair1_lagnaLord_and_8thLord", Map.of("derivedSpan", span1));
+        pairsMap.put("pair2_moon_and_saturn", Map.of("derivedSpan", span2));
+        pairsMap.put("pair3_lagna_and_horaLagna", Map.of("derivedSpan", span3));
+
+        // 1. Tri-Samvada (3/3 Unanimous Consensus)
+        if (span1 != null && span1.equals(span2) && span1.equals(span3)) {
+            String rule = "Tri-Samvada (Unanimous Consensus)";
+            String reason = "All 3 Jaimini pairs agree unanimously on " + span1 + ".";
+            pairsMap.put("majorityConsensus", span1);
+            pairsMap.put("ruleApplied", rule);
+            pairsMap.put("overrideReason", reason);
+            return new SynthesisResult(span1, rule, reason, pairsMap);
+        }
+
+        // 2. Vishesha Sutra 1 (Chandra-Kendra Sutra: Moon in 1st or 7th House)
+        if (moonHouse == 1 || moonHouse == 7) {
+            String rule = "Vishesha Sutra 1 (Chandra-Kendra)";
+            String reason = "Moon in " + (moonHouse == 1 ? "Lagna (1st house)" : "7th house") +
+                    ": Pair 2 (Moon + Saturn) holds overriding authority (Jaimini Upadesha Sutra 2.1.23).";
+            pairsMap.put("majorityConsensus", span2);
+            pairsMap.put("ruleApplied", rule);
+            pairsMap.put("overrideReason", reason);
+            return new SynthesisResult(span2, rule, reason, pairsMap);
+        }
+
+        // 3. Vishesha Sutra 2 (Atmakaraka Kendra Sutra: AK in 1st or 7th House)
+        int akHouse = (akPos != null) ? (((akPos.getSignNumber() - lagnaSign + 12) % 12) + 1) : (akInKendra ? 1 : 0);
+        boolean akIn1stOr7th = (akHouse == 1 || akHouse == 7) || (akInKendra && akPos == null);
+        if (akIn1stOr7th) {
+            String chosenSpan = isOddLagna ? span3 : span1;
+            String rule = "Vishesha Sutra 2 (Atmakaraka-Kendra)";
+            String reason = "Atmakaraka in " + (akHouse == 1 ? "Lagna (1st house)" : (akHouse == 7 ? "7th house" : "Kendra")) +
+                    ": " + (isOddLagna ? "Odd Lagna gives precedence to Lagna-Hora Lagna (Pair 3)." : "Even Lagna gives precedence to Lagna Lord-8th Lord (Pair 1).");
+            pairsMap.put("majorityConsensus", chosenSpan);
+            pairsMap.put("ruleApplied", rule);
+            pairsMap.put("overrideReason", reason);
+            return new SynthesisResult(chosenSpan, rule, reason, pairsMap);
+        }
+
+        // 4. Dwi-Samvada (2/3 Majority Consensus)
+        Map<String, Integer> votes = new HashMap<>();
+        votes.put("Poornayu", 0);
+        votes.put("Madhyayu", 0);
+        votes.put("Alpayu", 0);
+        if (span1 != null) votes.put(span1, votes.getOrDefault(span1, 0) + 1);
+        if (span2 != null) votes.put(span2, votes.getOrDefault(span2, 0) + 1);
+        if (span3 != null) votes.put(span3, votes.getOrDefault(span3, 0) + 1);
+
+        if (votes.get("Poornayu") >= 2) {
+            String rule = "Dwi-Samvada (Majority Consensus)";
+            String reason = "Majority consensus: 2 of 3 pairs agree on Poornayu.";
+            pairsMap.put("majorityConsensus", "Poornayu");
+            pairsMap.put("ruleApplied", rule);
+            pairsMap.put("overrideReason", reason);
+            return new SynthesisResult("Poornayu", rule, reason, pairsMap);
+        } else if (votes.get("Madhyayu") >= 2) {
+            String rule = "Dwi-Samvada (Majority Consensus)";
+            String reason = "Majority consensus: 2 of 3 pairs agree on Madhyayu.";
+            pairsMap.put("majorityConsensus", "Madhyayu");
+            pairsMap.put("ruleApplied", rule);
+            pairsMap.put("overrideReason", reason);
+            return new SynthesisResult("Madhyayu", rule, reason, pairsMap);
+        } else if (votes.get("Alpayu") >= 2) {
+            String rule = "Dwi-Samvada (Majority Consensus)";
+            String reason = "Majority consensus: 2 of 3 pairs agree on Alpayu.";
+            pairsMap.put("majorityConsensus", "Alpayu");
+            pairsMap.put("ruleApplied", rule);
+            pairsMap.put("overrideReason", reason);
+            return new SynthesisResult("Alpayu", rule, reason, pairsMap);
+        }
+
+        // 5. Asamvada (All 3 Pairs Differ: 1 Poorna, 1 Madhya, 1 Alpa)
+        String chosenSpan = isOddLagna ? span3 : span1;
+        String rule = isOddLagna ? "Asamvada (Odd Lagna Tie-Breaker)" : "Asamvada (Even Lagna Tie-Breaker)";
+        String reason = "All 3 pairs indicate distinct spans: " +
+                (isOddLagna ? "Odd Lagna gives precedence to Lagna-Hora Lagna (Pair 3)."
+                        : "Even Lagna gives precedence to Lagna Lord-8th Lord (Pair 1).");
+        pairsMap.put("majorityConsensus", chosenSpan);
+        pairsMap.put("ruleApplied", rule);
+        pairsMap.put("overrideReason", reason);
+        return new SynthesisResult(chosenSpan, rule, reason, pairsMap);
+    }
+
+    public static SynthesisResult synthesizeThreePairs(
+            String span1,
+            String span2,
+            String span3,
+            int moonHouse,
+            boolean isOddLagna,
+            boolean akInKendra,
+            ChartResponseDTO.PositionDetail akPos) {
+        return synthesizeThreePairs(span1, span2, span3, moonHouse, isOddLagna, akInKendra, akPos, isOddLagna ? 1 : 2);
     }
 }

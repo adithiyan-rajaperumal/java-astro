@@ -311,16 +311,16 @@ public class AyurdayaCalculationUtilsTest {
     public void testTwoPairsAgreePrevailsOverSingleDiscordantPair() {
         // Libra Lagna (Sign 7 - Movable)
         int lagnaSign = 7;
-        // Moon in Aries (Sign 1 - Movable, in 7th house)
-        int moonSign = 1;
+        // Moon in Leo (Sign 5 - Fixed, in 11th house - non-Kendra)
+        int moonSign = 5;
 
         List<ChartResponseDTO.PositionDetail> d1Chart = new ArrayList<>();
         d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("LAGNA").signNumber(7).rashiName("Tula").degreeInSign(15.0).build());
         // Lagna Lord Venus in Virgo (Dual) & 8th Lord Venus in Virgo (Dual) -> Pair 1: Dual + Dual = Madhyayu
         d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").displayName("Venus").signNumber(6).rashiName("Kanya").degreeInSign(10.0).build());
-        // Moon in Aries (Movable) & Saturn in Pisces (Dual) -> Pair 2: Movable + Dual = Alpayu
-        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(1).rashiName("Mesha").degreeInSign(5.0).build());
-        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(12).rashiName("Meena").degreeInSign(18.0).build());
+        // Moon in Leo (Fixed) & Saturn in Taurus (Fixed) -> Pair 2: Fixed + Fixed = Alpayu
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("MOON").displayName("Moon").signNumber(5).rashiName("Simha").degreeInSign(5.0).build());
+        d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").displayName("Saturn").signNumber(2).rashiName("Vrishabha").degreeInSign(18.0).build());
         // Hora Lagna in Taurus (Fixed) -> Pair 3: Lagna (Movable) + HL (Fixed) = Madhyayu
         d1Chart.add(ChartResponseDTO.PositionDetail.builder().planetKey("SUN").displayName("Sun").signNumber(5).rashiName("Simha").degreeInSign(10.0).build());
 
@@ -332,6 +332,101 @@ public class AyurdayaCalculationUtilsTest {
         // Pair 1 (Madhyayu) and Pair 3 (Madhyayu) both agree (2 out of 3 votes) -> Majority Consensus is Madhyayu!
         assertEquals("Madhyayu", profile.longevityClassification());
         assertTrue(profile.estimatedLifespanCeiling() >= 62, "Madhyayu should have ceiling >= 62, got: " + profile.estimatedLifespanCeiling());
+    }
+
+    @Test
+    public void testVisheshaSutraMoonInLagnaOverridesMajority() {
+        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Poornayu
+        // But Moon in 1st house -> Vishesha Sutra 1 overrides majority -> Alpayu!
+        var result = AyurdayaCalculationUtils.synthesizeThreePairs(
+                "Poornayu", "Alpayu", "Poornayu", 1, true, false, null, 1
+        );
+        assertEquals("Alpayu", result.span());
+        assertEquals("Vishesha Sutra 1 (Chandra-Kendra)", result.ruleApplied());
+        assertNotNull(result.overrideReason());
+        assertTrue(result.overrideReason().contains("Moon in Lagna (1st house)"));
+    }
+
+    @Test
+    public void testVisheshaSutraMoonIn7thOverridesMajority() {
+        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Poornayu
+        // But Moon in 7th house -> Vishesha Sutra 1 overrides majority -> Alpayu!
+        var result = AyurdayaCalculationUtils.synthesizeThreePairs(
+                "Poornayu", "Alpayu", "Poornayu", 7, true, false, null, 1
+        );
+        assertEquals("Alpayu", result.span());
+        assertEquals("Vishesha Sutra 1 (Chandra-Kendra)", result.ruleApplied());
+        assertNotNull(result.overrideReason());
+        assertTrue(result.overrideReason().contains("7th house"));
+    }
+
+    @Test
+    public void testVisheshaSutraAtmakarakaInKendra() {
+        // Case A: Odd Lagna (Aries 1) with AK in 1st house
+        // Pair 1 = Alpayu, Pair 2 = Alpayu, Pair 3 = Poornayu
+        // Majority is Alpayu, but AK in 1st house overrides -> Pair 3 (Poornayu) for Odd Lagna
+        ChartResponseDTO.PositionDetail akInLagna = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("SUN").signNumber(1).degreeInSign(29.0).build();
+        var resultOdd = AyurdayaCalculationUtils.synthesizeThreePairs(
+                "Alpayu", "Alpayu", "Poornayu", 4, true, true, akInLagna, 1
+        );
+        assertEquals("Poornayu", resultOdd.span());
+        assertEquals("Vishesha Sutra 2 (Atmakaraka-Kendra)", resultOdd.ruleApplied());
+        assertTrue(resultOdd.overrideReason().contains("Atmakaraka in Lagna"));
+
+        // Case B: Even Lagna (Taurus 2) with AK in 7th house (Scorpio 8)
+        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Alpayu
+        // Majority is Alpayu, but AK in 7th house overrides -> Pair 1 (Poornayu) for Even Lagna
+        ChartResponseDTO.PositionDetail akIn7th = ChartResponseDTO.PositionDetail.builder()
+                .planetKey("MARS").signNumber(8).degreeInSign(28.5).build();
+        var resultEven = AyurdayaCalculationUtils.synthesizeThreePairs(
+                "Poornayu", "Alpayu", "Alpayu", 4, false, true, akIn7th, 2
+        );
+        assertEquals("Poornayu", resultEven.span());
+        assertEquals("Vishesha Sutra 2 (Atmakaraka-Kendra)", resultEven.ruleApplied());
+        assertTrue(resultEven.overrideReason().contains("7th house"));
+    }
+
+    @Test
+    public void testTriSamvadaUnanimous() {
+        // All 3 pairs agree on Poornayu
+        var result = AyurdayaCalculationUtils.synthesizeThreePairs(
+                "Poornayu", "Poornayu", "Poornayu", 4, true, false, null, 1
+        );
+        assertEquals("Poornayu", result.span());
+        assertEquals("Tri-Samvada (Unanimous Consensus)", result.ruleApplied());
+        assertTrue(result.overrideReason().contains("unanimously"));
+    }
+
+    @Test
+    public void testDwiSamvadaMajority() {
+        // 2 out of 3 pairs agree on Madhyayu (Pair 1 and Pair 3), Moon in 4th (no Vishesha override)
+        var result = AyurdayaCalculationUtils.synthesizeThreePairs(
+                "Madhyayu", "Alpayu", "Madhyayu", 4, true, false, null, 1
+        );
+        assertEquals("Madhyayu", result.span());
+        assertEquals("Dwi-Samvada (Majority Consensus)", result.ruleApplied());
+        assertTrue(result.overrideReason().contains("Majority consensus"));
+    }
+
+    @Test
+    public void testAsamvadaOddAndEvenLagnaTieBreakers() {
+        // All 3 pairs differ: Pair 1 = Poornayu, Pair 2 = Madhyayu, Pair 3 = Alpayu, Moon in 4th house
+        // Odd Lagna -> Pair 3 (Alpayu)
+        var resultOdd = AyurdayaCalculationUtils.synthesizeThreePairs(
+                "Poornayu", "Madhyayu", "Alpayu", 4, true, false, null, 1
+        );
+        assertEquals("Alpayu", resultOdd.span());
+        assertEquals("Asamvada (Odd Lagna Tie-Breaker)", resultOdd.ruleApplied());
+        assertTrue(resultOdd.overrideReason().contains("Odd Lagna gives precedence to Lagna-Hora Lagna"));
+
+        // Even Lagna -> Pair 1 (Poornayu)
+        var resultEven = AyurdayaCalculationUtils.synthesizeThreePairs(
+                "Poornayu", "Madhyayu", "Alpayu", 4, false, false, null, 2
+        );
+        assertEquals("Poornayu", resultEven.span());
+        assertEquals("Asamvada (Even Lagna Tie-Breaker)", resultEven.ruleApplied());
+        assertTrue(resultEven.overrideReason().contains("Even Lagna gives precedence to Lagna Lord-8th Lord"));
     }
 
     @Test
