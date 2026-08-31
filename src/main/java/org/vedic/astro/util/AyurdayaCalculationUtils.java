@@ -122,8 +122,8 @@ public class AyurdayaCalculationUtils {
 
         // 1. Identify Key Longevity Determinants
         String lagnaLord = PlanetDignityUtils.getSignLord(lagnaSign);
-        int eighthSign = ((lagnaSign + 7 - 1) % 12) + 1;
-        String eighthLord = PlanetDignityUtils.getSignLord(eighthSign);
+        int eighthSign = getJaiminiEighthSign(lagnaSign);
+        String eighthLord = getActiveEighthLord(lagnaSign, planetMap);
 
         ChartResponseDTO.PositionDetail lagnaLordPos = planetMap.get(lagnaLord.toUpperCase());
         ChartResponseDTO.PositionDetail eighthLordPos = planetMap.get(eighthLord.toUpperCase());
@@ -729,5 +729,191 @@ public class AyurdayaCalculationUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * Determines the Jaimini 8th sign based on directional (Savya / Apasavya) counting:
+     * - Odd Lagna (Aries 1, Gemini 3, Leo 5, Libra 7, Sagittarius 9, Aquarius 11): Count 8 houses direct -> ((lagnaSign + 7 - 1) % 12) + 1
+     * - Even Lagna (Taurus 2, Cancer 4, Virgo 6, Scorpio 8, Capricorn 10, Pisces 12): Count 8 houses reverse -> ((lagnaSign - 7 - 1 + 12) % 12) + 1
+     */
+    public static int getJaiminiEighthSign(int lagnaSign) {
+        if (lagnaSign % 2 != 0) {
+            return ((lagnaSign + 7 - 1) % 12) + 1;
+        } else {
+            return ((lagnaSign - 7 - 1 + 12) % 12) + 1;
+        }
+    }
+
+    /**
+     * Resolves dual lordship for dual-ruled signs in Jaimini astrology:
+     * - Scorpio (Sign 8): Mars vs Ketu
+     * - Aquarius (Sign 11): Saturn vs Rahu
+     *
+     * Selection Hierarchy:
+     * 1. Conjunction count: Co-lord with higher number of other conjoined planets in same sign wins.
+     * 2. Exaltation / Own sign: Co-lord in exalted or own sign wins.
+     * 3. Kendra / Trikona: Co-lord placed in Kendra (1,4,7,10) or Trikona (1,5,9) from Lagna wins.
+     * 4. Longitude degree: Co-lord with higher degree in sign wins.
+     */
+    public static String resolveDualLord(String signName, Map<String, ChartResponseDTO.PositionDetail> planetMap, int lagnaSign) {
+        if (signName == null || signName.trim().isEmpty()) {
+            return "";
+        }
+        String s = signName.trim().toLowerCase();
+        boolean isScorpio = s.contains("scorpio") || s.contains("vrishchika") || s.contains("vrischika") || s.equals("8");
+        boolean isAquarius = s.contains("aquarius") || s.contains("kumbha") || s.equals("11");
+
+        if (isScorpio) {
+            return resolveCoLords("Mars", "Ketu", 8, planetMap, lagnaSign);
+        } else if (isAquarius) {
+            return resolveCoLords("Saturn", "Rahu", 11, planetMap, lagnaSign);
+        } else {
+            int signNum = parseSignNumber(signName);
+            if (signNum >= 1 && signNum <= 12) {
+                return PlanetDignityUtils.getSignLord(signNum);
+            }
+            return signName;
+        }
+    }
+
+    /**
+     * Resolves the active 8th lord according to Jaimini Savya/Apasavya counting and dual-lord rules.
+     */
+    public static String getActiveEighthLord(int lagnaSign, Map<String, ChartResponseDTO.PositionDetail> planetMap) {
+        int eighthSign = getJaiminiEighthSign(lagnaSign);
+        if (eighthSign == 8) {
+            return resolveDualLord("Scorpio", planetMap, lagnaSign);
+        } else if (eighthSign == 11) {
+            return resolveDualLord("Aquarius", planetMap, lagnaSign);
+        } else {
+            return PlanetDignityUtils.getSignLord(eighthSign);
+        }
+    }
+
+    private static String resolveCoLords(
+            String cand1,
+            String cand2,
+            int signNumber,
+            Map<String, ChartResponseDTO.PositionDetail> planetMap,
+            int lagnaSign) {
+        if (planetMap == null || planetMap.isEmpty()) {
+            return cand1;
+        }
+
+        ChartResponseDTO.PositionDetail pos1 = findPosition(planetMap, cand1);
+        ChartResponseDTO.PositionDetail pos2 = findPosition(planetMap, cand2);
+
+        if (pos1 == null && pos2 == null) return cand1;
+        if (pos1 != null && pos2 == null) return cand1;
+        if (pos1 == null && pos2 != null) return cand2;
+
+        // 1. Conjunction Count: Number of other planets in same sign (excluding LAGNA and the candidate itself)
+        int count1 = getConjunctionCount(planetMap, pos1.getSignNumber(), cand1);
+        int count2 = getConjunctionCount(planetMap, pos2.getSignNumber(), cand2);
+
+        if (count1 > count2) return cand1;
+        if (count2 > count1) return cand2;
+
+        // 2. Exaltation / Own Sign Dignity
+        boolean dig1 = isExaltedOrOwnSign(cand1, pos1.getSignNumber());
+        boolean dig2 = isExaltedOrOwnSign(cand2, pos2.getSignNumber());
+
+        if (dig1 && !dig2) return cand1;
+        if (dig2 && !dig1) return cand2;
+
+        // 3. Kendra / Trikona Placement from Lagna
+        int h1 = ((pos1.getSignNumber() - lagnaSign + 12) % 12) + 1;
+        int h2 = ((pos2.getSignNumber() - lagnaSign + 12) % 12) + 1;
+        boolean kt1 = PlanetDignityUtils.isKendra(h1) || PlanetDignityUtils.isTrikona(h1);
+        boolean kt2 = PlanetDignityUtils.isKendra(h2) || PlanetDignityUtils.isTrikona(h2);
+
+        if (kt1 && !kt2) return cand1;
+        if (kt2 && !kt1) return cand2;
+
+        // 4. Longitude Degree
+        double deg1 = pos1.getDegreeInSign();
+        double deg2 = pos2.getDegreeInSign();
+        if (deg1 >= deg2) {
+            return cand1;
+        } else {
+            return cand2;
+        }
+    }
+
+    private static ChartResponseDTO.PositionDetail findPosition(
+            Map<String, ChartResponseDTO.PositionDetail> planetMap,
+            String planetName) {
+        if (planetMap == null || planetName == null) return null;
+        for (Map.Entry<String, ChartResponseDTO.PositionDetail> entry : planetMap.entrySet()) {
+            if (entry.getKey() != null && entry.getKey().equalsIgnoreCase(planetName)) {
+                return entry.getValue();
+            }
+            if (entry.getValue() != null && entry.getValue().getPlanetKey() != null
+                    && entry.getValue().getPlanetKey().equalsIgnoreCase(planetName)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+    private static int getConjunctionCount(
+            Map<String, ChartResponseDTO.PositionDetail> planetMap,
+            int signNumber,
+            String excludePlanet) {
+        if (planetMap == null) return 0;
+        int count = 0;
+        for (Map.Entry<String, ChartResponseDTO.PositionDetail> entry : planetMap.entrySet()) {
+            String key = entry.getKey();
+            ChartResponseDTO.PositionDetail pos = entry.getValue();
+            if (pos == null) continue;
+            if ("LAGNA".equalsIgnoreCase(key) || (pos.getPlanetKey() != null && "LAGNA".equalsIgnoreCase(pos.getPlanetKey()))) {
+                continue;
+            }
+            if (excludePlanet.equalsIgnoreCase(key) || (pos.getPlanetKey() != null && excludePlanet.equalsIgnoreCase(pos.getPlanetKey()))) {
+                continue;
+            }
+            if (pos.getSignNumber() == signNumber) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static boolean isExaltedOrOwnSign(String planet, int sign) {
+        if (planet == null) return false;
+        String p = planet.trim().toLowerCase();
+        return switch (p) {
+            case "mars" -> PlanetDignityUtils.isExalted("Mars", sign) || PlanetDignityUtils.isOwnSign("Mars", sign);
+            case "saturn" -> PlanetDignityUtils.isExalted("Saturn", sign) || PlanetDignityUtils.isOwnSign("Saturn", sign);
+            case "rahu" -> sign == 11 || sign == 2 || sign == 3 || sign == 6;
+            case "ketu" -> sign == 8 || sign == 9 || sign == 12;
+            default -> PlanetDignityUtils.isExalted(capitalize(planet), sign) || PlanetDignityUtils.isOwnSign(capitalize(planet), sign);
+        };
+    }
+
+    private static int parseSignNumber(String signName) {
+        if (signName == null) return 0;
+        String s = signName.trim().toLowerCase();
+        return switch (s) {
+            case "1", "aries", "mesha" -> 1;
+            case "2", "taurus", "vrishabha" -> 2;
+            case "3", "gemini", "mithuna" -> 3;
+            case "4", "cancer", "karka", "kataka" -> 4;
+            case "5", "leo", "simha" -> 5;
+            case "6", "virgo", "kanya" -> 6;
+            case "7", "libra", "tula" -> 7;
+            case "8", "scorpio", "vrishchika", "vrischika" -> 8;
+            case "9", "sagittarius", "dhanu", "dhanus" -> 9;
+            case "10", "capricorn", "makara" -> 10;
+            case "11", "aquarius", "kumbha" -> 11;
+            case "12", "pisces", "meena" -> 12;
+            default -> {
+                try {
+                    yield Integer.parseInt(s);
+                } catch (NumberFormatException e) {
+                    yield 0;
+                }
+            }
+        };
     }
 }

@@ -333,4 +333,109 @@ public class AyurdayaCalculationUtilsTest {
         assertEquals("Madhyayu", profile.longevityClassification());
         assertTrue(profile.estimatedLifespanCeiling() >= 62, "Madhyayu should have ceiling >= 62, got: " + profile.estimatedLifespanCeiling());
     }
+
+    @Test
+    public void testSavyaApasavyaCountingAndDualLords() {
+        // 1. Savya / Apasavya 8th Sign Directional Counting
+        // Odd Lagna (Direct counting: 8th from Lagna)
+        assertEquals(8, AyurdayaCalculationUtils.getJaiminiEighthSign(1), "Aries (1) -> 8th is Scorpio (8)");
+        assertEquals(10, AyurdayaCalculationUtils.getJaiminiEighthSign(3), "Gemini (3) -> 8th is Capricorn (10)");
+        assertEquals(12, AyurdayaCalculationUtils.getJaiminiEighthSign(5), "Leo (5) -> 8th is Pisces (12)");
+        assertEquals(2, AyurdayaCalculationUtils.getJaiminiEighthSign(7), "Libra (7) -> 8th is Taurus (2)");
+        assertEquals(4, AyurdayaCalculationUtils.getJaiminiEighthSign(9), "Sagittarius (9) -> 8th is Cancer (4)");
+        assertEquals(6, AyurdayaCalculationUtils.getJaiminiEighthSign(11), "Aquarius (11) -> 8th is Virgo (6)");
+
+        // Even Lagna (Reverse counting: 8th reverse from Lagna)
+        assertEquals(7, AyurdayaCalculationUtils.getJaiminiEighthSign(2), "Taurus (2) -> 8th reverse is Libra (7)");
+        assertEquals(9, AyurdayaCalculationUtils.getJaiminiEighthSign(4), "Cancer (4) -> 8th reverse is Sagittarius (9)");
+        assertEquals(11, AyurdayaCalculationUtils.getJaiminiEighthSign(6), "Virgo (6) -> 8th reverse is Aquarius (11)");
+        assertEquals(1, AyurdayaCalculationUtils.getJaiminiEighthSign(8), "Scorpio (8) -> 8th reverse is Aries (1)");
+        assertEquals(3, AyurdayaCalculationUtils.getJaiminiEighthSign(10), "Capricorn (10) -> 8th reverse is Gemini (3)");
+        assertEquals(5, AyurdayaCalculationUtils.getJaiminiEighthSign(12), "Pisces (12) -> 8th reverse is Leo (5)");
+
+        // 2. Scorpio Dual-Lordship Resolution (Mars vs Ketu)
+        // Rule A: Conjunction count priority (Ketu conjoined with 2 planets > Mars alone)
+        Map<String, ChartResponseDTO.PositionDetail> chartKetuConjoined = Map.of(
+                "MARS", ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(1).degreeInSign(10.0).build(),
+                "KETU", ChartResponseDTO.PositionDetail.builder().planetKey("KETU").signNumber(9).degreeInSign(15.0).build(),
+                "JUPITER", ChartResponseDTO.PositionDetail.builder().planetKey("JUPITER").signNumber(9).degreeInSign(12.0).build(),
+                "SUN", ChartResponseDTO.PositionDetail.builder().planetKey("SUN").signNumber(9).degreeInSign(5.0).build()
+        );
+        assertEquals("Ketu", AyurdayaCalculationUtils.resolveDualLord("Scorpio", chartKetuConjoined, 1),
+                "Ketu with 2 conjunctions wins over solitary Mars");
+
+        // Rule B: Dignity priority (Mars exalted in Capricorn > Ketu in Gemini)
+        Map<String, ChartResponseDTO.PositionDetail> chartMarsExalted = Map.of(
+                "MARS", ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(10).degreeInSign(10.0).build(),
+                "KETU", ChartResponseDTO.PositionDetail.builder().planetKey("KETU").signNumber(3).degreeInSign(15.0).build()
+        );
+        assertEquals("Mars", AyurdayaCalculationUtils.resolveDualLord("Scorpio", chartMarsExalted, 1),
+                "Exalted Mars wins over neutral Ketu when conjunction counts are equal");
+
+        // Rule C: Kendra/Trikona placement (Ketu in 5th Trikona > Mars in 6th Dusthana from Aries Lagna)
+        Map<String, ChartResponseDTO.PositionDetail> chartKetuTrikona = Map.of(
+                "MARS", ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(6).degreeInSign(10.0).build(),
+                "KETU", ChartResponseDTO.PositionDetail.builder().planetKey("KETU").signNumber(5).degreeInSign(15.0).build()
+        );
+        assertEquals("Ketu", AyurdayaCalculationUtils.resolveDualLord("Scorpio", chartKetuTrikona, 1),
+                "Trikona Ketu (5th) wins over Dusthana Mars (6th)");
+
+        // Rule D: Longitude Degree (Mars 24.5° > Ketu 12.3° when in same neutral house)
+        Map<String, ChartResponseDTO.PositionDetail> chartMarsHigherDeg = Map.of(
+                "MARS", ChartResponseDTO.PositionDetail.builder().planetKey("MARS").signNumber(3).degreeInSign(24.5).build(),
+                "KETU", ChartResponseDTO.PositionDetail.builder().planetKey("KETU").signNumber(3).degreeInSign(12.3).build()
+        );
+        assertEquals("Mars", AyurdayaCalculationUtils.resolveDualLord("Scorpio", chartMarsHigherDeg, 1),
+                "Higher degree Mars (24.5°) wins over lower degree Ketu (12.3°)");
+
+        // 3. Aquarius Dual-Lordship Resolution (Saturn vs Rahu)
+        // Rule A: Conjunction count priority (Rahu conjoined with 2 planets > Saturn alone)
+        Map<String, ChartResponseDTO.PositionDetail> chartRahuConjoined = Map.of(
+                "SATURN", ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").signNumber(2).degreeInSign(10.0).build(),
+                "RAHU", ChartResponseDTO.PositionDetail.builder().planetKey("RAHU").signNumber(12).degreeInSign(15.0).build(),
+                "MERCURY", ChartResponseDTO.PositionDetail.builder().planetKey("MERCURY").signNumber(12).degreeInSign(8.0).build(),
+                "VENUS", ChartResponseDTO.PositionDetail.builder().planetKey("VENUS").signNumber(12).degreeInSign(20.0).build()
+        );
+        assertEquals("Rahu", AyurdayaCalculationUtils.resolveDualLord("Aquarius", chartRahuConjoined, 1),
+                "Rahu with 2 conjunctions wins over solitary Saturn");
+
+        // Rule B: Dignity priority (Saturn exalted in Libra > Rahu in Cancer)
+        Map<String, ChartResponseDTO.PositionDetail> chartSaturnExalted = Map.of(
+                "SATURN", ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").signNumber(7).degreeInSign(15.0).build(),
+                "RAHU", ChartResponseDTO.PositionDetail.builder().planetKey("RAHU").signNumber(4).degreeInSign(10.0).build()
+        );
+        assertEquals("Saturn", AyurdayaCalculationUtils.resolveDualLord("Aquarius", chartSaturnExalted, 1),
+                "Exalted Saturn wins over Rahu");
+
+        // Rule C: Kendra/Trikona placement (Rahu in 4th Kendra > Saturn in 12th Dusthana from Aries Lagna)
+        Map<String, ChartResponseDTO.PositionDetail> chartRahuKendra = Map.of(
+                "SATURN", ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").signNumber(12).degreeInSign(10.0).build(),
+                "RAHU", ChartResponseDTO.PositionDetail.builder().planetKey("RAHU").signNumber(4).degreeInSign(15.0).build()
+        );
+        assertEquals("Rahu", AyurdayaCalculationUtils.resolveDualLord("Aquarius", chartRahuKendra, 1),
+                "Kendra Rahu (4th) wins over Dusthana Saturn (12th)");
+
+        // Rule D: Longitude Degree (Rahu 28.1° > Saturn 14.1°)
+        Map<String, ChartResponseDTO.PositionDetail> chartRahuHigherDeg = Map.of(
+                "SATURN", ChartResponseDTO.PositionDetail.builder().planetKey("SATURN").signNumber(3).degreeInSign(14.1).build(),
+                "RAHU", ChartResponseDTO.PositionDetail.builder().planetKey("RAHU").signNumber(3).degreeInSign(28.1).build()
+        );
+        assertEquals("Rahu", AyurdayaCalculationUtils.resolveDualLord("Aquarius", chartRahuHigherDeg, 1),
+                "Higher degree Rahu (28.1°) wins over Saturn (14.1°)");
+
+        // 4. getActiveEighthLord Integration Check
+        // Aries Lagna (1) -> 8th is Scorpio (8) -> dual lord Mars vs Ketu
+        assertEquals("Mars", AyurdayaCalculationUtils.getActiveEighthLord(1, chartMarsExalted));
+        assertEquals("Ketu", AyurdayaCalculationUtils.getActiveEighthLord(1, chartKetuConjoined));
+
+        // Virgo Lagna (6) -> 8th is Aquarius (11) -> dual lord Saturn vs Rahu
+        assertEquals("Saturn", AyurdayaCalculationUtils.getActiveEighthLord(6, chartSaturnExalted));
+        assertEquals("Rahu", AyurdayaCalculationUtils.getActiveEighthLord(6, chartRahuConjoined));
+
+        // Taurus Lagna (2) -> 8th reverse is Libra (7) -> single lord Venus
+        assertEquals("Venus", AyurdayaCalculationUtils.getActiveEighthLord(2, Map.of()));
+
+        // Cancer Lagna (4) -> 8th reverse is Sagittarius (9) -> single lord Jupiter
+        assertEquals("Jupiter", AyurdayaCalculationUtils.getActiveEighthLord(4, Map.of()));
+    }
 }
