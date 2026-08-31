@@ -1263,12 +1263,13 @@ public class AyurdayaCalculationUtils {
     }
 
     /**
-     * Synthesizes Jaimini 3-pair longevity spans following the classical Vishesha Sutras & synthesis hierarchy:
+     * Synthesizes Jaimini 3-pair longevity spans following the classical hierarchy (Maharishi Jaimini Sutras 2.1.22 - 2.1.25):
      * 1. Tri-Samvada (3/3 Consensus): All 3 pairs agree -> Unanimous baseline span.
-     * 2. Vishesha Sutra 1 (Chandra-Kendra): Moon in 1st or 7th house -> Pair 2 (Moon + Saturn) overrides.
-     * 3. Vishesha Sutra 2 (Atmakaraka Kendra): AK in 1st or 7th house -> Lagna/AK pair overrides (Odd Lagna -> Pair 3, Even Lagna -> Pair 1).
-     * 4. Dwi-Samvada (2/3 Majority): 2-pair majority consensus.
-     * 5. Asamvada (All 3 Differ): Moon in 1st/7th -> Pair 2; Odd Lagna -> Pair 3; Even Lagna -> Pair 1.
+     * 2. Dwi-Samvada (2/3 Majority): 2-pair majority consensus (Sutra 2.1.22: "Teṣu bahusāmyaṃ pramāṇam").
+     * 3. Asamvada (All 3 Differ - 1 Alpa, 1 Madhya, 1 Poorna):
+     *    a. Vishesha Sutra 1 (Chandra-Kendra Sutra 2.1.23): Moon in 1st/7th -> Pair 2 (Moon + Saturn) breaks deadlock.
+     *    b. Vishesha Sutra 2 (Atmakaraka Kendra): AK in 1st/7th -> Odd Lagna gives Pair 3, Even Lagna gives Pair 1.
+     *    c. Standard Asamvada (Sutras 2.1.24-25): Odd Lagna -> Pair 3 (Lagna & HL); Even Lagna -> Pair 1 (Lagna Lord & 8th Lord).
      */
     public static SynthesisResult synthesizeThreePairs(
             String span1,
@@ -1295,32 +1296,7 @@ public class AyurdayaCalculationUtils {
             return new SynthesisResult(span1, rule, reason, pairsMap);
         }
 
-        // 2. Vishesha Sutra 1 (Chandra-Kendra Sutra: Moon in 1st or 7th House)
-        if (moonHouse == 1 || moonHouse == 7) {
-            String rule = "Vishesha Sutra 1 (Chandra-Kendra)";
-            String reason = "Moon in " + (moonHouse == 1 ? "Lagna (1st house)" : "7th house") +
-                    ": Pair 2 (Moon + Saturn) holds overriding authority (Jaimini Upadesha Sutra 2.1.23).";
-            pairsMap.put("majorityConsensus", span2);
-            pairsMap.put("ruleApplied", rule);
-            pairsMap.put("overrideReason", reason);
-            return new SynthesisResult(span2, rule, reason, pairsMap);
-        }
-
-        // 3. Vishesha Sutra 2 (Atmakaraka Kendra Sutra: AK in 1st or 7th House)
-        int akHouse = (akPos != null) ? (((akPos.getSignNumber() - lagnaSign + 12) % 12) + 1) : (akInKendra ? 1 : 0);
-        boolean akIn1stOr7th = (akHouse == 1 || akHouse == 7) || (akInKendra && akPos == null);
-        if (akIn1stOr7th) {
-            String chosenSpan = isOddLagna ? span3 : span1;
-            String rule = "Vishesha Sutra 2 (Atmakaraka-Kendra)";
-            String reason = "Atmakaraka in " + (akHouse == 1 ? "Lagna (1st house)" : (akHouse == 7 ? "7th house" : "Kendra")) +
-                    ": " + (isOddLagna ? "Odd Lagna gives precedence to Lagna-Hora Lagna (Pair 3)." : "Even Lagna gives precedence to Lagna Lord-8th Lord (Pair 1).");
-            pairsMap.put("majorityConsensus", chosenSpan);
-            pairsMap.put("ruleApplied", rule);
-            pairsMap.put("overrideReason", reason);
-            return new SynthesisResult(chosenSpan, rule, reason, pairsMap);
-        }
-
-        // 4. Dwi-Samvada (2/3 Majority Consensus)
+        // 2. Dwi-Samvada (2/3 Majority Consensus - Sutra 2.1.22: "Teṣu bahusāmyaṃ pramāṇam")
         Map<String, Integer> votes = new HashMap<>();
         votes.put("Poornayu", 0);
         votes.put("Madhyayu", 0);
@@ -1352,7 +1328,33 @@ public class AyurdayaCalculationUtils {
             return new SynthesisResult("Alpayu", rule, reason, pairsMap);
         }
 
-        // 5. Asamvada (All 3 Pairs Differ: 1 Poorna, 1 Madhya, 1 Alpa)
+        // 3. Asamvada (All 3 Pairs Differ: 1 Poorna, 1 Madhya, 1 Alpa - Deadlock Resolution)
+        // 3A. Vishesha Sutra 1 (Chandra-Kendra Sutra 2.1.23: Moon in 1st or 7th House)
+        if (moonHouse == 1 || moonHouse == 7) {
+            String rule = "Vishesha Sutra 1 (Chandra-Kendra)";
+            String reason = "All 3 pairs differ; Moon in " + (moonHouse == 1 ? "Lagna (1st house)" : "7th house") +
+                    ": Pair 2 (Moon + Saturn) holds overriding authority (Jaimini Upadesha Sutra 2.1.23).";
+            pairsMap.put("majorityConsensus", span2);
+            pairsMap.put("ruleApplied", rule);
+            pairsMap.put("overrideReason", reason);
+            return new SynthesisResult(span2, rule, reason, pairsMap);
+        }
+
+        // 3B. Vishesha Sutra 2 (Atmakaraka Kendra Sutra: AK in 1st or 7th House)
+        int akHouse = (akPos != null) ? (((akPos.getSignNumber() - lagnaSign + 12) % 12) + 1) : (akInKendra ? 1 : 0);
+        boolean akIn1stOr7th = (akHouse == 1 || akHouse == 7) || (akInKendra && akPos == null);
+        if (akIn1stOr7th) {
+            String chosenSpan = isOddLagna ? span3 : span1;
+            String rule = "Vishesha Sutra 2 (Atmakaraka-Kendra)";
+            String reason = "All 3 pairs differ; Atmakaraka in " + (akHouse == 1 ? "Lagna (1st house)" : (akHouse == 7 ? "7th house" : "Kendra")) +
+                    ": " + (isOddLagna ? "Odd Lagna gives precedence to Lagna-Hora Lagna (Pair 3)." : "Even Lagna gives precedence to Lagna Lord-8th Lord (Pair 1).");
+            pairsMap.put("majorityConsensus", chosenSpan);
+            pairsMap.put("ruleApplied", rule);
+            pairsMap.put("overrideReason", reason);
+            return new SynthesisResult(chosenSpan, rule, reason, pairsMap);
+        }
+
+        // 3C. Asamvada Standard Tie-Breaker (Sutras 2.1.24-25)
         String chosenSpan = isOddLagna ? span3 : span1;
         String rule = isOddLagna ? "Asamvada (Odd Lagna Tie-Breaker)" : "Asamvada (Even Lagna Tie-Breaker)";
         String reason = "All 3 pairs indicate distinct spans: " +

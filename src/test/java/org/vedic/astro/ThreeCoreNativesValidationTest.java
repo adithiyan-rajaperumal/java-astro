@@ -274,9 +274,9 @@ public class ThreeCoreNativesValidationTest {
         // 2. Ayurdaya & Longevity Engine
         var ayurdaya = profile.getAyurdayaProfile();
         assertNotNull(ayurdaya);
-        assertEquals("Poornayu", ayurdaya.longevityClassification(), "Deepanathan longevity classification must be Poornayu via Chandra-Kendra override");
-        assertTrue(ayurdaya.estimatedLifespanCeiling() >= 80 && ayurdaya.estimatedLifespanCeiling() <= 100,
-                "Lifespan ceiling should be in healthy Poornayu range (80-100), got: " + ayurdaya.estimatedLifespanCeiling());
+        assertEquals("Madhyayu", ayurdaya.longevityClassification(), "Deepanathan longevity classification should be Madhyayu via 2-pair majority consensus");
+        assertTrue(ayurdaya.estimatedLifespanCeiling() >= 66 && ayurdaya.estimatedLifespanCeiling() <= 80,
+                "Lifespan ceiling should be in Madhyayu range (66-80), got: " + ayurdaya.estimatedLifespanCeiling());
         assertTrue(ayurdaya.lifespanRange().contains("Years"));
 
         // Kakshya Vriddhi (Jupiter in 9th Trikona) & Neecha Bhanga for Saturn in Aries (Exaltation lord Venus is exalted in Pisces)

@@ -338,11 +338,11 @@ public class AyurdayaCalculationUtilsTest {
     }
 
     @Test
-    public void testVisheshaSutraMoonInLagnaOverridesMajority() {
-        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Poornayu
-        // But Moon in 1st house -> Vishesha Sutra 1 overrides majority -> Alpayu!
+    public void testVisheshaSutraMoonInLagnaAsamvadaDeadlock() {
+        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Madhyayu (All 3 differ)
+        // Moon in 1st house -> Vishesha Sutra 1 resolves deadlock -> Pair 2 (Alpayu)!
         var result = AyurdayaCalculationUtils.synthesizeThreePairs(
-                "Poornayu", "Alpayu", "Poornayu", 1, true, false, null, 1
+                "Poornayu", "Alpayu", "Madhyayu", 1, true, false, null, 1
         );
         assertEquals("Alpayu", result.span());
         assertEquals("Vishesha Sutra 1 (Chandra-Kendra)", result.ruleApplied());
@@ -351,11 +351,11 @@ public class AyurdayaCalculationUtilsTest {
     }
 
     @Test
-    public void testVisheshaSutraMoonIn7thOverridesMajority() {
-        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Poornayu
-        // But Moon in 7th house -> Vishesha Sutra 1 overrides majority -> Alpayu!
+    public void testVisheshaSutraMoonIn7thAsamvadaDeadlock() {
+        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Madhyayu (All 3 differ)
+        // Moon in 7th house -> Vishesha Sutra 1 resolves deadlock -> Pair 2 (Alpayu)!
         var result = AyurdayaCalculationUtils.synthesizeThreePairs(
-                "Poornayu", "Alpayu", "Poornayu", 7, true, false, null, 1
+                "Poornayu", "Alpayu", "Madhyayu", 7, true, false, null, 1
         );
         assertEquals("Alpayu", result.span());
         assertEquals("Vishesha Sutra 1 (Chandra-Kendra)", result.ruleApplied());
@@ -364,26 +364,26 @@ public class AyurdayaCalculationUtilsTest {
     }
 
     @Test
-    public void testVisheshaSutraAtmakarakaInKendra() {
-        // Case A: Odd Lagna (Aries 1) with AK in 1st house
-        // Pair 1 = Alpayu, Pair 2 = Alpayu, Pair 3 = Poornayu
-        // Majority is Alpayu, but AK in 1st house overrides -> Pair 3 (Poornayu) for Odd Lagna
+    public void testVisheshaSutraAtmakarakaInKendraAsamvadaDeadlock() {
+        // Case A: Odd Lagna (Aries 1) with AK in 1st house, Moon in 4th (not 1st/7th)
+        // Pair 1 = Alpayu, Pair 2 = Madhyayu, Pair 3 = Poornayu (All 3 differ)
+        // AK in 1st house resolves deadlock -> Pair 3 (Poornayu) for Odd Lagna
         ChartResponseDTO.PositionDetail akInLagna = ChartResponseDTO.PositionDetail.builder()
                 .planetKey("SUN").signNumber(1).degreeInSign(29.0).build();
         var resultOdd = AyurdayaCalculationUtils.synthesizeThreePairs(
-                "Alpayu", "Alpayu", "Poornayu", 4, true, true, akInLagna, 1
+                "Alpayu", "Madhyayu", "Poornayu", 4, true, true, akInLagna, 1
         );
         assertEquals("Poornayu", resultOdd.span());
         assertEquals("Vishesha Sutra 2 (Atmakaraka-Kendra)", resultOdd.ruleApplied());
         assertTrue(resultOdd.overrideReason().contains("Atmakaraka in Lagna"));
 
-        // Case B: Even Lagna (Taurus 2) with AK in 7th house (Scorpio 8)
-        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Alpayu
-        // Majority is Alpayu, but AK in 7th house overrides -> Pair 1 (Poornayu) for Even Lagna
+        // Case B: Even Lagna (Taurus 2) with AK in 7th house (Scorpio 8), Moon in 4th
+        // Pair 1 = Poornayu, Pair 2 = Alpayu, Pair 3 = Madhyayu (All 3 differ)
+        // AK in 7th house resolves deadlock -> Pair 1 (Poornayu) for Even Lagna
         ChartResponseDTO.PositionDetail akIn7th = ChartResponseDTO.PositionDetail.builder()
                 .planetKey("MARS").signNumber(8).degreeInSign(28.5).build();
         var resultEven = AyurdayaCalculationUtils.synthesizeThreePairs(
-                "Poornayu", "Alpayu", "Alpayu", 4, false, true, akIn7th, 2
+                "Poornayu", "Alpayu", "Madhyayu", 4, false, true, akIn7th, 2
         );
         assertEquals("Poornayu", resultEven.span());
         assertEquals("Vishesha Sutra 2 (Atmakaraka-Kendra)", resultEven.ruleApplied());

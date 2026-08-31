@@ -231,8 +231,12 @@ export default function HealthLongevityView({ chartData, language }) {
     if (!reason || language !== 'ta') return reason;
     return reason
       .replace(/All 3 Jaimini pairs agree unanimously on/g, 'அனைத்து 3 ஜெமினி இணைகளும் ஒருமனதாக தேர்வு செய்தவை:')
+      .replace(/All 3 pairs differ; Moon in Lagna \(1st house\): Pair 2 \(Moon \+ Saturn\) holds overriding authority \(Jaimini Upadesha Sutra 2.1.23\)\./g, '3 இணைகளும் மாறுபடுகின்றன; சந்திரன் லக்னத்தில் (1-ஆம் பாவகம்) அமர்ந்துள்ளதால்: இணை 2 (சந்திரன் + சனி) முதன்மை அதிகாரத்தைப் பெறுகிறது (ஜெமினி உபதேச சூத்திரம் 2.1.23).')
+      .replace(/All 3 pairs differ; Moon in 7th house: Pair 2 \(Moon \+ Saturn\) holds overriding authority \(Jaimini Upadesha Sutra 2.1.23\)\./g, '3 இணைகளும் மாறுபடுகின்றன; சந்திரன் 7-ஆம் பாவகத்தில் அமர்ந்துள்ளதால்: இணை 2 (சந்திரன் + சனி) முதன்மை அதிகாரத்தைப் பெறுகிறது (ஜெமினி உபதேச சூத்திரம் 2.1.23).')
       .replace(/Moon in Lagna \(1st house\): Pair 2 \(Moon \+ Saturn\) holds overriding authority \(Jaimini Upadesha Sutra 2.1.23\)\./g, 'சந்திரன் லக்னத்தில் (1-ஆம் பாவகம்) அமர்ந்துள்ளதால்: இணை 2 (சந்திரன் + சனி) முதன்மை அதிகாரத்தைப் பெறுகிறது (ஜெமினி உபதேச சூத்திரம் 2.1.23).')
       .replace(/Moon in 7th house: Pair 2 \(Moon \+ Saturn\) holds overriding authority \(Jaimini Upadesha Sutra 2.1.23\)\./g, 'சந்திரன் 7-ஆம் பாவகத்தில் அமர்ந்துள்ளதால்: இணை 2 (சந்திரன் + சனி) முதன்மை அதிகாரத்தைப் பெறுகிறது (ஜெமினி உபதேச சூத்திரம் 2.1.23).')
+      .replace(/All 3 pairs differ; Atmakaraka in Lagna \(1st house\):/g, '3 இணைகளும் மாறுபடுகின்றன; ஆத்மகாரகன் லக்னத்தில் (1-ஆம் பாவகம்) உள்ளதால்:')
+      .replace(/All 3 pairs differ; Atmakaraka in 7th house:/g, '3 இணைகளும் மாறுபடுகின்றன; ஆத்மகாரகன் 7-ஆம் பாவகத்தில் உள்ளதால்:')
       .replace(/Atmakaraka in Lagna \(1st house\):/g, 'ஆத்மகாரகன் லக்னத்தில் (1-ஆம் பாவகம்) உள்ளதால்:')
       .replace(/Atmakaraka in 7th house:/g, 'ஆத்மகாரகன் 7-ஆம் பாவகத்தில் உள்ளதால்:')
       .replace(/Atmakaraka in Kendra:/g, 'ஆத்மகாரகன் கேந்திரத்தில் உள்ளதால்:')
