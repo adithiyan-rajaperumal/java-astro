@@ -2612,7 +2612,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                         color: isSpecialRule ? '#e67e22' : '#2ecc71',
                         border: isSpecialRule ? '1px solid rgba(230, 126, 34, 0.3)' : '1px solid rgba(46, 204, 113, 0.3)'
                       }}>
-                        {isSpecialRule ? ('⚡ ' + t('visheshaOverrideBadge', language)) : ('⚖️ ' + t('synthesisConsensusBadge', language))}
+                        {isSpecialRule ? t('visheshaOverrideBadge', language) : t('synthesisConsensusBadge', language)}
                       </span>
                     </div>
                     {overrideReason && (
