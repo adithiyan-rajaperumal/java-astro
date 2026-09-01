@@ -1850,20 +1850,41 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
 
   const translateLagnaLordDignity = (dignity) => {
     if (!dignity) return '';
-    if (language === 'en') return dignity;
-    if (dignity.toLowerCase().includes('strong') || dignity.toLowerCase().includes('dignified')) {
+    const d = dignity.toLowerCase();
+    if (language === 'en') {
+      if (d.includes('very_strong') || d.includes('very strong')) return 'Very Strong / Dignified';
+      if (d.includes('strong') || d.includes('dignified')) return 'Strong / Dignified';
+      if (d.includes('moderate') || d.includes('balanced')) return 'Moderate Strength';
+      if (d.includes('cautious') || d.includes('weak') || d.includes('remedy')) return 'Cautionary / Mindful Care Advised';
+      return dignity;
+    }
+    if (d.includes('very_strong') || d.includes('very strong') || d.includes('exalted')) {
       if (language === 'ta') return 'ஆட்சி / உச்ச சுப பலம்';
+      if (language === 'hi') return 'अत्यंत सुदृढ़ / प्रतिष्ठित बल';
+      if (language === 'te') return 'అత్యంత సుదృఢ / శుభ బలం';
+      if (language === 'kn') return 'ಅತ್ಯಂತ ಸುದೃಢ / ಶುಭ ಬಲ';
+      if (language === 'ml') return 'അത്യന്തം സുദൃഢ / ശുഭ ബലം';
+    }
+    if (d.includes('strong') || d.includes('dignified')) {
+      if (language === 'ta') return 'வலுவான சுப பலம்';
       if (language === 'hi') return 'सुदृढ़ / प्रतिष्ठित बल';
       if (language === 'te') return 'సుదృఢ / శుభ బలం';
       if (language === 'kn') return 'ಸುದೃಢ / ಶುಭ ಬಲ';
       if (language === 'ml') return 'സുദൃഢ / ശുഭ ബലം';
     }
-    if (dignity.toLowerCase().includes('moderate')) {
+    if (d.includes('moderate') || d.includes('balanced') || d.includes('sound')) {
       if (language === 'ta') return 'சாதாரண பலம்';
       if (language === 'hi') return 'सामान्य बल';
       if (language === 'te') return 'సాధారణ బలం';
       if (language === 'kn') return 'ಸಾಮಾನ್ಯ ಬಲ';
       if (language === 'ml') return 'സാധാരണ ബലം';
+    }
+    if (d.includes('cautious') || d.includes('caution') || d.includes('weak') || d.includes('remedy')) {
+      if (language === 'ta') return 'எச்சரிக்கை / கவனமான நலம் தேவை';
+      if (language === 'hi') return 'सतर्कता / सावधानी आवश्यक';
+      if (language === 'te') return 'అప్రమత్తత / జాగ్రత్త అవసరం';
+      if (language === 'kn') return 'ಎಚ್ಚರಿಕೆ / ಆರೋಗ್ಯ ಜಾಗರೂಕತೆ ಅಗತ್ಯ';
+      if (language === 'ml') return 'ജാഗ്രത / ശ്രദ്ധ ആവശ്യമാണ്';
     }
     return dignity;
   };
