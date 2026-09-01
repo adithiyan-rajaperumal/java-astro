@@ -25,6 +25,7 @@ const getTodayDateString = (loc) => {
 };
 
 function PanchangamPage({ settings }) {
+  const lang = settings.language;
   const [currentDate, setCurrentDate] = useState(() => getTodayDateString(settings.location));
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);

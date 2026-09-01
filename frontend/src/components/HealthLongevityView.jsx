@@ -369,9 +369,9 @@ const LIFESTYLE_DIRECTIVES_I18N = {
 };
 
 export default function HealthLongevityView({ chartData, language }) {
-  if (!chartData) return null;
-
   const [expandedShoolaIndex, setExpandedShoolaIndex] = useState(null);
+
+  if (!chartData) return null;
 
   const health = chartData.ayurvedicHealth;
   const ayurdaya = chartData.ayurdayaProfile;
