@@ -386,26 +386,26 @@ function PanchangamPage({ settings }) {
           <button 
             onClick={() => changeDate(-1)} 
             className="today-btn"
-            title={t('prevDay', lang) || "Previous Day"}
+            title="Previous Day"
             style={{ padding: '6px 12px', fontSize: '13px' }}
           >
-            ◀ {t('prevDay', lang) || "Prev"}
+            ◀ Prev
           </button>
           <button 
             onClick={() => setCurrentDate(getTodayDateString(settings.location))} 
             className="today-btn"
-            title={t('today', lang) || "Today"}
+            title="Today"
             style={{ padding: '6px 14px', fontSize: '13px' }}
           >
-            {t('today', lang) || "Today"}
+            Today
           </button>
           <button 
             onClick={() => changeDate(1)} 
             className="today-btn"
-            title={t('nextDay', lang) || "Next Day"}
+            title="Next Day"
             style={{ padding: '6px 12px', fontSize: '13px' }}
           >
-            {t('nextDay', lang) || "Next"} ▶
+            Next ▶
           </button>
         </div>
 
