@@ -1026,11 +1026,11 @@ const translateKakshyaAdjustment = (adj, language) => {
 
   // Localize planet names in parentheses: (Moon) -> localized name
   const KAKSHYA_PLANETS = {
-    ta: { Sun: 'à®šà¯‚à®°à®¿à®¯à®©à¯', Moon: 'à®šà®¨à¯à®¤à®¿à®°à®©à¯', Mars: 'à®šà¯†à®µà¯à®µà®¾à®¯à¯', Mercury: 'à®ªà¯à®¤à®©à¯', Jupiter: 'à®•à¯à®°à¯', Venus: 'à®šà¯à®•à¯à®•à®¿à®°à®©à¯', Saturn: 'à®šà®©à®¿', Rahu: 'à®°à®¾à®•à¯', Ketu: 'à®•à¯‡à®¤à¯' },
-    hi: { Sun: 'à¤¸à¥‚à¤°à¥à¤¯', Moon: 'à¤šà¤¨à¥à¤¦à¥à¤°', Mars: 'à¤®à¤‚à¤—à¤²', Mercury: 'à¤¬à¥à¤§', Jupiter: 'à¤—à¥à¤°à¥', Venus: 'à¤¶à¥à¤•à¥à¤°', Saturn: 'à¤¶à¤¨à¤¿', Rahu: 'à¤°à¤¾à¤¹à¥', Ketu: 'à¤•à¥‡à¤¤à¥' },
-    te: { Sun: 'à°¸à±‚à°°à±à°¯à±à°¡à±', Moon: 'à°šà°‚à°¦à±à°°à±à°¡à±', Mars: 'à°•à±à°œà±à°¡à±', Mercury: 'à°¬à±à°§à±à°¡à±', Jupiter: 'à°—à±à°°à±à°µà±', Venus: 'à°¶à±à°•à±à°°à±à°¡à±', Saturn: 'à°¶à°¨à°¿', Rahu: 'à°°à°¾à°¹à±à°µà±', Ketu: 'à°•à±‡à°¤à±à°µà±' },
-    kn: { Sun: 'à²¸à³‚à²°à³à²¯', Moon: 'à²šà²‚à²¦à³à²°', Mars: 'à²®à²‚à²—à²³', Mercury: 'à²¬à³à²§', Jupiter: 'à²—à³à²°à³', Venus: 'à²¶à³à²•à³à²°', Saturn: 'à²¶à²¨à²¿', Rahu: 'à²°à²¾à²¹à³', Ketu: 'à²•à³‡à²¤à³' },
-    ml: { Sun: 'à´¸àµ‚à´°àµà´¯àµ»', Moon: 'à´šà´¨àµà´¦àµà´°àµ»', Mars: 'à´šàµŠà´µàµà´µ', Mercury: 'à´¬àµà´§àµ»', Jupiter: 'à´—àµà´°àµ', Venus: 'à´¶àµà´•àµà´°àµ»', Saturn: 'à´¶à´¨à´¿', Rahu: 'à´°à´¾à´¹àµ', Ketu: 'à´•àµ‡à´¤àµ' }
+    ta: { Sun: 'சூரியன்', Moon: 'சந்திரன்', Mars: 'செவ்வாய்', Mercury: 'புதன்', Jupiter: 'குரு', Venus: 'சுக்கிரன்', Saturn: 'சனி', Rahu: 'ராகு', Ketu: 'கேது' },
+    hi: { Sun: 'सूर्य', Moon: 'चन्द्र', Mars: 'मंगल', Mercury: 'बुध', Jupiter: 'गुरु', Venus: 'शुक्र', Saturn: 'शनि', Rahu: 'राहु', Ketu: 'केतु' },
+    te: { Sun: 'సూర్యుడు', Moon: 'చంద్రుడు', Mars: 'కుజుడు', Mercury: 'బుధుడు', Jupiter: 'గురు', Venus: 'శుక్రుడు', Saturn: 'శని', Rahu: 'రాహువు', Ketu: 'కేతువు' },
+    kn: { Sun: 'ಸೂರ್ಯ', Moon: 'ಚಂದ್ರ', Mars: 'ಮಂಗಳ', Mercury: 'ಬುಧ', Jupiter: 'ಗುರು', Venus: 'ಶುಕ್ರ', Saturn: 'ಶನಿ', Rahu: 'ರಾಹು', Ketu: 'ಕೇತು' },
+    ml: { Sun: 'സൂര്യൻ', Moon: 'ചന്ദ്രൻ', Mars: 'ചൊവ്വ', Mercury: 'ബുധൻ', Jupiter: 'ഗുരു', Venus: 'ശുക്രൻ', Saturn: 'ശനി', Rahu: 'രാഹു', Ketu: 'കേതു' }
   };
   if (KAKSHYA_PLANETS[language]) {
     Object.entries(KAKSHYA_PLANETS[language]).forEach(([eng, loc]) => {
@@ -1095,21 +1095,21 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     if (k.includes('majority') || k.includes('consensus')) {
       if (ruleApplied && (ruleApplied.includes('Vishesha') || ruleApplied.includes('Asamvada'))) {
         switch (language) {
-          case 'ta': return 'à®’à®°à¯à®™à¯à®•à®¿à®£à¯ˆà®¨à¯à®¤ à®®à¯à®Ÿà®¿à®µà¯';
-          case 'hi': return 'à¤¸à¤‚à¤¶à¥à¤²à¥‡à¤·à¤¿à¤¤ à¤¨à¤¿à¤°à¥à¤£à¤¯';
-          case 'te': return 'à°¸à°‚à°¶à±à°²à±‡à°·à°¿à°¤ à°¨à°¿à°°à±à°£à°¯à°‚';
-          case 'kn': return 'à²¸à²‚à²¶à³à²²à³‡à²·à²¿à²¤ à²¨à²¿à²°à³à²§à²¾à²°';
-          case 'ml': return 'à´¸à´‚à´¶àµà´²àµ‡à´·à´¿à´¤ à´¤àµ€à´°àµà´®à´¾à´¨à´‚';
+          case 'ta': return 'ஒருங்கிணைந்த முடிவு';
+          case 'hi': return 'संश्लेषित निर्णय';
+          case 'te': return 'సంశ్లేషిత నిర్ణయం';
+          case 'kn': return 'ಸಂಶ್ಲೇಷಿತ ನಿರ್ಧಾರ';
+          case 'ml': return 'സംശ്ലേഷിത തീരുമാനം';
           default: return 'Synthesis Result';
         }
       }
       if (ruleApplied && (ruleApplied.includes('Tri-Samvada') || ruleApplied.includes('Unanimous'))) {
         switch (language) {
-          case 'ta': return 'à®’à®°à¯à®®à®©à®¤à®¾à®© à®®à¯à®Ÿà®¿à®µà¯';
-          case 'hi': return 'à¤¸à¤°à¥à¤µà¤¸à¤®à¥à¤®à¤¤ à¤¨à¤¿à¤°à¥à¤£à¤¯';
-          case 'te': return 'à°à°•à°—à±à°°à±€à°µ à°¨à°¿à°°à±à°£à°¯à°‚';
-          case 'kn': return 'à²¸à²°à³à²µà²¾à²¨à³à²®à²¤à²¦ à²¨à²¿à²°à³à²§à²¾à²°';
-          case 'ml': return 'à´à´•à´•à´£àµà´ à´®à´¾à´¯ à´¤àµ€à´°àµà´®à´¾à´¨à´‚';
+          case 'ta': return 'ஒருமனதான முடிவு';
+          case 'hi': return 'सर्वसम्मत निर्णय';
+          case 'te': return 'ఏకగ్రీవ నిర్ణయం';
+          case 'kn': return 'ಸರ್ವಾನುಮತದ ನಿರ್ಧಾರ';
+          case 'ml': return 'ഏകകണ്ഠമായ തീരുമാനം';
           default: return 'Unanimous Consensus';
         }
       }
