@@ -899,7 +899,7 @@ const translateKakshyaAdjustment = (adj, language) => {
 
   switch (language) {
     case 'ta':
-      return res
+      res = res
         .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'அனைத்து 3 ஜெமினி இணைகளும் ஒருமனதாக பூரணாயுளை தேர்வு செய்தவை.')
         .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'அனைத்து 3 ஜெமினி இணைகளும் ஒருமனதாக மத்தியாயுளை தேர்வு செய்தவை.')
         .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'அனைத்து 3 ஜெமினி இணைகளும் ஒருமனதாக அல்பாயுளை தேர்வு செய்தவை.')
@@ -921,9 +921,10 @@ const translateKakshyaAdjustment = (adj, language) => {
         .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'லக்னம் பாபகர்த்தரி யோகத்தில் (12 & 2-ல் பாவ கிரகங்கள்) சிக்கியுள்ளதால் உடல் ஆரோக்கியத்தில் எச்சரிக்கை தேவை (-$1 ஆண்டுகள்).')
         .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'சந்திரன் பாபகர்த்தரி யோகத்தில் (12 & 2-ல் பாவ கிரகங்கள்) சிக்கியுள்ளதால் மன/உடல் நலனில் எச்சரிக்கை தேவை (-$1 ஆண்டுகள்).')
         .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'கேந்திரங்களில் சுப கிரகங்களின்றி பாவ கிரகங்கள் மட்டுமே இருப்பதால் கக்ஷ்ய ஹிராஸம் உண்டாகிறது (-$1 ஆண்டுகள்).');
+      break;
 
     case 'hi':
-      return res
+      res = res
         .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'सभी 3 जैमिनी युग्म सर्वसम्मति से पूर्णायु पर सहमत हैं।')
         .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'सभी 3 जैमिनी युग्म सर्वसम्मति से मध्यायु पर सहमत हैं।')
         .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'सभी 3 जैमिनी युग्म सर्वसम्मति से अल्पायु पर सहमत हैं।')
@@ -945,9 +946,10 @@ const translateKakshyaAdjustment = (adj, language) => {
         .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'लग्न पापकर्तरी योग में होने से शारीरिक स्वास्थ्य में सावधानी आवश्यक है (-$1 वर्ष)।')
         .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'चन्द्रमा पापकर्तरी योग में होने से मानसिक/शारीरिक स्वास्थ्य में सावधानी आवश्यक है (-$1 वर्ष)।')
         .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'केंद्रों में शुभ ग्रहों के बिना केवल पाप ग्रह होने से कक्ष्या ह्रास होता है (-$1 वर्ष)।');
+      break;
 
     case 'te':
-      return res
+      res = res
         .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'అన్ని 3 జైమిని జతలు ఏకగ్రీవంగా పూర్ణాయుష్షును నిర్ణయించాయి.')
         .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'అన్ని 3 జైమిని జతలు ఏకగ్రీవంగా మధ్యాయుష్షును నిర్ణయించాయి.')
         .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'అన్ని 3 జైమిని జతలు ఏకగ్రీవంగా అల్పాయుష్షును నిర్ణయించాయి.')
@@ -969,9 +971,10 @@ const translateKakshyaAdjustment = (adj, language) => {
         .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'లగ్నం పాపకర్తరి యోగంలో ఉండటం వల్ల శరీర ఆరోగ్యంపై జాగ్రత్త అవసరం (-$1 సంవత్సరాలు).')
         .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'చంద్రుడు పాపకర్తరి యోగంలో ఉండటం వల్ల మానసిక/శరీర ఆరోగ్యంపై జాగ్రత్త అవసరం (-$1 సంవత్సరాలు).')
         .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'కేంద్రాలలో శుభ గ్రహాలు లేకుండా కేవలం పాప గ్రహాలు ఉండటం వల్ల కక్ష్యా హ్రాసం కలుగుతుంది (-$1 సంవత్సరాలు).');
+      break;
 
     case 'kn':
-      return res
+      res = res
         .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'ಎಲ್ಲಾ 3 ಜೈಮಿನಿ ಜೋಡಿಗಳು ಸರ್ವಾನುಮತದಿಂದ ಪೂರ್ಣಾಯುಷ್ಯವನ್ನು ನಿರ್ಧರಿಸಿವೆ.')
         .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'ಎಲ್ಲಾ 3 ಜೈಮಿನಿ ಜೋಡಿಗಳು ಸರ್ವಾನುಮತದಿಂದ ಮಧ್ಯಾಯುಷ್ಯವನ್ನು ನಿರ್ಧರಿಸಿವೆ.')
         .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'ಎಲ್ಲಾ 3 ಜೈಮಿನಿ ಜೋಡಿಗಳು ಸರ್ವಾನುಮತದಿಂದ ಅಲ್ಪಾಯುಷ್ಯವನ್ನು ನಿರ್ಧರಿಸಿವೆ.')
@@ -993,9 +996,10 @@ const translateKakshyaAdjustment = (adj, language) => {
         .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'ಲಗ್ನವು ಪಾಪಕರ್ತರಿ ಯೋಗದಲ್ಲಿದ್ದು ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ (-$1 ವರ್ಷಗಳು).')
         .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'ಚಂದ್ರನು ಪಾಪಕರ್ತರಿ ಯೋಗದಲ್ಲಿದ್ದು ಮಾನಸಿಕ/ದೈಹಿಕ ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ (-$1 ವರ್ಷಗಳು).')
         .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'ಕೇಂದ್ರಗಳಲ್ಲಿ ಶುಭ ಗ್ರಹಗಳಿಲ್ಲದೆ ಕೇವಲ ಪಾಪ ಗ್ರಹಗಳಿರುವುದರಿಂದ ಕಕ್ಷ್ಯಾ ಹ್ರಾಸ ಉಂಟಾಗುತ್ತದೆ (-$1 ವರ್ಷಗಳು).');
+      break;
 
     case 'ml':
-      return res
+      res = res
         .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'എല്ലാ 3 ജൈമിനി ജോഡികളും ഏകകണ്ഠമായി പൂർണ്ണായുസ്സ് തിരഞ്ഞെടുത്തു.')
         .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'എല്ലാ 3 ജൈമിനി ജോഡികളും ഏകകണ്ഠമായി മദ്ധ്യായുസ്സ് തിരഞ്ഞെടുത്തു.')
         .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'എല്ലാ 3 ജൈമിനി ജോഡികളും ഏകകണ്ഠമായി അല്പായുസ്സ് തിരഞ്ഞെടുത്തു.')
@@ -1017,7 +1021,23 @@ const translateKakshyaAdjustment = (adj, language) => {
         .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'ലഗ്നം പാപകർത്താരി യോഗത്തിലായതിനാൽ ആരോഗ്യ ശ്രദ്ധ ആവശ്യമാണ് (-$1 വർഷങ്ങൾ).')
         .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'ചന്ദ്രൻ പാപകർത്താരി യോഗത്തിലായതിനാൽ മാനസിക/ശാരീരിക ആരോഗ്യ ശ്രദ്ധ ആവശ്യമാണ് (-$1 വർഷങ്ങൾ).')
         .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'കേന്ദ്രങ്ങളിൽ ശുഭന്മാരില്ലാതെ പാപ ഗ്രഹങ്ങൾ മാത്രമുള്ളതിനാൽ കക്ഷ്യാ ഹ്രാസം ഉണ്ടാകുന്നു (-$1 വർഷങ്ങൾ).');
+      break;
   }
+
+  // Localize planet names in parentheses: (Moon) -> localized name
+  const KAKSHYA_PLANETS = {
+    ta: { Sun: 'à®šà¯‚à®°à®¿à®¯à®©à¯', Moon: 'à®šà®¨à¯à®¤à®¿à®°à®©à¯', Mars: 'à®šà¯†à®µà¯à®µà®¾à®¯à¯', Mercury: 'à®ªà¯à®¤à®©à¯', Jupiter: 'à®•à¯à®°à¯', Venus: 'à®šà¯à®•à¯à®•à®¿à®°à®©à¯', Saturn: 'à®šà®©à®¿', Rahu: 'à®°à®¾à®•à¯', Ketu: 'à®•à¯‡à®¤à¯' },
+    hi: { Sun: 'à¤¸à¥‚à¤°à¥à¤¯', Moon: 'à¤šà¤¨à¥à¤¦à¥à¤°', Mars: 'à¤®à¤‚à¤—à¤²', Mercury: 'à¤¬à¥à¤§', Jupiter: 'à¤—à¥à¤°à¥', Venus: 'à¤¶à¥à¤•à¥à¤°', Saturn: 'à¤¶à¤¨à¤¿', Rahu: 'à¤°à¤¾à¤¹à¥', Ketu: 'à¤•à¥‡à¤¤à¥' },
+    te: { Sun: 'à°¸à±‚à°°à±à°¯à±à°¡à±', Moon: 'à°šà°‚à°¦à±à°°à±à°¡à±', Mars: 'à°•à±à°œà±à°¡à±', Mercury: 'à°¬à±à°§à±à°¡à±', Jupiter: 'à°—à±à°°à±à°µà±', Venus: 'à°¶à±à°•à±à°°à±à°¡à±', Saturn: 'à°¶à°¨à°¿', Rahu: 'à°°à°¾à°¹à±à°µà±', Ketu: 'à°•à±‡à°¤à±à°µà±' },
+    kn: { Sun: 'à²¸à³‚à²°à³à²¯', Moon: 'à²šà²‚à²¦à³à²°', Mars: 'à²®à²‚à²—à²³', Mercury: 'à²¬à³à²§', Jupiter: 'à²—à³à²°à³', Venus: 'à²¶à³à²•à³à²°', Saturn: 'à²¶à²¨à²¿', Rahu: 'à²°à²¾à²¹à³', Ketu: 'à²•à³‡à²¤à³' },
+    ml: { Sun: 'à´¸àµ‚à´°àµà´¯àµ»', Moon: 'à´šà´¨àµà´¦àµà´°àµ»', Mars: 'à´šàµŠà´µàµà´µ', Mercury: 'à´¬àµà´§àµ»', Jupiter: 'à´—àµà´°àµ', Venus: 'à´¶àµà´•àµà´°àµ»', Saturn: 'à´¶à´¨à´¿', Rahu: 'à´°à´¾à´¹àµ', Ketu: 'à´•àµ‡à´¤àµ' }
+  };
+  if (KAKSHYA_PLANETS[language]) {
+    Object.entries(KAKSHYA_PLANETS[language]).forEach(([eng, loc]) => {
+      res = res.replaceAll(`(${eng})`, `(${loc})`);
+    });
+  }
+
   return res;
 };
 
@@ -1061,7 +1081,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
     ? t('madhyayu', language)
     : t('alpayu', language);
 
-  const formatPairTitle = (key) => {
+  const formatPairTitle = (key, ruleApplied) => {
     const k = key.toLowerCase();
     if (k.includes('pair1') || k.includes('lagnalord')) {
       return t('pair1Label', language);
@@ -1073,6 +1093,26 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
       return t('pair3Label', language);
     }
     if (k.includes('majority') || k.includes('consensus')) {
+      if (ruleApplied && (ruleApplied.includes('Vishesha') || ruleApplied.includes('Asamvada'))) {
+        switch (language) {
+          case 'ta': return 'à®’à®°à¯à®™à¯à®•à®¿à®£à¯ˆà®¨à¯à®¤ à®®à¯à®Ÿà®¿à®µà¯';
+          case 'hi': return 'à¤¸à¤‚à¤¶à¥à¤²à¥‡à¤·à¤¿à¤¤ à¤¨à¤¿à¤°à¥à¤£à¤¯';
+          case 'te': return 'à°¸à°‚à°¶à±à°²à±‡à°·à°¿à°¤ à°¨à°¿à°°à±à°£à°¯à°‚';
+          case 'kn': return 'à²¸à²‚à²¶à³à²²à³‡à²·à²¿à²¤ à²¨à²¿à²°à³à²§à²¾à²°';
+          case 'ml': return 'à´¸à´‚à´¶àµà´²àµ‡à´·à´¿à´¤ à´¤àµ€à´°àµà´®à´¾à´¨à´‚';
+          default: return 'Synthesis Result';
+        }
+      }
+      if (ruleApplied && (ruleApplied.includes('Tri-Samvada') || ruleApplied.includes('Unanimous'))) {
+        switch (language) {
+          case 'ta': return 'à®’à®°à¯à®®à®©à®¤à®¾à®© à®®à¯à®Ÿà®¿à®µà¯';
+          case 'hi': return 'à¤¸à¤°à¥à¤µà¤¸à¤®à¥à¤®à¤¤ à¤¨à¤¿à¤°à¥à¤£à¤¯';
+          case 'te': return 'à°à°•à°—à±à°°à±€à°µ à°¨à°¿à°°à±à°£à°¯à°‚';
+          case 'kn': return 'à²¸à²°à³à²µà²¾à²¨à³à²®à²¤à²¦ à²¨à²¿à²°à³à²§à²¾à²°';
+          case 'ml': return 'à´à´•à´•à´£àµà´ à´®à´¾à´¯ à´¤àµ€à´°àµà´®à´¾à´¨à´‚';
+          default: return 'Unanimous Consensus';
+        }
+      }
       return t('majorityConsensusLabel', language);
     }
     return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -1779,90 +1819,6 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
       return `${localizedPlanet} ദശാ കാലത്ത്${ageLabel} ആരോഗ്യ ജാഗ്രത ആവശ്യം.`;
     }
     return `Vitality challenges and health caution during ${localizedPlanet} Dasa period${ageLabel}.`;
-  };
-
-  const translateKakshyaAdjustment = (adj) => {
-    if (!adj) return '';
-    if (language === 'en') return adj;
-
-    if (adj.includes('Moon in Lagna') || adj.includes('Moon in 7th')) {
-      if (language === 'ta') return 'சந்திரன் 1 அல்லது 7-ல் உள்ளதால்: சந்திரன் & சனி இணை (Pair 2) பிரதான ஆயுள் நிர்ணயமாகிறது (ஜைமினி சூத்திரம் 2.1.23).';
-      if (language === 'hi') return 'चन्द्रमा लग्न या सप्तम भाव में स्थित: चन्द्र-शनि युग्म (Pair 2) प्रमुख निर्णायक बना (जैमिनी सूत्र 2.1.23)।';
-      if (language === 'te') return 'చంద్రుడు 1 లేదా 7వ స్థానంలో ఉన్నందున: చంద్ర-శని జత (Pair 2) ప్రధాన నిర్ణాయకం (జైమిని సూత్రం 2.1.23).';
-      if (language === 'kn') return 'ಚಂದ್ರ 1 ಅಥವಾ 7ನೇ ಮನೆಯಲ್ಲಿರುವ ಕಾರಣ: ಚಂದ್ರ-ಶನಿ ಜೋಡಿ (Pair 2) ಪ್ರಮುಖ ನಿರ್ಣಾಯಕ (ಜೈಮಿನಿ ಸೂತ್ರ 2.1.23).';
-      if (language === 'ml') return 'ചന്ദ്രൻ 1 അല്ലെങ്കിൽ 7-ാം ഭാവത്തിൽ സ്ഥിതിചെയ്യുന്നതിനാൽ: ചന്ദ്ര-ശനി ജോടി (Pair 2) പ്രധാന നിർണ്ണായകമാകുന്നു (ജൈമിനി സൂത്രം 2.1.23).';
-    }
-        if (adj.includes('Alpayu to Madhyayu')) {
-      if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் கக்ஷ்ய விருத்தி ஏற்பட்டு அல்பாயுளிலிருந்து மத்தியாயுள் பிரிவுக்கு உயர்த்தப்படுகிறது (அடிப்படை: ~68 வயது).';
-      if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से कक्ष्या वृद्धि होकर अल्पायु से मध्यायु वर्ग में पदोन्नति (आधार: ~68 वर्ष)।';
-      if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల కక్ష్యా వృద్ధి కలిగి అల్పాయుష్షు నుండి మధ్యాయుష్షు వర్గానికి పెరుగుతుంది (ఆధారం: ~68 సం.)।';
-      if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ ಲಭಿಸಿ ಅಲ್ಪಾಯುಷ್ಯದಿಂದ ಮಧ್ಯಾಯುಷ್ಯ ವಿಭಾಗಕ್ಕೆ ಏರಿಕೆ (ಆಧಾರ: ~68 ವರ್ಷ).';
-      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രികോണ ശുഭ സ്ഥാനം മൂലം കക്ഷ്യാ വൃദ്ധി ലഭിച്ച് അല്പായുസ്സിൽ നിന്ന് മദ്ധ്യായുസ്സിലേക്ക് ഉയർത്തപ്പെടുന്നു (അടിസ്ഥാനം: ~68 വയസ്സ്).';
-    }
-    if (adj.includes('Madhyayu to Poornayu')) {
-      if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் கக்ஷ்ய விருத்தி ஏற்பட்டு மத்தியாயுளிலிருந்து பூர்ணாயுள் பிரிவுக்கு உயர்த்தப்படுகிறது (அடிப்படை: ~82 வயது).';
-      if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से कक्ष्या वृद्धि होकर मध्यायु से पूर्णायु वर्ग में पदोन्नति (आधार: ~82 वर्ष)।';
-      if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల కక్ష్యా వృద్ధి కలిగి మధ్యాయుష్షు నుండి పూర్ణాయుష్షు వర్గానికి పెరుగుతుంది (ఆధారం: ~82 సం.)।';
-      if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ ಲಭಿಸಿ ಮಧ್ಯಾಯುಷ್ಯದಿಂದ ಪೂರ್ಣಾಯುಷ್ಯ ವಿಭಾಗಕ್ಕೆ ಏರಿಕೆ (ಆಧಾರ: ~82 ವರ್ಷ).';
-      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രികോണ ശുഭ സ്ഥാനം മൂലം കക്ഷ്യാ വൃദ്ധി ലഭിച്ച് മദ്ധ്യായുസ്സിൽ നിന്ന് പൂർണ്ണായുസ്സിലേക്ക് ഉയർത്തപ്പെടുന്നു (അടിസ്ഥാനം: ~82 വയസ്സ്).';
-    }
-    if (adj.includes('Jupiter') || adj.includes('Kakshya Vriddhi')) {
-      if (language === 'ta') return 'குரு பகவான் கேந்திர/திரிகோண சுப பலத்தால் ஆயுள் கக்ஷ்ய விருத்தி அடைகிறது (+4 முதல் +7 ஆண்டுகள்).';
-      if (language === 'hi') return 'गुरु के केंद्र/त्रिकोण शुभ प्रभाव से आयु में कक्ष्या वृद्धि (+4 से +7 वर्ष)।';
-      if (language === 'te') return 'గురు గ్రహ కేంద్ర/త్రికోణ శుభ స్థానం వల్ల ఆయుష్షు కక్ష్యా వృద్ధి (+4 నుండి +7 సంవత్సరాలు).';
-      if (language === 'kn') return 'ಗುರು ಗ್ರಹದ ಕೇಂದ್ರ/ತ್ರಿಕೋಣ ಶುಭ ಸ್ಥಾನದಿಂದ ಆಯುಷ್ಯದಲ್ಲಿ ಕಕ್ಷ್ಯಾ ವೃದ್ಧಿ (+4 ರಿಂದ +7 ವರ್ಷಗಳು).';
-      if (language === 'ml') return 'വ്യാഴത്തിന്റെ കേന്ദ്ര/ത്രികോണ ശുഭ സ്ഥാനം മൂലം ആയുസ്സിൽ കക്യാ വൃദ്ധി (+4 മുതൽ +7 വർഷം വരെ).';
-    }
-    if (adj.includes('Ayushkaraka Saturn in Own/Exalted') || (adj.includes('Saturn') && adj.includes('Own/Exalted'))) {
-      if (language === 'ta') return 'ஆயுள்காரகன் சனி பகவான் ஆட்சி/உச்ச பலத்தால் ஆயுள் நீட்டிப்பு கூடுகிறது (+4 ஆண்டுகள்).';
-      if (language === 'hi') return 'आयुष्कारक शनि के स्वराशि/उच्च स्थिति से दीर्घायु बल प्राप्त होता है (+4 वर्ष)।';
-      if (language === 'te') return 'ఆయుష్కారక శని స్వక్షేత్ర/ఉచ్ఛ స్థితి వల్ల ఆయుష్షు పెరుగుతుంది (+4 సంవత్సరాలు).';
-      if (language === 'kn') return 'ಆಯುಷ್ಕಾರಕ ಶನಿಯ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಛ ಸ್ಥಾನದಿಂದ ದೀರ್ಘಾಯುಷ್ಯ ಬಲ (+4 ವರ್ಷಗಳು).';
-      if (language === 'ml') return 'ಆಯುಷ್കാരಕനായ ശനിയുടെ സ്വക്ഷേത്ര/ഉച്ച സ്ഥിതിയാൽ ദീർഘായുസ്സ് ലഭിക്കുന്നു (+4 വർഷം).';
-    }
-    if (adj.includes('Lagna Lord strong') || (adj.includes('Lagna Lord') && adj.includes('vitality'))) {
-      if (language === 'ta') return 'லக்னாதிபதி ஆட்சி/உச்ச/கேந்திர சுப பலத்தால் சரீர நோய் எதிர்ப்பு ஆற்றல் மற்றும் ஆயுள் பலம் கூடுகிறது (+4 ஆண்டுகள்).';
-      if (language === 'hi') return 'लग्नेश के स्वराशि/उच्च/केंद्र शुभ बल से शारीरिक रोग प्रतिरोधक क्षमता एवं आयु वृद्धि (+4 वर्ष)।';
-      if (language === 'te') return 'లగ్నాధిపతి స్వక్షేత్ర/ఉచ్ఛ/కేంద్ర శుభ బలం వల్ల శారీరక రోగనిరోధక శక్తి మరియు ఆయుర్బలం పెరుగుతుంది (+4 సంవత్సరాలు).';
-      if (language === 'kn') return 'ಲಗ್ನಾಧಿಪತಿಯ ಸ್ವಕ್ಷೇತ್ರ/ಉಚ್ಛ/ಕೇಂದ್ರ ಶುಭ ಬಲದಿಂದ ಶಾರೀರಿಕ ರೋಗನಿರೋಧಕ ಶಕ್ತಿ ಮತ್ತು ಆಯುರ್ಬಲ ವೃದ್ಧಿ (+4 ವರ್ಷಗಳು).';
-      if (language === 'ml') return 'ലഗ്നാധിപന്റെ സ്വക്ഷേത്ര/ഉച്ച/കേന്ദ്ര ശുഭ ಬಲത്താൽ ശാരീരിക പ്രതിരോധശേഷിയും ആയുർബലവും വർദ്ധിക്കുന്നു (+4 വർഷം).';
-    }
-    if (adj.includes('Neecha Bhanga') || adj.includes('Neechabhanga')) {
-      if (language === 'ta') return 'ஆயுள்காரகன் சனிக்கு நீசபங்க ராஜயோகம் ஏற்பட்டு நீசம் நீங்கி ஆயுள் பலம் நிலைபெறுகிறது.';
-      if (language === 'hi') return 'आयुष्कारक शनि को नीचभंग राजयोग प्राप्त होने से दीर्घायु बल की पुष्टि होती है।';
-      if (language === 'te') return 'ఆయుష్కారక శనికి నీచభంగ రాజయోగం కలిగి ఆయుర్బలం స్థిరపడుతుంది.';
-      if (language === 'kn') return 'ಆಯುಷ್ಕಾರಕ ಶನಿಗೆ ನೀಚಭಂಗ ರಾಜಯೋಗ ಲಭಿಸಿ ಆಯುರ್ಬಲ ಸ್ಥಿರಗೊಳ್ಳುತ್ತದೆ.';
-      if (language === 'ml') return 'ആയുഷ്കാരകൻ ശനിക്ക് നീചഭംഗ രാജയോഗം ലഭിച്ചതിനാൽ ആയുർബലം സ്ഥിരപ്പെടുന്നു.';
-    }
-    if (adj.includes('Saturn in debility')) {
-      if (language === 'ta') return 'ஆயுள்காரகன் சனி நீசமடைந்ததால் கக்ஷ்ய ஹ்ராஸம் (ஆயுள் குறைப்பு: -5 ஆண்டுகள்).';
-      if (language === 'hi') return 'आयुष्कारक शनि नीचस्थ होने से कक्ष्य ह्रास (-5 वर्ष)।';
-      if (language === 'te') return 'ఆయుష్కారక శని నీచ స్థితితో కక్ష్య హ్రాసం (-5 సంవత్సరాలు).';
-      if (language === 'kn') return 'ಆಯುಷ್ಕಾರಕ ಶನಿ ನೀಚ ಸ್ಥಿತಿಯಿಂದ ಕಕ್ಷ್ಯ ಹ್ರಾಸ (-5 ವರ್ಷ).';
-      if (language === 'ml') return 'ആയുഷ്കാരകൻ ശനി നീചനായതിനാൽ കക്ഷ്യാ ഹ്രാസം (-5 വർഷം).';
-    }
-    if (adj.includes('Papakarthari Yoga')) {
-      if (language === 'ta') return 'லக்னத்திற்கு 12 மற்றும் 2-ல் பாபர்கள் (பாபகர்த்தாரி யோகம்) உடல்நலத்தில் எச்சரிக்கை கோருகிறது (-3 ஆண்டுகள்).';
-      if (language === 'hi') return 'लग्न के दोनों ओर (12वें व 2रे भाव) पाप ग्रह (पापकर्तरी योग) स्वास्थ्य सतर्कता अपेक्षित (-3 वर्ष)।';
-      if (language === 'te') return 'లగ్నానికి ఇరువైపులా పాప గ్రహాలు (పాపకర్తరి యోగం) ఆరోగ్య జాగ్రత్త అవసరం (-3 సంవత్సరాలు).';
-      if (language === 'kn') return 'ಲಗ್ನದ ಎರಡೂ ಬದಿ ಪಾಪ ಗ್ರಹಗಳು (ಪಾಪಕರ್ತರಿ ಯೋಗ) ಆರೋಗ್ಯ ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ (-3 ವರ್ಷ).';
-      if (language === 'ml') return 'ലഗ്നത്തിന്റെ ഇരുവശങ്ങളിലും പാപ ഗ്രഹങ്ങൾ (പാപകർതരി യോഗം) ആരോഗ്യ ജാഗ്രത ആവശ്യപ്പെടുന്നു (-3 വർഷം).';
-    }
-    if (adj.includes('Lagna Lord in Dusthana')) {
-      if (language === 'ta') return 'லக்னாதிபதி மறைவு ஸ்தானத்தில் உள்ளதால் ஆரோக்கியத்தில் சீரான கவனம் தேவை.';
-      if (language === 'hi') return 'लग्नेश त्रिक भाव (6/8/12) में स्थित होने से स्वास्थ्य सतर्कता आवश्यक।';
-      if (language === 'te') return 'లగ్నాధిపతి దుస్థానంలో ఉన్నందున ఆరోగ్యంపై నిరంతర శ్రద్ధ అవసరం.';
-      if (language === 'kn') return 'ಲಗ್ನಾಧಿಪತಿ ದುಃಸ್ಥಾನದಲ್ಲಿರುವ ಕಾರಣ ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಕಾಳಜಿ ಅಗತ್ಯ.';
-      if (language === 'ml') return 'ലഗ്നാധിപൻ ദുരിത ഭാവത്തിൽ നിൽക്കുന്നതിനാൽ ആരോഗ്യത്തിൽ ശ്രദ്ധ വേണം.';
-    }
-    if (adj.includes('distinct spans')) {
-      if (language === 'ta') return adj.includes('Odd Lagna') ? '3 இணைகளும் வேறுபட்ட முடிவுகள்: ஒற்றை லக்னத்திற்கு லக்னம்-ஹோரா லக்னம் (Pair 3) முன்னுரிமை பெறுகிறது.' : '3 இணைகளும் வேறுபட்ட முடிவுகள்: இரட்டை லக்னத்திற்கு லக்னாதிபதி-8ஆம் அதிபதி (Pair 1) முன்னுரிமை பெறுகிறது.';
-      if (language === 'hi') return adj.includes('Odd Lagna') ? 'तीनों युग्मों का भिन्न निर्णय: विषम लग्न के कारण लग्न-होरा लग्न (Pair 3) को प्राथमिकता।' : 'तीनों युग्मों का भिन्न निर्णय: सम लग्न के कारण लग्नेश-अष्टमेश (Pair 1) को प्राथमिकता।';
-      if (language === 'te') return adj.includes('Odd Lagna') ? '3 జతలు వేర్వేరు ఫలితాలు: బేసి లగ్నానికి లగ్నం-హోరా లగ్నం (Pair 3) ప్రాధాన్యత.' : '3 జతలు వేర్వేరు ఫలితాలు: సరి లగ్నానికి లగ్నాధిపతి-8వ అధిపతి (Pair 1) ప్రాధాన్యత.';
-      if (language === 'kn') return adj.includes('Odd Lagna') ? '3 ಜೋಡಿಗಳು ಭಿನ್ನ ಫಲಿತಾಂಶ: ಬೆಸ ಲಗ್ನಕ್ಕೆ ಲಗ್ನ-ಹೋರಾ ಲಗ್ನ (Pair 3) ಆದ್ಯತೆ.' : '3 ಜೋಡಿಗಳು ಭಿನ್ನ ಫಲಿತಾಂಶ: ಸರಿ ಲಗ್ನಕ್ಕೆ ಲಗ್ನಾಧಿಪತಿ-8ನೇ ಅಧಿಪತಿ (Pair 1) ಆದ್ಯತೆ.';
-      if (language === 'ml') return adj.includes('Odd Lagna') ? '3 ജോടികളും വ്യത്യസ്ത ഫലം: ഒറ്റ ലഗ്നത്തിന് ലഗ്നം-ഹോരാ ലഗ്നം (Pair 3) മുൻഗണന.' : '3 ജോടികളും വ്യത്യസ്ത ഫലം: ഇരട്ട ലഗ്നത്തിന് ലഗ്നാധിപൻ-8-ാം അധിപൻ (Pair 1) മുൻഗണന.';
-    }
-    return adj;
   };
 
   const translateVitalityScore = (score) => {
@@ -2572,7 +2528,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                         }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
                             <strong style={{ color: 'var(--accent-gold)', fontSize: '12px' }}>
-                              {formatPairTitle(pairKey)}
+                              {formatPairTitle(pairKey, ruleApplied)}
                             </strong>
                             {isObj && detail.derivedSpan && renderSpanBadge(detail.derivedSpan)}
                             {!isObj && renderSpanBadge(String(detail))}
@@ -2629,7 +2585,9 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                       ✨ {t('kakshyaVriddhi', language)}:
                     </strong>
                     <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
-                      {ayurdaya.kakshyaAdjustments.map((adj, i) => (
+                      {ayurdaya.kakshyaAdjustments
+                        .filter(adj => !adj.includes('consensus') && !adj.includes('unanimously') && !adj.includes('distinct spans') && !adj.includes('holds overriding authority') && !adj.includes('precedence') && !adj.includes('All 3 pairs differ') && adj !== overrideReason)
+                        .map((adj, i) => (
                         <li key={i}>{translateKakshyaAdjustment(adj, language)}</li>
                       ))}
                     </ul>

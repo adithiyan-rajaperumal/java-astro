@@ -41,7 +41,7 @@ export default function HealthLongevityView({ chartData, language }) {
     ? t('madhyayu', language)
     : t('alpayu', language);
 
-  const formatPairTitle = (key) => {
+  const formatPairTitle = (key, ruleApplied) => {
     switch (key) {
       case 'pair1_lagnaLord_and_8thLord':
         return language === 'ta' ? '1. லக்னாதிபதி & 8-ஆம் அதிபதி' :
@@ -63,11 +63,31 @@ export default function HealthLongevityView({ chartData, language }) {
                language === 'hi' ? '3. लग्न और होरा लग्न' :
                language === 'te' ? '3. లగ్నం & హోరా లగ్నం' :
                language === 'kn' ? '3. ಲಗ್ನ & ಹೋರಾ ಲಗ್ನ' :
-               language === 'ml' ? '3. ലഗ്നവും ഹോരാ ലഗ്നവും' :
+               language === 'ml' ? '3. ലಗ್നവും ഹോರಾ ലഗ്നവും' :
                '3. Lagna & Hora Lagna';
       case 'majorityConsensus':
+        if (ruleApplied && (ruleApplied.includes('Vishesha') || ruleApplied.includes('Asamvada'))) {
+          switch (language) {
+            case 'ta': return 'ஒருங்கிணைந்த முடிவு';
+            case 'hi': return 'संश्लेषित निर्णय';
+            case 'te': return 'సంశ్లేషిత నిర్ణయం';
+            case 'kn': return 'ಸಂಶ್ಲೇಷಿತ ನಿರ್ಧಾರ';
+            case 'ml': return 'സംശ്ലേഷിത തീരുമാനം';
+            default: return 'Synthesis Result';
+          }
+        }
+        if (ruleApplied && (ruleApplied.includes('Tri-Samvada') || ruleApplied.includes('Unanimous'))) {
+          switch (language) {
+            case 'ta': return 'ஒருமனதான முடிவு';
+            case 'hi': return 'सर्वसम्मत निर्णय';
+            case 'te': return 'ఏకగ్రీవ నిర్ణయం';
+            case 'kn': return 'ಸರ್ವಾನುಮತದ ನಿರ್ಧಾರ';
+            case 'ml': return 'ഏകകണ്ഠമായ തീരുമാനം';
+            default: return 'Unanimous Consensus';
+          }
+        }
         return language === 'ta' ? 'பெரும்பான்மை முடிவு' :
-               language === 'hi' ? 'बहुमत सर्वसम्मत निर्णय' :
+               language === 'hi' ? 'बहुमत निर्णय' :
                language === 'te' ? 'మెజారిటీ నిర్ణయం' :
                language === 'kn' ? 'ಬಹುಮತದ ನಿರ್ಧಾರ' :
                language === 'ml' ? 'ഭൂരിപക്ഷ തീരുമാനം' :
@@ -533,7 +553,7 @@ export default function HealthLongevityView({ chartData, language }) {
 
     switch (language) {
       case 'ta':
-        return res
+      res = res
           .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'அனைத்து 3 ஜெமினி இணைகளும் ஒருமனதாக பூரணாயுளை தேர்வு செய்தவை.')
           .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'அனைத்து 3 ஜெமினி இணைகளும் ஒருமனதாக மத்தியாயுளை தேர்வு செய்தவை.')
           .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'அனைத்து 3 ஜெமினி இணைகளும் ஒருமனதாக அல்பாயுளை தேர்வு செய்தவை.')
@@ -555,9 +575,10 @@ export default function HealthLongevityView({ chartData, language }) {
           .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'லக்னம் பாபகர்த்தரி யோகத்தில் (12 & 2-ல் பாவ கிரகங்கள்) சிக்கியுள்ளதால் உடல் ஆரோக்கியத்தில் எச்சரிக்கை தேவை (-$1 ஆண்டுகள்).')
           .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'சந்திரன் பாபகர்த்தரி யோகத்தில் (12 & 2-ல் பாவ கிரகங்கள்) சிக்கியுள்ளதால் மன/உடல் நலனில் எச்சரிக்கை தேவை (-$1 ஆண்டுகள்).')
           .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'கேந்திரங்களில் சுப கிரகங்களின்றி பாவ கிரகங்கள் மட்டுமே இருப்பதால் கக்ஷ்ய ஹிராஸம் உண்டாகிறது (-$1 ஆண்டுகள்).');
+      break;
 
-      case 'hi':
-        return res
+    case 'hi':
+      res = res
           .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'सभी 3 जैमिनी युग्म सर्वसम्मति से पूर्णायु पर सहमत हैं।')
           .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'सभी 3 जैमिनी युग्म सर्वसम्मति से मध्यायु पर सहमत हैं।')
           .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'सभी 3 जैमिनी युग्म सर्वसम्मति से अल्पायु पर सहमत हैं।')
@@ -579,9 +600,10 @@ export default function HealthLongevityView({ chartData, language }) {
           .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'लग्न पापकर्तरी योग में होने से शारीरिक स्वास्थ्य में सावधानी आवश्यक है (-$1 वर्ष)।')
           .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'चन्द्रमा पापकर्तरी योग में होने से मानसिक/शारीरिक स्वास्थ्य में सावधानी आवश्यक है (-$1 वर्ष)।')
           .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'केंद्रों में शुभ ग्रहों के बिना केवल पाप ग्रह होने से कक्ष्या ह्रास होता है (-$1 वर्ष)।');
+      break;
 
-      case 'te':
-        return res
+    case 'te':
+      res = res
           .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'అన్ని 3 జైమిని జతలు ఏకగ్రీవంగా పూర్ణాయుష్షును నిర్ణయించాయి.')
           .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'అన్ని 3 జైమిని జతలు ఏకగ్రీవంగా మధ్యాయుష్షును నిర్ణయించాయి.')
           .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'అన్ని 3 జైమిని జతలు ఏకగ్రీవంగా అల్పాయుష్షును నిర్ణయించాయి.')
@@ -603,9 +625,10 @@ export default function HealthLongevityView({ chartData, language }) {
           .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'లగ్నం పాపకర్తరి యోగంలో ఉండటం వల్ల శరీర ఆరోగ్యంపై జాగ్రత్త అవసరం (-$1 సంవత్సరాలు).')
           .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'చంద్రుడు పాపకర్తరి యోగంలో ఉండటం వల్ల మానసిక/శరీర ఆరోగ్యంపై జాగ్రత్త అవసరం (-$1 సంవత్సరాలు).')
           .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'కేంద్రాలలో శుభ గ్రహాలు లేకుండా కేవలం పాప గ్రహాలు ఉండటం వల్ల కక్ష్యా హ్రాసం కలుగుతుంది (-$1 సంవత్సరాలు).');
+      break;
 
-      case 'kn':
-        return res
+    case 'kn':
+      res = res
           .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'ಎಲ್ಲಾ 3 ಜೈಮಿನಿ ಜೋಡಿಗಳು ಸರ್ವಾನುಮತದಿಂದ ಪೂರ್ಣಾಯುಷ್ಯವನ್ನು ನಿರ್ಧರಿಸಿವೆ.')
           .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'ಎಲ್ಲಾ 3 ಜೈಮಿನಿ ಜೋಡಿಗಳು ಸರ್ವಾನುಮತದಿಂದ ಮಧ್ಯಾಯುಷ್ಯವನ್ನು ನಿರ್ಧರಿಸಿವೆ.')
           .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'ಎಲ್ಲಾ 3 ಜೈಮಿನಿ ಜೋಡಿಗಳು ಸರ್ವಾನುಮತದಿಂದ ಅಲ್ಪಾಯುಷ್ಯವನ್ನು ನಿರ್ಧರಿಸಿವೆ.')
@@ -627,9 +650,10 @@ export default function HealthLongevityView({ chartData, language }) {
           .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'ಲಗ್ನವು ಪಾಪಕರ್ತರಿ ಯೋಗದಲ್ಲಿದ್ದು ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ (-$1 ವರ್ಷಗಳು).')
           .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'ಚಂದ್ರನು ಪಾಪಕರ್ತರಿ ಯೋಗದಲ್ಲಿದ್ದು ಮಾನಸಿಕ/ದೈಹಿಕ ಆರೋಗ್ಯದ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆ ಅಗತ್ಯ (-$1 ವರ್ಷಗಳು).')
           .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'ಕೇಂದ್ರಗಳಲ್ಲಿ ಶುಭ ಗ್ರಹಗಳಿಲ್ಲದೆ ಕೇವಲ ಪಾಪ ಗ್ರಹಗಳಿರುವುದರಿಂದ ಕಕ್ಷ್ಯಾ ಹ್ರಾಸ ಉಂಟಾಗುತ್ತದೆ (-$1 ವರ್ಷಗಳು).');
+      break;
 
-      case 'ml':
-        return res
+    case 'ml':
+      res = res
           .replace(/All 3 Jaimini pairs agree unanimously on Poornayu\./g, 'എല്ലാ 3 ജൈമിനി ജോഡികളും ഏകകണ്ഠമായി പൂർണ്ണായുസ്സ് തിരഞ്ഞെടുത്തു.')
           .replace(/All 3 Jaimini pairs agree unanimously on Madhyayu\./g, 'എല്ലാ 3 ജൈമിനി ജോഡികളും ഏകകണ്ഠമായി മദ്ധ്യായുസ്സ് തിരഞ്ഞെടുത്തു.')
           .replace(/All 3 Jaimini pairs agree unanimously on Alpayu\./g, 'എല്ലാ 3 ജൈമിനി ജോഡികളും ഏകകണ്ഠമായി അല്പായുസ്സ് തിരഞ്ഞെടുത്തു.')
@@ -651,7 +675,23 @@ export default function HealthLongevityView({ chartData, language }) {
           .replace(/Lagna hemmed between malefics in 12th & 2nd \(Papakarthari Yoga\) cautions physical vitality \(-(\d+) years\)\./g, 'ലഗ്നം പാപകർത്താരി യോഗത്തിലായതിനാൽ ആരോഗ്യ ശ്രദ്ധ ആവശ്യമാണ് (-$1 വർഷങ്ങൾ).')
           .replace(/Moon hemmed between malefics in 12th & 2nd \(Papakarthari Yoga on Moon\) cautions vitality \(-(\d+) years\)\./g, 'ചന്ദ്രൻ പാപകർത്താരി യോഗത്തിലായതിനാൽ മാനസിക/ശാരീരിക ആരോഗ്യ ശ്രദ്ധ ആവശ്യമാണ് (-$1 വർഷങ്ങൾ).')
           .replace(/Malefics in Kendras with no benefics in Kendras applies Kakshya Hrasa \(-(\d+) years\)\./g, 'കേന്ദ്രങ്ങളിൽ ശുഭന്മാരില്ലാതെ പാപ ഗ്രഹങ്ങൾ മാത്രമുള്ളതിനാൽ കക്ഷ്യാ ഹ്രാസം ഉണ്ടാകുന്നു (-$1 വർഷങ്ങൾ).');
+      break;
+  }
+
+    const KAKSHYA_PLANETS = {
+      ta: { Sun: 'சூரியன்', Moon: 'சந்திரன்', Mars: 'செவ்வாய்', Mercury: 'புதன்', Jupiter: 'குரு', Venus: 'சுக்கிரன்', Saturn: 'சனி', Rahu: 'ராகு', Ketu: 'கேது' },
+      hi: { Sun: 'सूर्य', Moon: 'चन्द्र', Mars: 'मंगल', Mercury: 'बुध', Jupiter: 'गुरु', Venus: 'शुक्र', Saturn: 'शनि', Rahu: 'राहु', Ketu: 'केतु' },
+      te: { Sun: 'సూర్యుడు', Moon: 'చంద్రుడు', Mars: 'కుజుడు', Mercury: 'బుధుడు', Jupiter: 'గురువు', Venus: 'శుక్రుడు', Saturn: 'శని', Rahu: 'రాహువు', Ketu: 'కేతువు' },
+      kn: { Sun: 'ಸೂರ್ಯ', Moon: 'ಚಂದ್ರ', Mars: 'ಮಂಗಳ', Mercury: 'ಬುಧ', Jupiter: 'ಗುರು', Venus: 'ಶುಕ್ರ', Saturn: 'ಶನಿ', Rahu: 'ರಾಹು', Ketu: 'ಕೇತು' },
+      ml: { Sun: 'സൂര്യൻ', Moon: 'ചന്ദ്രൻ', Mars: 'ചൊവ്വ', Mercury: 'ബുധൻ', Jupiter: 'ഗുരു', Venus: 'ശുക്രൻ', Saturn: 'ശനി', Rahu: 'രാഹു', Ketu: 'കേതു' }
+    };
+
+    if (KAKSHYA_PLANETS[language]) {
+      Object.entries(KAKSHYA_PLANETS[language]).forEach(([eng, loc]) => {
+        res = res.replaceAll(`(${eng})`, `(${loc})`);
+      });
     }
+
     return res;
   };
 
@@ -1125,7 +1165,7 @@ export default function HealthLongevityView({ chartData, language }) {
                     }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
                         <strong style={{ color: 'var(--accent-gold)', fontSize: '12px' }}>
-                          {formatPairTitle(pairKey)}
+                          {formatPairTitle(pairKey, ruleApplied)}
                         </strong>
                         {isObj && detail.derivedSpan && renderSpanBadge(detail.derivedSpan)}
                         {!isObj && renderSpanBadge(String(detail))}
