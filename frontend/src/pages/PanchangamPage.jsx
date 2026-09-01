@@ -227,7 +227,7 @@ function PanchangamPage({ settings }) {
                 fontWeight: 'bold',
                 cursor: 'pointer'
               }}
-              title="Gowri Panchangam Guide"
+              title={t('gowriGuideTitle', lang) || "Gowri Panchangam Guide"}
             >
               ℹ️
             </button>
@@ -385,26 +385,26 @@ function PanchangamPage({ settings }) {
           <button 
             onClick={() => changeDate(-1)} 
             className="today-btn"
-            title="Previous Day"
+            title={t('prevDay', lang) || "Previous Day"}
             style={{ padding: '6px 12px', fontSize: '13px' }}
           >
-            ◀ Prev
+            ◀ {t('prevDay', lang) || "Prev"}
           </button>
           <button 
             onClick={() => setCurrentDate(getTodayDateString(settings.location))} 
             className="today-btn"
-            title="Today"
+            title={t('today', lang) || "Today"}
             style={{ padding: '6px 14px', fontSize: '13px' }}
           >
-            Today
+            {t('today', lang) || "Today"}
           </button>
           <button 
             onClick={() => changeDate(1)} 
             className="today-btn"
-            title="Next Day"
+            title={t('nextDay', lang) || "Next Day"}
             style={{ padding: '6px 12px', fontSize: '13px' }}
           >
-            Next ▶
+            {t('nextDay', lang) || "Next"} ▶
           </button>
         </div>
 

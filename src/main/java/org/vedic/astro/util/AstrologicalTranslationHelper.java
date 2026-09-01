@@ -1104,6 +1104,72 @@ public class AstrologicalTranslationHelper {
         return res;
     }
 
+    public static String translateStartingSignReason(String reason, String lang) {
+        if (reason == null || reason.isBlank()) return "";
+        if ("en".equalsIgnoreCase(lang)) return reason;
+
+        String res = reason;
+        for (int i = 1; i <= 12; i++) {
+            String rashi = ZodiacUtils.getRashiName(i);
+            String rashiTrans = translate(rashi, lang);
+            res = res.replace(rashi, rashiTrans);
+        }
+
+        switch (lang.toLowerCase()) {
+            case "ta":
+                res = res
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "லக்ன ராசி ($1) தேர்வு செய்யப்பட்டது: அதிக இணைந்த கிரகங்கள் ($2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "7-ஆம் பாவ ராசி ($1) தேர்வு செய்யப்பட்டது: அதிக இணைந்த கிரகங்கள் ($2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "லக்ன ராசி ($1) தேர்வு செய்யப்பட்டது: உயர்ந்த கிரக பலம்/ஆட்சி/உச்சம் ($2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "7-ஆம் பாவ ராசி ($1) தேர்வு செய்யப்பட்டது: உயர்ந்த கிரக பலம்/ஆட்சி/உச்சம் ($2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "லக்ன ராசி ($1) தேர்வு செய்யப்பட்டது: வலிமையான குரு/சுப பார்வை செல்வாக்கு")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "7-ஆம் பாவ ராசி ($1) தேர்வு செய்யப்பட்டது: வலிமையான குரு/சுப பார்வை செல்வாக்கு")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected by default \\(equal strength with 7th house\\)", "லக்ன ராசி ($1) இயல்புநிலையாக தேர்வு செய்யப்பட்டது (7-ஆம் பாவகத்துடன் சம பலம்)");
+                break;
+            case "hi":
+                res = res
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "लग्न राशि ($1) चयनित: अधिक युत ग्रह ($2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "7वां भाव राशि ($1) चयनित: अधिक युत ग्रह ($2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "लग्न राशि ($1) चयनित: उच्चतर ग्रह गरिमा (स्व/उच्च $2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "7वां भाव राशि ($1) चयनित: उच्चतर ग्रह गरिमा (स्व/उच्च $2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "लग्न राशि ($1) चयनित: प्रबल गुरु/शुभ प्रभाव")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "7वां भाव राशि ($1) चयनित: प्रबल गुरु/शुभ प्रभाव")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected by default \\(equal strength with 7th house\\)", "लग्न राशि ($1) स्वतः चयनित (7वें भाव के साथ समान बल)");
+                break;
+            case "te":
+                res = res
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "లగ్న రాశి ($1) ఎంపిక చేయబడింది: ఎక్కువ కలిసి ఉన్న గ్రహాలు ($2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "7వ స్థాన రాశి ($1) ఎంపిక చేయబడింది: ఎక్కువ కలిసి ఉన్న గ్రహాలు ($2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "లగ్న రాశి ($1) ఎంపిక చేయబడింది: ఉన్నత గ్రహ బలం (స్వ/ఉచ్చ $2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "7వ స్థాన రాశి ($1) ఎంపిక చేయబడింది: ఉన్నత గ్రహ బలం (స్వ/ఉచ్చ $2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "లగ్న రాశి ($1) ఎంపిక చేయబడింది: బలమైన గురు/శుభ ప్రభావం")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "7వ స్థాన రాశి ($1) ఎంపిక చేయబడింది: బలమైన గురు/శుభ ప్రభావం")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected by default \\(equal strength with 7th house\\)", "లగ్న రాశి ($1) సాధారణంగా ఎంపిక చేయబడింది (7వ స్థానంతో సమాన బలం)");
+                break;
+            case "kn":
+                res = res
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "ಲಗ್ನ ರಾಶಿ ($1) ಆಯ್ಕೆಯಾಗಿದೆ: ಹೆಚ್ಚು ಸಂಯೋಜಿತ ಗ್ರಹಗಳು ($2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "7ನೇ ಮನೆ ರಾಶಿ ($1) ಆಯ್ಕೆಯಾಗಿದೆ: ಹೆಚ್ಚು ಸಂಯೋಜಿತ ಗ್ರಹಗಳು ($2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "ಲಗ್ನ ರಾಶಿ ($1) ಆಯ್ಕೆಯಾಗಿದೆ: ಉನ್ನತ ಗ್ರಹ ಬಲ (ಸ್ವ/ಉಚ್ಚ $2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "7ನೇ ಮನೆ ರಾಶಿ ($1) ಆಯ್ಕೆಯಾಗಿದೆ: ಉನ್ನತ ಗ್ರಹ ಬಲ (ಸ್ವ/ಉಚ್ಚ $2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "ಲಗ್ನ ರಾಶಿ ($1) ಆಯ್ಕೆಯಾಗಿದೆ: ಬಲವಾದ ಗುರು/ಶುಭ ಪ್ರಭಾವ")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "7ನೇ ಮನೆ ರಾಶಿ ($1) ಆಯ್ಕೆಯಾಗಿದೆ: ಬಲವಾದ ಗುರು/ಶುಭ ಪ್ರಭಾವ")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected by default \\(equal strength with 7th house\\)", "ಲಗ್ನ ರಾಶಿ ($1) ಪೂರ್ವನಿಯೋಜಿತವಾಗಿ ಆಯ್ಕೆಯಾಗಿದೆ (7ನೇ ಮನೆಯೊಂದಿಗೆ ಸಮಾನ ಬಲ)");
+                break;
+            case "ml":
+                res = res
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "ലഗ്ന രാശി ($1) തിരഞ്ഞെടുക്കപ്പെട്ടു: കൂടുതൽ സംയോജിത ഗ്രഹങ്ങൾ ($2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: more conjoined planets \\((\\d+) vs (\\d+)\\)", "7-ാം ഭാവ രാശി ($1) തിരഞ്ഞെടുക്കപ്പെട്ടു: കൂടുതൽ സംയോജിത ഗ്രഹങ്ങൾ ($2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "ലഗ്ന രാശി ($1) തിരഞ്ഞെടുക്കപ്പെട്ടു: ഉയർന്ന ഗ്രഹ ബലം (സ്വ/ഉച്ച $2 vs $3)")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: higher planetary dignity \\((\\d+) exalted/own vs (\\d+)\\)", "7-ാം ഭാവ രാശി ($1) തിരഞ്ഞെടുക്കപ്പെട്ടു: ഉയർന്ന ഗ്രഹ ബലം (സ്വ/ഉച്ച $2 vs $3)")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "ലഗ്ന രാശി ($1) തിരഞ്ഞെടുക്കപ്പെട്ടു: ശക്തമായ വ്യാഴ/ശുഭ സ്വാധീനം")
+                        .replaceAll("7th House sign \\(([^)]+)\\) selected: stronger Jupiter/benefic influence", "7-ാം ഭാവ രാശി ($1) തിരഞ്ഞെടുക്കപ്പെട്ടു: ശക്തമായ വ്യാഴ/ശുഭ സ്വാധീനം")
+                        .replaceAll("Lagna sign \\(([^)]+)\\) selected by default \\(equal strength with 7th house\\)", "ലഗ്ന രാശി ($1) സ്വതവേ തിരഞ്ഞെടുക്കപ്പെട്ടു (7-ാം ഭാവവുമായി തുല്യ ബലം)");
+                break;
+        }
+        return res;
+    }
+
     public static String translateLifespanRange(String lifespanRange, String lang) {
         if (lifespanRange == null || lifespanRange.isBlank()) return "";
         if ("en".equalsIgnoreCase(lang)) return lifespanRange;

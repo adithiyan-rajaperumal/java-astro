@@ -336,7 +336,7 @@ function MatchingPage({ settings }) {
                   value={boyName}
                   onChange={(e) => setBoyName(e.target.value)}
                   onClear={() => setBoyName('')}
-                  placeholder="Enter boy's name"
+                  placeholder={t('boyNamePlaceholder', settings.language) || "Enter boy's name"}
                   required
                 />
               </div>
@@ -400,7 +400,7 @@ function MatchingPage({ settings }) {
                   value={girlName}
                   onChange={(e) => setGirlName(e.target.value)}
                   onClear={() => setGirlName('')}
-                  placeholder="Enter girl's name"
+                  placeholder={t('girlNamePlaceholder', settings.language) || "Enter girl's name"}
                   required
                 />
               </div>

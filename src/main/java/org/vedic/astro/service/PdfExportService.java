@@ -114,8 +114,7 @@ public class PdfExportService {
             String sysKey = "system." + (data.getPanchangamSystem() != null ? data.getPanchangamSystem().toUpperCase() : "DRIK_TIRUKANITHAM");
             info.addCell(buildTableCell(ts.getLabel(sysKey), bFont, Element.ALIGN_LEFT));
 
-            String pobLabel = "ta".equalsIgnoreCase(lang) ? "பிறந்த இடம்" : "Place of Birth";
-            info.addCell(buildTableCell(pobLabel, boldB, Element.ALIGN_LEFT));
+            info.addCell(buildTableCell(ts.getLabel("pdf.info.pob"), boldB, Element.ALIGN_LEFT));
             String pobVal = data.getPlaceOfBirth() != null && !data.getPlaceOfBirth().isBlank()
                     ? data.getPlaceOfBirth()
                     : String.format("%.4f, %.4f", data.getLatitude(), data.getLongitude());
