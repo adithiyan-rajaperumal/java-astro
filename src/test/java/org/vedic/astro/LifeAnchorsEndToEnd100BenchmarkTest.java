@@ -211,6 +211,192 @@ public class LifeAnchorsEndToEnd100BenchmarkTest {
         }
     }
 
+    @Test
+    @DisplayName("Verify Parashara Ayur Bala (Lagna Lord Dignity & Vitality Score) and Deities 6-Language Parity with Zero Mojibake")
+    void testParasharaBalaAndDeitiesMultilingualParity() {
+        String[] languages = {"en", "ta", "hi", "te", "kn", "ml"};
+
+        // 1. Direct validation of Parashara Ayur Bala Lagna Lord Dignity statuses
+        List<String> dignityStatuses = List.of("VERY_STRONG", "STRONG", "MODERATE", "CAUTIOUS");
+        for (String status : dignityStatuses) {
+            for (String lang : languages) {
+                String trans = AstrologicalTranslationHelper.translateLagnaLordStrength(status, lang);
+                assertNotNull(trans, "Lagna lord strength translation must not be null for " + lang + " and status " + status);
+                assertFalse(trans.isBlank(), "Lagna lord strength translation must not be blank for " + lang + " and status " + status);
+                assertFalse(trans.contains("à®") || trans.contains("à¤") || trans.contains("à°") || trans.contains("à²") || trans.contains("à´"),
+                        "Must not contain mojibake in lagna lord strength translation for " + lang + ": " + trans);
+                if (!"en".equalsIgnoreCase(lang)) {
+                    assertNotEquals(status, trans, "Must not leak unlocalized status token for " + lang);
+                }
+            }
+        }
+
+        // 2. Direct validation of Vitality Scores
+        List<String> vitalityScores = List.of(
+                "High Resilience & Deerghayu Vitality",
+                "Robust Sarira & Jeeva Strength",
+                "Balanced Constitutional Vitality",
+                "Moderate Vitality (Mindful Regimen)",
+                "Health-Cautious Vitality"
+        );
+        for (String score : vitalityScores) {
+            for (String lang : languages) {
+                String trans = AstrologicalTranslationHelper.translateVitalityScore(score, lang);
+                assertNotNull(trans, "Vitality score translation must not be null for " + lang + " and score " + score);
+                assertFalse(trans.isBlank(), "Vitality score translation must not be blank for " + lang + " and score " + score);
+                assertFalse(trans.contains("à®") || trans.contains("à¤") || trans.contains("à°") || trans.contains("à²") || trans.contains("à´"),
+                        "Must not contain mojibake in vitality score translation for " + lang + ": " + trans);
+                if (!"en".equalsIgnoreCase(lang)) {
+                    assertNotEquals(score, trans, "Must not leak unlocalized vitality score for " + lang);
+                }
+            }
+        }
+
+        // 3. Direct validation of Classical Planetary Deities
+        List<String> deities = List.of(
+                "Lord Shiva / Lord Rama",
+                "Goddess Parvati / Goddess Gauri / Lord Krishna",
+                "Lord Murugan / Lord Narasimha / Kartikeya",
+                "Lord Vishnu / Lord Venkateshwara",
+                "Lord Dakshinamurthy / Lord Hayagriva",
+                "Goddess Maha Lakshmi / Annapoorneshwari",
+                "Lord Hanuman / Shani Deva / Lord Ayyappan",
+                "Goddess Durga / Goddess Varahi / Bhadrakali",
+                "Lord Ganesha (Maha Ganapati)"
+        );
+        for (String deity : deities) {
+            for (String lang : languages) {
+                String trans = AstrologicalTranslationHelper.translateDeity(deity, lang);
+                assertNotNull(trans, "Deity translation must not be null for " + lang + " and deity " + deity);
+                assertFalse(trans.isBlank(), "Deity translation must not be blank for " + lang + " and deity " + deity);
+                assertFalse(trans.contains("à®") || trans.contains("à¤") || trans.contains("à°") || trans.contains("à²") || trans.contains("à´"),
+                        "Must not contain mojibake in deity translation for " + lang + ": " + trans);
+                if (!"en".equalsIgnoreCase(lang)) {
+                    assertNotEquals(deity, trans, "Must not leak unlocalized deity name for " + lang);
+                }
+            }
+        }
+
+        // 4. End-to-End Evaluation across all 90 Synthetic + 10 Historical Benchmark Charts
+        List<LifeAnchorsSyntheticChartFactory.TestCase> syntheticCases = LifeAnchorsSyntheticChartFactory.generate90SyntheticCases();
+        for (var sc : syntheticCases) {
+            verifyParasharaBalaAndDeitiesForChart(sc.lagnaSign(), sc.planetMap(), sc.shadbalaRupas(), languages);
+        }
+
+        List<LifeAnchorsHistoricalChartsFactory.HistoricalNative> historicalNatives = LifeAnchorsHistoricalChartsFactory.get10ClassicalNatives();
+        for (var hn : historicalNatives) {
+            verifyParasharaBalaAndDeitiesForChart(hn.lagnaSign(), hn.planetMap(), hn.shadbalaRupas(), languages);
+        }
+    }
+
+    private void verifyParasharaBalaAndDeitiesForChart(
+            int lagnaSign,
+            Map<String, ChartResponseDTO.PositionDetail> planetMap,
+            Map<String, Double> shadbalaRupas,
+            String[] languages
+    ) {
+        ChartResponseDTO.PositionDetail moonPos = planetMap.get("Moon") != null
+                ? planetMap.get("Moon")
+                : planetMap.get("MOON");
+        int moonSign = moonPos != null ? moonPos.getSignNumber() : lagnaSign;
+
+        ShadbalaDTO shadbalaDTO = null;
+        if (shadbalaRupas != null && !shadbalaRupas.isEmpty()) {
+            Map<String, ShadbalaDTO.PlanetaryStrength> sMap = new HashMap<>();
+            for (Map.Entry<String, Double> entry : shadbalaRupas.entrySet()) {
+                sMap.put(entry.getKey(), ShadbalaDTO.PlanetaryStrength.builder()
+                        .totalShadbalaRupas(entry.getValue())
+                        .build());
+            }
+            shadbalaDTO = ShadbalaDTO.builder().planetStrengths(sMap).build();
+        }
+
+        AyurdayaProfile profile = AyurdayaCalculationUtils.calculateAyurdaya(
+                lagnaSign,
+                moonSign,
+                new ArrayList<>(planetMap.values()),
+                List.of(),
+                1990,
+                12,
+                0,
+                shadbalaDTO
+        );
+
+        assertNotNull(profile.parasharaAyurBala(), "Parashara Ayur Bala map must not be null");
+        String lagnaLordStrength = (String) profile.parasharaAyurBala().get("lagnaLordStrength");
+        String vitalityScore = (String) profile.parasharaAyurBala().get("vitalityScore");
+        assertNotNull(lagnaLordStrength, "lagnaLordStrength must not be null");
+        assertNotNull(vitalityScore, "vitalityScore must not be null");
+
+        Map<String, PlanetaryPosition> d1PosMap = new HashMap<>();
+        for (Map.Entry<String, ChartResponseDTO.PositionDetail> entry : planetMap.entrySet()) {
+            var p = entry.getValue();
+            if (p != null) {
+                String key = entry.getKey();
+                d1PosMap.put(key, PlanetaryPosition.builder()
+                        .name(p.getDisplayName() != null ? p.getDisplayName() : key)
+                        .signNumber(p.getSignNumber())
+                        .degreeInSign(p.getDegreeInSign())
+                        .build());
+            }
+        }
+        var deitiesResult = SpiritualDeityUtils.calculateSpiritualDeities(d1PosMap, List.of());
+        assertNotNull(deitiesResult, "SpiritualDeitiesResult must not be null");
+
+        String ishtaDevata = deitiesResult.ishtaDevata();
+        String dharmaDevata = deitiesResult.dharmaDevata();
+        String palanaDevata = deitiesResult.palanaDevata();
+
+        assertNotNull(ishtaDevata, "ishtaDevata must not be null");
+        assertNotNull(dharmaDevata, "dharmaDevata must not be null");
+        assertNotNull(palanaDevata, "palanaDevata must not be null");
+
+        for (String lang : languages) {
+            // Validate Lagna Lord Strength translation
+            String transStrength = AstrologicalTranslationHelper.translateLagnaLordStrength(lagnaLordStrength, lang);
+            assertNotNull(transStrength, "Lagna lord strength translation must not be null for " + lang);
+            assertFalse(transStrength.isBlank(), "Lagna lord strength translation must not be blank for " + lang);
+            assertFalse(transStrength.contains("à®") || transStrength.contains("à¤") || transStrength.contains("à°") || transStrength.contains("à²") || transStrength.contains("à´"),
+                    "Must not contain mojibake in lagna lord strength for " + lang);
+
+            // Validate Vitality Score translation
+            String transVitality = AstrologicalTranslationHelper.translateVitalityScore(vitalityScore, lang);
+            assertNotNull(transVitality, "Vitality score translation must not be null for " + lang);
+            assertFalse(transVitality.isBlank(), "Vitality score translation must not be blank for " + lang);
+            assertFalse(transVitality.contains("à®") || transVitality.contains("à¤") || transVitality.contains("à°") || transVitality.contains("à²") || transVitality.contains("à´"),
+                    "Must not contain mojibake in vitality score for " + lang);
+
+            // Validate Ishta Devata translation
+            String transIshta = AstrologicalTranslationHelper.translateDeity(ishtaDevata, lang);
+            assertNotNull(transIshta, "Ishta Devata translation must not be null for " + lang);
+            assertFalse(transIshta.isBlank(), "Ishta Devata translation must not be blank for " + lang);
+            assertFalse(transIshta.contains("à®") || transIshta.contains("à¤") || transIshta.contains("à°") || transIshta.contains("à²") || transIshta.contains("à´"),
+                    "Must not contain mojibake in ishta devata for " + lang);
+
+            // Validate Dharma Devata translation
+            String transDharma = AstrologicalTranslationHelper.translateDeity(dharmaDevata, lang);
+            assertNotNull(transDharma, "Dharma Devata translation must not be null for " + lang);
+            assertFalse(transDharma.isBlank(), "Dharma Devata translation must not be blank for " + lang);
+            assertFalse(transDharma.contains("à®") || transDharma.contains("à¤") || transDharma.contains("à°") || transDharma.contains("à²") || transDharma.contains("à´"),
+                    "Must not contain mojibake in dharma devata for " + lang);
+
+            // Validate Palana Devata translation
+            String transPalana = AstrologicalTranslationHelper.translateDeity(palanaDevata, lang);
+            assertNotNull(transPalana, "Palana Devata translation must not be null for " + lang);
+            assertFalse(transPalana.isBlank(), "Palana Devata translation must not be blank for " + lang);
+            assertFalse(transPalana.contains("à®") || transPalana.contains("à¤") || transPalana.contains("à°") || transPalana.contains("à²") || transPalana.contains("à´"),
+                    "Must not contain mojibake in palana devata for " + lang);
+
+            if (!"en".equalsIgnoreCase(lang)) {
+                assertNotEquals(lagnaLordStrength, transStrength, "Must not return untranslated strength for " + lang);
+                assertNotEquals(vitalityScore, transVitality, "Must not return untranslated vitality score for " + lang);
+                assertNotEquals(ishtaDevata, transIshta, "Must not return untranslated ishta devata for " + lang);
+                assertNotEquals(dharmaDevata, transDharma, "Must not return untranslated dharma devata for " + lang);
+                assertNotEquals(palanaDevata, transPalana, "Must not return untranslated palana devata for " + lang);
+            }
+        }
+    }
+
     // =========================================================================
     // INVARIANT ASSERTION ENGINE
     // =========================================================================

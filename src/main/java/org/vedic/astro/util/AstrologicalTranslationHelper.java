@@ -121,6 +121,70 @@ public class AstrologicalTranslationHelper {
                 "ദുർഗ്ഗാ ദേവി / ചാമുണ്ഡേശ്വരി",
                 "Goddess Durga / Chamundeshwari");
 
+        add("Lord Dakshinamurthy / Lord Hayagriva",
+                "ஸ்ரீ தக்ஷிணாமூர்த்தி / ஹயக்ரீவர்",
+                "भगवान दक्षिणामूर्ति / हयग्रीव",
+                "శ్రీ దక్షిణామూర్తి / హయగ్రీవుడు",
+                "ಶ್ರೀ ದಕ್ಷಿಣಾಮೂರ್ತಿ / ಹಯಗ್ರೀವ",
+                "ശ്രീ ദക്ഷിണാമൂർത്തി / ഹയഗ്രീവൻ",
+                "Lord Dakshinamurthy / Lord Hayagriva");
+
+        add("Lord Dakshinamurthy",
+                "ஸ்ரீ தக்ஷிணாமூர்த்தி",
+                "भगवान दक्षिणामूर्ति",
+                "శ్రీ దక్షిణామూర్తి",
+                "ಶ್ರೀ ದಕ್ಷಿಣಾಮೂರ್ತಿ",
+                "ശ്രീ ദക്ഷിണಾಮൂർത്തി",
+                "Lord Dakshinamurthy");
+
+        add("Goddess Maha Lakshmi / Annapoorneshwari",
+                "ஸ்ரீ மகாலட்சுமி / அன்னபூரணி",
+                "माँ महालक्ष्मी / अन्नपूर्णा",
+                "శ్రీ మహాలక్ష్మి దేవి / అన్నపూర్ణ",
+                "ಶ್ರೀ ಮಹಾಲಕ್ಷ್ಮಿ / ಅನ್ನಪೂರ್ಣೇಶ್ವರಿ",
+                "ശ്രീ മഹാലക്ഷ്മി / അന്നപൂർണ്ണേശ്വരി",
+                "Goddess Maha Lakshmi / Annapoorneshwari");
+
+        add("Goddess Mahalakshmi / Annapoorneshwari",
+                "ஸ்ரீ மகாலட்சுமி / அன்னபூரணி",
+                "माँ महालक्ष्मी / अन्नपूर्णा",
+                "శ్రీ మహాలక్ష్మి దేవి / అన్నపూర్ణ",
+                "ಶ್ರೀ ಮಹಾಲಕ್ಷ್ಮಿ / ಅನ್ನಪೂರ್ಣೇಶ್ವರಿ",
+                "ശ്രീ മഹാലಕ್ಷ്മി / അന്നപൂർണ്ണേശ്വരി",
+                "Goddess Mahalakshmi / Annapoorneshwari");
+
+        add("Lord Hanuman / Shani Deva / Lord Ayyappan",
+                "ஸ்ரீ அனுமான் / சனி பகவான் / ஐயப்பன்",
+                "भगवान हनुमान / शनि देव / अय्यप्पा",
+                "శ్రీ హనుమంతుడు / శని దేవుడు / అయ్యప్ప",
+                "ಶ್ರೀ ಹನುಮಂತ / ಶನಿ ದೇವ / ಅಯ್ಯಪ್ಪ",
+                "ശ്രീ ഹനുമാൻ / ശനി ദേവൻ / അയ്യപ്പൻ",
+                "Lord Hanuman / Shani Deva / Lord Ayyappan");
+
+        add("Goddess Durga / Goddess Varahi / Bhadrakali",
+                "ஸ்ரீ துர்க்கை / வாராஹி / பத்ரகாளி",
+                "माँ दुर्गा / वाराही / भद्रकाली",
+                "శ్రీ దుర్గా దేవి / వారాహి / భద్రకాళి",
+                "ಶ್ರೀ ದುರ್ಗಾ ದೇವಿ / ವಾರಾಹಿ / భద్రಕಾಳಿ",
+                "ശ്രീ ദുർഗ്ഗാ ದೇവി / വാരാഹി / ഭദ്രകാളി",
+                "Goddess Durga / Goddess Varahi / Bhadrakali");
+
+        add("Lord Ganesha (Maha Ganapati)",
+                "ஸ்ரீ மகா கணபதி / விநாயகர்",
+                "भगवान गणेश / महागणपति",
+                "శ్రీ మహాగణపతి / వినాయకుడు",
+                "ಶ್ರೀ ಮಹಾಗಣಪತಿ / ಗಣೇಶ",
+                "ശ്രീ മഹാ ഗണപതി / വിനായകൻ",
+                "Lord Ganesha (Maha Ganapati)");
+
+        add("Lord Vishnu",
+                "ஸ்ரீ மகாவிஷ்ணு",
+                "भगवान विष्णु",
+                "శ్రీ మహావిష్ణువు",
+                "ಶ್ರೀ ಮಹಾವಿಷ್ಣು",
+                "ശ്രീ മഹാവിഷ്ണു",
+                "Lord Vishnu");
+
         // =========================================================================
         // 2. GEMSTONES
         // =========================================================================
@@ -433,6 +497,88 @@ public class AstrologicalTranslationHelper {
         add("Prithvi (Earth)", "பிரித்வி தத்துவம் (நிலம்)", "पृथ्वी तत्व (भूमि)", "పృథ్వీ తత్వం (భూమి)", "ಪೃಥ್ವಿ ತತ್ವ (ಭೂಮಿ)", "പൃഥ്വി തത്വം (ഭൂമി)", "Prithvi (Earth)");
         add("Vayu (Air)", "வாயு தத்துவம் (காற்று)", "वायु तत्व (पवन)", "వాయు తత్వం (గాలి)", "ವಾಯು ತತ್ವ (ಗಾಳಿ)", "വായു തത്വം (കാറ്റ്)", "Vayu (Air)");
         add("Jala (Water)", "ஜல தத்துவம் (நீர்)", "जल तत्व (जल)", "జల తత్వం (నీరు)", "ಜಲ ತತ್ವ (ನೀರು)", "ജല തത്വം (വെള്ളം)", "Jala (Water)");
+        add("Jala", "ஜல தத்துவம்", "जल तत्व", "జల తత్వం", "ಜಲ ತತ್ವ", "ജല തത്വം", "Jala");
+        add("Agni", "அக்னி தத்துவம்", "अग्नि तत्व", "అగ్ని తత్వం", "ಅಗ್ನಿ ತತ್ವ", "അഗ്നി തത്വം", "Agni");
+        add("Prithvi", "பிரித்வி தத்துவம்", "पृथ्वी तत्व", "పృథ్వీ తత్వం", "ಪೃಥ್ವಿ ತತ್ವ", "പൃഥ്വി തത്വം", "Prithvi");
+        add("Vayu", "வாயு தத்துவம்", "वायु तत्व", "వాయు తత్వం", "ವಾಯು ತತ್ವ", "വായു തത്വം", "Vayu");
+
+        // =========================================================================
+        // 12. PARASHARA BALA & LAGNA LORD DIGNITY
+        // =========================================================================
+        add("VERY_STRONG",
+                "ஆட்சி / உச்ச சுப பலம் (Very Strong)",
+                "अत्यंत सुदृढ़ / प्रतिष्ठित बल (Very Strong)",
+                "అత్యంత సుదృఢ / శుభ బలం (Very Strong)",
+                "ಅತ್ಯಂತ ಸುದೃಢ / ಶುಭ ಬಲ (Very Strong)",
+                "അത്യന്തം സുദൃഢ / ശുഭ ബലം (Very Strong)",
+                "Very Strong / Dignified");
+
+        add("STRONG",
+                "வலுவான சுப பலம் (Strong)",
+                "सुदृढ़ / प्रतिष्ठित बल (Strong)",
+                "సుదృఢ / శుభ బలం (Strong)",
+                "ಸುದೃಢ / ಶುಭ ಬಲ (Strong)",
+                "സുദൃഢ / ശുഭ ബലം (Strong)",
+                "Strong / Dignified");
+
+        add("MODERATE",
+                "சாதாரண பலம் (Moderate)",
+                "सामान्य बल (Moderate)",
+                "సాధారణ బలం (Moderate)",
+                "ಸಾಮಾನ್ಯ ಬಲ (Moderate)",
+                "ಸಾಧಾರಣ ಬಲಂ (Moderate)",
+                "Moderate Strength");
+
+        add("CAUTIOUS",
+                "எச்சரிக்கை / கவனமான நலம் தேவை (Cautious)",
+                "सतर्कता / सावधानी आवश्यक (Cautious)",
+                "అప్రమత్తత / జాగ్రత్త అవసరం (Cautious)",
+                "ಎಚ್ಚರಿಕೆ / ಆರೋಗ್ಯ ಜಾಗರೂಕತೆ ಅಗತ್ಯ (Cautious)",
+                "ജാഗ്രത / ശ്രദ്ധ ആവശ്യമാണ് (Cautious)",
+                "Cautionary / Mindful Care Advised");
+
+        // =========================================================================
+        // 13. VITALITY CLASSIFICATIONS
+        // =========================================================================
+        add("High Resilience & Deerghayu Vitality",
+                "உயர்ந்த சரீர பலம் & தீர்க்காயுள் யோகம்",
+                "उत्कृष्ट शारीरिक जीवन शक्ति एवं दीर्घायु योग",
+                "ఉన్నత శారీరక బలం & దీర్ఘాయుష్షు యోగం",
+                "ಉನ್ನತ ಶಾರೀರಿಕ ಬಲ & ದೀರ್ಘಾಯುಷ್ಯ ಯೋಗ",
+                "ഉയർന്ന ശാരീരിക ബലവും ദീർഘായുസ്സ് യോഗവും",
+                "High Resilience & Deerghayu Vitality");
+
+        add("Robust Sarira & Jeeva Strength",
+                "உறுதியான சரீர & ஜீவ பலம்",
+                "दृढ़ शारीरिक व जीव बल",
+                "దృఢమైన శరీర & జీవ బలం",
+                "ದೃಢವಾದ ಶಾರೀರಿಕ & ಜೀವ ಬಲ",
+                "ദൃഢമായ ശാരീരിക & ജീവ ബലം",
+                "Robust Sarira & Jeeva Strength");
+
+        add("Balanced Constitutional Vitality",
+                "சீரான சரீர ஜீவ பலம்",
+                "संतुलित शारीरिक जीवन शक्ति",
+                "సమతుల్య శారీరక జీవ బలం",
+                "ಸಮತೋಲಿತ ಶಾರೀರಿಕ ಜೀವ ಬಲ",
+                "സന്തുലിത ശാരീരിക ജീവ ബലം",
+                "Balanced Constitutional Vitality");
+
+        add("Moderate Vitality (Mindful Regimen)",
+                "மிதமான ஆயுள் பலம் (சீரான உணவு/பழக்கவழக்கம் தேவை)",
+                "मध्यम जीवन शक्ति (नियमित दिनचर्या आवश्यक)",
+                "మితమైన జీవ బలం (క్రమబద్ధమైన జీవనశైలి అవసరం)",
+                "ಮಧ್ಯಮ ಜೀವ ಬಲ (ಕ್ರಮಬದ್ಧ ಜೀವನಶೈಲಿ ಅಗತ್ಯ)",
+                "മിതമായ ജീവ ബലം (ചിട്ടയായ ദിനചര്യ ആവശ്യം)",
+                "Moderate Vitality (Mindful Regimen)");
+
+        add("Health-Cautious Vitality",
+                "ஆரோக்கிய விழிப்புணர்வு தேவைப்படும் சரீர பலம்",
+                "स्वास्थ्य सतर्कता आवश्यक जीवन शक्ति",
+                "ఆరోగ్య జాగ్రత్త అవసరమైన జీవ బలం",
+                "ಆರೋಗ್ಯ ಜಾಗರೂಕತೆ ಅಗತ್ಯವಿರುವ ಜೀವ ಬಲ",
+                "ആരോഗ്യ ജാഗ്രത ആവശ്യമുള്ള ജീവ ബലം",
+                "Health-Cautious Vitality");
     }
 
     private static void add(String key, String ta, String hi, String te, String kn, String ml, String en) {
@@ -456,22 +602,34 @@ public class AstrologicalTranslationHelper {
         return key;
     }
 
+    public static String translateLagnaLordStrength(String strength, String lang) {
+        if (strength == null || strength.isBlank()) return "";
+        return translate(strength, lang);
+    }
+
+    public static String translateVitalityScore(String score, String lang) {
+        if (score == null || score.isBlank()) return "";
+        return translate(score, lang);
+    }
+
     public static String translateDeity(String deity, String lang) {
         if (deity == null || deity.isBlank()) return "";
         String trans = translate(deity, lang);
-        if (!trans.equals(deity)) return trans;
+        if (!trans.equals(deity) && !"en".equalsIgnoreCase(lang)) return trans;
 
         String lower = deity.toLowerCase();
         if (lower.contains("shiva") || lower.contains("rama")) return translate("Lord Shiva / Lord Rama", lang);
         if (lower.contains("parvati") || lower.contains("gauri") || lower.contains("krishna")) return translate("Goddess Parvati / Goddess Gauri / Lord Krishna", lang);
         if (lower.contains("muruga") || lower.contains("kartikeya") || lower.contains("subramanya") || lower.contains("narasimha")) return translate("Lord Murugan / Lord Narasimha / Kartikeya", lang);
-        if (lower.contains("vishnu") || lower.contains("narayana") || lower.contains("venkateshwara")) return translate("Lord Vishnu / Lord Venkateshwara", lang);
-        if (lower.contains("ganesha") || lower.contains("ganapati")) return translate("Lord Ganesha / Ganapati", lang);
-        if (lower.contains("lakshmi")) return translate("Goddess Mahalakshmi / Goddess Lakshmi", lang);
-        if (lower.contains("hanuman") || lower.contains("bhairava")) return translate("Lord Hanuman / Lord Bhairava / Lord Rudra", lang);
-        if (lower.contains("durga")) return translate("Goddess Durga / Chamundeshwari", lang);
+        if (lower.contains("venkateshwara") || (lower.contains("vishnu") && lower.contains("lord"))) return translate("Lord Vishnu / Lord Venkateshwara", lang);
+        if (lower.contains("dakshinamurthy") || lower.contains("hayagriva")) return translate("Lord Dakshinamurthy / Lord Hayagriva", lang);
+        if (lower.contains("lakshmi") || lower.contains("annapoorn")) return translate("Goddess Maha Lakshmi / Annapoorneshwari", lang);
+        if (lower.contains("hanuman") || lower.contains("ayyappan") || (lower.contains("shani") && lower.contains("deva"))) return translate("Lord Hanuman / Shani Deva / Lord Ayyappan", lang);
+        if (lower.contains("durga") || lower.contains("varahi") || lower.contains("bhadrakali") || lower.contains("chamundeshwari")) return translate("Goddess Durga / Goddess Varahi / Bhadrakali", lang);
+        if (lower.contains("ganesha") || lower.contains("ganapati")) return translate("Lord Ganesha (Maha Ganapati)", lang);
+        if (lower.contains("vishnu")) return translate("Lord Vishnu", lang);
 
-        return deity;
+        return translate(deity, lang);
     }
 
     public static String translateKulaDevata(String remedy, String lang) {
