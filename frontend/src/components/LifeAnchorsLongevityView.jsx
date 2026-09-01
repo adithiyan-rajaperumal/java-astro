@@ -2557,7 +2557,7 @@ export default function LifeAnchorsLongevityView({ chartData, language = 'en' })
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                       <strong style={{ fontSize: '13px', color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        📜 {t('visheshaSutraTitle', language)}: <span style={{ color: '#fff' }}>{translateRule(ruleApplied, language)}</span>
+                        📜 {t('visheshaSutraTitle', language)}: <span style={{ color: 'var(--text-primary)' }}>{translateRule(ruleApplied, language)}</span>
                       </strong>
                       <span style={{
                         fontSize: '11px',
