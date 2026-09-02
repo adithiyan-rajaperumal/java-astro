@@ -25,6 +25,7 @@ const getTodayDateString = (loc) => {
 };
 
 function PanchangamPage({ settings }) {
+  const lang = settings.language;
   const [currentDate, setCurrentDate] = useState(() => getTodayDateString(settings.location));
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -227,7 +228,7 @@ function PanchangamPage({ settings }) {
                 fontWeight: 'bold',
                 cursor: 'pointer'
               }}
-              title="Gowri Panchangam Guide"
+              title={t('gowriGuideTitle', lang) || "Gowri Panchangam Guide"}
             >
               ℹ️
             </button>

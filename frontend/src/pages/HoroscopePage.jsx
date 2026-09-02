@@ -815,7 +815,7 @@ function HoroscopePage({ settings }) {
                     <button
                       onClick={(e) => handleDeleteProfile(e, prof.id)}
                       style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: '12px', padding: 0 }}
-                      title="Delete"
+                      title={t('delete', settings.language) || "Delete"}
                     >
                       ✕
                     </button>

@@ -88,7 +88,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
           value={name}
           onChange={(e) => setName(e.target.value)}
           onClear={() => setName('')}
-          placeholder="Enter name"
+          placeholder={t('namePlaceholder', lang) || "Enter name"}
           required
         />
       </div>
@@ -123,7 +123,7 @@ function BirthForm({ onSubmit, initialValues = {}, submitLabel = 'Submit', lang 
         <LocationSearch
           value={location}
           onChange={setLocation}
-          placeholder="Type city name and select suggestion..."
+          placeholder={t('locationPlaceholder', lang) || "Type city name and select suggestion..."}
         />
       </div>
 

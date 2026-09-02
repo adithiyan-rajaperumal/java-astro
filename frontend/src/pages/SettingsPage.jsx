@@ -50,7 +50,7 @@ function SettingsPage({ settings, onSettingsChange }) {
           onChange={handleLocationChange}
           placeholder={t('searchLocationPlaceholder', settings.language)}
         />
-        {settings.location && (
+        {settings.location && typeof settings.location.latitude === 'number' && typeof settings.location.longitude === 'number' && (
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: '5px' }}>
             {t('currentDefault', settings.language)}: Lat {settings.location.latitude.toFixed(4)}, Lon {settings.location.longitude.toFixed(4)}
           </p>

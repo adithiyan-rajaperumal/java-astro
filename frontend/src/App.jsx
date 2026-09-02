@@ -22,7 +22,16 @@ function App() {
   const [settings, setSettings] = useState(() => {
     try {
       const saved = localStorage.getItem('drikvedic_settings');
-      return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+      if (!saved) return DEFAULT_SETTINGS;
+      const parsed = JSON.parse(saved);
+      return {
+        ...DEFAULT_SETTINGS,
+        ...parsed,
+        location: {
+          ...DEFAULT_SETTINGS.location,
+          ...(parsed.location && typeof parsed.location === 'object' ? parsed.location : {})
+        }
+      };
     } catch {
       return DEFAULT_SETTINGS;
     }
@@ -45,6 +54,10 @@ function App() {
     { id: 'settings', labelKey: 'settings', icon: '⚙️' }
   ];
 
+  const locationDisplay = settings?.location?.label
+    ? settings.location.label.split(',')[0]
+    : (settings?.location?.name || settings?.location?.city || (typeof settings?.location === 'string' ? settings.location : 'Chennai'));
+
   return (
     <>
       {/* Top Navbar */}
@@ -62,7 +75,7 @@ function App() {
               title={t('changeLocation', settings.language) || "Click to change location"}
             >
               <span className="loc-icon">📍</span>
-              <span className="loc-text">{settings.location.label.split(',')[0]}</span>
+              <span className="loc-text">{locationDisplay}</span>
             </button>
           )}
           <select 

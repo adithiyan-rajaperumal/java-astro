@@ -37,8 +37,48 @@ public class SpiritualDeityUtils {
             String dharmaDevataTamil,
             String dharmaDevataRationale,
             String dharmaDevataRationaleTamil,
-            String dharmaDevataRationaleEnglish
-    ) {}
+            String dharmaDevataRationaleEnglish,
+            String palanaDevata,
+            String palanaDevataTamil,
+            String palanaDevataRationale,
+            String palanaDevataRationaleTamil,
+            String palanaDevataRationaleEnglish
+    ) {
+        public SpiritualDeitiesResult(
+                String atmakarakaPlanet,
+                String karakamsaSignD9,
+                String ishtaDevata,
+                String ishtaDevataTamil,
+                String ishtaDevataRationale,
+                String ishtaDevataRationaleTamil,
+                String ishtaDevataRationaleEnglish,
+                String kulaDevataBlessingStatus,
+                String kulaDevataRemedy,
+                String dharmaDevata,
+                String dharmaDevataTamil,
+                String dharmaDevataRationale,
+                String dharmaDevataRationaleTamil,
+                String dharmaDevataRationaleEnglish
+        ) {
+            this(
+                    atmakarakaPlanet,
+                    karakamsaSignD9,
+                    ishtaDevata,
+                    ishtaDevataTamil,
+                    ishtaDevataRationale,
+                    ishtaDevataRationaleTamil,
+                    ishtaDevataRationaleEnglish,
+                    kulaDevataBlessingStatus,
+                    kulaDevataRemedy,
+                    dharmaDevata,
+                    dharmaDevataTamil,
+                    dharmaDevataRationale,
+                    dharmaDevataRationaleTamil,
+                    dharmaDevataRationaleEnglish,
+                    null, null, null, null, null
+            );
+        }
+    }
 
     public static SpiritualDeitiesResult calculateSpiritualDeities(
             Map<String, PlanetaryPosition> d1,
@@ -55,27 +95,29 @@ public class SpiritualDeityUtils {
                     "Lord Vishnu / Lord Venkateshwara", "ஸ்ரீ மகாவிஷ்ணு / வேங்கடாஜலபதி",
                     "Default Dharma Devata anchor",
                     "Default Dharma Devata anchor",
-                    "Default Dharma Devata anchor"
+                    "Default Dharma Devata anchor",
+                    "Lord Vishnu / Lord Venkateshwara", "ஸ்ரீ மகாவிஷ்ணு / வேங்கடாஜலபதி",
+                    "Default Palana Devata anchor",
+                    "Default Palana Devata anchor",
+                    "Default Palana Devata anchor"
             );
         }
 
-        // 1. Identify Atmakaraka (AK) - Planet with highest degree in sign (0-30 deg) among 7 classical planets
+        // 1. Identify Atmakaraka (AK) & Amatyakaraka (AmK)
         String[] classicalPlanets = {"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"};
-        String atmakaraka = "Sun";
-        double maxDegree = -1.0;
-
+        List<Map.Entry<String, Double>> sortedPlanets = new ArrayList<>();
         for (String p : classicalPlanets) {
             PlanetaryPosition pos = d1.get(p);
             if (pos != null) {
-                double deg = pos.getDegreeInSign();
-                if (deg > maxDegree) {
-                    maxDegree = deg;
-                    atmakaraka = p;
-                }
+                sortedPlanets.add(Map.entry(p, pos.getDegreeInSign()));
             }
         }
+        sortedPlanets.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
 
-        // 2. Locate Karakamsa (AK sign in D9 Navamsa)
+        String atmakaraka = sortedPlanets.isEmpty() ? "Sun" : sortedPlanets.get(0).getKey();
+        String amatyakaraka = sortedPlanets.size() > 1 ? sortedPlanets.get(1).getKey() : (atmakaraka.equals("Sun") ? "Moon" : "Sun");
+
+        // 2. Locate Karakamsa (AK sign in D9 Navamsa) & Amatyakaramsa (AmK sign in D9)
         int karakamsaSignNum = 1;
         Map<String, Integer> d9Map = new HashMap<>();
         Map<Integer, List<String>> d9SignToPlanets = new HashMap<>();
@@ -110,6 +152,20 @@ public class SpiritualDeityUtils {
         HouseAnalysis dharmaAnalysis = analyzeKarakamsaHouse(9, ninthSignNum, karakamsaSignNum, d9SignToPlanets);
         String dharmaDevata = mapPlanetToIshtaDevata(dharmaAnalysis.dominantPlanet(), false);
         String dharmaDevataTa = mapPlanetToIshtaDevata(dharmaAnalysis.dominantPlanet(), true);
+
+        // 4b. Palana Devata: 6th House from Amatyakaraka (AmK) in D9 (Palana / Sustenance Sthana)
+        Integer amkD9Sign = d9Map.get(amatyakaraka.toUpperCase());
+        int amkSignNum;
+        if (amkD9Sign != null) {
+            amkSignNum = amkD9Sign;
+        } else {
+            PlanetaryPosition amkPos = d1.get(amatyakaraka);
+            amkSignNum = amkPos != null ? amkPos.getSignNumber() : 1;
+        }
+        int sixthSignNum = ((amkSignNum - 1 + 5) % 12) + 1;
+        HouseAnalysis palanaAnalysis = analyzeKarakamsaHouse(6, sixthSignNum, amkSignNum, d9SignToPlanets);
+        String palanaDevata = mapPlanetToIshtaDevata(palanaAnalysis.dominantPlanet(), false);
+        String palanaDevataTa = mapPlanetToIshtaDevata(palanaAnalysis.dominantPlanet(), true);
 
         // 5. Kula Devata Status: 5th House & 5th Lord in D1 (with Benefic Drishti & Kula Vriddhi rules)
         int lagnaSign = d1.get("Lagna") != null ? d1.get("Lagna").getSignNumber() : 1;
@@ -180,7 +236,12 @@ public class SpiritualDeityUtils {
                 dharmaDevataTa,
                 dharmaAnalysis.rationaleTamil(),
                 dharmaAnalysis.rationaleTamil(),
-                dharmaAnalysis.rationaleEnglish()
+                dharmaAnalysis.rationaleEnglish(),
+                palanaDevata,
+                palanaDevataTa,
+                palanaAnalysis.rationaleTamil(),
+                palanaAnalysis.rationaleTamil(),
+                palanaAnalysis.rationaleEnglish()
         );
     }
 
@@ -206,8 +267,8 @@ public class SpiritualDeityUtils {
         String karakamsaNameTa = RASHIS_TA[karakamsaSignNum - 1];
         String signLord = PlanetDignityUtils.getSignLord(targetSignNum);
         String lordTa = getPlanetNameTamil(signLord);
-        String houseLabelTa = (houseNumber == 12) ? "12-ஆம் வீடான (மோக்ஷ ஸ்தானம்)" : "9-ஆம் வீடான (தர்ம ஸ்தானம்)";
-        String houseLabelEn = (houseNumber == 12) ? "12th house (Moksha Sthana)" : "9th house (Dharma Sthana)";
+        String houseLabelTa = (houseNumber == 12) ? "12-ஆம் வீடான (மோக்ஷ ஸ்தானம்)" : (houseNumber == 9 ? "9-ஆம் வீடான (தர்ம ஸ்தானம்)" : "6-ஆம் வீடான (பாலன ஸ்தானம்)");
+        String houseLabelEn = (houseNumber == 12) ? "12th house (Moksha Sthana)" : (houseNumber == 9 ? "9th house (Dharma Sthana)" : "6th house (Palana Sthana)");
 
         List<String> rawOccupants = d9SignToPlanets.getOrDefault(targetSignNum, Collections.emptyList());
         List<String> occupants = rawOccupants.stream()

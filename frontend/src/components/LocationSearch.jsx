@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 function LocationSearch({ value, onChange, placeholder = 'Search location...' }) {
-  const [query, setQuery] = useState(value?.label || '');
+  const [query, setQuery] = useState(value?.label || value?.name || value?.city || (typeof value === 'string' ? value : ''));
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -9,7 +9,7 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
 
   useEffect(() => {
     if (value) {
-      setQuery(value.label);
+      setQuery(value.label || value.name || value.city || (typeof value === 'string' ? value : ''));
     } else {
       setQuery('');
     }
@@ -30,13 +30,14 @@ function LocationSearch({ value, onChange, placeholder = 'Search location...' })
   }, []);
 
   useEffect(() => {
-    if (!query.trim()) {
+    if (!query || typeof query !== 'string' || !query.trim()) {
       setSuggestions([]);
       setShowDropdown(false);
       return;
     }
 
-    if (value && query === value.label) {
+    const currentLabel = value?.label || value?.name || value?.city || (typeof value === 'string' ? value : '');
+    if (value && query === currentLabel) {
       return;
     }
 
