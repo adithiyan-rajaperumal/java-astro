@@ -20,9 +20,12 @@ public class GeminiProperties {
     private boolean pdfPredictionsEnabled = true;
     private String model = "gemini-3.8-flash";
     private String fallbackModel = "gemini-3.7-flash";
-    private String fallbackModels = "gemini-3.7-flash,gemini-3.6-flash,gemini-3.1-flash-lite";
+    private String fallbackModels = "gemini-3.7-flash,gemini-3.6-flash,gemini-flash-lite-latest,gemini-3.1-flash-lite";
+    private int connectTimeoutMs = 10000;
+    private int readTimeoutMs = 90000;
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
+    private String thinkingLevel = "high";
     private Integer maxOutputTokens; // null means do not set, let API default
     private String forecastMode = "FULL_LIFESPAN";
     private int forecastYears = 0;

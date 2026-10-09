@@ -33,14 +33,21 @@ public class GeminiPredictionService {
     private final DailyPanchangamService dailyPanchangamService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final RestTemplate restTemplate = createRestTemplate();
+    private RestTemplate restTemplate;
 
-    private static RestTemplate createRestTemplate() {
-        org.springframework.http.client.SimpleClientHttpRequestFactory factory =
-                new org.springframework.http.client.SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(10000);
-        factory.setReadTimeout(120000); // 120s (2 minutes) to comfortably support full lifetime AI predictions
-        return new RestTemplate(factory);
+    private synchronized RestTemplate getRestTemplate() {
+        if (restTemplate == null) {
+            int connectTimeout = (geminiProperties != null && geminiProperties.getConnectTimeoutMs() > 0)
+                    ? geminiProperties.getConnectTimeoutMs() : 10000;
+            int readTimeout = (geminiProperties != null && geminiProperties.getReadTimeoutMs() > 0)
+                    ? geminiProperties.getReadTimeoutMs() : 45000;
+            org.springframework.http.client.SimpleClientHttpRequestFactory factory =
+                    new org.springframework.http.client.SimpleClientHttpRequestFactory();
+            factory.setConnectTimeout(connectTimeout);
+            factory.setReadTimeout(readTimeout);
+            this.restTemplate = new RestTemplate(factory);
+        }
+        return this.restTemplate;
     }
 
     public PredictionResponseDTO generateLifePredictions(PredictionRequestDTO req) {
@@ -697,7 +704,9 @@ public class GeminiPredictionService {
             generationConfig.put("maxOutputTokens", geminiProperties.getMaxOutputTokens());
         }
 
-        if (geminiProperties.getThinkingBudget() > 0) {
+        if (geminiProperties.getThinkingLevel() != null && !geminiProperties.getThinkingLevel().trim().isEmpty()) {
+            generationConfig.put("thinkingConfig", Map.of("thinking_level", geminiProperties.getThinkingLevel().trim().toLowerCase()));
+        } else if (geminiProperties.getThinkingBudget() > 0) {
             generationConfig.put("thinkingConfig", Map.of("thinkingBudget", geminiProperties.getThinkingBudget()));
         }
 
@@ -713,19 +722,23 @@ public class GeminiPredictionService {
 
         int maxRetriesPerModel = 2; // Up to 2 attempts with exponential backoff on transient 503 before model failover
         Exception lastException = null;
+        Set<Integer> invalidKeys = new HashSet<>();
+        RestTemplate client = getRestTemplate();
 
-        for (int keyIdx = 0; keyIdx < apiKeys.size(); keyIdx++) {
-            String currentKey = apiKeys.get(keyIdx);
-            boolean keyQuotaExhausted = false;
+        for (int modelIdx = 0; modelIdx < models.size(); modelIdx++) {
+            String currentModel = models.get(modelIdx);
 
-            for (int modelIdx = 0; modelIdx < models.size(); modelIdx++) {
-                String currentModel = models.get(modelIdx);
+            for (int keyIdx = 0; keyIdx < apiKeys.size(); keyIdx++) {
+                if (invalidKeys.contains(keyIdx)) {
+                    continue;
+                }
+                String currentKey = apiKeys.get(keyIdx);
                 String url = "https://generativelanguage.googleapis.com/v1beta/models/" 
                         + currentModel + ":generateContent?key=" + currentKey;
 
                 for (int attempt = 1; attempt <= maxRetriesPerModel; attempt++) {
                     try {
-                        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+                        ResponseEntity<String> response = client.postForEntity(url, entity, String.class);
                         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                             return new GeminiApiResult(response.getBody(), currentModel);
                         }
@@ -736,13 +749,19 @@ public class GeminiPredictionService {
 
                         boolean isHighDemand503 = (statusCode == 503 || statusCode == 500)
                                 && (body.contains("high demand") || body.contains("UNAVAILABLE") || body.contains("overloaded") || body.contains("temporarily"));
-                        boolean isQuotaOrLimit = statusCode == 429 || statusCode == 403
-                                || body.contains("RESOURCE_EXHAUSTED") || body.contains("quota") || body.contains("limit");
+                        boolean isQuotaOrLimit = statusCode == 429
+                                || body.contains("RESOURCE_EXHAUSTED") || body.contains("quota");
+                        boolean isKeyInvalid = (statusCode == 400 && body.contains("API_KEY_INVALID")) || statusCode == 403;
+
+                        if (isKeyInvalid) {
+                            log.warn("API key index {} is invalid or forbidden (status {}). Marking as unusable.", keyIdx, statusCode);
+                            invalidKeys.add(keyIdx);
+                            break; // switch to next key
+                        }
 
                         if (isQuotaOrLimit) {
-                            log.warn("Quota/Rate limit hit on API key index {} (status {}). Switching to backup API key.", keyIdx, statusCode);
-                            keyQuotaExhausted = true;
-                            break; // break retry loop, switch to next key
+                            log.warn("Model '{}' quota reached on API key index {} (status {}). Trying next key/model...", currentModel, keyIdx, statusCode);
+                            break; // break retry loop for this key, try next key for this model (or next model)
                         }
 
                         if (isHighDemand503) {
@@ -758,22 +777,18 @@ public class GeminiPredictionService {
                                 }
                                 continue; // retry same model with backoff
                             } else {
-                                log.warn("Model '{}' high demand persisted after {} attempts. Switching to fallback model...", currentModel, maxRetriesPerModel);
-                                break; // break retry loop, try next fallback model
+                                log.warn("Model '{}' high demand persisted after {} attempts on key index {}. Trying next key/model...", currentModel, maxRetriesPerModel, keyIdx);
+                                break; // break retry loop, try next key or fallback model
                             }
                         }
 
                         log.warn("Gemini API call failed with status {} on model '{}', key index {}: {}", statusCode, currentModel, keyIdx, e.getMessage());
-                        break; // non-503, non-quota error: break retry loop, try next model
+                        break; // non-503, non-quota error: break retry loop
                     } catch (Exception e) {
                         lastException = e;
-                        log.warn("Gemini API call encountered exception on model '{}', key index {}: {}", currentModel, keyIdx, e.getMessage());
-                        break;
+                        log.warn("Gemini API call encountered exception on model '{}', key index {}: {}. Trying next candidate...", currentModel, keyIdx, e.getMessage());
+                        break; // socket timeout or I/O exception: break retry loop, try next key/model immediately
                     }
-                }
-
-                if (keyQuotaExhausted) {
-                    break; // break model loop to switch key
                 }
             }
         }
