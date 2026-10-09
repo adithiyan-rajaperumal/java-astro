@@ -126,7 +126,7 @@ function AiMatchingView({ aiData, loading, onGenerate, language = 'en' }) {
               {(aiData.tokenUsage.estimatedCostUsd > 0 || aiData.tokenUsage.estimatedCostInr > 0) && (
                 <span>💵 <strong>₹{aiData.tokenUsage.estimatedCostInr?.toFixed(2)}</strong></span>
               )}
-              <span>🤖 <code style={{ color: 'var(--accent-saffron)' }}>{aiData.tokenUsage.modelUsed || 'gemini-3.7-flash'}</code></span>
+              <span>🤖 <code style={{ color: 'var(--accent-saffron)' }}>{aiData.tokenUsage.modelUsed || 'gemini-3.8-flash'}</code></span>
             </>
           )}
         </div>
@@ -336,7 +336,7 @@ function AiMatchingView({ aiData, loading, onGenerate, language = 'en' }) {
       {/* Token Usage Footer */}
       {aiData.tokenUsage && (
         <div style={{ textAlign: 'right', fontSize: '11px', color: 'var(--text-secondary)', marginTop: '10px' }}>
-          ⚡ Powered by Google Gemini ({aiData.tokenUsage.modelUsed || 'gemini-3.7-flash'}) • Tokens: {aiData.tokenUsage.totalTokens} • Cost: ₹{aiData.tokenUsage.estimatedCostInr?.toFixed(2) || '0.00'}
+          ⚡ Powered by Google Gemini ({aiData.tokenUsage.modelUsed || 'gemini-3.8-flash'}) • Tokens: {aiData.tokenUsage.totalTokens} • Cost: ₹{aiData.tokenUsage.estimatedCostInr?.toFixed(2) || '0.00'}
         </div>
       )}
     </div>

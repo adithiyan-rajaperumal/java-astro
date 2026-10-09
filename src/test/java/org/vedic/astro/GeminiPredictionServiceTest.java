@@ -865,13 +865,15 @@ public class GeminiPredictionServiceTest {
 
     @Test
     public void testModelDefaultAndMultiKeyFailoverProperties() {
-        assertEquals("gemini-3.7-flash", geminiProperties.getModel());
-        assertEquals("gemini-3.6-flash", geminiProperties.getFallbackModel());
+        assertEquals("gemini-3.8-flash", geminiProperties.getModel());
+        assertEquals("gemini-3.7-flash", geminiProperties.getFallbackModel());
 
         List<String> activeModels = geminiProperties.getResolvedModels();
-        assertEquals(2, activeModels.size());
-        assertEquals("gemini-3.7-flash", activeModels.get(0));
-        assertEquals("gemini-3.6-flash", activeModels.get(1));
+        assertTrue(activeModels.size() >= 4);
+        assertEquals("gemini-3.8-flash", activeModels.get(0));
+        assertEquals("gemini-3.7-flash", activeModels.get(1));
+        assertEquals("gemini-3.6-flash", activeModels.get(2));
+        assertEquals("gemini-3.1-flash-lite", activeModels.get(3));
 
         org.vedic.astro.config.GeminiProperties testProps = new org.vedic.astro.config.GeminiProperties();
         testProps.setApiKey("primary-key-123");
@@ -882,5 +884,42 @@ public class GeminiPredictionServiceTest {
         assertEquals("primary-key-123", resolved.get(0));
         assertEquals("backup-key-456", resolved.get(1));
         assertEquals("primary-key-123", testProps.getResolvedApiKey());
+    }
+
+    @Test
+    public void testFallbackModelsChainDeduplication() {
+        org.vedic.astro.config.GeminiProperties testProps = new org.vedic.astro.config.GeminiProperties();
+        testProps.setModel("gemini-3.8-flash");
+        testProps.setFallbackModel("gemini-3.7-flash");
+        testProps.setFallbackModels("gemini-3.7-flash, gemini-3.6-flash, gemini-3.1-flash-lite, gemini-3.8-flash");
+
+        List<String> resolved = testProps.getResolvedModels();
+        assertEquals(4, resolved.size());
+        assertEquals("gemini-3.8-flash", resolved.get(0));
+        assertEquals("gemini-3.7-flash", resolved.get(1));
+        assertEquals("gemini-3.6-flash", resolved.get(2));
+        assertEquals("gemini-3.1-flash-lite", resolved.get(3));
+    }
+
+    @Test
+    public void testLiveDailyBalanCallWithRetryAndFallback() {
+        if (!geminiProperties.isDailyBalanEnabled()) return;
+        BirthDetailsDTO birth = new BirthDetailsDTO("TestNative", 1995, 7, 19, 13, 10, 0, 12.9165, 79.1325, "LAHIRI");
+        ChartUiResponseDTO chart = ChartUiResponseDTO.builder()
+                .birthProfile(ChartResponseDTO.BirthProfile.builder().lagna("Tula").rashi("Mesha").nakshatra("Bharani").build())
+                .currentDasaTimeline(java.util.Collections.emptyList())
+                .build();
+        DailyBalanRequestDTO req = DailyBalanRequestDTO.builder()
+                .birthDetails(birth)
+                .chartData(chart)
+                .targetDate(LocalDate.now().toString())
+                .language("en")
+                .forceRefresh(true)
+                .build();
+        DailyBalanDTO balan = predictionService.generateDailyBalan(req);
+        assertNotNull(balan);
+        assertTrue(balan.isEnabled(), "Expected AI daily balan to succeed with new model and retry logic, but got: " + balan.getMessage());
+        assertNotNull(balan.getDailyNarrative());
+        assertFalse(balan.getDailyNarrative().isEmpty());
     }
 }
