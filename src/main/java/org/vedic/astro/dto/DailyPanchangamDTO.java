@@ -38,7 +38,8 @@ public record DailyPanchangamDTO(
     boolean adverseNityaYoga,
     boolean isPurattasiOrAadi,
     String muhurthamWindow,
-    String adverseYogaAvoidWindow
+    String adverseYogaAvoidWindow,
+    boolean thithiSoonyaBhanga
 ) {
     // Backwards-compatible constructor for existing tests
     public DailyPanchangamDTO(
@@ -76,7 +77,7 @@ public record DailyPanchangamDTO(
             nallaNeram, gowriNallaNeram, nakshatraYogams, raghuKalam, emagandam, kulikai, horais,
             abhijitMuhurtham, chandrastamamNakshatras, netram, jeevan, muhurthamDay,
             vasthuDay, vasthuAuspicious, agniNakshathiram, isTheiPirai, vasthuNeram, vasthuPujaNeram,
-            false, false, false, false, false, false, null, null
+            false, false, false, false, false, false, null, null, false
         );
     }
     public record PanchangamElementDTO(

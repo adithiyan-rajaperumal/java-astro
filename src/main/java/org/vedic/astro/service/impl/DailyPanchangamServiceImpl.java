@@ -352,6 +352,12 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 && isAuspiciousNakVaraYogam
                 && (netram > 0 && jeevan > 0.0);
 
+        // Thithi Soonya Bhanga (Nullification):
+        // In classical Vedic Muhurtha Shastra, when a day possesses an auspicious Nakshatra with Amrita or Siddha Yogam,
+        // and positive Netram (>=1) and Jeevan (>0), the stellar energy completely nullifies (Bhanga / Nivrutti)
+        // the generic voidness of the Rashi for daytime auspicious ceremonies.
+        boolean thithiSoonyaBhanga = isThithiSoonya && isMuhurthamDay;
+
         // Muhurtham Timing Window Resolution
         String muhurthamWindow = null;
         if (isMuhurthamDay) {
@@ -432,7 +438,8 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             isAdverseNityaYoga,
             isPurattasiOrAadi,
             muhurthamWindow,
-            adverseYogaAvoidWindow
+            adverseYogaAvoidWindow,
+            thithiSoonyaBhanga
         );
     }
 

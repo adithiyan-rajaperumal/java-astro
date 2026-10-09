@@ -542,7 +542,12 @@ function PanchangamPage({ settings }) {
                         ⚠️ <strong>{(t('adverseYogaCaution', settings.language) || '').replace('{time}', data.adverseYogaAvoidWindow || '')}</strong>
                       </div>
                     )}
-                    {data.thithiSoonya && (
+                    {data.thithiSoonya && data.thithiSoonyaBhanga && (
+                      <div style={{ background: '#e8f5e9', border: '1px solid #c8e6c9', color: '#2e7d32', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        ✓ <strong>{t('thithiSoonyaNivrutti', settings.language)}</strong>
+                      </div>
+                    )}
+                    {data.thithiSoonya && !data.thithiSoonyaBhanga && (
                       <div style={{ background: '#f5f5f5', border: '1px solid #e0e0e0', color: '#555555', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
                         🌑 <strong>{t('thithiSoonyaCaution', settings.language)}</strong>
                       </div>

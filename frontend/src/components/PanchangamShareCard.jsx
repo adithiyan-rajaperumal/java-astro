@@ -209,7 +209,12 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
               ⚠️ {(t('adverseYogaCaution', lang) || '').replace('{time}', data.adverseYogaAvoidWindow || '')}
             </div>
           )}
-          {data.thithiSoonya && (
+          {data.thithiSoonya && data.thithiSoonyaBhanga && (
+            <div style={{ background: '#e8f5e9', border: '1px solid #c8e6c9', color: '#2e7d32', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
+              ✓ {t('thithiSoonyaNivrutti', lang)}
+            </div>
+          )}
+          {data.thithiSoonya && !data.thithiSoonyaBhanga && (
             <div style={{ background: '#f5f5f5', border: '1px solid #e0e0e0', color: '#555555', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
               🌑 {t('thithiSoonyaCaution', lang)}
             </div>
