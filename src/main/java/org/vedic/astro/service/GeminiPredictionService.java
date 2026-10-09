@@ -33,7 +33,15 @@ public class GeminiPredictionService {
     private final DailyPanchangamService dailyPanchangamService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = createRestTemplate();
+
+    private static RestTemplate createRestTemplate() {
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory =
+                new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(10000);
+        factory.setReadTimeout(120000); // 120s (2 minutes) to comfortably support full lifetime AI predictions
+        return new RestTemplate(factory);
+    }
 
     public PredictionResponseDTO generateLifePredictions(PredictionRequestDTO req) {
         if (req == null || req.getBirthDetails() == null || req.getChartData() == null) {
@@ -703,69 +711,70 @@ public class GeminiPredictionService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-        int currentKeyIndex = 0;
-        int currentModelIndex = 0;
+        int maxRetriesPerModel = 2; // Up to 2 attempts with exponential backoff on transient 503 before model failover
         Exception lastException = null;
 
-        while (currentModelIndex < models.size() && currentKeyIndex < apiKeys.size()) {
-            String currentModel = models.get(currentModelIndex);
-            String currentKey = apiKeys.get(currentKeyIndex);
-            String url = "https://generativelanguage.googleapis.com/v1beta/models/" 
-                    + currentModel + ":generateContent?key=" + currentKey;
+        for (int keyIdx = 0; keyIdx < apiKeys.size(); keyIdx++) {
+            String currentKey = apiKeys.get(keyIdx);
+            boolean keyQuotaExhausted = false;
 
-            try {
-                ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-                if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                    return new GeminiApiResult(response.getBody(), currentModel);
-                }
-            } catch (org.springframework.web.client.HttpStatusCodeException e) {
-                lastException = e;
-                int statusCode = e.getStatusCode().value();
-                String body = e.getResponseBodyAsString();
+            for (int modelIdx = 0; modelIdx < models.size(); modelIdx++) {
+                String currentModel = models.get(modelIdx);
+                String url = "https://generativelanguage.googleapis.com/v1beta/models/" 
+                        + currentModel + ":generateContent?key=" + currentKey;
 
-                boolean isHighDemand503 = (statusCode == 503 || statusCode == 500)
-                        && (body.contains("high demand") || body.contains("UNAVAILABLE") || body.contains("temporarily"));
-                boolean isQuotaOrLimit = statusCode == 429 || statusCode == 403
-                        || body.contains("RESOURCE_EXHAUSTED") || body.contains("quota") || body.contains("limit");
+                for (int attempt = 1; attempt <= maxRetriesPerModel; attempt++) {
+                    try {
+                        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+                        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                            return new GeminiApiResult(response.getBody(), currentModel);
+                        }
+                    } catch (org.springframework.web.client.HttpStatusCodeException e) {
+                        lastException = e;
+                        int statusCode = e.getStatusCode().value();
+                        String body = e.getResponseBodyAsString();
 
-                if (isHighDemand503) {
-                    log.warn("Model '{}' is experiencing high demand (status 503). Switching to fallback model without changing API key.", currentModel);
-                    if (currentModelIndex < models.size() - 1) {
-                        currentModelIndex++;
-                        log.info("Trying next model: '{}' with current API key (index {})...", models.get(currentModelIndex), currentKeyIndex);
-                        continue;
-                    }
-                } else if (isQuotaOrLimit) {
-                    log.warn("Quota/Rate limit hit on API key index {} (status {}). Switching to backup API key.", currentKeyIndex, statusCode);
-                    if (currentKeyIndex < apiKeys.size() - 1) {
-                        currentKeyIndex++;
-                        log.info("Trying backup API key (index {}) with model '{}'...", currentKeyIndex, currentModel);
-                        continue;
-                    }
-                } else {
-                    log.warn("Gemini API call failed with status {} on model '{}', key index {}: {}", statusCode, currentModel, currentKeyIndex, e.getMessage());
-                    if (currentModelIndex < models.size() - 1) {
-                        currentModelIndex++;
-                        log.info("Trying fallback model: '{}' with current API key...", models.get(currentModelIndex));
-                        continue;
-                    } else if (currentKeyIndex < apiKeys.size() - 1) {
-                        currentKeyIndex++;
-                        log.info("Trying backup API key (index {})...", currentKeyIndex);
-                        continue;
+                        boolean isHighDemand503 = (statusCode == 503 || statusCode == 500)
+                                && (body.contains("high demand") || body.contains("UNAVAILABLE") || body.contains("overloaded") || body.contains("temporarily"));
+                        boolean isQuotaOrLimit = statusCode == 429 || statusCode == 403
+                                || body.contains("RESOURCE_EXHAUSTED") || body.contains("quota") || body.contains("limit");
+
+                        if (isQuotaOrLimit) {
+                            log.warn("Quota/Rate limit hit on API key index {} (status {}). Switching to backup API key.", keyIdx, statusCode);
+                            keyQuotaExhausted = true;
+                            break; // break retry loop, switch to next key
+                        }
+
+                        if (isHighDemand503) {
+                            if (attempt < maxRetriesPerModel) {
+                                long backoffMs = attempt * 1200L;
+                                log.warn("Model '{}' is experiencing high demand (status {}). Retrying in {}ms (attempt {}/{})...",
+                                        currentModel, statusCode, backoffMs, attempt, maxRetriesPerModel);
+                                try {
+                                    Thread.sleep(backoffMs);
+                                } catch (InterruptedException ie) {
+                                    Thread.currentThread().interrupt();
+                                    throw new RuntimeException("API retry interrupted", ie);
+                                }
+                                continue; // retry same model with backoff
+                            } else {
+                                log.warn("Model '{}' high demand persisted after {} attempts. Switching to fallback model...", currentModel, maxRetriesPerModel);
+                                break; // break retry loop, try next fallback model
+                            }
+                        }
+
+                        log.warn("Gemini API call failed with status {} on model '{}', key index {}: {}", statusCode, currentModel, keyIdx, e.getMessage());
+                        break; // non-503, non-quota error: break retry loop, try next model
+                    } catch (Exception e) {
+                        lastException = e;
+                        log.warn("Gemini API call encountered exception on model '{}', key index {}: {}", currentModel, keyIdx, e.getMessage());
+                        break;
                     }
                 }
-                break;
-            } catch (Exception e) {
-                lastException = e;
-                log.warn("Gemini API call encountered exception on model '{}', key index {}: {}", currentModel, currentKeyIndex, e.getMessage());
-                if (currentModelIndex < models.size() - 1) {
-                    currentModelIndex++;
-                    continue;
-                } else if (currentKeyIndex < apiKeys.size() - 1) {
-                    currentKeyIndex++;
-                    continue;
+
+                if (keyQuotaExhausted) {
+                    break; // break model loop to switch key
                 }
-                break;
             }
         }
 
@@ -791,7 +800,7 @@ public class GeminiPredictionService {
                 int completionTokens = usageNode.path("candidatesTokenCount").asInt(0);
                 int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
 
-                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
+                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.8-flash");
                 double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
                 double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
 
@@ -876,7 +885,7 @@ public class GeminiPredictionService {
                 int completionTokens = usageNode.path("candidatesTokenCount").asInt(0);
                 int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
 
-                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
+                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.8-flash");
                 double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
                 double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
 
@@ -1839,7 +1848,7 @@ public class GeminiPredictionService {
                     int candidatesTokens = usage.path("candidatesTokenCount").asInt(0);
                     int totalTokens = usage.path("totalTokenCount").asInt(promptTokens + candidatesTokens);
 
-                    String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
+                    String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.8-flash");
                     double costUsd = ((promptTokens / 1_000_000.0) * 0.15) + ((candidatesTokens / 1_000_000.0) * 0.60);
                     double costInr = costUsd * 86.50;
 

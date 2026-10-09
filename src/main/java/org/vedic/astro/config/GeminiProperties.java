@@ -18,8 +18,9 @@ public class GeminiProperties {
     private boolean dailyBalanEnabled = true;
     private boolean matchingEnabled = true;
     private boolean pdfPredictionsEnabled = true;
-    private String model = "gemini-3.7-flash";
-    private String fallbackModel = "gemini-3.6-flash";
+    private String model = "gemini-3.8-flash";
+    private String fallbackModel = "gemini-3.7-flash";
+    private String fallbackModels = "gemini-3.7-flash,gemini-3.6-flash,gemini-3.1-flash-lite";
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
     private Integer maxOutputTokens; // null means do not set, let API default
@@ -34,8 +35,16 @@ public class GeminiProperties {
         if (fallbackModel != null && !fallbackModel.trim().isEmpty() && !models.contains(fallbackModel.trim())) {
             models.add(fallbackModel.trim());
         }
+        if (fallbackModels != null && !fallbackModels.trim().isEmpty()) {
+            for (String m : fallbackModels.split(",")) {
+                String trimmed = m.trim();
+                if (!trimmed.isEmpty() && !models.contains(trimmed)) {
+                    models.add(trimmed);
+                }
+            }
+        }
         if (models.isEmpty()) {
-            models.add("gemini-3.7-flash");
+            models.add("gemini-3.8-flash");
         }
         return models;
     }
