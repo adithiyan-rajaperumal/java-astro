@@ -25,6 +25,7 @@ public class GeminiProperties {
     private int readTimeoutMs = 90000;
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
+    private String thinkingLevel = "high";
     private Integer maxOutputTokens; // null means do not set, let API default
     private String forecastMode = "FULL_LIFESPAN";
     private int forecastYears = 0;

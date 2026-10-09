@@ -704,7 +704,9 @@ public class GeminiPredictionService {
             generationConfig.put("maxOutputTokens", geminiProperties.getMaxOutputTokens());
         }
 
-        if (geminiProperties.getThinkingBudget() > 0) {
+        if (geminiProperties.getThinkingLevel() != null && !geminiProperties.getThinkingLevel().trim().isEmpty()) {
+            generationConfig.put("thinkingConfig", Map.of("thinking_level", geminiProperties.getThinkingLevel().trim().toLowerCase()));
+        } else if (geminiProperties.getThinkingBudget() > 0) {
             generationConfig.put("thinkingConfig", Map.of("thinkingBudget", geminiProperties.getThinkingBudget()));
         }
 
