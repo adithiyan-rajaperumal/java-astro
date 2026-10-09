@@ -348,8 +348,6 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 && isAuspiciousKaranam
                 && isAuspiciousMonth
                 && !isSankrantiDay
-                && !isGuruMoudhya
-                && !isSukraMoudhya
                 && !isNityaYogaMahadosha
                 && isAuspiciousNakVaraYogam
                 && (netram > 0 && jeevan > 0.0);
@@ -388,21 +386,9 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
                 }
             }
 
-            if (startTimeStr != null && endTimeStr != null) {
-                muhurthamWindow = startTimeStr + " - " + endTimeStr;
-            } else if (startTimeStr != null) {
-                String pattern = translationService.getLabel("panchangam.after_time_pattern", startTimeStr);
-                if (pattern == null || pattern.startsWith("panchangam.")) pattern = "After " + startTimeStr;
-                muhurthamWindow = pattern;
-            } else if (endTimeStr != null) {
-                String pattern = translationService.getLabel("panchangam.until_time_pattern", endTimeStr);
-                if (pattern == null || pattern.startsWith("panchangam.")) pattern = "Until " + endTimeStr;
-                muhurthamWindow = pattern;
-            } else {
-                String throughoutDayLabel = translationService.getLabel("panchangam.throughout_day");
-                if (throughoutDayLabel == null || throughoutDayLabel.startsWith("panchangam.")) throughoutDayLabel = "Throughout the day";
-                muhurthamWindow = throughoutDayLabel;
-            }
+            String effectiveStart = (startTimeStr != null) ? startTimeStr : sunriseStr;
+            String effectiveEnd = (endTimeStr != null) ? endTimeStr : sunsetStr;
+            muhurthamWindow = effectiveStart + " - " + effectiveEnd;
         }
 
         // Vasthu Result

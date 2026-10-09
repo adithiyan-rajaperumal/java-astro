@@ -102,12 +102,10 @@ public class Panchangam120DaysChennaiValidationTest {
 
             if (dto.guruMoudhya()) {
                 guruMoudhyaCount++;
-                assertFalse(dto.muhurthamDay(), "Guru Moudhya day must NOT be a Subha Muhurtham day on: " + currentDate);
             }
 
             if (dto.sukraMoudhya()) {
                 sukraMoudhyaCount++;
-                assertFalse(dto.muhurthamDay(), "Sukra Moudhya day must NOT be a Subha Muhurtham day on: " + currentDate);
             }
 
             if (dto.thithiSoonya()) {

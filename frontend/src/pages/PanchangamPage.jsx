@@ -487,9 +487,9 @@ function PanchangamPage({ settings }) {
 
               <div className="element-detail-item" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                  <div style={{ color: data.muhurthamDay ? ((data.isPurattasiOrAadi || data.isTheiPirai) ? '#e65100' : 'var(--success)') : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px', lineHeight: '1.5', wordBreak: 'break-word' }}>
+                  <div style={{ color: data.muhurthamDay ? ((data.isPurattasiOrAadi || data.isTheiPirai || data.guruMoudhya || data.sukraMoudhya) ? '#e65100' : 'var(--success)') : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px', lineHeight: '1.5', wordBreak: 'break-word' }}>
                     {data.muhurthamDay 
-                      ? ((data.isPurattasiOrAadi || data.isTheiPirai) ? '⚠️ ' : '✅ ') + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.isPurattasiOrAadi ? ` ⚠️` : (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : ''))
+                      ? ((data.isPurattasiOrAadi || data.isTheiPirai || data.guruMoudhya || data.sukraMoudhya) ? '⚠️ ' : '✅ ') + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.sukraMoudhya ? ` ⚠️` : (data.guruMoudhya ? ` ⚠️` : (data.isPurattasiOrAadi ? ` ⚠️` : (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : ''))))
                       : '❌ ' + t('inauspiciousDay', settings.language)}
                   </div>
 
@@ -535,7 +535,7 @@ function PanchangamPage({ settings }) {
                 </div>
 
                 {/* Subha Muhurtham Guidance & Caution Banners */}
-                {data.muhurthamDay && (data.adverseNityaYoga || data.thithiSoonya || data.isPurattasiOrAadi) && (
+                {data.muhurthamDay && (data.adverseNityaYoga || data.thithiSoonya || data.isPurattasiOrAadi || data.guruMoudhya || data.sukraMoudhya) && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
                     {data.adverseNityaYoga && (
                       <div style={{ background: '#fff8e1', border: '1px solid #ffe082', color: '#8d6e03', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
@@ -550,6 +550,16 @@ function PanchangamPage({ settings }) {
                     {data.isPurattasiOrAadi && (
                       <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
                         ℹ️ <strong>{t('purattasiAadiCaution', settings.language)}</strong>
+                      </div>
+                    )}
+                    {data.guruMoudhya && (
+                      <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        ⚠️ <strong>{t('guruMoudhyaCaution', settings.language)}</strong>
+                      </div>
+                    )}
+                    {data.sukraMoudhya && (
+                      <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 10px', borderRadius: '8px', fontSize: '12px', lineHeight: '1.4' }}>
+                        ⚠️ <strong>{t('sukraMoudhyaCaution', settings.language)}</strong>
                       </div>
                     )}
                   </div>
@@ -628,12 +638,16 @@ function PanchangamPage({ settings }) {
                       padding: '3px 8px',
                       borderRadius: '12px',
                       fontWeight: 'bold',
-                      backgroundColor: (data.isPurattasiOrAadi || data.isTheiPirai) ? 'rgba(237, 108, 2, 0.15)' : 'rgba(76, 175, 80, 0.2)',
-                      color: (data.isPurattasiOrAadi || data.isTheiPirai) ? '#e65100' : '#2e7d32'
+                      backgroundColor: (data.isPurattasiOrAadi || data.isTheiPirai || data.guruMoudhya || data.sukraMoudhya) ? 'rgba(237, 108, 2, 0.15)' : 'rgba(76, 175, 80, 0.2)',
+                      color: (data.isPurattasiOrAadi || data.isTheiPirai || data.guruMoudhya || data.sukraMoudhya) ? '#e65100' : '#2e7d32'
                     }}>
                       {data.isPurattasiOrAadi 
                         ? `⚠️ ${t('purattasiAadiCaution', settings.language)}`
-                        : (data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', settings.language)}` : `✓ ${t('auspicious', settings.language)}`)}
+                        : (data.sukraMoudhya
+                            ? `⚠️ ${t('sukraMoudhya', settings.language)}`
+                            : (data.guruMoudhya
+                                ? `⚠️ ${t('guruMoudhya', settings.language)}`
+                                : (data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', settings.language)}` : `✓ ${t('auspicious', settings.language)}`)))}
                     </span>
                   </div>
                   <div style={{ fontSize: '13.5px', color: 'var(--text-primary)', fontWeight: 'bold' }}>

@@ -154,9 +154,9 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
         fontSize: '15px',
         fontWeight: 'bold'
       }}>
-        <div style={{ color: data.muhurthamDay ? ((data.isPurattasiOrAadi || data.isTheiPirai) ? '#d84315' : '#2e7d32') : '#c62828' }}>
+        <div style={{ color: data.muhurthamDay ? ((data.isPurattasiOrAadi || data.isTheiPirai || data.guruMoudhya || data.sukraMoudhya) ? '#d84315' : '#2e7d32') : '#c62828' }}>
           {data.muhurthamDay 
-            ? ((data.isPurattasiOrAadi || data.isTheiPirai) ? '⚠️ ' : '✅ ') + (t('subhaMuhurtham', lang) || t('auspiciousDay', lang)) + (data.isPurattasiOrAadi ? ` ⚠️` : (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', lang)}` : ''))
+            ? ((data.isPurattasiOrAadi || data.isTheiPirai || data.guruMoudhya || data.sukraMoudhya) ? '⚠️ ' : '✅ ') + (t('subhaMuhurtham', lang) || t('auspiciousDay', lang)) + (data.sukraMoudhya ? ` ⚠️` : (data.guruMoudhya ? ` ⚠️` : (data.isPurattasiOrAadi ? ` ⚠️` : (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', lang)}` : ''))))
             : '❌ ' + t('inauspiciousDay', lang)}
         </div>
 
@@ -202,7 +202,7 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
       </div>
 
       {/* Subha Muhurtham Guidance & Caution Banners */}
-      {data.muhurthamDay && (data.adverseNityaYoga || data.thithiSoonya || data.isPurattasiOrAadi) && (
+      {data.muhurthamDay && (data.adverseNityaYoga || data.thithiSoonya || data.isPurattasiOrAadi || data.guruMoudhya || data.sukraMoudhya) && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px' }}>
           {data.adverseNityaYoga && (
             <div style={{ background: '#fff8e1', border: '1px solid #ffe082', color: '#8d6e03', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
@@ -217,6 +217,16 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
           {data.isPurattasiOrAadi && (
             <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
               ℹ️ {t('purattasiAadiCaution', lang)}
+            </div>
+          )}
+          {data.guruMoudhya && (
+            <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
+              ⚠️ {t('guruMoudhyaCaution', lang)}
+            </div>
+          )}
+          {data.sukraMoudhya && (
+            <div style={{ background: '#fff3e0', border: '1px solid #ffe0b2', color: '#e65100', padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}>
+              ⚠️ {t('sukraMoudhyaCaution', lang)}
             </div>
           )}
         </div>
@@ -279,12 +289,16 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
                 padding: '2px 8px',
                 borderRadius: '12px',
                 fontWeight: 'bold',
-                backgroundColor: (data.isPurattasiOrAadi || data.isTheiPirai) ? '#ffe0b2' : '#c8e6c9',
-                color: (data.isPurattasiOrAadi || data.isTheiPirai) ? '#e65100' : '#2e7d32'
+                backgroundColor: (data.isPurattasiOrAadi || data.isTheiPirai || data.guruMoudhya || data.sukraMoudhya) ? '#ffe0b2' : '#c8e6c9',
+                color: (data.isPurattasiOrAadi || data.isTheiPirai || data.guruMoudhya || data.sukraMoudhya) ? '#e65100' : '#2e7d32'
               }}>
                 {data.isPurattasiOrAadi 
                   ? `⚠️ ${t('purattasiAadiCaution', lang)}`
-                  : (data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', lang)}` : `✓ ${t('auspicious', lang)}`)}
+                  : (data.sukraMoudhya
+                      ? `⚠️ ${t('sukraMoudhya', lang)}`
+                      : (data.guruMoudhya
+                          ? `⚠️ ${t('guruMoudhya', lang)}`
+                          : (data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', lang)}` : `✓ ${t('auspicious', lang)}`)))}
               </span>
             </div>
             <div style={{ fontSize: '14px', color: '#37474f', fontWeight: 'bold' }}>
