@@ -321,7 +321,7 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
         double jupiterLong = getPlanetLongitude(jdSunrise, SweConst.SE_JUPITER, ayanamsaType);
         double venusLong = getPlanetLongitude(jdSunrise, SweConst.SE_VENUS, ayanamsaType);
         boolean isGuruMoudhya = Math.abs(angularDiff(sunLong, jupiterLong)) < 11.0;
-        boolean isSukraMoudhya = Math.abs(angularDiff(sunLong, venusLong)) < 8.0;
+        boolean isSukraMoudhya = isSukraCombust(jdSunrise, sunLong, ayanamsaType);
 
         // Thithi Soonya (Dagda Rashi) Validation on daytime Thithi
         boolean isThithiSoonya = isMoonInThithiSoonya(daytimeThithiIdx, rashiNum);
@@ -581,6 +581,21 @@ public class DailyPanchangamServiceImpl implements DailyPanchangamService {
             }
         }
         return false;
+    }
+
+    private boolean isSukraCombust(double jd, double sunLong, org.vedic.astro.model.AyanamsaType ayanamsaType) {
+        int calculationFlags = SweConst.SEFLG_SWIEPH | SweConst.SEFLG_SIDEREAL | SweConst.SEFLG_SPEED;
+        double[] xx = new double[6];
+        StringBuffer serr = new StringBuffer();
+        synchronized (swissEph) {
+            ayanamsaType.applyTo(swissEph);
+            swissEph.swe_calc_ut(jd, SweConst.SE_VENUS, calculationFlags, xx, serr);
+            double venusLong = (xx[0] + 360.0) % 360.0;
+            double diff = Math.abs(angularDiff(sunLong, venusLong));
+            boolean isRetrograde = xx[3] < 0;
+            double limit = isRetrograde ? 8.0 : 10.0;
+            return diff < limit;
+        }
     }
 
     private double getPlanetLongitude(double jd, int planetConst, org.vedic.astro.model.AyanamsaType ayanamsaType) {
