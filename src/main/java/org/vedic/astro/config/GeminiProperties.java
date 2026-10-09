@@ -22,7 +22,7 @@ public class GeminiProperties {
     private String fallbackModel = "gemini-3.7-flash";
     private String fallbackModels = "gemini-3.7-flash,gemini-3.6-flash,gemini-flash-lite-latest,gemini-3.1-flash-lite";
     private int connectTimeoutMs = 10000;
-    private int readTimeoutMs = 90000;
+    private int readTimeoutMs = 45000;
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
     private String thinkingLevel = "high";
