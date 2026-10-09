@@ -487,9 +487,9 @@ function PanchangamPage({ settings }) {
 
               <div className="element-detail-item" style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                  <div style={{ color: data.muhurthamDay ? (data.isTheiPirai ? '#e65100' : 'var(--success)') : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px', lineHeight: '1.5', wordBreak: 'break-word' }}>
+                  <div style={{ color: data.muhurthamDay ? ((data.isPurattasiOrAadi || data.isTheiPirai) ? '#e65100' : 'var(--success)') : 'var(--danger)', fontWeight: 'bold', fontSize: '13.5px', lineHeight: '1.5', wordBreak: 'break-word' }}>
                     {data.muhurthamDay 
-                      ? '✅ ' + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.muhurthamWindow ? ` (${formatMuhurthamWindow(data.muhurthamWindow, settings.language)})` : '') + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : '')
+                      ? ((data.isPurattasiOrAadi || data.isTheiPirai) ? '⚠️ ' : '✅ ') + (t('subhaMuhurtham', settings.language) || t('auspiciousDay', settings.language)) + (data.isPurattasiOrAadi ? ` ⚠️` : (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', settings.language)}` : ''))
                       : '❌ ' + t('inauspiciousDay', settings.language)}
                   </div>
 
@@ -610,6 +610,37 @@ function PanchangamPage({ settings }) {
             {/* Card 3: Auspicious Timings Card */}
             <div className="card" style={{ margin: 0, borderLeft: '4px solid var(--accent-gold)' }}>
               <h3 className="title-gold" style={{ marginTop: 0 }}>🌟 {t('auspicious', settings.language)}</h3>
+              {data.muhurthamDay && data.muhurthamWindow && (
+                <div style={{
+                  marginBottom: '14px',
+                  padding: '12px',
+                  backgroundColor: 'rgba(255, 215, 0, 0.09)',
+                  borderRadius: '10px',
+                  borderLeft: '4px solid var(--accent-gold)',
+                  border: '1px solid rgba(255, 215, 0, 0.28)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                    <span style={{ fontWeight: 'bold', fontSize: '15px', color: 'var(--accent-gold)' }}>
+                      ✨ {t('muhurthamWindow', settings.language) || 'Subha Muhurtham Window'}
+                    </span>
+                    <span style={{
+                      fontSize: '11.5px',
+                      padding: '3px 8px',
+                      borderRadius: '12px',
+                      fontWeight: 'bold',
+                      backgroundColor: (data.isPurattasiOrAadi || data.isTheiPirai) ? 'rgba(237, 108, 2, 0.15)' : 'rgba(76, 175, 80, 0.2)',
+                      color: (data.isPurattasiOrAadi || data.isTheiPirai) ? '#e65100' : '#2e7d32'
+                    }}>
+                      {data.isPurattasiOrAadi 
+                        ? `⚠️ ${t('purattasiAadiCaution', settings.language)}`
+                        : (data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', settings.language)}` : `✓ ${t('auspicious', settings.language)}`)}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '13.5px', color: 'var(--text-primary)', fontWeight: 'bold' }}>
+                    ⏰ <strong>{t('muhurthamWindow', settings.language)}:</strong> {formatMuhurthamWindow(data.muhurthamWindow, settings.language)}
+                  </div>
+                </div>
+              )}
               {data.abhijitMuhurtham && (
                 <div style={{ marginBottom: '12px', padding: '10px 12px', backgroundColor: 'rgba(255, 215, 0, 0.08)', borderRadius: '8px', borderLeft: '4px solid var(--accent-gold)' }}>
                   <div style={{ fontWeight: 'bold', color: 'var(--accent-gold)', marginBottom: '3px' }}>☀️ {t('abhijitMuhurtham', settings.language)}</div>

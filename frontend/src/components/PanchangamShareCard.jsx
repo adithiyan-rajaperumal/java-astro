@@ -154,9 +154,9 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
         fontSize: '15px',
         fontWeight: 'bold'
       }}>
-        <div style={{ color: data.muhurthamDay ? (data.isTheiPirai ? '#d84315' : '#2e7d32') : '#c62828' }}>
+        <div style={{ color: data.muhurthamDay ? ((data.isPurattasiOrAadi || data.isTheiPirai) ? '#d84315' : '#2e7d32') : '#c62828' }}>
           {data.muhurthamDay 
-            ? '✅ ' + (t('subhaMuhurtham', lang) || t('auspiciousDay', lang)) + (data.muhurthamWindow ? ` (${formatMuhurthamWindow(data.muhurthamWindow, lang)})` : '') + (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', lang)}` : '')
+            ? ((data.isPurattasiOrAadi || data.isTheiPirai) ? '⚠️ ' : '✅ ') + (t('subhaMuhurtham', lang) || t('auspiciousDay', lang)) + (data.isPurattasiOrAadi ? ` ⚠️` : (data.isTheiPirai ? ` ⚠️ ${t('theiPiraiCaution', lang)}` : ''))
             : '❌ ' + t('inauspiciousDay', lang)}
         </div>
 
@@ -260,6 +260,38 @@ export function PanchangamShareCard({ data, currentDate, settings }) {
         <h4 style={{ margin: '0 0 10px', color: '#2e7d32', fontSize: '18px', borderBottom: '1.5px solid #c8e6c9', paddingBottom: '4px' }}>
           🌟 {t('auspicious', lang)}
         </h4>
+
+        {data.muhurthamDay && data.muhurthamWindow && (
+          <div style={{
+            marginBottom: '12px',
+            padding: '10px 14px',
+            backgroundColor: '#fffde7',
+            borderRadius: '8px',
+            borderLeft: '4px solid #fbc02d',
+            border: '1px solid #fff59d'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px', flexWrap: 'wrap', gap: '6px' }}>
+              <span style={{ fontWeight: 'bold', fontSize: '15px', color: '#f57f17' }}>
+                ✨ {t('muhurthamWindow', lang) || 'Subha Muhurtham Window'}
+              </span>
+              <span style={{
+                fontSize: '12px',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                fontWeight: 'bold',
+                backgroundColor: (data.isPurattasiOrAadi || data.isTheiPirai) ? '#ffe0b2' : '#c8e6c9',
+                color: (data.isPurattasiOrAadi || data.isTheiPirai) ? '#e65100' : '#2e7d32'
+              }}>
+                {data.isPurattasiOrAadi 
+                  ? `⚠️ ${t('purattasiAadiCaution', lang)}`
+                  : (data.isTheiPirai ? `⚠️ ${t('theiPiraiCaution', lang)}` : `✓ ${t('auspicious', lang)}`)}
+              </span>
+            </div>
+            <div style={{ fontSize: '14px', color: '#37474f', fontWeight: 'bold' }}>
+              ⏰ <strong>{t('muhurthamWindow', lang)}:</strong> {formatMuhurthamWindow(data.muhurthamWindow, lang)}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '15px' }}>
           {/* Left Column: Nalla Neram + Abhijit Muhurtham + Nakshatra Yogam */}

@@ -147,4 +147,76 @@ public class Panchangam120DaysChennaiValidationTest {
         System.out.println("Vaidhriti Yoga Days: " + vaidhritiCount);
         System.out.println("Subha Muhurtham Days (" + subhaMuhurthamCount + "): " + subhaMuhurthamDates);
     }
+
+    @Test
+    @DisplayName("Compare Chennai vs Vellore Muhurtham Discrepancies")
+    public void testChennaiVsVelloreMuhurthamComparison() {
+        double VELLORE_LAT = 12.9165;
+        double VELLORE_LON = 79.1325;
+        LocalDate startDate = LocalDate.of(2026, 8, 1);
+        int totalDays = 120;
+
+        int diffCount = 0;
+        for (int i = 0; i < totalDays; i++) {
+            LocalDate currentDate = startDate.plusDays(i);
+            PanchangamRequestDTO reqChennai = new PanchangamRequestDTO(
+                currentDate.toString(), CHENNAI_LAT, CHENNAI_LON, "LAHIRI", "ta"
+            );
+            PanchangamRequestDTO reqVellore = new PanchangamRequestDTO(
+                currentDate.toString(), VELLORE_LAT, VELLORE_LON, "LAHIRI", "ta"
+            );
+
+            DailyPanchangamDTO ch = dailyPanchangamService.calculateDailyPanchangam(reqChennai);
+            DailyPanchangamDTO vel = dailyPanchangamService.calculateDailyPanchangam(reqVellore);
+
+            if (ch.muhurthamDay() != vel.muhurthamDay()) {
+                diffCount++;
+                System.out.println("DISCREPANCY on " + currentDate + ":");
+                System.out.println("  Chennai: isMuhurtham=" + ch.muhurthamDay() + " (Sunrise=" + ch.sunrise() + ", Thithi=" + ch.thithi().name() + " (" + ch.thithi().number() + "), Nakshatra=" + ch.nakshatra().name() + " (" + ch.nakshatra().number() + "), Netram=" + ch.netram() + ", Jeevan=" + ch.jeevan() + ", Window=" + ch.muhurthamWindow() + ")");
+                System.out.println("  Vellore: isMuhurtham=" + vel.muhurthamDay() + " (Sunrise=" + vel.sunrise() + ", Thithi=" + vel.thithi().name() + " (" + vel.thithi().number() + "), Nakshatra=" + vel.nakshatra().name() + " (" + vel.nakshatra().number() + "), Netram=" + vel.netram() + ", Jeevan=" + vel.jeevan() + ", Window=" + vel.muhurthamWindow() + ")");
+            }
+        }
+        System.out.println("Total Chennai vs Vellore Muhurtham discrepancies: " + diffCount);
+        assertEquals(0, diffCount, "Expected 0 Chennai vs Vellore Subha Muhurtham discrepancies across 120 days");
+    }
+
+    @Test
+    @DisplayName("Verify authentic Tamil Muhurtham dates in Avani, Aippasi, and Karthigai")
+    public void testAuthenticTamilMuhurthamDates() {
+        // Avani authentic Muhurthams
+        DailyPanchangamDTO avaniMula = dailyPanchangamService.calculateDailyPanchangam(
+            new PanchangamRequestDTO("2026-08-23", CHENNAI_LAT, CHENNAI_LON, "LAHIRI", "ta")
+        );
+        assertTrue(avaniMula.muhurthamDay(), "2026-08-23 (Avani 6, Mula Nakshatra) must be a Subha Muhurtham day");
+
+        DailyPanchangamDTO avaniUttaraBhadra = dailyPanchangamService.calculateDailyPanchangam(
+            new PanchangamRequestDTO("2026-08-30", CHENNAI_LAT, CHENNAI_LON, "LAHIRI", "ta")
+        );
+        assertTrue(avaniUttaraBhadra.muhurthamDay(), "2026-08-30 (Avani 13, Uttara Bhadrapada) must be a Subha Muhurtham day");
+
+        DailyPanchangamDTO avaniRevati = dailyPanchangamService.calculateDailyPanchangam(
+            new PanchangamRequestDTO("2026-08-31", CHENNAI_LAT, CHENNAI_LON, "LAHIRI", "ta")
+        );
+        assertTrue(avaniRevati.muhurthamDay(), "2026-08-31 (Avani 14, Revati) must be a Subha Muhurtham day");
+
+        // Aippasi & Karthigai authentic Muhurthams
+        DailyPanchangamDTO aippasiPushya = dailyPanchangamService.calculateDailyPanchangam(
+            new PanchangamRequestDTO("2026-11-01", CHENNAI_LAT, CHENNAI_LON, "LAHIRI", "ta")
+        );
+        assertTrue(aippasiPushya.muhurthamDay(), "2026-11-01 (Aippasi 15, Pushya) must be a Subha Muhurtham day");
+
+        DailyPanchangamDTO karthigaiUttaraBhadra = dailyPanchangamService.calculateDailyPanchangam(
+            new PanchangamRequestDTO("2026-11-20", CHENNAI_LAT, CHENNAI_LON, "LAHIRI", "ta")
+        );
+        assertTrue(karthigaiUttaraBhadra.muhurthamDay(), "2026-11-20 (Karthigai 4, Uttara Bhadrapada) must be a Subha Muhurtham day");
+
+        // Purattasi month days show as Subha Muhurtham with isPurattasiOrAadi caution flag
+        DailyPanchangamDTO purattasiSample = dailyPanchangamService.calculateDailyPanchangam(
+            new PanchangamRequestDTO("2026-10-01", CHENNAI_LAT, CHENNAI_LON, "LAHIRI", "ta")
+        );
+        assertTrue(purattasiSample.muhurthamDay(), "Genuinely auspicious day in Purattasi should be marked as Subha Muhurtham with caution");
+        assertTrue(purattasiSample.isPurattasiOrAadi(), "Purattasi month day must have isPurattasiOrAadi=true");
+    }
 }
+
+
