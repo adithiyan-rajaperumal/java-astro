@@ -865,15 +865,15 @@ public class GeminiPredictionServiceTest {
 
     @Test
     public void testModelDefaultAndMultiKeyFailoverProperties() {
-        assertEquals("gemini-3.7-flash", geminiProperties.getModel());
-        assertEquals("gemini-flash-lite-latest", geminiProperties.getFallbackModel());
+        assertEquals("gemini-3.8-flash", geminiProperties.getModel());
+        assertEquals("gemini-3.7-flash", geminiProperties.getFallbackModel());
 
         List<String> activeModels = geminiProperties.getResolvedModels();
         assertTrue(activeModels.size() >= 4);
-        assertEquals("gemini-3.7-flash", activeModels.get(0));
-        assertEquals("gemini-flash-lite-latest", activeModels.get(1));
+        assertEquals("gemini-3.8-flash", activeModels.get(0));
+        assertEquals("gemini-3.7-flash", activeModels.get(1));
         assertEquals("gemini-3.6-flash", activeModels.get(2));
-        assertEquals("gemini-3.1-flash-lite", activeModels.get(3));
+        assertEquals("gemini-flash-lite-latest", activeModels.get(3));
 
         org.vedic.astro.config.GeminiProperties testProps = new org.vedic.astro.config.GeminiProperties();
         testProps.setApiKey("primary-key-123");
@@ -889,16 +889,16 @@ public class GeminiPredictionServiceTest {
     @Test
     public void testFallbackModelsChainDeduplication() {
         org.vedic.astro.config.GeminiProperties testProps = new org.vedic.astro.config.GeminiProperties();
-        testProps.setModel("gemini-3.7-flash");
-        testProps.setFallbackModel("gemini-flash-lite-latest");
-        testProps.setFallbackModels("gemini-flash-lite-latest, gemini-3.6-flash, gemini-3.1-flash-lite, gemini-3.7-flash");
+        testProps.setModel("gemini-3.8-flash");
+        testProps.setFallbackModel("gemini-3.7-flash");
+        testProps.setFallbackModels("gemini-3.7-flash, gemini-3.6-flash, gemini-flash-lite-latest, gemini-3.8-flash");
 
         List<String> resolved = testProps.getResolvedModels();
         assertEquals(4, resolved.size());
-        assertEquals("gemini-3.7-flash", resolved.get(0));
-        assertEquals("gemini-flash-lite-latest", resolved.get(1));
+        assertEquals("gemini-3.8-flash", resolved.get(0));
+        assertEquals("gemini-3.7-flash", resolved.get(1));
         assertEquals("gemini-3.6-flash", resolved.get(2));
-        assertEquals("gemini-3.1-flash-lite", resolved.get(3));
+        assertEquals("gemini-flash-lite-latest", resolved.get(3));
     }
 
     @Test

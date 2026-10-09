@@ -18,11 +18,11 @@ public class GeminiProperties {
     private boolean dailyBalanEnabled = true;
     private boolean matchingEnabled = true;
     private boolean pdfPredictionsEnabled = true;
-    private String model = "gemini-3.7-flash";
-    private String fallbackModel = "gemini-flash-lite-latest";
-    private String fallbackModels = "gemini-flash-lite-latest,gemini-3.6-flash,gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.8-flash";
+    private String model = "gemini-3.8-flash";
+    private String fallbackModel = "gemini-3.7-flash";
+    private String fallbackModels = "gemini-3.7-flash,gemini-3.6-flash,gemini-flash-lite-latest,gemini-3.1-flash-lite";
     private int connectTimeoutMs = 10000;
-    private int readTimeoutMs = 45000;
+    private int readTimeoutMs = 90000;
     private double temperature = 0.4;
     private int thinkingBudget = 1024;
     private Integer maxOutputTokens; // null means do not set, let API default
@@ -46,7 +46,7 @@ public class GeminiProperties {
             }
         }
         if (models.isEmpty()) {
-            models.add("gemini-3.7-flash");
+            models.add("gemini-3.8-flash");
         }
         return models;
     }

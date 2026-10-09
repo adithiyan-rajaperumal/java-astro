@@ -813,7 +813,7 @@ public class GeminiPredictionService {
                 int completionTokens = usageNode.path("candidatesTokenCount").asInt(0);
                 int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
 
-                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
+                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.8-flash");
                 double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
                 double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
 
@@ -898,7 +898,7 @@ public class GeminiPredictionService {
                 int completionTokens = usageNode.path("candidatesTokenCount").asInt(0);
                 int totalTokens = usageNode.path("totalTokenCount").asInt(promptTokens + completionTokens);
 
-                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
+                String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.8-flash");
                 double promptRate = model.contains("pro") ? 0.00000125 : 0.00000010;
                 double completionRate = model.contains("pro") ? 0.00000500 : 0.00000040;
 
@@ -1861,7 +1861,7 @@ public class GeminiPredictionService {
                     int candidatesTokens = usage.path("candidatesTokenCount").asInt(0);
                     int totalTokens = usage.path("totalTokenCount").asInt(promptTokens + candidatesTokens);
 
-                    String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.7-flash");
+                    String model = modelUsed != null ? modelUsed : (geminiProperties.getModel() != null ? geminiProperties.getModel() : "gemini-3.8-flash");
                     double costUsd = ((promptTokens / 1_000_000.0) * 0.15) + ((candidatesTokens / 1_000_000.0) * 0.60);
                     double costInr = costUsd * 86.50;
 
