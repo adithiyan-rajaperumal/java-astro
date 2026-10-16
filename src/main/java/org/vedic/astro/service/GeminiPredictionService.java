@@ -40,7 +40,7 @@ public class GeminiPredictionService {
             int connectTimeout = (geminiProperties != null && geminiProperties.getConnectTimeoutMs() > 0)
                     ? geminiProperties.getConnectTimeoutMs() : 10000;
             int readTimeout = (geminiProperties != null && geminiProperties.getReadTimeoutMs() > 0)
-                    ? geminiProperties.getReadTimeoutMs() : 45000;
+                    ? geminiProperties.getReadTimeoutMs() : 120000;
             org.springframework.http.client.SimpleClientHttpRequestFactory factory =
                     new org.springframework.http.client.SimpleClientHttpRequestFactory();
             factory.setConnectTimeout(connectTimeout);
